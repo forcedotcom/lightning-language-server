@@ -8,8 +8,6 @@ import {
     InitializeResult,
     TextDocumentPositionParams,
     CompletionItem,
-    SymbolInformation,
-    DocumentSymbolParams,
     Files,
 } from 'vscode-languageserver';
 
