@@ -1,9 +1,10 @@
 {
   "name": "raptor-language-server",
   "version": "0.0.1",
+  "description": "Language Server Protocol implementation for Raptor projects",
   "main": "lib/server.js",
   "typings": "lib/server.d.ts",
-  "repository": "git@git.soma.salesforce.com:p-dartus/raptor-language-server.git",
+  "repository": "git@git.soma.salesforce.com:raptor/raptor-language-server.git",
   "author": "Pierre-Marie <p.dartus@salesforce.com>",
   "license": "MIT",
   "scripts": {
@@ -27,6 +28,9 @@
     "ts-jest": "^20.0.5",
     "tslint": "^5.4.3",
     "typescript": "^2.3.4"
+  },
+  "publishConfig": {
+    "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
   },
   "jest": {
     "transform": {
