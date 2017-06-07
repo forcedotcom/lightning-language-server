@@ -1,0 +1,21 @@
+{
+  "name": "raptor-language-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@git.soma.salesforce.com:p-dartus/raptor-language-server.git",
+  "author": "Pierre-Marie <p.dartus@salesforce.com>",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf lib",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "parse5": "^3.0.2",
+    "raptor-template-compiler": "../raptor/packages/raptor-template-compiler",
+    "vscode-languageserver": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.28",
+    "typescript": "^2.3.4"
+  }
+}
