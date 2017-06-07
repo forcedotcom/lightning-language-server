@@ -9,10 +9,3 @@ export function getExtension(textDocument: TextDocument): string {
 export function isTemplate(document: TextDocument): boolean {
     return getExtension(document) !== '.html'
 }
-
-export function toRange(textDocument: TextDocument, start: number, length: number): Range {
-    return Range.create(
-        textDocument.positionAt(start),
-        textDocument.positionAt(start + length),
-    )
-}

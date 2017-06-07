@@ -5,20 +5,23 @@ const treeAdapter = treeAdapters.default;
 
 export default function findSymbols(document: TextDocument): SymbolInformation[] {
     const symbols: SymbolInformation[] = [];
-    const AST = parseFragment(document.getText());
+    const AST = parseFragment(document.getText(), {
+        locationInfo: true,
+        treeAdapter,
+    });
 
     findSymbolsRecursively(document, AST, symbols);
 
     return symbols;
 }
 
-function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols: SymbolInformation[]): void {
+function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols: SymbolInformation[]): void {    
     if (!node || !treeAdapter.isElementNode(node)) {
         return;
     }
 
     const tagName = treeAdapter.getTagName(node);
-    if (tagName.includes('-')) {
+    if (tagName && tagName.includes('-')) {
         const parse5Location = (node as AST.Default.Element).__location!;
         const location = Location.create(
             document.uri,
