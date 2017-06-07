@@ -1,6 +1,6 @@
 {
   "name": "raptor-language-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Language Server Protocol implementation for Raptor projects",
   "main": "lib/server.js",
   "typings": "lib/server.d.ts",
