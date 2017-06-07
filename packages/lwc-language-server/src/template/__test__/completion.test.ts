@@ -5,13 +5,20 @@ function createAutocomplite(content: string) {
     const [before, after] = content.split('|');
 
     return {
-        document: TextDocument.create('test://test.html', 'html', 0, before + after),
+        document: TextDocument.create(
+            'test://test.html',
+            'html',
+            0,
+            before + after,
+        ),
         position: Position.create(0, before.length),
     };
 }
 
 it('in a tag body', () => {
-    const { document, position } = createAutocomplite('<template> | </template>');
+    const { document, position } = createAutocomplite(
+        '<template> | </template>',
+    );
     const items = templateCompletion(document, position);
     expect(items).toHaveLength(0);
 });

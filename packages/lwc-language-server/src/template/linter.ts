@@ -1,5 +1,10 @@
 import templateCompiler from 'raptor-template-compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
+import {
+    TextDocument,
+    Diagnostic,
+    DiagnosticSeverity,
+    Range,
+} from 'vscode-languageserver';
 
 const LEVEL_MAPPING = {
     info: DiagnosticSeverity.Information,
@@ -19,7 +24,11 @@ export default function lint(document: TextDocument): Diagnostic[] {
     }));
 }
 
-function toRange(textDocument: TextDocument, start: number, length: number): Range {
+function toRange(
+    textDocument: TextDocument,
+    start: number,
+    length: number,
+): Range {
     return Range.create(
         textDocument.positionAt(start),
         textDocument.positionAt(start + length),

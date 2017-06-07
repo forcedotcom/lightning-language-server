@@ -1,9 +1,17 @@
 import { parseFragment, treeAdapters, AST } from 'parse5';
-import { TextDocument, SymbolInformation, SymbolKind, Location, Range } from 'vscode-languageserver';
+import {
+    TextDocument,
+    SymbolInformation,
+    SymbolKind,
+    Location,
+    Range,
+} from 'vscode-languageserver';
 
 const treeAdapter = treeAdapters.default;
 
-export default function findSymbols(document: TextDocument): SymbolInformation[] {
+export default function findSymbols(
+    document: TextDocument,
+): SymbolInformation[] {
     const symbols: SymbolInformation[] = [];
     const AST = parseFragment(document.getText(), {
         locationInfo: true,
@@ -15,7 +23,11 @@ export default function findSymbols(document: TextDocument): SymbolInformation[]
     return symbols;
 }
 
-function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols: SymbolInformation[]): void {
+function findSymbolsRecursively(
+    document: TextDocument,
+    node: AST.Node,
+    symbols: SymbolInformation[],
+): void {
     if (!node || !treeAdapter.isElementNode(node)) {
         return;
     }
@@ -45,7 +57,7 @@ function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols:
 }
 
 function getChildren(node: AST.ParentNode): AST.Node[] {
-    return treeAdapter.getTagName(node) === 'template' ?
-        getChildren(treeAdapter.getTemplateContent(node)) :
-        treeAdapter.getChildNodes(node);
+    return treeAdapter.getTagName(node) === 'template'
+        ? getChildren(treeAdapter.getTemplateContent(node))
+        : treeAdapter.getChildNodes(node);
 }

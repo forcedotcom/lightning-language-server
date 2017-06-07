@@ -1,7 +1,16 @@
 import {
-    IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments,
-    InitializeParams, InitializeResult, TextDocumentPositionParams,
-    CompletionItem, SymbolInformation, DocumentSymbolParams, Files,
+    IPCMessageReader,
+    IPCMessageWriter,
+    createConnection,
+    IConnection,
+    TextDocuments,
+    InitializeParams,
+    InitializeResult,
+    TextDocumentPositionParams,
+    CompletionItem,
+    SymbolInformation,
+    DocumentSymbolParams,
+    Files,
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
@@ -11,7 +20,10 @@ import templateCompletionProvider from './template/completion';
 import { isTemplate } from './utils';
 
 // Establish a new connection for the server
-const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+const connection: IConnection = createConnection(
+    new IPCMessageReader(process),
+    new IPCMessageWriter(process),
+);
 
 // Redirect the errors and warnings
 console.log = connection.console.log.bind(connection.console);
@@ -51,7 +63,7 @@ documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
-documents.onDidChangeContent((change) => {
+documents.onDidChangeContent(change => {
     const { document } = change;
     if (isTemplate(document)) {
         const diagnostics = templateLinter(document);
@@ -59,15 +71,24 @@ documents.onDidChangeContent((change) => {
     }
 });
 
-connection.onDocumentSymbol((documentSymbolParams: DocumentSymbolParams): SymbolInformation[] => {
-    const document = documents.get(documentSymbolParams.textDocument.uri);
-    return isTemplate(document) ? templateSymbolsProvider(document) : [];
-});
+connection.onDocumentSymbol(
+    (documentSymbolParams: DocumentSymbolParams): SymbolInformation[] => {
+        const document = documents.get(documentSymbolParams.textDocument.uri);
+        return isTemplate(document) ? templateSymbolsProvider(document) : [];
+    },
+);
 
-connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    const document = documents.get(textDocumentPosition.textDocument.uri);
-    return isTemplate(document) ? templateCompletionProvider(document, textDocumentPosition.position) : [];
-});
+connection.onCompletion(
+    (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        return isTemplate(document)
+            ? templateCompletionProvider(
+                  document,
+                  textDocumentPosition.position,
+              )
+            : [];
+    },
+);
 
 // Listen on the connection
 connection.listen();
