@@ -15,7 +15,7 @@ export default function findSymbols(document: TextDocument): SymbolInformation[]
     return symbols;
 }
 
-function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols: SymbolInformation[]): void {    
+function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols: SymbolInformation[]): void {
     if (!node || !treeAdapter.isElementNode(node)) {
         return;
     }
@@ -28,8 +28,8 @@ function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols:
             Range.create(
                 document.positionAt(parse5Location.startOffset),
                 document.positionAt(parse5Location.endOffset),
-            )
-        )
+            ),
+        );
 
         symbols.push({
             name: tagName,
@@ -39,7 +39,7 @@ function findSymbolsRecursively(document: TextDocument, node: AST.Node, symbols:
         });
     }
 
-    for (let child of getChildren(node)) {
+    for (const child of getChildren(node)) {
         findSymbolsRecursively(document, child, symbols);
     }
 }

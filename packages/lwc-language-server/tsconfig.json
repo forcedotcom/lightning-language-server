@@ -12,6 +12,7 @@
         "strictNullChecks": true,
         "noImplicitAny": true,
         "noUnusedParameters": true,
+        "noUnusedLocals": true,
 
         "pretty": true,
         "declaration": true

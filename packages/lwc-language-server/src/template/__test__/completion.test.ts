@@ -7,8 +7,8 @@ function createAutocomplite(content: string) {
     return {
         document: TextDocument.create('test://test.html', 'html', 0, before + after),
         position: Position.create(0, before.length),
-    }
-} 
+    };
+}
 
 it('in a tag body', () => {
     const { document, position } = createAutocomplite('<template> | </template>');

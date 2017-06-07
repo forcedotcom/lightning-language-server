@@ -16,6 +16,6 @@ it('returns a list containing raptor components', () => {
     const symbols = templateSymbolsProvider(document);
     expect(symbols).toMatchObject([
         { name: 'foo-bar' },
-        { name: 'foo-baz' }
-    ])
+        { name: 'foo-baz' },
+    ]);
 });

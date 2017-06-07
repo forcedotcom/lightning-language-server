@@ -1,10 +1,7 @@
 import {
-    IPCMessageReader, IPCMessageWriter,
-    createConnection, IConnection, TextDocumentSyncKind,
-    TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
+    IPCMessageReader, IPCMessageWriter, createConnection, IConnection, TextDocuments,
     InitializeParams, InitializeResult, TextDocumentPositionParams,
-    CompletionItem, CompletionItemKind, Range, InsertTextFormat,
-    SymbolInformation, DocumentSymbolParams, Files
+    CompletionItem, SymbolInformation, DocumentSymbolParams, Files,
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
@@ -14,14 +11,14 @@ import templateCompletionProvider from './template/completion';
 import { isTemplate } from './utils';
 
 // Establish a new connection for the server
-let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
 // Redirect the errors and warnings
 console.log = connection.console.log.bind(connection.console);
 console.error = connection.console.error.bind(connection.console);
 
 // Create a document namager supporting only full document sync
-let documents: TextDocuments = new TextDocuments();
+const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let workspaceRoot: string;
@@ -36,17 +33,17 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 
     workspaceRoot = root;
     console.log(`Starting raptor language server at ${workspaceRoot}`);
-    
+
     // Return the language server capabilities
     return {
         capabilities: {
             textDocumentSync: documents.syncKind,
             documentSymbolProvider: true,
             completionProvider: {
-                resolveProvider: true
-            }
-        }
-    }
+                resolveProvider: true,
+            },
+        },
+    };
 });
 
 // Make sure to clear all the diagnostics when the a document get closed

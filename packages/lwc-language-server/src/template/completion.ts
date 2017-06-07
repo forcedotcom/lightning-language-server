@@ -11,7 +11,7 @@ const RAPTOR_COMPLETION_ITEMS: CompletionItem[] = [
     new RaptorCompletionItem('for:each', CompletionItemKind.Function),
     new RaptorCompletionItem('if:true', CompletionItemKind.Function),
     new RaptorCompletionItem('if:false', CompletionItemKind.Function),
-]
+];
 
 export default function doCompilation(document: TextDocument, position: Position): CompletionItem[] {
     return isPostionInTag(document, position) ? RAPTOR_COMPLETION_ITEMS : [];
@@ -20,7 +20,7 @@ export default function doCompilation(document: TextDocument, position: Position
 function isPostionInTag(document: TextDocument, position: Position): boolean {
     const source = document.getText();
     let offset = document.offsetAt(position);
-    
+
     if (source.charAt(offset) === '>') {
       // handle case where the cursor is at the closing bracket location in the tag
       return true;

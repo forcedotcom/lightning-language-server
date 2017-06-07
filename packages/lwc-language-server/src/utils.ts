@@ -1,5 +1,5 @@
 import { extname } from 'path';
-import { TextDocument, Files, Range, Position } from 'vscode-languageserver';
+import { TextDocument, Files } from 'vscode-languageserver';
 
 export function getExtension(textDocument: TextDocument): string {
     const filePath = Files.uriToFilePath(textDocument.uri);
@@ -7,5 +7,5 @@ export function getExtension(textDocument: TextDocument): string {
 }
 
 export function isTemplate(document: TextDocument): boolean {
-    return getExtension(document) !== '.html'
+    return getExtension(document) !== '.html';
 }
