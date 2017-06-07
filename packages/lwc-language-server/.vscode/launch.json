@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "attach",
-            "port": 6004,
+            "port": 6009,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceRoot}/lib/**"

@@ -14,7 +14,6 @@ import {
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
-import templateSymbolsProvider from './template/symbols';
 import templateCompletionProvider from './template/completion';
 
 import { isTemplate } from './utils';
@@ -24,10 +23,6 @@ const connection: IConnection = createConnection(
     new IPCMessageReader(process),
     new IPCMessageWriter(process),
 );
-
-// Redirect the errors and warnings
-console.log = connection.console.log.bind(connection.console);
-console.error = connection.console.error.bind(connection.console);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -40,17 +35,17 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     // Early exit if no workspace is opened
     const root = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!root) {
+        console.log(`No workspace found`);
         return { capabilities: {} };
     }
 
     workspaceRoot = root;
-    console.log(`Starting raptor language server at ${workspaceRoot}`);
+    console.log(`Starting language server at ${workspaceRoot}`);
 
     // Return the language server capabilities
     return {
         capabilities: {
             textDocumentSync: documents.syncKind,
-            documentSymbolProvider: true,
             completionProvider: {
                 resolveProvider: true,
             },
@@ -70,13 +65,6 @@ documents.onDidChangeContent(change => {
         connection.sendDiagnostics({ uri: document.uri, diagnostics });
     }
 });
-
-connection.onDocumentSymbol(
-    (documentSymbolParams: DocumentSymbolParams): SymbolInformation[] => {
-        const document = documents.get(documentSymbolParams.textDocument.uri);
-        return isTemplate(document) ? templateSymbolsProvider(document) : [];
-    },
-);
 
 connection.onCompletion(
     (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {

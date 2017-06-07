@@ -9,14 +9,14 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "tsc -p .",
-    "prepublish": "npm run clean && npm run build",
+    "prepare": "npm run clean && npm run build",
     "test": "jest",
     "lint": "tslint src/**",
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
   },
   "dependencies": {
     "parse5": "^3.0.2",
-    "raptor-template-compiler": "../raptor/packages/raptor-template-compiler",
+    "raptor-template-compiler": "^0.10.5",
     "vscode-languageserver": "^3.2.2"
   },
   "devDependencies": {
