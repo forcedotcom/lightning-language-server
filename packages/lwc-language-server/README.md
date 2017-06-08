@@ -9,4 +9,8 @@ This project is an implementation of the [Language Server Protocol](https://gith
 
 ## Editor Integrations
 
-* VSCode
+* [VS Code](https://git.soma.salesforce.com/raptor/raptor-vscode)
+
+## Contributing
+
+See [CONTRIBUTING.md](/CONTRIBUTING.md)
