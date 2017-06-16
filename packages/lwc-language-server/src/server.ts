@@ -1,6 +1,4 @@
 import {
-    IPCMessageReader,
-    IPCMessageWriter,
     createConnection,
     IConnection,
     TextDocuments,
@@ -16,11 +14,9 @@ import templateCompletionProvider from './template/completion';
 
 import { isTemplate } from './utils';
 
-// Establish a new connection for the server
-const connection: IConnection = createConnection(
-    new IPCMessageReader(process),
-    new IPCMessageWriter(process),
-);
+// Create a standard connection and let the caller decide the strategy
+// Availalble startegies: '--node-ipc', '--stdio' or '--socket={number}'
+const connection: IConnection = createConnection();
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
