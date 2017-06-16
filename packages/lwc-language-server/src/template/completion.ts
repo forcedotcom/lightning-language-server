@@ -11,6 +11,8 @@ class RaptorCompletionItem implements CompletionItem {
 
 const RAPTOR_COMPLETION_ITEMS: CompletionItem[] = [
     new RaptorCompletionItem('for:each', CompletionItemKind.Function),
+    new RaptorCompletionItem('for:item', CompletionItemKind.Function),
+    new RaptorCompletionItem('for:index', CompletionItemKind.Function),
     new RaptorCompletionItem('if:true', CompletionItemKind.Function),
     new RaptorCompletionItem('if:false', CompletionItemKind.Function),
 ];

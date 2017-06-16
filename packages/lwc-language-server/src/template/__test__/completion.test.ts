@@ -26,5 +26,5 @@ it('in a tag body', () => {
 it('in a element start tag', () => {
     const { document, position } = createAutocomplite('<template><div | ');
     const items = templateCompletion(document, position);
-    expect(items).toHaveLength(3);
+    expect(items).toHaveLength(5);
 });
