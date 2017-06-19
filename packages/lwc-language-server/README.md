@@ -4,7 +4,8 @@ This project is an implementation of the [Language Server Protocol](https://gith
 
 ## Features
 
-* Component template linting
+* Component template validation
+* Basic directive autocompletion in the template
 * ... more to come
 
 ## Editor Integrations
