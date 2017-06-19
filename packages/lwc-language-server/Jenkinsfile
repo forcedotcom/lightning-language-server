@@ -1,0 +1,27 @@
+pipeline {
+    agent { label 'raptor' }
+    stages {
+        stage('Init') {
+          steps {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'sfci-nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD']]) {
+                sh "npm-config ${NEXUS_USERNAME} ${NEXUS_PASSWORD}"
+            }
+
+            sh "npm install"
+          }
+        }
+
+        stage("Static Analysis") {
+          steps {
+            sh "npm run lint"
+            sh "npm run build"
+          }
+        }
+
+        stage("Test") {
+          steps {
+            sh "npm test"
+          }
+        }
+    }
+}
