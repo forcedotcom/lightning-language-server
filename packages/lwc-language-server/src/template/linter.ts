@@ -14,7 +14,7 @@ const LEVEL_MAPPING = {
 
 export default function lint(document: TextDocument): Diagnostic[] {
     const source = document.getText();
-    const { warnings } = templateCompiler(source);
+    const { warnings } = templateCompiler(source, {});
 
     return warnings.map(warning => ({
         range: toRange(document, warning.start, warning.length),

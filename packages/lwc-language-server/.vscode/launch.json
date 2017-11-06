@@ -5,13 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Attach to LS",
             "type": "node",
             "request": "attach",
             "port": 6009,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceRoot}/lib/**"
-            ]
+            ],
+            "protocol": "inspector"
         }
     ]
 }

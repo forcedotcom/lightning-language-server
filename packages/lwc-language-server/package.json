@@ -16,18 +16,19 @@
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
   },
   "dependencies": {
-    "raptor-template-compiler": "^0.11.1",
+    "@types/babel-types": "^6.25.1",
+    "raptor-template-compiler": "^0.16.0",
     "vscode-languageserver": "^3.2.2"
   },
   "devDependencies": {
-    "@types/jest": "^19.2.4",
-    "@types/node": "^7.0.28",
+    "@types/jest": "^21.1.5",
+    "@types/node": "^8.0.49",
     "babel-types": "^6.25.0",
-    "jest": "^20.0.4",
+    "jest": "^21.1.5",
     "prettier": "^1.4.2",
-    "ts-jest": "^20.0.5",
+    "ts-jest": "^21.1.4",
     "tslint": "^5.4.3",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.3"
   },
   "publishConfig": {
     "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"

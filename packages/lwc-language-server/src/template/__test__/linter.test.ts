@@ -2,7 +2,7 @@ import { TextDocument } from 'vscode-languageserver';
 import templateLinter from '../linter';
 
 it('returns a list of all the template compilation errors', () => {
-    const content = `<template><template if:true="invalidExpression">{Math.random()}<template></template>`;
+    const content = `<template><template if:true="invalidExpression">{Math.random()}</template></template>`;
     const document = TextDocument.create(
         'test://test.html',
         'html',
