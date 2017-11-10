@@ -5,6 +5,7 @@ import {
     DiagnosticSeverity,
     Range,
 } from 'vscode-languageserver';
+import { DIAGNOSTIC_SOURCE } from '../constants';
 
 const LEVEL_MAPPING = {
     info: DiagnosticSeverity.Information,
@@ -20,7 +21,7 @@ export default function lint(document: TextDocument): Diagnostic[] {
         range: toRange(document, warning.start, warning.length),
         message: warning.message,
         severity: LEVEL_MAPPING[warning.level],
-        source: 'raptor',
+        source: DIAGNOSTIC_SOURCE,
     }));
 }
 

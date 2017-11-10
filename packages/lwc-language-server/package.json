@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@types/babel-types": "^6.25.1",
-    "raptor-template-compiler": "^0.16.0",
+    "raptor-compiler": "^0.16.1",
     "vscode-languageserver": "^3.2.2"
   },
   "devDependencies": {

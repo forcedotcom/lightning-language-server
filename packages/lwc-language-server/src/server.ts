@@ -10,9 +10,10 @@ import {
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
+import javascriptLinter from './javascript/linter';
 import templateCompletionProvider from './template/completion';
 
-import { isTemplate } from './utils';
+import { isTemplate, isJavascript } from './utils';
 
 // Create a standard connection and let the caller decide the strategy
 // Availalble startegies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -47,7 +48,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     };
 });
 
-// Make sure to clear all the diagnostics when the a document get closed
+// Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
@@ -56,6 +57,9 @@ documents.onDidChangeContent(change => {
     const { document } = change;
     if (isTemplate(document)) {
         const diagnostics = templateLinter(document);
+        connection.sendDiagnostics({ uri: document.uri, diagnostics });
+    } else if (isJavascript(document)) {
+        const diagnostics = javascriptLinter(document);
         connection.sendDiagnostics({ uri: document.uri, diagnostics });
     }
 });
