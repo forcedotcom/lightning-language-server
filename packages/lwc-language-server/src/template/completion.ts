@@ -80,7 +80,9 @@ export default function doCompilation(
 
     const scanner = createScanner(text, node.start);
 
+    // @ts-ignore: may use in the future
     let currentTag: string;
+    // @ts-ignore: may use in the future
     let currentAttributeName: string;
 
     function collectAttributeNameSuggestions(
