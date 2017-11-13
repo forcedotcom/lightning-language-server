@@ -37,7 +37,7 @@ it('transform(src, id, options) throws exceptions on errors', async () => {
 `;
 
     try {
-        transform(code, 'foo.js', { moduleNamespace: 'x', moduleName: 'foo' });
+        await transform(code, 'foo.js', { moduleNamespace: 'x', moduleName: 'foo' });
         fail("expects exception");
     } catch (err) {
         // verify err has the info we need
@@ -48,7 +48,7 @@ it('transform(src, id, options) throws exceptions on errors', async () => {
     }
 });
 
-it('returns list of javascript compilation errors', () => {
+it('returns list of javascript compilation errors', async () => {
     const content = `
     import { Element } from 'engine';
     export default class Foo extends Element {
@@ -58,7 +58,7 @@ it('returns list of javascript compilation errors', () => {
 
     const document = TextDocument.create('test://foo.js', 'javascript', 0, content);
 
-    const diagnostics = javascriptLinter(document);
+    const diagnostics = await javascriptLinter(document);
 
     expect(diagnostics).toHaveLength(1);
     expect(diagnostics[0].message).toMatch(

@@ -53,13 +53,13 @@ documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
-documents.onDidChangeContent(change => {
+documents.onDidChangeContent(async change => {
     const { document } = change;
     if (isTemplate(document)) {
         const diagnostics = templateLinter(document);
         connection.sendDiagnostics({ uri: document.uri, diagnostics });
     } else if (isJavascript(document)) {
-        const diagnostics = javascriptLinter(document);
+        const diagnostics = await javascriptLinter(document);
         connection.sendDiagnostics({ uri: document.uri, diagnostics });
     }
 });

@@ -2,12 +2,12 @@ import { transform } from 'raptor-compiler';
 import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 
-export default function lint(document: TextDocument): Diagnostic[] {
+export default async function lint(document: TextDocument): Promise<Diagnostic[]> {
     const source = document.getText();
 
     try {
         // TODO: need proper id/moduleNamespace/moduleName?
-        transform(source, "foo.js", { moduleNamespace: 'x', moduleName: 'foo' });
+        await transform(source, "foo.js", { moduleNamespace: 'x', moduleName: 'foo' });
     } catch (err) {
         return [toDiagnostic(err)];
     }
