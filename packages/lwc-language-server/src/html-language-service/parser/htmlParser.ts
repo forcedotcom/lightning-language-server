@@ -64,6 +64,7 @@ export function parse(text: string): HTMLDocument {
 	let htmlDocument = new Node(0, text.length, [], null);
 	let curr = htmlDocument;
 	let endTagStart: number = -1;
+	let attributes;
 	let pendingAttribute: string = null;
 	let token = scanner.scan();
 	while (token !== TokenType.EOS) {
@@ -112,8 +113,8 @@ export function parse(text: string): HTMLDocument {
 				}
 				break;
 			case TokenType.AttributeName:
-				let attributeName = pendingAttribute = scanner.getTokenText();
-				let attributes = curr.attributes;
+				//let attributeName = pendingAttribute = scanner.getTokenText();
+				attributes = curr.attributes;
 				if (!attributes) {
 					curr.attributes = attributes = {};
 				}

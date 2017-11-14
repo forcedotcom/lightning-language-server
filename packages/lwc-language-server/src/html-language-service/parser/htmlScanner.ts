@@ -203,7 +203,7 @@ export interface Scanner {
 	getScannerState(): ScannerState;
 }
 
-const htmlScriptContents = {
+const htmlScriptContents:any = {
 	'text/x-handlebars-template': true
 };
 

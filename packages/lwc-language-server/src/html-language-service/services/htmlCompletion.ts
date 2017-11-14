@@ -144,7 +144,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 			replaceEnd++;
 		}
 		let range = getReplaceRange(nameStart, replaceEnd);
-		let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '="$1"';
+		let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '=$1';
 		let tag = currentTag.toLowerCase();
 		tagProviders.forEach(provider => {
 			provider.collectAttributes(tag, (attribute, type) => {
@@ -335,9 +335,9 @@ function isWhiteSpace(s: string): boolean {
 	return /^\s*$/.test(s);
 }
 
-function isWhiteSpaceOrQuote(s: string): boolean {
-	return /^[\s"]*$/.test(s);
-}
+//function isWhiteSpaceOrQuote(s: string): boolean {
+//	return /^[\s"]*$/.test(s);
+//}
 
 function isFollowedBy(s: string, offset: number, intialState: ScannerState, expectedToken: TokenType) {
 	let scanner = createScanner(s, offset, intialState);

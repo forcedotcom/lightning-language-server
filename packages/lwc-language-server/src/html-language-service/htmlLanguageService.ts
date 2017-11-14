@@ -6,12 +6,7 @@
 
 import {createScanner} from './parser/htmlScanner';
 import {parse} from './parser/htmlParser';
-import {doComplete, doTagComplete} from './services/htmlCompletion';
-import {doHover} from './services/htmlHover';
-import {format} from './services/htmlFormatter';
-import {findDocumentLinks} from './services/htmlLinks';
-import {findDocumentHighlights} from './services/htmlHighlighting';
-import {findDocumentSymbols} from './services/htmlSymbolsProvider';
+import {doComplete} from './services/htmlCompletion';
 import {TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink } from 'vscode-languageserver-types';
 
 export {TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink };
@@ -110,13 +105,7 @@ export interface DocumentContext {
 export interface LanguageService {
 	createScanner(input: string): Scanner;
 	parseHTMLDocument(document: TextDocument): HTMLDocument;
-	findDocumentHighlights(document: TextDocument, position: Position, htmlDocument: HTMLDocument): DocumentHighlight[];
 	doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, options?: CompletionConfiguration): CompletionList;
-	doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover;
-	format(document: TextDocument, range: Range, options: HTMLFormatConfiguration): TextEdit[];
-	findDocumentLinks(document: TextDocument, documentContext: DocumentContext): DocumentLink[];
-	findDocumentSymbols(document: TextDocument, htmlDocument: HTMLDocument): SymbolInformation[];
-	doTagComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string;
 }
 
 export function getLanguageService(): LanguageService {
@@ -124,11 +113,5 @@ export function getLanguageService(): LanguageService {
 		createScanner,
 		parseHTMLDocument: document => parse(document.getText()),
 		doComplete,
-		doHover,
-		format,
-		findDocumentHighlights,
-		findDocumentLinks,
-		findDocumentSymbols,
-		doTagComplete
 	};
 }

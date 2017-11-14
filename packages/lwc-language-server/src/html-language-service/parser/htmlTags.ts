@@ -47,7 +47,7 @@ export function isEmptyElement(e: string): boolean {
 
 export interface IHTMLTagProvider {
 	getId(): string;
-	isApplicable(languageId: string);
+	isApplicable(languageId: string): boolean;
 	collectTags(collector: (tag: string, label: string) => void): void;
 	collectAttributes(tag: string, collector: (attribute: string, type: string) => void): void;
 	collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
@@ -510,7 +510,7 @@ export function getAngularTagProvider(): IHTMLTagProvider {
 	return {
 		getId: () => 'angular1',
 		isApplicable: (languageId) => languageId === 'html',
-		collectTags: (collector: (tag: string, label: string) => void) => {
+	collectTags: (/*collector: (tag: string, label: string) => void*/) => {
 			// no extra tags
 		},
 		collectAttributes: (tag: string, collector: (attribute: string, type: string) => void) => {
@@ -528,7 +528,7 @@ export function getAngularTagProvider(): IHTMLTagProvider {
 				collector('data-' + a, null);
 			});
 		},
-		collectValues: (tag: string, attribute: string, collector: (value: string) => void) => {
+		collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
 			// no values
 		}
 	};
