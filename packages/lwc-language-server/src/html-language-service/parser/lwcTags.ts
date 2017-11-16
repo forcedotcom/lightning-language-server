@@ -1,13 +1,43 @@
 import { IHTMLTagProvider } from './htmlTags';
 import { getlwcStandardResourcePath } from '../../utils';
 import * as fs from "fs"
+import { CompletionItem } from 'vscode-languageserver';
 
 interface TagInfo {
     attributes: string[];
 }
 
 let lwcTags: Map<string, TagInfo> = new Map();
-const DIRECTIVES = ["for:each" ,"for:item", "for:index" , "if:true"];
+
+class LwcCompletionItem implements CompletionItem {
+    constructor(
+        readonly label: string,
+        readonly documentation: string,
+    ) {}
+}
+
+const LWC_DIRECTIVES: LwcCompletionItem[] = [
+    new LwcCompletionItem(
+        'for:each',
+        'Renders the element or template block multiple times based on the expression value.'
+    ),
+    new LwcCompletionItem(
+        'for:item',
+        'Bind the current iteration item to an identifier.'
+    ),
+    new LwcCompletionItem(
+        'for:index',
+        'Bind the current iteration index to an identifier.'
+    ),
+    new LwcCompletionItem(
+        'if:true',
+        'Renders the element or template if the expression value is thruthy.'
+    ),
+    new LwcCompletionItem(
+        'if:false',
+        'Renders the element or template if the expression value is falsy.'
+    ),
+];
 
 export function indexLwc(){
     loadStandardLwc();
@@ -46,8 +76,8 @@ export function getLwcTagProvider() : IHTMLTagProvider {
     }
 
     function addDirectives(collector: (attribute: string, type: string) => void){
-        DIRECTIVES.map(d => {
-            collector(d, '');
+        LWC_DIRECTIVES.map(d => {
+            collector(d.label, null);
         });
     }
 

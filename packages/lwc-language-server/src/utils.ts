@@ -1,6 +1,7 @@
 import { extname, join } from 'path';
 import { TextDocument, Files } from 'vscode-languageserver';
 
+const RESOURCES_DIR = "resources"
 const LWC_STANDARD: string = 'lwc-standard.json';
 
 export function getExtension(textDocument: TextDocument): string {
@@ -17,9 +18,9 @@ export function isJavascript(document: TextDocument): boolean {
 }
 
 export function getResourcePath(resourceName: string){
-    return join(__dirname, resourceName);
+    return join(__dirname, RESOURCES_DIR, resourceName);
 }
 
 export function getlwcStandardResourcePath(){
-    return join(__dirname, LWC_STANDARD);
+    return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
 }

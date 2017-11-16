@@ -4,7 +4,8 @@ import {
     CompletionItem,
     TextEdit,
 } from 'vscode-languageserver';
-import templateCompletion from '../completion';
+import { getLanguageService } from '../htmlLanguageService';
+import { indexLwc } from '../parser/lwcTags';
 
 interface ICompletionMatcher {
     label: string;
@@ -31,42 +32,52 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
         before + after,
     );
     const position = Position.create(0, before.length);
-    const items = templateCompletion(document, position);
+    let ls = getLanguageService();
+    const htmlDocument = ls.parseHTMLDocument(document);
+    const items = ls.doComplete(document, position, htmlDocument);
 
     matchers.forEach(matcher => {
-        const item = items.find(candidate => matcher.label === candidate.label);
+        const item = items.items.find(candidate => matcher.label === candidate.label);
         expect(item).toBeDefined();
         expect(applyEdit(document, item.textEdit)).toEqual(matcher.result);
     });
 
-    return items;
+    return items.items;
 }
 
 let res: CompletionItem[];
 
 it('complete', () => {
     res = testCompletion('<template>|</template>');
-    expect(res).toHaveLength(0);
+    expect(res).toHaveLength(1);
 
     res = testCompletion('<template |');
-    expect(res).toHaveLength(0);
+    expect(res).toHaveLength(5);
 
     testCompletion('<template><div |', [
-        { label: 'if:true', result: '<template><div if:true={$1}' },
-        { label: 'for:item', result: '<template><div for:item="$1"' },
+        { label: 'if:true', result: '<template><div if:true=$1' },
+        { label: 'for:item', result: '<template><div for:item=$1' },
     ]);
 
     testCompletion('<template><div if|', [
-        { label: 'if:true', result: '<template><div if:true={$1}' },
-        { label: 'if:false', result: '<template><div if:false={$1}' },
+        { label: 'if:true', result: '<template><div if:true=$1' },
+        { label: 'if:false', result: '<template><div if:false=$1' },
     ]);
 
     testCompletion('<template><div i|f', [
-        { label: 'if:true', result: '<template><div if:true={$1}' },
-        { label: 'if:false', result: '<template><div if:false={$1}' },
+        { label: 'if:true', result: '<template><div if:true=$1' },
+        { label: 'if:false', result: '<template><div if:false=$1' },
     ]);
 
     testCompletion('<template><div if:|true={isTrue}', [
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
+    ]);
+
+    indexLwc();
+    res = testCompletion('<template><lightning-');
+    expect(res.length).toBeGreaterThan(10);
+
+    testCompletion('<template><lightning-button-icon-stateful a',[
+        { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1' },
     ]);
 });
