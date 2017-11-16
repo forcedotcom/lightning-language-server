@@ -1,4 +1,312 @@
 {
+  "avatar": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "alternativeText",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "fallbackIconName",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "initials",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "size",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "src",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "badge": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "label",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "breadcrumb": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "href",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "label",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "name",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onclick",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "breadcrumbs": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "button": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "iconName",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconPosition",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "label",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "name",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onclick",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "type",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "button-icon": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "alternativeText",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "iconClass",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconName",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "name",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onclick",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "size",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "type",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
   "button-icon-stateful": {
     "@type": "COMPONENT",
     "attributes": [
@@ -84,6 +392,192 @@
         "name": "focus"
       }
     ],
+    "support": "GA"
+  },
+  "button-menu": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "alternativeText",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "body",
+        "required": false,
+        "type": "AURA.COMPONENTDEFREF[]"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "iconName",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconSize",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "menuAlignment",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "name",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onselect",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "visible",
+        "required": false,
+        "type": "BOOLEAN"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "button-stateful": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconNameWhenHover",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconNameWhenOff",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconNameWhenOn",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "labelWhenHover",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "labelWhenOff",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "labelWhenOn",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onclick",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "state",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
     "support": "GA"
   },
   "checkbox-group": {
@@ -327,6 +821,11 @@
         "type": "BOOLEAN"
       },
       {
+        "name": "isLoading",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
         "name": "keyField",
         "required": true,
         "type": "STRING"
@@ -338,6 +837,11 @@
       },
       {
         "name": "maxColumnWidth",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "maxRowSelection",
         "required": false,
         "type": "INTEGER"
       },
@@ -390,6 +894,11 @@
         "name": "rowNumberOffset",
         "required": false,
         "type": "INTEGER"
+      },
+      {
+        "name": "selectedRows",
+        "required": false,
+        "type": "LIST"
       },
       {
         "name": "showRowNumberColumn",
@@ -708,6 +1217,84 @@
     "extensible": false,
     "support": "GA"
   },
+  "formatted-date-time": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "day",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "era",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "hour",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "hour12",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "minute",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "month",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "second",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "timeZone",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "timeZoneName",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": true,
+        "type": "OBJECT"
+      },
+      {
+        "name": "weekday",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "year",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "BETA"
+  },
   "formatted-email": {
     "@type": "COMPONENT",
     "attributes": [
@@ -771,6 +1358,11 @@
         "type": "STRING"
       },
       {
+        "name": "format",
+        "required": false,
+        "type": "STRING"
+      },
+      {
         "name": "informalName",
         "required": false,
         "type": "STRING"
@@ -803,6 +1395,69 @@
     ],
     "extensible": false,
     "support": "GA"
+  },
+  "formatted-number": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "currencyCode",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "currencyDisplayAs",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "maximumFractionDigits",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "maximumSignificantDigits",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "minimumFractionDigits",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "minimumIntegerDigits",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "minimumSignificantDigits",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "style",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": true,
+        "type": "DECIMAL"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "BETA"
   },
   "formatted-phone": {
     "@type": "COMPONENT",
@@ -923,6 +1578,216 @@
     "minVersion": "41.0",
     "support": "GA"
   },
+  "input": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accept",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "checked",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "files",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "formatter",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "isLoading",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "label",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "max",
+        "required": false,
+        "type": "DECIMAL"
+      },
+      {
+        "name": "maxlength",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "messageToggleActive",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageToggleInactive",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenBadInput",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenPatternMismatch",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenRangeOverflow",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenRangeUnderflow",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenStepMismatch",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenTooLong",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenTypeMismatch",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenValueMissing",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "min",
+        "required": false,
+        "type": "DECIMAL"
+      },
+      {
+        "name": "minlength",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "multiple",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "name",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onchange",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "pattern",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "placeholder",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "readonly",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "required",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "step",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "type",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "validity",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      },
+      {
+        "name": "showHelpMessageIfInvalid"
+      }
+    ],
+    "support": "BETA"
+  },
   "input-address": {
     "@type": "COMPONENT",
     "attributes": [
@@ -955,6 +1820,11 @@
         "name": "countryLabel",
         "required": false,
         "type": "STRING"
+      },
+      {
+        "name": "countryOptions",
+        "required": false,
+        "type": "LIST"
       },
       {
         "name": "disabled",
@@ -995,6 +1865,11 @@
         "name": "provinceLabel",
         "required": false,
         "type": "STRING"
+      },
+      {
+        "name": "provinceOptions",
+        "required": false,
+        "type": "LIST"
       },
       {
         "name": "readonly",
@@ -1111,6 +1986,11 @@
         "type": "BOOLEAN"
       },
       {
+        "name": "fieldsToDisplay",
+        "required": false,
+        "type": "LIST"
+      },
+      {
         "name": "firstName",
         "required": false,
         "type": "STRING"
@@ -1151,6 +2031,11 @@
         "type": "AURA.ACTION"
       },
       {
+        "name": "options",
+        "required": false,
+        "type": "LIST"
+      },
+      {
         "name": "readonly",
         "required": false,
         "type": "BOOLEAN"
@@ -1164,11 +2049,6 @@
         "name": "salutation",
         "required": false,
         "type": "STRING"
-      },
-      {
-        "name": "salutationOptions",
-        "required": false,
-        "type": "LIST"
       },
       {
         "name": "suffix",
@@ -1189,6 +2069,157 @@
     "extensible": false,
     "support": "GA"
   },
+  "input-rich-text": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "disabledCategories",
+        "required": false,
+        "type": "LIST"
+      },
+      {
+        "name": "messageWhenBadInput",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "placeholder",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "valid",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "menu-item": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "checked",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "iconName",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "label",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onactive",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "focus"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
   "output-field": {
     "@type": "COMPONENT",
     "attributes": [
@@ -1204,6 +2235,59 @@
       }
     ],
     "extensible": false,
+    "support": "GA"
+  },
+  "pill": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "hasError",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "href",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "label",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "media",
+        "required": false,
+        "type": "AURA.COMPONENT[]"
+      },
+      {
+        "name": "name",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "onclick",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onremove",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
     "support": "GA"
   },
   "pill-container": {
@@ -1381,6 +2465,95 @@
     ],
     "support": "GA"
   },
+  "record-edit-form": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "objectApiName",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "onerror",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onload",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onsubmit",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onsuccess",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "recordId",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "recordTypeId",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "submit"
+      }
+    ],
+    "minVersion": "41.0",
+    "support": "GA"
+  },
+  "record-view-form": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "objectApiName",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "recordId",
+        "required": true,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "41.0",
+    "support": "GA"
+  },
+  "relative-date-time": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": true,
+        "type": "OBJECT"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "BETA"
+  },
   "slider": {
     "@type": "COMPONENT",
     "attributes": [
@@ -1522,6 +2695,157 @@
     ],
     "support": "GA"
   },
+  "spinner": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "alternativeText",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "size",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
+    "support": "GA"
+  },
+  "textarea": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "accesskey",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "label",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "maxlength",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "messageWhenBadInput",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenTooLong",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "messageWhenValueMissing",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "minlength",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "name",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "onblur",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onchange",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onfocus",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "placeholder",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "readonly",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "required",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "tabindex",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "validity",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "methods": [
+      {
+        "name": "showHelpMessageIfInvalid"
+      }
+    ],
+    "minVersion": "0.0",
+    "support": "GA"
+  },
   "tree": {
     "@type": "COMPONENT",
     "attributes": [
@@ -1544,6 +2868,108 @@
         "name": "onselect",
         "required": false,
         "type": "AURA.ACTION"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "support": "GA"
+  },
+  "tree-grid": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "columns",
+        "required": false,
+        "type": "LIST"
+      },
+      {
+        "name": "data",
+        "required": false,
+        "type": "OBJECT"
+      },
+      {
+        "name": "expandedRows",
+        "required": false,
+        "type": "LIST"
+      },
+      {
+        "name": "hideCheckboxColumn",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "isLoading",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "keyField",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "maxColumnWidth",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "minColumnWidth",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "onresize",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onrowaction",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "onrowselection",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "ontoggle",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "ontoggleall",
+        "required": false,
+        "type": "AURA.ACTION"
+      },
+      {
+        "name": "resizeColumnDisabled",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "rowNumberOffset",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "selectedRows",
+        "required": false,
+        "type": "LIST"
+      },
+      {
+        "name": "showRowNumberColumn",
+        "required": false,
+        "type": "BOOLEAN"
       },
       {
         "name": "title",
