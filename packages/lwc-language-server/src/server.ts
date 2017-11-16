@@ -29,8 +29,8 @@ documents.listen(connection);
 let workspaceRoot: string;
 let ls: LanguageService;
 
-//TODO: See if this can be made this async
-function init(){
+// TODO: See if this can be made this async
+function init() {
     indexLwc();
 }
 
@@ -77,7 +77,7 @@ documents.onDidChangeContent(async change => {
 
 connection.onCompletion(
     (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
-        if(!ls){
+        if (!ls) {
             ls = getLanguageService();
         }
         const document = documents.get(textDocumentPosition.textDocument.uri);
