@@ -12,7 +12,7 @@
     "build": "tsc -p . && cp -r src/resources lib/",
     "prepare": "npm run clean && npm run build",
     "test": "jest",
-    "lint": "tslint src/**/*.ts",
+    "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
   },
   "dependencies": {

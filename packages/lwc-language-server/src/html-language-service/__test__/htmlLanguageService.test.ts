@@ -32,7 +32,7 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
         before + after,
     );
     const position = Position.create(0, before.length);
-    let ls = getLanguageService();
+    const ls = getLanguageService();
     const htmlDocument = ls.parseHTMLDocument(document);
     const items = ls.doComplete(document, position, htmlDocument);
 
@@ -77,7 +77,7 @@ it('complete', () => {
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 
-    testCompletion('<template><lightning-button-icon-stateful a',[
+    testCompletion('<template><lightning-button-icon-stateful a', [
         { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1' },
     ]);
 });
