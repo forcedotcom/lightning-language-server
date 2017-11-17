@@ -9,7 +9,7 @@
         ],
         "outDir": "./lib",
 
-        "strictNullChecks": true,
+        "strictNullChecks": false,
         "noImplicitAny": true,
         "noUnusedParameters": true,
         "noUnusedLocals": true,

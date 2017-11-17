@@ -5,15 +5,18 @@ import {
     InitializeParams,
     InitializeResult,
     TextDocumentPositionParams,
+    CompletionList,
     CompletionItem,
     Files,
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
+
 import javascriptLinter from './javascript/linter';
-import templateCompletionProvider from './template/completion';
 
 import { isTemplate, isJavascript } from './utils';
+import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
+import { indexLwc } from './html-language-service/parser/lwcTags';
 
 // Create a standard connection and let the caller decide the strategy
 // Availalble startegies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -24,6 +27,13 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let workspaceRoot: string;
+let ls: LanguageService;
+
+// TODO: See if this can be made this async
+function init() {
+    indexLwc();
+}
+
 connection.onInitialize((params: InitializeParams): InitializeResult => {
     const { rootUri, rootPath } = params;
 
@@ -36,6 +46,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 
     workspaceRoot = root;
     console.log(`Starting language server at ${workspaceRoot}`);
+    init();
 
     // Return the language server capabilities
     return {
@@ -65,16 +76,21 @@ documents.onDidChangeContent(async change => {
 });
 
 connection.onCompletion(
-    (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+    (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
+        if (!ls) {
+            ls = getLanguageService();
+        }
         const document = documents.get(textDocumentPosition.textDocument.uri);
+        const htmlDocument = ls.parseHTMLDocument(document);
         return isTemplate(document)
-            ? templateCompletionProvider(
-                  document,
-                  textDocumentPosition.position,
-              )
-            : [];
+            ? ls.doComplete(document, textDocumentPosition.position, htmlDocument)
+            : {isIncomplete: false, items: []};
     },
 );
+
+connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
+    return item;
+});
 
 // Listen on the connection
 connection.listen();

@@ -9,16 +9,17 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "tsc -p .",
+    "build": "tsc -p . && cp -r src/resources lib/",
     "prepare": "npm run clean && npm run build",
     "test": "jest",
-    "lint": "tslint src/**/*.ts",
+    "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@types/babel-types": "6.25.1",
     "raptor-compiler": "0.16.3",
-    "vscode-languageserver": "3.5.0"
+    "vscode-languageserver": "3.5.0",
+    "vscode-nls": "^2.0.2"
   },
   "devDependencies": {
     "@types/jest": "^21.1.5",
