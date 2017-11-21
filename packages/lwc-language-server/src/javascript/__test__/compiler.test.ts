@@ -1,7 +1,10 @@
+import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { transform } from 'raptor-compiler';
-import javascriptLinter from '../linter';
+import { compileSource, compileDocument, compileFile } from '../compiler';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
+
+const FIXTURE_DIR = path.join(__dirname, 'fixtures');
 
 it('can use transform(src, id, options) from raptor-compiler', async () => {
     const actual = `
@@ -57,8 +60,7 @@ it('returns list of javascript compilation errors', async () => {
 `;
 
     const document = TextDocument.create('file:///example.js', 'javascript', 0, content);
-
-    const diagnostics = await javascriptLinter(document);
+    const { diagnostics } = await compileDocument(document);
 
     expect(diagnostics).toHaveLength(1);
     expect(diagnostics[0].message).toMatch(
@@ -69,6 +71,58 @@ it('returns list of javascript compilation errors', async () => {
         end: { character: 9 },
     });
     expect(diagnostics[0].source).toBe(DIAGNOSTIC_SOURCE);
+});
+
+it('linter returns empty diagnostics on correct file', async () => {
+    const content = `
+    import { Element } from 'engine';
+    export default class Foo extends Element {
+        connectedCallback() {}
+    }
+`;
+
+    const { diagnostics } = await compileSource(content);
+    expect(diagnostics).toEqual([]);
+});
+
+it('returns javascript metadata', async () => {
+    const content = `
+        import { Element } from 'engine';
+        export default class Foo extends Element {
+            _privateTodo;
+            @api get todo () {
+                return this._privateTodo;
+            }
+            @api set todo (val) {
+                return this._privateTodo = val;
+            }
+            @api
+            index;
+        }
+    `;
+
+    const { result } = await compileSource(content);
+    expect(result.metadata.apiProperties).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+});
+
+it('use compileDocument()', async () => {
+    const content = `
+        import { Element } from 'engine';
+        export default class Foo extends Element {
+            @api
+            index;
+        }
+    `;
+
+    const document = TextDocument.create('file:///foo.js', 'javascript', 0, content);
+    const { result } = await compileDocument(document);
+    expect(result.metadata.apiProperties).toMatchObject([{ name: 'index' }]);
+});
+
+it('use compileFile()', async () => {
+    const filepath = path.join(FIXTURE_DIR, 'foo.js');
+    const { result } = await compileFile(filepath);
+    expect(result.metadata.apiProperties).toMatchObject([{ name: 'index' }]);
 });
 
 function pretify(str: string) {

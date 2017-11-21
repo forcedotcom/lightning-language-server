@@ -33,3 +33,11 @@ export function getSfdxResource(resourceName: string) {
 export function isSfdxProject(workspaceRoot: string) {
     return fs.existsSync(join(workspaceRoot, 'sfdx-project.json'));
 }
+
+/**
+ * @return string showing elapsed milliseconds from start mark
+ */
+export function elapsedMillis(start: [number, number]): string {
+    const elapsed = process.hrtime(start);
+    return (elapsed[0] * 1000 + elapsed[1] / 1e6).toFixed(2) + ' ms';
+}

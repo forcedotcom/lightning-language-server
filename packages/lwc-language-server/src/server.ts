@@ -12,7 +12,7 @@ import {
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
-import javascriptLinter from './javascript/linter';
+import { compileDocument as javascriptCompileDocument, extractAttributes } from './javascript/compiler';
 import {
     isTemplate,
     isJavascript,
@@ -28,6 +28,8 @@ import {
 import {
     indexLwc,
     updateCustomComponentIndex,
+    setCustomAttributes,
+    getLwcByTag,
 } from './metadata-utils/custom-components-util';
 import {
     getLanguageService,
@@ -55,7 +57,11 @@ async function init() {
     ]);
 }
 
-connection.onInitialize((params: InitializeParams): InitializeResult => {
+connection.onInitialize((params: InitializeParams): Promise<InitializeResult> => {
+    return onInitialize(params);
+});
+
+async function onInitialize(params: InitializeParams): Promise<InitializeResult> {
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
@@ -66,7 +72,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     }
 
     console.log(`Starting language server at ${workspaceRoot}`);
-    init();
+    await init();
 
     // Return the language server capabilities
     return {
@@ -77,7 +83,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
             },
         },
     };
-});
+}
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -85,13 +91,24 @@ documents.onDidClose(event => {
 });
 
 documents.onDidChangeContent(async change => {
+    console.log('onDidChangeContent: ', change.document.uri);
     const { document } = change;
+    const { uri } = document;
     if (isTemplate(document)) {
         const diagnostics = templateLinter(document);
-        connection.sendDiagnostics({ uri: document.uri, diagnostics });
+        connection.sendDiagnostics({ uri, diagnostics });
     } else if (isJavascript(document)) {
-        const diagnostics = await javascriptLinter(document);
-        connection.sendDiagnostics({ uri: document.uri, diagnostics });
+        const { result, diagnostics } = await javascriptCompileDocument(document);
+        connection.sendDiagnostics({ uri, diagnostics });
+        if (result) {
+            const attributes = extractAttributes(result.metadata);
+            // TODO: use namespace+tagName to also work outside sfdx custom components
+            const tagName = uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'));
+            if (attributes.length > 0 || getLwcByTag(tagName)) {
+                // has @apis or known tag => assuming is the main .js file for the module
+                setCustomAttributes(tagName, attributes);
+            }
+        }
     }
 });
 
@@ -104,7 +121,7 @@ connection.onCompletion(
         const htmlDocument = ls.parseHTMLDocument(document);
         return isTemplate(document)
             ? ls.doComplete(document, textDocumentPosition.position, htmlDocument)
-            : {isIncomplete: false, items: []};
+            : { isIncomplete: false, items: [] };
     },
 );
 

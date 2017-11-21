@@ -1,8 +1,9 @@
 import { sep, parse } from 'path';
 import { Glob } from 'glob';
-import { getlwcStandardResourcePath } from './../utils';
-import * as fs from 'fs';
+import { getlwcStandardResourcePath, elapsedMillis } from './../utils';
+import * as fs from "fs";
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
+import { compileFile, extractAttributes } from '../javascript/compiler';
 
 export interface ITagInfo {
     attributes: string[];
@@ -68,17 +69,21 @@ function loadStandardLwc() {
     });
 }
 
-function addCustomTag(tag: string) {
-    LWC_TAGS.set('c-' + tag, { attributes: [] });
+function addCustomTag(tag: string, attributes: string[]) {
+    LWC_TAGS.set('c-' + tag, { attributes });
 }
 function removeCustomTag(tag: string) {
     LWC_TAGS.delete('c-' + tag);
 }
 
+export function setCustomAttributes(tag: string, attributes: string[]) {
+    LWC_TAGS.set('c-' + tag, { attributes });
+}
+
 function indexCustomComponents(workspacePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
         /* tslint:disable */
-        new Glob(LWC_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
+        new Glob(LWC_GLOB_PATTERN, { cwd: workspacePath, absolute: true }, async (err: Error, files: string[]) => {
             if (err) {
                 console.log(`Error queing up indexing of labels. Error detatils: ${err}`);
                 reject(err);
@@ -92,17 +97,26 @@ function indexCustomComponents(workspacePath: string): Promise<void> {
 }
 
 function loadCustomTagsFromFiles(filePaths: string[]) {
+    const startTime = process.hrtime();
     filePaths.map((file: string) => {
         addCustomTagFromFile(file);
     });
+    // TODO: not including compile time, await above to get it
+    console.log('loadCustomTagsFromFiles: executed in ' + elapsedMillis(startTime));
 }
 
-function addCustomTagFromFile(file: string) {
+async function addCustomTagFromFile(file: string) {
     const filePath = parse(file);
     const fileName = filePath.name;
     const parentDirName = filePath.dir.split(sep).pop();
     if (fileName === parentDirName) {
-        addCustomTag(parentDirName);
+        // get attributes from compiler metadata
+        const rv = await compileFile(file);
+        const attributes = rv.result ? extractAttributes(rv.result.metadata) : [];
+        if (rv.diagnostics.length > 0) {
+            console.log('error compiling ' + file + ': ', rv.diagnostics);
+        }
+        addCustomTag(parentDirName, attributes);
     }
 }
 
