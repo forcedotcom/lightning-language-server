@@ -21,7 +21,14 @@
     "raptor-compiler": "0.16.5",
     "vscode-languageserver": "3.5.0",
     "vscode-nls": "^2.0.2",
-    "fs-extra": "4.0.2"
+    "fs-extra": "4.0.2",
+    "@types/glob": "^5.0.33",
+    "@types/xml2js": "^0.4.2",
+    "glob": "^7.1.2",
+    "raptor-compiler": "0.16.3",
+    "vscode-languageserver": "3.5.0",
+    "vscode-nls": "^2.0.2",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@types/jest": "^21.1.5",

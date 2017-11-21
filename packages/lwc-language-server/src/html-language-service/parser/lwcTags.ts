@@ -1,14 +1,6 @@
 import { IHTMLTagProvider } from './htmlTags';
-import { getlwcStandardResourcePath } from '../../utils';
-import * as fs from "fs";
 import { CompletionItem } from 'vscode-languageserver';
-
-interface ITagInfo {
-    attributes: string[];
-}
-
-const lwcTags: Map<string, ITagInfo> = new Map();
-
+import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
 class LwcCompletionItem implements CompletionItem {
     constructor(
         readonly label: string,
@@ -39,35 +31,15 @@ const LWC_DIRECTIVES: LwcCompletionItem[] = [
     ),
 ];
 
-export function indexLwc() {
-    loadStandardLwc();
-}
-
-function loadStandardLwc() {
-    const lwcStandard = JSON.parse(fs.readFileSync(getlwcStandardResourcePath(), 'utf8'));
-    for (const property in lwcStandard) {
-        if (lwcStandard.hasOwnProperty(property) && typeof property === 'string') {
-            const val: ITagInfo = { attributes: [] };
-            if (lwcStandard[property].attributes) {
-                lwcStandard[property].attributes.map((a: any) => {
-                    const attrName = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    val.attributes.push(attrName);
-                });
-            }
-            lwcTags.set('lightning-' + property, val);
-        }
-    }
-}
-
 export function getLwcTagProvider(): IHTMLTagProvider {
     function addTags(collector: (tag: string, label: string) => void) {
-        for (const tag of lwcTags.keys()) {
+        for (const tag of getLwcTags()) {
             collector(tag, tag);
         }
     }
 
     function addAttributes(tag: string, collector: (attribute: string, type: string) => void) {
-        const cTag = lwcTags.get(tag);
+        const cTag = getLwcByTag(tag);
         if (cTag) {
             cTag.attributes.map((a) => {
                 collector(a, '');
