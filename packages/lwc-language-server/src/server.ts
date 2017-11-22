@@ -17,20 +17,21 @@ import javascriptLinter from './javascript/linter';
 import { isTemplate, isJavascript } from './utils';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import { indexLwc } from './html-language-service/parser/lwcTags';
+import * as sfdxConfig from './sfdx/sfdxConfig';
 
 // Create a standard connection and let the caller decide the strategy
-// Availalble startegies: '--node-ipc', '--stdio' or '--socket={number}'
+// Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 const connection: IConnection = createConnection();
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
-let workspaceRoot: string;
 let ls: LanguageService;
 
 // TODO: See if this can be made this async
-function init() {
+function init(workspaceRoot: string) {
+    sfdxConfig.configSfdxProject(workspaceRoot);
     indexLwc();
 }
 
@@ -38,15 +39,14 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    const root = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
-    if (!root) {
+    const workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    if (!workspaceRoot) {
         console.log(`No workspace found`);
         return { capabilities: {} };
     }
 
-    workspaceRoot = root;
     console.log(`Starting language server at ${workspaceRoot}`);
-    init();
+    init(workspaceRoot);
 
     // Return the language server capabilities
     return {
