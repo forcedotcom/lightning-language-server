@@ -56,13 +56,13 @@ it('returns list of javascript compilation errors', async () => {
     }
 `;
 
-    const document = TextDocument.create('test://foo.js', 'javascript', 0, content);
+    const document = TextDocument.create('file:///example.js', 'javascript', 0, content);
 
     const diagnostics = await javascriptLinter(document);
 
     expect(diagnostics).toHaveLength(1);
     expect(diagnostics[0].message).toMatch(
-        /Wrong lifecycle method name connectCallback. You probably meant connectedCallback/,
+        /example.js: Wrong lifecycle method name connectCallback. You probably meant connectedCallback/,
     );
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 8 },

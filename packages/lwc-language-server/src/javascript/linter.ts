@@ -1,13 +1,17 @@
 import { transform } from 'raptor-compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
+import { TextDocument, Diagnostic, DiagnosticSeverity, Range, Files } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
+import * as path from 'path';
 
 export default async function lint(document: TextDocument): Promise<Diagnostic[]> {
     const source = document.getText();
+    const file = Files.uriToFilePath(document.uri);
+    const filePath = path.parse(file);
+    const fileName = filePath.base;
 
     try {
-        // TODO: need proper id/moduleNamespace/moduleName?
-        await transform(source, "foo.js", { moduleNamespace: 'x', moduleName: 'foo' });
+        // TODO: need proper moduleNamespace/moduleName?
+        await transform(source, fileName, { moduleNamespace: 'x', moduleName: 'foo' });
     } catch (err) {
         return [toDiagnostic(err)];
     }
