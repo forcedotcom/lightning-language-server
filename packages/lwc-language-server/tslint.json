@@ -9,6 +9,7 @@
     },
     "linterOptions": {
         "exclude": [
+            "src/resources/**",
             "src/html-language-service/htmlLanguageService.ts",
             "src/html-language-service/parser/htmlParser.ts",
             "src/html-language-service/parser/htmlScanner.ts",
