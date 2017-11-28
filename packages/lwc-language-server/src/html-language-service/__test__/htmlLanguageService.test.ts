@@ -81,4 +81,8 @@ it('complete', async () => {
     testCompletion('<template><lightning-button-icon-stateful a', [
         { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1' },
     ]);
+
+    testCompletion('<template><c-todo_item tod|', [
+        { label: 'todo', result: '<template><c-todo_item todo=$1' },
+    ]);
 });

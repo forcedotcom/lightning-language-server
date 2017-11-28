@@ -88,7 +88,7 @@ function indexCustomComponents(workspacePath: string): Promise<void> {
                 console.log(`Error queing up indexing of labels. Error detatils: ${err}`);
                 reject(err);
             } else {
-                loadCustomTagsFromFiles(files);
+                await loadCustomTagsFromFiles(files);
                 resolve();
             }
         });
@@ -96,16 +96,15 @@ function indexCustomComponents(workspacePath: string): Promise<void> {
     });
 }
 
-function loadCustomTagsFromFiles(filePaths: string[]) {
+async function loadCustomTagsFromFiles(filePaths: string[]) {
     const startTime = process.hrtime();
-    filePaths.map((file: string) => {
-        addCustomTagFromFile(file);
-    });
-    // TODO: not including compile time, await above to get it
+    for (const file of filePaths) {
+        await addCustomTagFromFile(file);
+    }
     console.log('loadCustomTagsFromFiles: executed in ' + elapsedMillis(startTime));
 }
 
-async function addCustomTagFromFile(file: string) {
+export async function addCustomTagFromFile(file: string) {
     const filePath = parse(file);
     const fileName = filePath.name;
     const parentDirName = filePath.dir.split(sep).pop();
