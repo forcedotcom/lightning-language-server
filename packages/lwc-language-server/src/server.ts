@@ -7,16 +7,32 @@ import {
     TextDocumentPositionParams,
     CompletionList,
     CompletionItem,
+    DidChangeWatchedFilesParams,
     Files,
 } from 'vscode-languageserver';
 
 import templateLinter from './template/linter';
-
 import javascriptLinter from './javascript/linter';
-
-import { isTemplate, isJavascript } from './utils';
-import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
-import { indexLwc } from './html-language-service/parser/lwcTags';
+import {
+    isTemplate,
+    isJavascript,
+} from './utils';
+import {
+    indexCustomLabels,
+    updateLabelsIndex,
+} from './metadata-utils/custom-labels-util';
+import {
+    indexStaticResources,
+    updateStaticResourceIndex,
+} from "./metadata-utils/static-resources-util";
+import {
+    indexLwc,
+    updateCustomComponentIndex,
+} from "./metadata-utils/custom-components-util";
+import {
+    getLanguageService,
+    LanguageService,
+} from './html-language-service/htmlLanguageService';
 import * as sfdxConfig from './sfdx/sfdxConfig';
 
 // Create a standard connection and let the caller decide the strategy
@@ -28,25 +44,29 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ls: LanguageService;
+let workspaceRoot: string;
 
-// TODO: See if this can be made this async
-function init(workspaceRoot: string) {
+async function init() {
     sfdxConfig.configSfdxProject(workspaceRoot);
-    indexLwc();
+    return Promise.all([
+        indexLwc(workspaceRoot), // TODO: See if this can be made this async
+        indexStaticResources(workspaceRoot),
+        indexCustomLabels(workspaceRoot),
+    ]);
 }
 
 connection.onInitialize((params: InitializeParams): InitializeResult => {
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    const workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!workspaceRoot) {
         console.log(`No workspace found`);
         return { capabilities: {} };
     }
 
     console.log(`Starting language server at ${workspaceRoot}`);
-    init(workspaceRoot);
+    init();
 
     // Return the language server capabilities
     return {
@@ -94,3 +114,13 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 
 // Listen on the connection
 connection.listen();
+
+connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
+    connection.console.log('We recevied an file change event');
+    console.log('onDidChangeWatchedFiles...');
+    return Promise.all([
+        updateStaticResourceIndex(workspaceRoot, change.changes),
+        updateLabelsIndex(workspaceRoot, change.changes),
+        updateCustomComponentIndex(change.changes),
+    ]);
+});

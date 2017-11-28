@@ -5,7 +5,8 @@ import {
     TextEdit,
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
-import { indexLwc } from '../parser/lwcTags';
+import { indexLwc } from '../../metadata-utils/custom-components-util';
+import { join } from "path";
 
 interface ICompletionMatcher {
     label: string;
@@ -47,7 +48,7 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
 
 let res: CompletionItem[];
 
-it('complete', () => {
+it('complete', async () => {
     res = testCompletion('<template>|</template>');
     expect(res).toHaveLength(1);
 
@@ -73,7 +74,7 @@ it('complete', () => {
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
     ]);
 
-    indexLwc();
+    await indexLwc(join("test-workspaces", "test-force-app-metadata"));
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 
