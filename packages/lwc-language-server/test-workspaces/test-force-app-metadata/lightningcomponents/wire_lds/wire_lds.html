@@ -1,0 +1,19 @@
+<template>
+        <label>Enter Account Id:
+            <input class="new-todo" autofocus autocomplete="off" placeholder="<account-id>" onkeydown={handleKeyDown}/>
+        </label>
+        <template if:true={record.error}>
+            <p>An error occured while fetch record {recordId}</p>
+            <code>{record.error.message}</code>
+        </template>
+    
+        <template if:true={record.data}>
+            <ul>
+                <li>Account ID: {recordId}</li>
+                <li>Name: {record.data.fields.Name.value}</li>
+                <li>Phone: {record.data.fields.Phone.value}</li>
+                <li>Industry: {record.data.fields.Industry.value}</li>
+                <li>Description: {record.data.fields.Description.value}</li>
+            </ul>
+        </template>
+</template>

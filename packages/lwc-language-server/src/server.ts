@@ -8,9 +8,9 @@ import {
     CompletionList,
     CompletionItem,
     DidChangeWatchedFilesParams,
-    FileChangeType,
     Files,
 } from 'vscode-languageserver';
+
 import templateLinter from './template/linter';
 import javascriptLinter from './javascript/linter';
 import {
@@ -19,25 +19,21 @@ import {
 } from './utils';
 import {
     indexCustomLabels,
-    writeLabelTypeDeclarations,
-    addLabelsFile,
-    removeLabelsFile,
+    updateLabelsIndex,
 } from './metadata-utils/custom-labels-util';
 import {
     indexStaticResources,
-    addStaticResource,
-    removeStaticResource,
+    updateStaticResourceIndex,
 } from "./metadata-utils/static-resources-util";
 import {
     indexLwc,
-    addCustomTagFromFile,
-    removeCustomTagFromFile,
+    updateCustomComponentIndex,
 } from "./metadata-utils/custom-components-util";
 import {
     getLanguageService,
     LanguageService,
 } from './html-language-service/htmlLanguageService';
-import { sep } from "path";
+import * as sfdxConfig from './sfdx/sfdxConfig';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -48,27 +44,29 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ls: LanguageService;
+let workspaceRoot: string;
 
-// TODO: See if this can be made this async
-function init(workspaceRoot: string) {
+async function init() {
     sfdxConfig.configSfdxProject(workspaceRoot);
-    indexLwc();
-    indexStaticResources();
-    indexCustomLabels();
+    return Promise.all([
+        indexLwc(workspaceRoot), // TODO: See if this can be made this async
+        indexStaticResources(workspaceRoot),
+        indexCustomLabels(workspaceRoot),
+    ]);
 }
 
 connection.onInitialize((params: InitializeParams): InitializeResult => {
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    const workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!workspaceRoot) {
         console.log(`No workspace found`);
         return { capabilities: {} };
     }
 
     console.log(`Starting language server at ${workspaceRoot}`);
-    init(workspaceRoot);
+    init();
 
     // Return the language server capabilities
     return {
@@ -117,29 +115,12 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 // Listen on the connection
 connection.listen();
 
-connection.onDidChangeWatchedFiles((change: DidChangeWatchedFilesParams) => {
+connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     connection.console.log('We recevied an file change event');
     console.log('onDidChangeWatchedFiles...');
-    change.changes.map(f => {
-        if (f.uri.endsWith(".resource")) {
-            if (f.type === FileChangeType.Created) {
-                addStaticResource(f.uri);
-            } else if (f.type === FileChangeType.Deleted) {
-                removeStaticResource(f.uri);
-            }
-        } else if (f.uri.endsWith("CustomLabels.labels-meta.xml")) {
-            if (f.type === FileChangeType.Created ) {
-                addLabelsFile(f.uri);
-            } else if (f.type === FileChangeType.Deleted) {
-                removeLabelsFile(f.uri);
-            }
-            writeLabelTypeDeclarations();
-        } else if (f.uri.match(`.*${sep}lightningcomponents${sep}.*.js`)) {
-            if (f.type === FileChangeType.Created) {
-                addCustomTagFromFile(f.uri);
-            } else if (f.type === FileChangeType.Deleted) {
-                removeCustomTagFromFile(f.uri);
-            }
-        }
-    });
+    return Promise.all([
+        updateStaticResourceIndex(workspaceRoot, change.changes),
+        updateLabelsIndex(workspaceRoot, change.changes),
+        updateCustomComponentIndex(change.changes),
+    ]);
 });
