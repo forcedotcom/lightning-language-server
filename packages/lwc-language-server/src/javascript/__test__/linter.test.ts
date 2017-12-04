@@ -71,7 +71,7 @@ it('returns list of javascript compilation errors', async () => {
     expect(diagnostics[0].source).toBe(DIAGNOSTIC_SOURCE);
 });
 
-function pretify(str) {
+function pretify(str: string) {
     return str.toString()
         .replace(/^\s+|\s+$/, '')
         .split('\n')

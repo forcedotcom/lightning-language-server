@@ -11,7 +11,7 @@
     "clean": "rm -rf lib",
     "build": "tsc -p . && cp -r src/resources lib/ && cp node_modules/raptor-engine/types/engine.d.ts lib/resources/sfdx/typings/engine.d.ts",
     "prepare": "npm run clean && npm run build",
-    "test": "jest",
+    "test": "jest src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
   },
