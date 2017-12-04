@@ -1,9 +1,9 @@
-import { Glob, IOptions } from "glob";
-import { readFile } from "fs";
-import { join } from "path";
-import { parseString } from "xml2js";
-import { write } from "./file-flush-util";
-import { FileEvent, FileChangeType, Files } from "vscode-languageserver/lib/main";
+import { Glob, IOptions } from 'glob';
+import { readFile } from 'fs';
+import { join } from 'path';
+import { parseString } from 'xml2js';
+import { write } from './file-flush-util';
+import { FileEvent, FileChangeType, Files } from 'vscode-languageserver/lib/main';
 
 interface ICustomLabelsResult {
     CustomLabels: ICustomLabels;
@@ -17,8 +17,8 @@ interface ILabel {
 
 const CUSTOM_LABELS: Set<string> = new Set();
 const CUSTOM_LABEL_FILES: Set<string> = new Set();
-const CUSTOM_LABELS_DECLARATION_FILE = "typings/customlabels.d.ts";
-const CUSTOM_LABEL_GLOB_PATTERN = "**/labels/CustomLabels.labels-meta.xml";
+const CUSTOM_LABELS_DECLARATION_FILE = 'typings/customlabels.d.ts';
+const CUSTOM_LABEL_GLOB_PATTERN = '**/labels/CustomLabels.labels-meta.xml';
 
 function getGlob(globPattern: string, workspace: string, callBack: (err: Error, files: string[]) => void) {
     const options: IOptions = {};
@@ -51,7 +51,7 @@ export function indexCustomLabels(workspacePath: string): Promise<void> {
 export async function updateLabelsIndex(workspace: string, updatedFiles: FileEvent[]) {
     let didChange = false;
     updatedFiles.forEach(f => {
-        if (f.uri.endsWith("CustomLabels.labels-meta.xml")) {
+        if (f.uri.endsWith('CustomLabels.labels-meta.xml')) {
             didChange = true;
             if (f.type === FileChangeType.Created) {
                 CUSTOM_LABEL_FILES.add(Files.uriToFilePath(f.uri));
@@ -108,7 +108,7 @@ function readLabelFile(filePath: string) {
 }
 
 function generateLabelTypeDeclarations(): string {
-    let resTypeDecs = "";
+    let resTypeDecs = '';
     CUSTOM_LABELS.forEach(res => {
         resTypeDecs += generateLabelTypeDeclaration(res);
     });
@@ -116,7 +116,7 @@ function generateLabelTypeDeclarations(): string {
 }
 
 function generateLabelTypeDeclaration(labelName: string) {
-    const ns = "c";
+    const ns = 'c';
     const result =
         `declare module "@label/${ns}/${labelName}" {
     var labelName: string;

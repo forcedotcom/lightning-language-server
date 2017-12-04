@@ -2,7 +2,7 @@ import { extname, join } from 'path';
 import * as fs from 'fs';
 import { TextDocument, Files } from 'vscode-languageserver';
 
-const RESOURCES_DIR = "resources";
+const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
 export function getExtension(textDocument: TextDocument): string {
@@ -27,7 +27,7 @@ export function getlwcStandardResourcePath() {
 }
 
 export function getSfdxResource(resourceName: string) {
-    return join(__dirname, RESOURCES_DIR, "sfdx", resourceName);
+    return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
 }
 
 export function isSfdxProject(workspaceRoot: string) {

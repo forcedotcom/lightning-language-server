@@ -3,7 +3,7 @@
     "rules": {
         "arrow-parens": false,
         "no-console": [false],
-        "quotemark": ["single"],
+        "quotemark": [true, "single"],
         "ordered-imports": [false],
         "object-literal-sort-keys": false
     },

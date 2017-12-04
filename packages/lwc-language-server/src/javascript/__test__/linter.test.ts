@@ -38,7 +38,7 @@ it('transform(src, id, options) throws exceptions on errors', async () => {
 
     try {
         await transform(code, 'foo.js', { moduleNamespace: 'x', moduleName: 'foo' });
-        fail("expects exception");
+        fail('expects exception');
     } catch (err) {
         // verify err has the info we need
         expect(err.message).toMatch(

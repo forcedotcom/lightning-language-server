@@ -1,6 +1,6 @@
-import { mockFileUtil } from "./mock-file-util";
-import { indexCustomLabels } from "../custom-labels-util";
-import { validate } from "./util";
+import { mockFileUtil } from './mock-file-util';
+import { indexCustomLabels } from '../custom-labels-util';
+import { validate } from './util';
 
 jest.mock('../file-flush-util', () => {
     return mockFileUtil();
@@ -17,5 +17,5 @@ declare module "@label/c/greeting2" {
     export default labelName;
 }
 `;
-    validate(indexCustomLabels, "test-force-app-metadata", "customlabels.d.ts", expectedDTS, done);
+    validate(indexCustomLabels, 'test-force-app-metadata', 'customlabels.d.ts', expectedDTS, done);
 });

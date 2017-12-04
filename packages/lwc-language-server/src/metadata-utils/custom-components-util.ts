@@ -1,14 +1,14 @@
 import { sep, parse } from 'path';
-import { Glob } from "glob";
+import { Glob } from 'glob';
 import { getlwcStandardResourcePath } from './../utils';
-import * as fs from "fs";
+import * as fs from 'fs';
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
 
 export interface ITagInfo {
     attributes: string[];
 }
 
-const LWC_GLOB_PATTERN = "**/lightningcomponents/*/*.js";
+const LWC_GLOB_PATTERN = '**/lightningcomponents/*/*.js';
 export const LWC_TAGS: Map<string, ITagInfo> = new Map();
 
 export async function indexLwc(workspacePath: string) {
@@ -40,7 +40,7 @@ export function getLwcByTag(tagName: string) {
 
 function loadStandardLwc() {
     return new Promise((resolve, reject) => {
-        fs.readFile(getlwcStandardResourcePath(), { encoding: "utf8" }, (err, data) => {
+        fs.readFile(getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
                 reject(err);
             } else {

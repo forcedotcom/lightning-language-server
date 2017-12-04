@@ -6,7 +6,7 @@ import {
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
 import { indexLwc } from '../../metadata-utils/custom-components-util';
-import { join } from "path";
+import { join } from 'path';
 
 interface ICompletionMatcher {
     label: string;
@@ -74,7 +74,7 @@ it('complete', async () => {
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
     ]);
 
-    await indexLwc(join("test-workspaces", "test-force-app-metadata"));
+    await indexLwc(join('test-workspaces', 'test-force-app-metadata'));
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 

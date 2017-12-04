@@ -24,11 +24,11 @@ import {
 import {
     indexStaticResources,
     updateStaticResourceIndex,
-} from "./metadata-utils/static-resources-util";
+} from './metadata-utils/static-resources-util';
 import {
     indexLwc,
     updateCustomComponentIndex,
-} from "./metadata-utils/custom-components-util";
+} from './metadata-utils/custom-components-util';
 import {
     getLanguageService,
     LanguageService,

@@ -1,10 +1,10 @@
 import { parse, join } from 'path';
-import { Glob } from "glob";
-import { write } from "./file-flush-util";
+import { Glob } from 'glob';
+import { write } from './file-flush-util';
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
 
-const STATIC_RESOURCE_DECLARATION_FILE = "typings/staticresources.d.ts";
-const STATIC_RESOURCE_GLOB_PATTERN = "**/staticresources/*.resource";
+const STATIC_RESOURCE_DECLARATION_FILE = 'typings/staticresources.d.ts';
+const STATIC_RESOURCE_GLOB_PATTERN = '**/staticresources/*.resource';
 const STATIC_RESOURCES: Set<string> = new Set();
 
 function getResourceName(resourceFile: string) {
@@ -14,7 +14,7 @@ function getResourceName(resourceFile: string) {
 export async function updateStaticResourceIndex(workspace: string, updatedFiles: FileEvent[]) {
     let didChange = false;
     updatedFiles.forEach(f => {
-        if (f.uri.endsWith(".resource")) {
+        if (f.uri.endsWith('.resource')) {
             if (f.type === FileChangeType.Created) {
                 didChange = true;
                 STATIC_RESOURCES.add(getResourceName(f.uri));
@@ -55,7 +55,7 @@ export function indexStaticResources(workspacePath: string): Promise<void> {
 }
 
 function generateResourceTypeDeclarations(): string {
-    let resTypeDecs = "";
+    let resTypeDecs = '';
     STATIC_RESOURCES.forEach(res => {
         resTypeDecs += generateResourceTypeDeclaration(res);
     });
