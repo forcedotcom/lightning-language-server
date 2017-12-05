@@ -11,7 +11,7 @@ export function getExtension(textDocument: TextDocument): string {
 }
 
 export function isTemplate(document: TextDocument): boolean {
-    return document.languageId === 'html';
+    return document.languageId === 'html' && getExtension(document) === '.html';
 }
 
 export function isJavascript(document: TextDocument): boolean {
