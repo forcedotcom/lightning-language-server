@@ -8,11 +8,11 @@ jest.mock('../file-flush-util', () => {
 
 it('fush test', async (done) => {
     const expectedDTS =
-`declare module "@label/c/greeting" {
+`declare module "@label/c.greeting" {
     var labelName: string;
     export default labelName;
 }
-declare module "@label/c/greeting2" {
+declare module "@label/c.greeting2" {
     var labelName: string;
     export default labelName;
 }
