@@ -4,6 +4,9 @@
   "description": "Language Server Protocol implementation for Raptor projects",
   "main": "lib/server.js",
   "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
   "repository": "git@git.soma.salesforce.com:raptor/raptor-language-server.git",
   "author": "Pierre-Marie <p.dartus@salesforce.com>",
   "license": "MIT",
