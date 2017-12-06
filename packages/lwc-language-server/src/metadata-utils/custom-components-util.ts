@@ -1,31 +1,23 @@
 import { sep, parse } from 'path';
-import { Glob } from 'glob';
-import { getlwcStandardResourcePath, elapsedMillis } from './../utils';
-import * as fs from "fs";
+import * as fs from 'fs';
+import * as utils from '../utils';
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
 import { compileFile, extractAttributes } from '../javascript/compiler';
+import { IWorkspaceContext } from '../context';
 
 export interface ITagInfo {
     attributes: string[];
 }
 
-const LWC_GLOB_PATTERN = '**/lightningcomponents/*/*.js';
 export const LWC_TAGS: Map<string, ITagInfo> = new Map();
 
-export async function indexLwc(workspacePath: string) {
-    return Promise.all([
-        loadStandardLwc(),
-        indexCustomComponents(workspacePath),
-    ]);
-}
-
-export async function updateCustomComponentIndex(updatedFiles: FileEvent[]) {
+export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { sfdxProject }: IWorkspaceContext) {
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${sep}lightningcomponents${sep}.*.js`)) {
             if (f.type === FileChangeType.Created) {
-                addCustomTagFromFile(f.uri);
+                addCustomTagFromFile(f.uri, sfdxProject);
             } else if (f.type === FileChangeType.Deleted) {
-                removeCustomTagFromFile(f.uri);
+                removeCustomTagFromFile(f.uri, sfdxProject);
             }
         }
     });
@@ -39,9 +31,9 @@ export function getLwcByTag(tagName: string) {
     return LWC_TAGS.get(tagName);
 }
 
-function loadStandardLwc() {
+export function loadStandardLwc(): Promise<void> {
     return new Promise((resolve, reject) => {
-        fs.readFile(getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
+        fs.readFile(utils.getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -69,42 +61,33 @@ function loadStandardLwc() {
     });
 }
 
-function addCustomTag(tag: string, attributes: string[]) {
-    LWC_TAGS.set('c-' + tag, { attributes });
+function addCustomTag(tag: string, attributes: string[], sfdxProject: boolean) {
+    // TODO: handle namespaces
+    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, { attributes });
 }
-function removeCustomTag(tag: string) {
-    LWC_TAGS.delete('c-' + tag);
-}
-
-export function setCustomAttributes(tag: string, attributes: string[]) {
-    LWC_TAGS.set('c-' + tag, { attributes });
+function removeCustomTag(tag: string, sfdxProject: boolean) {
+    LWC_TAGS.delete(sfdxProject ? 'c-' + tag : tag);
 }
 
-function indexCustomComponents(workspacePath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        /* tslint:disable */
-        new Glob(LWC_GLOB_PATTERN, { cwd: workspacePath, absolute: true }, async (err: Error, files: string[]) => {
-            if (err) {
-                console.log(`Error queing up indexing of labels. Error detatils: ${err}`);
-                reject(err);
-            } else {
-                await loadCustomTagsFromFiles(files);
-                resolve();
-            }
-        });
-        /* tslint:enable */
-    });
+export function setCustomAttributes(tag: string, attributes: string[], { sfdxProject }: IWorkspaceContext) {
+    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, { attributes });
 }
 
-async function loadCustomTagsFromFiles(filePaths: string[]) {
+export async function indexCustomComponents(namespaceRoots: string[], sfdxProject: boolean): Promise<void> {
+    const files = utils.findModules(namespaceRoots);
+    await loadCustomTagsFromFiles(files, sfdxProject);
+}
+
+async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean) {
     const startTime = process.hrtime();
     for (const file of filePaths) {
-        await addCustomTagFromFile(file);
+        await addCustomTagFromFile(file, sfdxProject);
     }
-    console.log('loadCustomTagsFromFiles: executed in ' + elapsedMillis(startTime));
+    console.log('loadCustomTagsFromFiles: processed ' + filePaths.length + ' files in '
+        + utils.elapsedMillis(startTime));
 }
 
-export async function addCustomTagFromFile(file: string) {
+export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
     const filePath = parse(file);
     const fileName = filePath.name;
     const parentDirName = filePath.dir.split(sep).pop();
@@ -115,15 +98,15 @@ export async function addCustomTagFromFile(file: string) {
         if (rv.diagnostics.length > 0) {
             console.log('error compiling ' + file + ': ', rv.diagnostics);
         }
-        addCustomTag(parentDirName, attributes);
+        addCustomTag(parentDirName, attributes, sfdxProject);
     }
 }
 
-function removeCustomTagFromFile(file: string) {
+function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
     const filePath = parse(file);
     const fileName = filePath.name;
     const parentDirName = filePath.dir.split(sep).pop();
     if (fileName === parentDirName) {
-        removeCustomTag(parentDirName);
+        removeCustomTag(parentDirName, sfdxProject);
     }
 }

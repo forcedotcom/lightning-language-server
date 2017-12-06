@@ -5,8 +5,9 @@ import {
     TextEdit,
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
-import { indexLwc } from '../../metadata-utils/custom-components-util';
+import { loadStandardLwc, indexCustomComponents, getLwcByTag } from '../../metadata-utils/custom-components-util';
 import { join } from 'path';
+import * as utils from '../../utils';
 
 interface ICompletionMatcher {
     label: string;
@@ -74,7 +75,9 @@ it('complete', async () => {
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
     ]);
 
-    await indexLwc(join('test-workspaces', 'test-force-app-metadata'));
+    const namespaceRoots = utils.findNamespaceRoots(join('test-workspaces', 'test-force-app-metadata'));
+    await loadStandardLwc();
+    await indexCustomComponents(namespaceRoots, true);
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 
@@ -85,4 +88,12 @@ it('complete', async () => {
     testCompletion('<template><c-todo_item tod|', [
         { label: 'todo', result: '<template><c-todo_item todo=$1' },
     ]);
+});
+
+it('indexLwc', async () => {
+    // test indexing of core-like workspace
+    const namespaceRoots = utils.findNamespaceRoots('test-workspaces/core-like-workspace');
+    await indexCustomComponents(namespaceRoots, false);
+    expect(getLwcByTag('app-nav-bar').attributes).toEqual([]);
+    expect(getLwcByTag('input-phone').attributes).toEqual([ 'value' ]);
 });

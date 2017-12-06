@@ -2,6 +2,7 @@ import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { write } from './file-flush-util';
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
+import { IWorkspaceContext } from '../context';
 
 const STATIC_RESOURCE_DECLARATION_FILE = 'typings/staticresources.d.ts';
 const STATIC_RESOURCE_GLOB_PATTERN = '**/staticresources/*.resource';
@@ -11,7 +12,7 @@ function getResourceName(resourceFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateStaticResourceIndex(workspace: string, updatedFiles: FileEvent[]) {
+export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoot }: IWorkspaceContext) {
     let didChange = false;
     updatedFiles.forEach(f => {
         if (f.uri.endsWith('.resource')) {
@@ -25,7 +26,7 @@ export async function updateStaticResourceIndex(workspace: string, updatedFiles:
         }
     });
     if (didChange) {
-        await processStaticResources(workspace);
+        await processStaticResources(workspaceRoot);
     }
 }
 

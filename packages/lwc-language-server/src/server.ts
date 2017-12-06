@@ -11,12 +11,11 @@ import {
     Files,
 } from 'vscode-languageserver';
 
+import { IWorkspaceContext } from './context';
+
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument, extractAttributes } from './javascript/compiler';
-import {
-    isTemplate,
-    isJavascript,
-} from './utils';
+import * as utils from './utils';
 import {
     indexCustomLabels,
     updateLabelsIndex,
@@ -26,7 +25,8 @@ import {
     updateStaticResourceIndex,
 } from './metadata-utils/static-resources-util';
 import {
-    indexLwc,
+    loadStandardLwc,
+    indexCustomComponents,
     updateCustomComponentIndex,
     setCustomAttributes,
     getLwcByTag,
@@ -46,15 +46,20 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ls: LanguageService;
-let workspaceRoot: string;
+let workspaceContext: IWorkspaceContext;
 
-async function init() {
-    sfdxConfig.configSfdxProject(workspaceRoot);
-    return Promise.all([
-        indexLwc(workspaceRoot), // TODO: See if this can be made this async
-        indexStaticResources(workspaceRoot),
-        indexCustomLabels(workspaceRoot),
-    ]);
+async function init(workspaceRoot: string): Promise<IWorkspaceContext> {
+    const namespaceRoots = utils.findNamespaceRoots(workspaceRoot);
+    const sfdxProject = sfdxConfig.configSfdxProject(workspaceRoot);
+    const indexingTasks: Array<Promise<void>> = [];
+    indexingTasks.push(loadStandardLwc());
+    indexingTasks.push(indexCustomComponents(namespaceRoots, sfdxProject));
+    if (sfdxProject) {
+        indexingTasks.push(indexStaticResources(workspaceRoot));
+        indexingTasks.push(indexCustomLabels(workspaceRoot));
+    }
+    await Promise.all(indexingTasks);
+    return { workspaceRoot, sfdxProject, namespaceRoots };
 }
 
 connection.onInitialize((params: InitializeParams): Promise<InitializeResult> => {
@@ -65,14 +70,16 @@ async function onInitialize(params: InitializeParams): Promise<InitializeResult>
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    const workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!workspaceRoot) {
         console.log(`No workspace found`);
         return { capabilities: {} };
     }
 
     console.log(`Starting language server at ${workspaceRoot}`);
-    await init();
+    const startTime = process.hrtime();
+    workspaceContext = await init(workspaceRoot);
+    console.log('     ... language server started in ' + utils.elapsedMillis(startTime), workspaceContext);
 
     // Return the language server capabilities
     return {
@@ -94,10 +101,10 @@ documents.onDidChangeContent(async change => {
     console.log('onDidChangeContent: ', change.document.uri);
     const { document } = change;
     const { uri } = document;
-    if (isTemplate(document)) {
+    if (utils.isTemplate(document)) {
         const diagnostics = templateLinter(document);
         connection.sendDiagnostics({ uri, diagnostics });
-    } else if (isJavascript(document)) {
+    } else if (utils.isJavascript(document)) {
         const { result, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (result) {
@@ -106,7 +113,7 @@ documents.onDidChangeContent(async change => {
             const tagName = uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'));
             if (attributes.length > 0 || getLwcByTag(tagName)) {
                 // has @apis or known tag => assuming is the main .js file for the module
-                setCustomAttributes(tagName, attributes);
+                setCustomAttributes(tagName, attributes, workspaceContext);
             }
         }
     }
@@ -119,7 +126,7 @@ connection.onCompletion(
         }
         const document = documents.get(textDocumentPosition.textDocument.uri);
         const htmlDocument = ls.parseHTMLDocument(document);
-        return isTemplate(document)
+        return utils.isTemplate(document)
             ? ls.doComplete(document, textDocumentPosition.position, htmlDocument)
             : { isIncomplete: false, items: [] };
     },
@@ -136,8 +143,8 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     connection.console.log('We recevied an file change event');
     console.log('onDidChangeWatchedFiles...');
     return Promise.all([
-        updateStaticResourceIndex(workspaceRoot, change.changes),
-        updateLabelsIndex(workspaceRoot, change.changes),
-        updateCustomComponentIndex(change.changes),
+        updateStaticResourceIndex(change.changes, workspaceContext),
+        updateLabelsIndex(change.changes, workspaceContext),
+        updateCustomComponentIndex(change.changes, workspaceContext),
     ]);
 });

@@ -4,6 +4,7 @@ import { join } from 'path';
 import { parseString } from 'xml2js';
 import { write } from './file-flush-util';
 import { FileEvent, FileChangeType, Files } from 'vscode-languageserver/lib/main';
+import { IWorkspaceContext } from '../context';
 
 interface ICustomLabelsResult {
     CustomLabels: ICustomLabels;
@@ -48,7 +49,7 @@ export function indexCustomLabels(workspacePath: string): Promise<void> {
     });
 }
 
-export async function updateLabelsIndex(workspace: string, updatedFiles: FileEvent[]) {
+export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRoot }: IWorkspaceContext) {
     let didChange = false;
     updatedFiles.forEach(f => {
         if (f.uri.endsWith('CustomLabels.labels-meta.xml')) {
@@ -61,7 +62,7 @@ export async function updateLabelsIndex(workspace: string, updatedFiles: FileEve
         }
     });
     if (didChange) {
-        await processLabels(workspace);
+        await processLabels(workspaceRoot);
     }
 }
 
