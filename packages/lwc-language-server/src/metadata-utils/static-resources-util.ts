@@ -1,7 +1,7 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { write } from './file-flush-util';
-import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
+import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 
 const STATIC_RESOURCE_DECLARATION_FILE = 'typings/staticresources.d.ts';

@@ -1,7 +1,7 @@
 import { sep, parse } from 'path';
 import * as fs from 'fs';
 import * as utils from '../utils';
-import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
+import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { compileFile, extractAttributes } from '../javascript/compiler';
 import { WorkspaceContext } from '../context';
 
@@ -11,13 +11,13 @@ export interface ITagInfo {
 
 export const LWC_TAGS: Map<string, ITagInfo> = new Map();
 
-export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { sfdxProject }: WorkspaceContext) {
+export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { isSfdxProject }: WorkspaceContext) {
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${sep}lightningcomponents${sep}.*.js`)) {
             if (f.type === FileChangeType.Created) {
-                addCustomTagFromFile(f.uri, sfdxProject);
+                addCustomTagFromFile(f.uri, isSfdxProject);
             } else if (f.type === FileChangeType.Deleted) {
-                removeCustomTagFromFile(f.uri, sfdxProject);
+                removeCustomTagFromFile(f.uri, isSfdxProject);
             }
         }
     });
@@ -69,13 +69,13 @@ function removeCustomTag(tag: string, sfdxProject: boolean) {
     LWC_TAGS.delete(sfdxProject ? 'c-' + tag : tag);
 }
 
-export function setCustomAttributes(tag: string, attributes: string[], { sfdxProject }: WorkspaceContext) {
-    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, { attributes });
+export function setCustomAttributes(tag: string, attributes: string[], { isSfdxProject }: WorkspaceContext) {
+    LWC_TAGS.set(isSfdxProject ? 'c-' + tag : tag, { attributes });
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
     const files = context.findAllModules();
-    await loadCustomTagsFromFiles(files, context.sfdxProject);
+    await loadCustomTagsFromFiles(files, context.isSfdxProject);
 }
 
 async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean) {

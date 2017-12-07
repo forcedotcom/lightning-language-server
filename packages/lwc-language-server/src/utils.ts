@@ -1,20 +1,17 @@
-import { extname, join } from 'path';
-import { TextDocument, Files } from 'vscode-languageserver';
+import { extname, join, resolve } from 'path';
+import { TextDocument } from 'vscode-languageserver';
+import URI from 'vscode-uri';
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
+export function toResolvedPath(uri: string): string {
+    return resolve(URI.parse(uri).path);
+}
+
 export function getExtension(textDocument: TextDocument): string {
-    const filePath = Files.uriToFilePath(textDocument.uri);
+    const filePath = URI.parse(textDocument.uri).path;
     return filePath ? extname(filePath) : '';
-}
-
-export function isTemplate(document: TextDocument): boolean {
-    return document.languageId === 'html' && getExtension(document) === '.html';
-}
-
-export function isJavascript(document: TextDocument): boolean {
-    return document.languageId === 'javascript';
 }
 
 export function getResourcePath(resourceName: string) {

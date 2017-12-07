@@ -1,10 +1,11 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { join } from 'path';
-import { getSfdxResource } from './utils';
+import * as utils from './utils';
 import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
 import { loadStandardLwc, indexCustomComponents } from './metadata-utils/custom-components-util';
+import { TextDocument } from 'vscode-languageserver';
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -16,24 +17,25 @@ export class WorkspaceContext {
      */
     public static createFrom(workspaceRoot: string): WorkspaceContext {
         const namespaceRoots = findNamespaceRoots(workspaceRoot);
-        const sfdxProject = isSfdxProject(workspaceRoot);
+        const sfdxProject = fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'));
         return new WorkspaceContext(workspaceRoot, sfdxProject, namespaceRoots);
     }
 
     private constructor(public readonly workspaceRoot: string
-                      , public readonly sfdxProject: boolean
-                      , public readonly namespaceRoots: string[]) {
+                      , public readonly isSfdxProject: boolean
+                      , private readonly namespaceRoots: string[]) {
+        this.workspaceRoot = path.resolve(workspaceRoot);
     }
 
     public async configureAndIndex() {
-        if (this.sfdxProject) {
+        if (this.isSfdxProject) {
             this.configureSfdxProject();
         }
 
         const indexingTasks: Array<Promise<void>> = [];
         indexingTasks.push(loadStandardLwc());
         indexingTasks.push(indexCustomComponents(this));
-        if (this.sfdxProject) {
+        if (this.isSfdxProject) {
             indexingTasks.push(indexStaticResources(this.workspaceRoot));
             indexingTasks.push(indexCustomLabels(this.workspaceRoot));
         }
@@ -51,6 +53,29 @@ export class WorkspaceContext {
         return files;
     }
 
+    public isLWCTemplate(document: TextDocument): boolean {
+        return document.languageId === 'html' && utils.getExtension(document) === '.html' && this.isInsideModulesRoots(document);
+    }
+
+    public isLWCJavascript(document: TextDocument): boolean {
+        return document.languageId === 'javascript' && this.isInsideModulesRoots(document);
+    }
+
+    public isInsideModulesRoots(document: TextDocument): boolean {
+        const file = utils.toResolvedPath(document.uri);
+        if (!file.startsWith(this.workspaceRoot)) {
+            throw new Error('document not in workspace: ' + file + '\n' + this.workspaceRoot);
+        }
+
+        for (const root of this.namespaceRoots) {
+            if (file.startsWith(root)) {
+                return true;
+            }
+        }
+        return false;
+        // TODO: optimize by switching namespaceRoots to moduleRoots
+    }
+
     /**
      * Configures a sfdx project
      */
@@ -59,13 +84,13 @@ export class WorkspaceContext {
 
         // copy jsconfig.json
         // TODO: allow user modifications in jsonfig.json
-        fs.copySync(getSfdxResource('jsconfig-sfdx.json'), join(this.workspaceRoot, 'jsconfig.json'));
+        fs.copySync(utils.getSfdxResource('jsconfig-sfdx.json'), join(this.workspaceRoot, 'jsconfig.json'));
 
         // copy engine.d.ts, lwc.d.ts to ./typings
         const typingsDir = join(this.workspaceRoot, 'typings');
         fs.ensureDir(typingsDir);
-        fs.copySync(getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
-        fs.copySync(getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
+        fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
+        fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
     }
 }
 
@@ -101,9 +126,11 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
             return;
         }
 
+        // module_root/name/name.js
+
         const subdirs = findSubdirectories(candidate);
         if (isModuleRoot(subdirs)) {
-            roots.push(candidate);
+            roots.push(path.resolve(candidate));
         } else {
             for (const subdir of subdirs) {
                 traverse(subdir, depth);
@@ -141,8 +168,4 @@ function findSubdirectories(dir: string): string[] {
         }
     }
     return subdirs;
-}
-
-function isSfdxProject(workspaceRoot: string) {
-    return fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'));
 }

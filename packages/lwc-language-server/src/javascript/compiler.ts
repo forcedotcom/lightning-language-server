@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import { transform } from 'raptor-compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range, Files } from 'vscode-languageserver';
+import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import * as path from 'path';
+import URI from 'vscode-uri';
 
 export interface ICompilerMetadata {
     apiProperties: Array<{ name: string }>;
@@ -14,7 +15,7 @@ export interface ICompilerResult {
 }
 
 export async function compileDocument(document: TextDocument): Promise<ICompilerResult> {
-    const file = Files.uriToFilePath(document.uri);
+    const file = URI.parse(document.uri).path;
     const filePath = path.parse(file);
     const fileName = filePath.base;
     return compileSource(document.getText(), fileName);

@@ -77,7 +77,7 @@ it('complete', async () => {
     const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
     await loadStandardLwc();
     await indexCustomComponents(context);
-    expect(context.sfdxProject).toBeTruthy();
+    expect(context.isSfdxProject).toBeTruthy();
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 

@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {
     createConnection,
     IConnection,
@@ -8,7 +10,6 @@ import {
     CompletionList,
     CompletionItem,
     DidChangeWatchedFilesParams,
-    Files,
 } from 'vscode-languageserver';
 
 import { WorkspaceContext } from './context';
@@ -27,6 +28,7 @@ import {
     getLanguageService,
     LanguageService,
 } from './html-language-service/htmlLanguageService';
+import URI from 'vscode-uri';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -37,17 +39,13 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ls: LanguageService;
-let workspaceContext: WorkspaceContext;
+let context: WorkspaceContext;
 
-connection.onInitialize((params: InitializeParams): Promise<InitializeResult> => {
-    return onInitialize(params);
-});
-
-async function onInitialize(params: InitializeParams): Promise<InitializeResult> {
+connection.onInitialize(async (params: InitializeParams): Promise<InitializeResult> => {
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    const workspaceRoot = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).path : rootPath);
     if (!workspaceRoot) {
         console.log(`No workspace found`);
         return { capabilities: {} };
@@ -55,9 +53,9 @@ async function onInitialize(params: InitializeParams): Promise<InitializeResult>
 
     console.log(`Starting language server at ${workspaceRoot}`);
     const startTime = process.hrtime();
-    workspaceContext = WorkspaceContext.createFrom(workspaceRoot);
-    workspaceContext.configureAndIndex();
-    console.log('     ... language server started in ' + utils.elapsedMillis(startTime), workspaceContext);
+    context = WorkspaceContext.createFrom(workspaceRoot);
+    context.configureAndIndex();
+    console.log('     ... language server started in ' + utils.elapsedMillis(startTime), context);
 
     // Return the language server capabilities
     return {
@@ -68,7 +66,7 @@ async function onInitialize(params: InitializeParams): Promise<InitializeResult>
             },
         },
     };
-}
+});
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -76,13 +74,12 @@ documents.onDidClose(event => {
 });
 
 documents.onDidChangeContent(async change => {
-    console.log('onDidChangeContent: ', change.document.uri);
     const { document } = change;
     const { uri } = document;
-    if (utils.isTemplate(document)) {
+    if (context.isLWCTemplate(document)) {
         const diagnostics = templateLinter(document);
         connection.sendDiagnostics({ uri, diagnostics });
-    } else if (utils.isJavascript(document)) {
+    } else if (context.isLWCJavascript(document)) {
         const { result, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (result) {
@@ -91,7 +88,7 @@ documents.onDidChangeContent(async change => {
             const tagName = uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'));
             if (attributes.length > 0 || getLwcByTag(tagName)) {
                 // has @apis or known tag => assuming is the main .js file for the module
-                setCustomAttributes(tagName, attributes, workspaceContext);
+                setCustomAttributes(tagName, attributes, context);
             }
         }
     }
@@ -104,7 +101,7 @@ connection.onCompletion(
         }
         const document = documents.get(textDocumentPosition.textDocument.uri);
         const htmlDocument = ls.parseHTMLDocument(document);
-        return utils.isTemplate(document)
+        return context.isLWCTemplate(document)
             ? ls.doComplete(document, textDocumentPosition.position, htmlDocument)
             : { isIncomplete: false, items: [] };
     },
@@ -118,11 +115,10 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    connection.console.log('We recevied an file change event');
     console.log('onDidChangeWatchedFiles...');
     return Promise.all([
-        updateStaticResourceIndex(change.changes, workspaceContext),
-        updateLabelsIndex(change.changes, workspaceContext),
-        updateCustomComponentIndex(change.changes, workspaceContext),
+        updateStaticResourceIndex(change.changes, context),
+        updateLabelsIndex(change.changes, context),
+        updateCustomComponentIndex(change.changes, context),
     ]);
 });

@@ -3,7 +3,7 @@ import { readFile } from 'fs';
 import { join } from 'path';
 import { parseString } from 'xml2js';
 import { write } from './file-flush-util';
-import { FileEvent, FileChangeType, Files } from 'vscode-languageserver/lib/main';
+import { FileEvent, FileChangeType, Files } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 
 interface ICustomLabelsResult {
