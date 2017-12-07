@@ -21,7 +21,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/node_modules/.bin/jest",
             "args": [
-                "src",
+                "src/__test__/context.test.ts",
                 "--runInBand",
                 "--verbose",
                 "--no-cache"

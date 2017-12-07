@@ -11,22 +11,14 @@ import {
     Files,
 } from 'vscode-languageserver';
 
-import { IWorkspaceContext } from './context';
+import { WorkspaceContext } from './context';
 
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument, extractAttributes } from './javascript/compiler';
 import * as utils from './utils';
+import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
+import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import {
-    indexCustomLabels,
-    updateLabelsIndex,
-} from './metadata-utils/custom-labels-util';
-import {
-    indexStaticResources,
-    updateStaticResourceIndex,
-} from './metadata-utils/static-resources-util';
-import {
-    loadStandardLwc,
-    indexCustomComponents,
     updateCustomComponentIndex,
     setCustomAttributes,
     getLwcByTag,
@@ -35,7 +27,6 @@ import {
     getLanguageService,
     LanguageService,
 } from './html-language-service/htmlLanguageService';
-import * as sfdxConfig from './sfdx/sfdxConfig';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -46,21 +37,7 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ls: LanguageService;
-let workspaceContext: IWorkspaceContext;
-
-async function init(workspaceRoot: string): Promise<IWorkspaceContext> {
-    const namespaceRoots = utils.findNamespaceRoots(workspaceRoot);
-    const sfdxProject = sfdxConfig.configSfdxProject(workspaceRoot);
-    const indexingTasks: Array<Promise<void>> = [];
-    indexingTasks.push(loadStandardLwc());
-    indexingTasks.push(indexCustomComponents(namespaceRoots, sfdxProject));
-    if (sfdxProject) {
-        indexingTasks.push(indexStaticResources(workspaceRoot));
-        indexingTasks.push(indexCustomLabels(workspaceRoot));
-    }
-    await Promise.all(indexingTasks);
-    return { workspaceRoot, sfdxProject, namespaceRoots };
-}
+let workspaceContext: WorkspaceContext;
 
 connection.onInitialize((params: InitializeParams): Promise<InitializeResult> => {
     return onInitialize(params);
@@ -78,7 +55,8 @@ async function onInitialize(params: InitializeParams): Promise<InitializeResult>
 
     console.log(`Starting language server at ${workspaceRoot}`);
     const startTime = process.hrtime();
-    workspaceContext = await init(workspaceRoot);
+    workspaceContext = WorkspaceContext.createFrom(workspaceRoot);
+    workspaceContext.configureAndIndex();
     console.log('     ... language server started in ' + utils.elapsedMillis(startTime), workspaceContext);
 
     // Return the language server capabilities

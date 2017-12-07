@@ -13,7 +13,7 @@ export default class App extends Element {
     // state = 4;  // example type error if checkJs is enabled
 
     reverseMessage(event) {
-        this.state.message = this.state.message.split('').reverse().join('');\
+        this.state.message = this.state.message.split('').reverse().join('');
     }
 
     get computedMessage() {

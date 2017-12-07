@@ -1,0 +1,12 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://mobile1.t.salesforce.com",
+  "signupTargetLoginUrl" : "https://mobile1.t.salesforce.com",
+  "sourceApiVersion": "42.0"
+}

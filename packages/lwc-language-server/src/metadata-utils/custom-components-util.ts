@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as utils from '../utils';
 import { FileEvent, FileChangeType } from 'vscode-languageserver/lib/main';
 import { compileFile, extractAttributes } from '../javascript/compiler';
-import { IWorkspaceContext } from '../context';
+import { WorkspaceContext } from '../context';
 
 export interface ITagInfo {
     attributes: string[];
@@ -11,7 +11,7 @@ export interface ITagInfo {
 
 export const LWC_TAGS: Map<string, ITagInfo> = new Map();
 
-export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { sfdxProject }: IWorkspaceContext) {
+export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { sfdxProject }: WorkspaceContext) {
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${sep}lightningcomponents${sep}.*.js`)) {
             if (f.type === FileChangeType.Created) {
@@ -69,13 +69,13 @@ function removeCustomTag(tag: string, sfdxProject: boolean) {
     LWC_TAGS.delete(sfdxProject ? 'c-' + tag : tag);
 }
 
-export function setCustomAttributes(tag: string, attributes: string[], { sfdxProject }: IWorkspaceContext) {
+export function setCustomAttributes(tag: string, attributes: string[], { sfdxProject }: WorkspaceContext) {
     LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, { attributes });
 }
 
-export async function indexCustomComponents(namespaceRoots: string[], sfdxProject: boolean): Promise<void> {
-    const files = utils.findModules(namespaceRoots);
-    await loadCustomTagsFromFiles(files, sfdxProject);
+export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
+    const files = context.findAllModules();
+    await loadCustomTagsFromFiles(files, context.sfdxProject);
 }
 
 async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean) {
