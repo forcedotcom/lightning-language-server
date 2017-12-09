@@ -394,104 +394,6 @@
     ],
     "support": "GA"
   },
-  "button-menu": {
-    "@type": "COMPONENT",
-    "attributes": [
-      {
-        "name": "accesskey",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "alternativeText",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "body",
-        "required": false,
-        "type": "AURA.COMPONENTDEFREF[]"
-      },
-      {
-        "name": "class",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "disabled",
-        "required": false,
-        "type": "BOOLEAN"
-      },
-      {
-        "name": "iconName",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "iconSize",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "menuAlignment",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "name",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "onblur",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onfocus",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onselect",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "tabindex",
-        "required": false,
-        "type": "INTEGER"
-      },
-      {
-        "name": "title",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "value",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "variant",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "visible",
-        "required": false,
-        "type": "BOOLEAN"
-      }
-    ],
-    "extensible": false,
-    "methods": [
-      {
-        "name": "focus"
-      }
-    ],
-    "minVersion": "0.0",
-    "support": "GA"
-  },
   "button-stateful": {
     "@type": "COMPONENT",
     "attributes": [
@@ -578,6 +480,39 @@
       }
     ],
     "minVersion": "0.0",
+    "support": "GA"
+  },
+  "carousel": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "disableAutoRefresh",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "disableAutoScroll",
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "scrollDuration",
+        "required": false,
+        "type": "INTEGER"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "42.0",
     "support": "GA"
   },
   "checkbox-group": {
@@ -1508,6 +1443,28 @@
     "extensible": false,
     "support": "GA"
   },
+  "formatted-time": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "value",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "support": "GA"
+  },
   "formatted-url": {
     "@type": "COMPONENT",
     "attributes": [
@@ -1576,6 +1533,44 @@
     ],
     "extensible": false,
     "minVersion": "41.0",
+    "support": "GA"
+  },
+  "icon": {
+    "@type": "COMPONENT",
+    "attributes": [
+      {
+        "name": "alternativeText",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "iconName",
+        "required": true,
+        "type": "STRING"
+      },
+      {
+        "name": "size",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "title",
+        "required": false,
+        "type": "STRING"
+      },
+      {
+        "name": "variant",
+        "required": false,
+        "type": "STRING"
+      }
+    ],
+    "extensible": false,
+    "minVersion": "0.0",
     "support": "GA"
   },
   "input": {
@@ -1786,6 +1781,7 @@
         "name": "showHelpMessageIfInvalid"
       }
     ],
+    "minVersion": "0.0",
     "support": "BETA"
   },
   "input-address": {
@@ -2147,82 +2143,14 @@
     "minVersion": "0.0",
     "support": "GA"
   },
-  "menu-item": {
+  "output-field": {
     "@type": "COMPONENT",
     "attributes": [
-      {
-        "name": "accesskey",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "checked",
-        "required": false,
-        "type": "BOOLEAN"
-      },
       {
         "name": "class",
         "required": false,
         "type": "STRING"
       },
-      {
-        "name": "disabled",
-        "required": false,
-        "type": "BOOLEAN"
-      },
-      {
-        "name": "iconName",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "label",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "onactive",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onblur",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onfocus",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "tabindex",
-        "required": false,
-        "type": "INTEGER"
-      },
-      {
-        "name": "title",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "value",
-        "required": false,
-        "type": "STRING"
-      }
-    ],
-    "extensible": false,
-    "methods": [
-      {
-        "name": "focus"
-      }
-    ],
-    "minVersion": "0.0",
-    "support": "GA"
-  },
-  "output-field": {
-    "@type": "COMPONENT",
-    "attributes": [
       {
         "name": "fieldName",
         "required": false,
@@ -2465,57 +2393,14 @@
     ],
     "support": "GA"
   },
-  "record-edit-form": {
-    "@type": "COMPONENT",
-    "attributes": [
-      {
-        "name": "objectApiName",
-        "required": true,
-        "type": "STRING"
-      },
-      {
-        "name": "onerror",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onload",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onsubmit",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "onsuccess",
-        "required": false,
-        "type": "AURA.ACTION"
-      },
-      {
-        "name": "recordId",
-        "required": false,
-        "type": "STRING"
-      },
-      {
-        "name": "recordTypeId",
-        "required": false,
-        "type": "STRING"
-      }
-    ],
-    "extensible": false,
-    "methods": [
-      {
-        "name": "submit"
-      }
-    ],
-    "minVersion": "41.0",
-    "support": "GA"
-  },
   "record-view-form": {
     "@type": "COMPONENT",
     "attributes": [
+      {
+        "name": "class",
+        "required": false,
+        "type": "STRING"
+      },
       {
         "name": "objectApiName",
         "required": true,
