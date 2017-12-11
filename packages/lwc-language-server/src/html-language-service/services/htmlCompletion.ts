@@ -39,10 +39,12 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 	function collectOpenTagSuggestions(afterOpenBracket: number, tagNameEnd?: number): CompletionList {
 		let range = getReplaceRange(afterOpenBracket, tagNameEnd);
 		tagProviders.forEach((provider) => {
+			const detail = provider.getId() === 'lwc'? 'LWC tag' : undefined;
 			provider.collectTags((tag, label) => {
 				result.items.push({
 					label: tag,
 					kind: CompletionItemKind.Property,
+					detail,
 					documentation: label,
 					textEdit: TextEdit.replace(range, tag),
 					insertTextFormat: InsertTextFormat.PlainText
@@ -154,6 +156,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 				}
 				result.items.push({
 					label: attribute,
+					detail: 'LWC attribute',
 					kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
 					textEdit: TextEdit.replace(range, codeSnippet),
 					insertTextFormat: InsertTextFormat.Snippet
