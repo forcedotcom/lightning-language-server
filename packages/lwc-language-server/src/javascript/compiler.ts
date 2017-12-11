@@ -43,10 +43,10 @@ export function extractAttributes(metadata: ICompilerMetadata): string[] {
 
 // TODO: proper type for 'err' (i.e. SyntaxError)
 function toDiagnostic(err: any): Diagnostic {
-    // TODO: 'err' doesn't have end loc
+    // TODO: 'err' doesn't have end loc, squiggling until the end of the line until babel 7 is released
     const startLine: number = err.loc.line - 1;
     const startCharacter: number = err.loc.column;
-    const range: Range = Range.create(startLine, startCharacter, startLine, startCharacter + 1);
+    const range: Range = Range.create(startLine, startCharacter, startLine, Number.MAX_VALUE);
     return {
         range,
         severity: DiagnosticSeverity.Error,
