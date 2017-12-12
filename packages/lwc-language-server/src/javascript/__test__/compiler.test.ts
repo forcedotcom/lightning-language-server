@@ -1,12 +1,12 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
-import { transform } from 'raptor-compiler';
+import { transform } from 'lwc-compiler';
 import { compileSource, compileDocument, compileFile } from '../compiler';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
 
 const FIXTURE_DIR = path.join(__dirname, 'fixtures');
 
-it('can use transform(src, id, options) from raptor-compiler', async () => {
+it('can use transform(src, id, options) from lwc-compiler', async () => {
     const actual = `
         import { Element } from 'engine';
         export default class Foo extends Element {}
@@ -68,7 +68,7 @@ it('returns list of javascript compilation errors', async () => {
     );
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 8 },
-        end: { character: 9 },
+        end: { character: Number.MAX_VALUE },
     });
     expect(diagnostics[0].source).toBe(DIAGNOSTIC_SOURCE);
 });

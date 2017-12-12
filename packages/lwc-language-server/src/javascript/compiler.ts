@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { transform } from 'raptor-compiler';
+import { transform } from 'lwc-compiler';
 import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import * as path from 'path';

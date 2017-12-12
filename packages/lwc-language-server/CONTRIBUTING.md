@@ -16,14 +16,14 @@ npm test -- --watch         # Run the test in watch mode
 
 # Running
 
-To run/debug this language server in VSCode you can launch it from the [raptor-vscode](https://git.soma.salesforce.com/raptor/raptor-vscode) client extension.
+To run/debug this language server in VSCode you can launch it from the [lwc-vscode](https://git.soma.salesforce.com/raptor/lwc-vscode) client extension.
 
-First setup raptor-vscode to use the live raptor-language-server source:
+First setup lwc-vscode to use the live lwc-language-server source:
 ```sh
-cd ~/git/raptor-language-server; npm link
-cd ~/git/raptor-vscode; npm link raptor-language-server
+cd ~/git/lwc-language-server; npm link
+cd ~/git/lwc-vscode; npm link lwc-language-server
 ```
 
 and run/debug both projects using VSCode:
-1. Launch the raptor-vscode extension using the "Launch Extension" debug configuration in raptor-vscode.
-2. Attach the debugger to the raptor-language-server using the "Attach to LS" debug configuration in raptor-language-server.
+1. Launch the lwc-vscode extension using the "Launch Extension" debug configuration in lwc-vscode.
+2. Attach the debugger to the lwc-language-server using the "Attach to LS" debug configuration in lwc-language-server.

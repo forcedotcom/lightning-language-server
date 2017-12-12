@@ -1,2 +1,2 @@
 // TODO: provide typings for those:
-declare module 'raptor-compiler';
+declare module 'lwc-compiler';

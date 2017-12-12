@@ -1,6 +1,6 @@
-# Raptor Language Server
+# LWC Language Server
 
-This project is an implementation of the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) for Raptor projects. 
+This project is an implementation of the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) for LWC projects. 
 
 ## Features
 
@@ -10,7 +10,7 @@ This project is an implementation of the [Language Server Protocol](https://gith
 
 ## Editor Integrations
 
-* [VS Code](https://git.soma.salesforce.com/raptor/raptor-vscode)
+* [VS Code](https://git.soma.salesforce.com/raptor/lwc-vscode)
 
 ## Contributing
 

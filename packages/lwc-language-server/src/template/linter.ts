@@ -1,4 +1,4 @@
-import templateCompiler from 'raptor-template-compiler';
+import templateCompiler from 'lwc-template-compiler';
 import {
     TextDocument,
     Diagnostic,

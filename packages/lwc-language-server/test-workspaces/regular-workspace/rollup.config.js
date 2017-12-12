@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const path = require('path');
-const raptorCompiler = require('rollup-plugin-raptor-compiler');
+const lwcCompiler = require('rollup-plugin-lwc-compiler');
 
 module.exports = {
     input: path.resolve('src/main.js'),
@@ -12,7 +12,7 @@ module.exports = {
     external: ['engine'],
     globals: { engine: 'Engine' },
     plugins: [
-        raptorCompiler({
+        lwcCompiler({
             mapNamespaceFromPath: true,
             resolveFromPackages: false,
         })
