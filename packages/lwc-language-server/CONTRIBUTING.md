@@ -16,7 +16,7 @@ npm test -- --watch         # Run the test in watch mode
 
 # Running
 
-To run/debug this language server in VSCode you can launch it from the [lwc-vscode](https://git.soma.salesforce.com/raptor/lwc-vscode) client extension.
+To run/debug this language server in VSCode you can launch it from the [lwc-vscode](https://git.soma.salesforce.com/lwc/lwc-vscode) client extension.
 
 First setup lwc-vscode to use the live lwc-language-server source:
 ```sh

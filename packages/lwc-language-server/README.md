@@ -10,7 +10,7 @@ This project is an implementation of the [Language Server Protocol](https://gith
 
 ## Editor Integrations
 
-* [VS Code](https://git.soma.salesforce.com/raptor/lwc-vscode)
+* [VS Code](https://git.soma.salesforce.com/lwc/lwc-vscode)
 
 ## Contributing
 
