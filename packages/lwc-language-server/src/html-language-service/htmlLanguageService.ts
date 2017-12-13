@@ -4,12 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import {createScanner} from './parser/htmlScanner';
-import {parse} from './parser/htmlParser';
-import {doComplete} from './services/htmlCompletion';
-import {TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink } from 'vscode-languageserver-types';
+import { createScanner } from './parser/htmlScanner';
+import { parse } from './parser/htmlParser';
+import { doComplete } from './services/htmlCompletion';
+import { TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink } from 'vscode-languageserver-types';
 
-export {TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink };
+export { TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink };
 
 export interface HTMLFormatConfiguration {
 	tabSize?: number;
@@ -27,8 +27,8 @@ export interface HTMLFormatConfiguration {
 }
 
 export interface CompletionConfiguration {
-	[provider: string]: boolean;
-	hideAutoCompleteProposals?: boolean
+	[provider: string]: boolean | undefined;
+	hideAutoCompleteProposals?: boolean;
 }
 
 export interface Node {
@@ -37,8 +37,8 @@ export interface Node {
 	end: number;
 	endTagStart: number;
 	children: Node[];
-	parent: Node;
-	attributes?: {[name: string]: string};
+	parent?: Node;
+	attributes?: { [name: string]: string | null };
 }
 
 
@@ -88,7 +88,7 @@ export interface Scanner {
 	getTokenLength(): number;
 	getTokenEnd(): number;
 	getTokenText(): string;
-	getTokenError(): string;
+	getTokenError(): string | undefined;
 	getScannerState(): ScannerState;
 }
 

@@ -5,9 +5,9 @@
 'use strict';
 
 import { TextDocument, Position, CompletionList, CompletionItemKind, Range, TextEdit, InsertTextFormat, CompletionItem } from 'vscode-languageserver-types';
-import { HTMLDocument } from '../parser/htmlParser';
+import { HTMLDocument, Node } from '../parser/htmlParser';
 import { TokenType, createScanner, ScannerState } from '../parser/htmlScanner';
-import { isEmptyElement } from '../parser/htmlTags'
+import { isEmptyElement } from '../parser/htmlTags';
 import { allTagProviders } from './tagProviders';
 import { CompletionConfiguration } from '../htmlLanguageService';
 
@@ -19,14 +19,16 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 	};
 	let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId) && (!settings || settings[p.getId()] !== false));
 
+	let text = document.getText();
 	let offset = document.offsetAt(position);
+
 	let node = htmlDocument.findNodeBefore(offset);
 	if (!node) {
 		return result;
 	}
-	let text = document.getText();
+
 	let scanner = createScanner(text, node.start);
-	let currentTag: string;
+	let currentTag: string = '';
 	let currentAttributeName: string;
 
 	function getReplaceRange(replaceStart: number, replaceEnd: number = offset): Range {
@@ -72,7 +74,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 	function collectCloseTagSuggestions(afterOpenBracket: number, inOpenTag: boolean, tagNameEnd: number = offset): CompletionList {
 		let range = getReplaceRange(afterOpenBracket, tagNameEnd);
 		let closeTag = isFollowedBy(text, tagNameEnd, ScannerState.WithinEndTag, TokenType.EndTagClose) ? '' : '>';
-		let curr = node;
+		let curr: Node | undefined = node;
 		if (inOpenTag) {
 			curr = curr.parent; // don't suggest the own tag, it's not yet open
 		}
@@ -149,7 +151,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '=$1';
 		let tag = currentTag.toLowerCase();
 		tagProviders.forEach(provider => {
-			provider.collectAttributes(tag, (attribute, type) => {
+			provider.collectAttributes(tag, (attribute, type?: string) => {
 				let codeSnippet = attribute;
 				if (type !== 'v' && value.length) {
 					codeSnippet = codeSnippet + value;
@@ -166,7 +168,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		return result;
 	}
 
-	function collectAttributeValueSuggestions(valueStart: number, valueEnd?: number): CompletionList {
+	function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
 		let range: Range;
 		let addQuotes: boolean;
 		if (offset > valueStart && offset <= valueEnd && text[valueStart] === '"') {
@@ -177,7 +179,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 			let wsBefore = getWordStart(text, offset, valueStart + 1);
 			let wsAfter = getWordEnd(text, offset, valueEnd);
 			range = getReplaceRange(wsBefore, wsAfter);
-			addQuotes = false
+			addQuotes = false;
 		} else {
 			range = getReplaceRange(valueStart, valueEnd);
 			addQuotes = true;
@@ -297,10 +299,10 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 	return result;
 }
 
-export function doTagComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string {
+export function doTagComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null {
 	let offset = document.offsetAt(position);
 	if (offset <= 0) {
-		return;
+		return null;
 	}
 	let char = document.getText().charAt(offset - 1);
 	if (char === '>') {
@@ -316,7 +318,7 @@ export function doTagComplete(document: TextDocument, position: Position, htmlDo
 			}
 		}
 	} else if (char === '/') {
-		let node = htmlDocument.findNodeBefore(offset);
+		let node: Node | undefined = htmlDocument.findNodeBefore(offset);
 		while (node && node.closed) {
 			node = node.parent;
 		}
@@ -337,10 +339,6 @@ export function doTagComplete(document: TextDocument, position: Position, htmlDo
 function isWhiteSpace(s: string): boolean {
 	return /^\s*$/.test(s);
 }
-
-//function isWhiteSpaceOrQuote(s: string): boolean {
-//	return /^[\s"]*$/.test(s);
-//}
 
 function isFollowedBy(s: string, offset: number, intialState: ScannerState, expectedToken: TokenType) {
 	let scanner = createScanner(s, offset, intialState);
