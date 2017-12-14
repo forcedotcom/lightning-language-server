@@ -1,4 +1,4 @@
-import templateCompiler from 'lwc-template-compiler';
+import { templateCompiler } from '../resources/lwc/compiler';
 import {
     TextDocument,
     Diagnostic,

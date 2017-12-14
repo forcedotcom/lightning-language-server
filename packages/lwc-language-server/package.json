@@ -20,7 +20,6 @@
     "@types/xml2js": "^0.4.2",
     "fs-extra": "4.0.2",
     "glob": "^7.1.2",
-    "lwc-compiler": "0.17.0",
     "vscode-languageserver": "3.5.0",
     "vscode-nls": "^2.0.2",
     "vscode-uri": "^1.0.1",

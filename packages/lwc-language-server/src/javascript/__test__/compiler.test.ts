@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
-import { transform } from 'lwc-compiler';
+import { transform } from '../../resources/lwc/compiler';
 import { compileSource, compileDocument, compileFile } from '../compiler';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
 
