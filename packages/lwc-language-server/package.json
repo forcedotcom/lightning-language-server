@@ -4,9 +4,6 @@
   "description": "Language Server Protocol implementation for LWC projects",
   "main": "lib/server.js",
   "typings": "lib/server.d.ts",
-  "files": [
-    "lib"
-  ],
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf lib",

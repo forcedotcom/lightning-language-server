@@ -1,0 +1,10 @@
+/src
+/test-workspaces
+**/__test__
+.vscode
+tsconfig.json
+tslint.json
+CONTRIBUTING.md
+Jenkinsfile
+jest
+/typings
