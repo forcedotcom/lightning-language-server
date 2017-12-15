@@ -11,7 +11,8 @@
     "prepare": "npm run clean && npm run build",
     "test": "jest src",
     "lint": "tslint 'src/**/*.ts'",
-    "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\""
+    "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\"",
+    "prepush": "npm run prepare && npm run lint && npm test"
   },
   "dependencies": {
     "@types/babel-types": "6.25.1",
@@ -29,12 +30,13 @@
     "@types/jest": "^21.1.5",
     "@types/node": "8.0.51",
     "babel-types": "6.25.0",
+    "husky": "^0.14.3",
     "jest": "^21.1.5",
+    "lwc-engine": "0.17.0",
     "prettier": "1.7.4",
     "ts-jest": "21.1.4",
     "tslint": "5.8.0",
-    "typescript": "2.6.1",
-    "lwc-engine": "0.17.0"
+    "typescript": "2.6.1"
   },
   "publishConfig": {
     "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
