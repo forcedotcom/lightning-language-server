@@ -5,7 +5,7 @@ import {
     TextEdit,
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
-import { loadStandardLwc, indexCustomComponents, getLwcByTag } from '../../metadata-utils/custom-components-util';
+import { loadStandardLwc, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { WorkspaceContext } from '../../context';
 
 interface ICompletionMatcher {
@@ -88,12 +88,4 @@ it('complete', async () => {
     testCompletion('<template><c-todo_item tod|', [
         { label: 'todo', result: '<template><c-todo_item todo=$1' },
     ]);
-});
-
-it('indexLwc', async () => {
-    // test indexing of core-like workspace
-    const context = WorkspaceContext.createFrom('test-workspaces/core-like-workspace');
-    await indexCustomComponents(context);
-    expect(getLwcByTag('app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('input-phone').attributes).toEqual([ 'value' ]);
 });

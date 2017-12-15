@@ -1,6 +1,7 @@
 import { IHTMLTagProvider } from './htmlTags';
 import { CompletionItem } from 'vscode-languageserver';
 import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
+
 class LwcCompletionItem implements CompletionItem {
     constructor(
         readonly label: string,
@@ -33,8 +34,8 @@ const LWC_DIRECTIVES: LwcCompletionItem[] = [
 
 export function getLwcTagProvider(): IHTMLTagProvider {
     function addTags(collector: (tag: string, label: string) => void) {
-        for (const tag of getLwcTags()) {
-            collector(tag, tag);
+        for (const [tag, tagInfo] of getLwcTags()) {
+            collector(tag, tagInfo.documentation);
         }
     }
 

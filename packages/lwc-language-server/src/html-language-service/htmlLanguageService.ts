@@ -7,6 +7,7 @@
 import { createScanner } from './parser/htmlScanner';
 import { parse } from './parser/htmlParser';
 import { doComplete } from './services/htmlCompletion';
+import { doHover } from './services/htmlHover';
 import { TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink } from 'vscode-languageserver-types';
 
 export { TextDocument, Position, CompletionItem, CompletionList, Hover, Range, SymbolInformation, Diagnostic, TextEdit, DocumentHighlight, FormattingOptions, MarkedString, DocumentLink };
@@ -106,6 +107,7 @@ export interface LanguageService {
 	createScanner(input: string): Scanner;
 	parseHTMLDocument(document: TextDocument): HTMLDocument;
 	doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, options?: CompletionConfiguration): CompletionList;
+	doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover | null;
 }
 
 export function getLanguageService(): LanguageService {
@@ -113,5 +115,6 @@ export function getLanguageService(): LanguageService {
 		createScanner,
 		parseHTMLDocument: document => parse(document.getText()),
 		doComplete,
+		doHover
 	};
 }

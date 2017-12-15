@@ -10,6 +10,7 @@ import {
     CompletionList,
     CompletionItem,
     DidChangeWatchedFilesParams,
+    Hover,
 } from 'vscode-languageserver';
 
 import { WorkspaceContext } from './context';
@@ -38,7 +39,7 @@ const connection: IConnection = createConnection();
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
-let ls: LanguageService;
+let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
 connection.onInitialize(async (params: InitializeParams): Promise<InitializeResult> => {
@@ -55,6 +56,7 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
     const startTime = process.hrtime();
     context = WorkspaceContext.createFrom(workspaceRoot);
     context.configureAndIndex();
+    htmlLS = getLanguageService();
     console.log('     ... language server started in ' + utils.elapsedMillis(startTime), context);
 
     // Return the language server capabilities
@@ -64,6 +66,7 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
             completionProvider: {
                 resolveProvider: true,
             },
+            hoverProvider: true,
         },
     };
 });
@@ -96,19 +99,26 @@ documents.onDidChangeContent(async change => {
 
 connection.onCompletion(
     (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
-        if (!ls) {
-            ls = getLanguageService();
-        }
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        const htmlDocument = ls.parseHTMLDocument(document);
-        return context.isLWCTemplate(document)
-            ? ls.doComplete(document, textDocumentPosition.position, htmlDocument)
-            : { isIncomplete: false, items: [] };
+        if (!context.isLWCTemplate(document)) {
+            return { isIncomplete: false, items: [] };
+        }
+        const htmlDocument = htmlLS.parseHTMLDocument(document);
+        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
     },
 );
 
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
     return item;
+});
+
+connection.onHover((textDocumentPosition: TextDocumentPositionParams): Hover => {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!context.isLWCTemplate(document)) {
+        return null;
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
 });
 
 // Listen on the connection

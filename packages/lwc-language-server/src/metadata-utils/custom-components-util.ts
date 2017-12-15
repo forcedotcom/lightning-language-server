@@ -5,11 +5,12 @@ import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { compileFile, extractAttributes } from '../javascript/compiler';
 import { WorkspaceContext } from '../context';
 
-export interface ITagInfo {
-    attributes: string[];
+export class TagInfo {
+    constructor(public attributes: string[], public documentation: string = '[doc placeholder]') {
+    }
 }
 
-export const LWC_TAGS: Map<string, ITagInfo> = new Map();
+const LWC_TAGS: Map<string, TagInfo> = new Map();
 
 export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { isSfdxProject }: WorkspaceContext) {
     updatedFiles.forEach(f => {
@@ -23,8 +24,8 @@ export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { is
     });
 }
 
-export function getLwcTags() {
-    return LWC_TAGS.keys();
+export function getLwcTags(): Map<string, TagInfo> {
+    return LWC_TAGS;
 }
 
 export function getLwcByTag(tagName: string) {
@@ -41,7 +42,7 @@ export function loadStandardLwc(): Promise<void> {
                     const lwcStandard = JSON.parse(data);
                     for (const property in lwcStandard) {
                         if (lwcStandard.hasOwnProperty(property) && typeof property === 'string') {
-                            const val: ITagInfo = { attributes: [] };
+                            const val = new TagInfo([]);
                             if (lwcStandard[property].attributes) {
                                 lwcStandard[property].attributes.map((a: any) => {
                                     const attrName =
@@ -63,14 +64,14 @@ export function loadStandardLwc(): Promise<void> {
 
 function addCustomTag(tag: string, attributes: string[], sfdxProject: boolean) {
     // TODO: handle namespaces
-    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, { attributes });
+    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, new TagInfo(attributes));
 }
 function removeCustomTag(tag: string, sfdxProject: boolean) {
     LWC_TAGS.delete(sfdxProject ? 'c-' + tag : tag);
 }
 
 export function setCustomAttributes(tag: string, attributes: string[], { isSfdxProject }: WorkspaceContext) {
-    LWC_TAGS.set(isSfdxProject ? 'c-' + tag : tag, { attributes });
+    LWC_TAGS.set(isSfdxProject ? 'c-' + tag : tag, new TagInfo(attributes));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
