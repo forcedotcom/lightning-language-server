@@ -1,5 +1,6 @@
 import { WorkspaceContext } from '../context';
 import { readAsTextDocument } from './test-utils';
+import * as fs from 'fs-extra';
 
 const META_ROOT = 'test-workspaces/sfdx-workspace/force-app/main/default';
 
@@ -91,6 +92,22 @@ it('isLWCJavascript()', () => {
     // .js outside namespace roots
     document = readAsTextDocument(META_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
     expect(context.isLWCJavascript(document)).toBeFalsy();
+});
+
+it('configureSfdxProject()', () => {
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const jsconfigPath = META_ROOT + '/lightningcomponents/jsconfig.json';
+    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+
+    // make sure no typings/jsconfig.json are there from previous run
+    fs.remove(jsconfigPath);
+    fs.removeSync(sfdxTypingsPath);
+
+    // verify typings/jsconfig after configuration
+    context.configureSfdxProject();
+    expect(jsconfigPath).toExist();
+    expect(sfdxTypingsPath + '/engine.d.ts').toExist();
+    expect(sfdxTypingsPath + '/lwc.d.ts').toExist();
 });
 
 // TODO: .js outside namespace roots:

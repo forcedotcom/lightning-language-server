@@ -79,7 +79,7 @@ export class WorkspaceContext {
     /**
      * Configures a sfdx project
      */
-    private configureSfdxProject() {
+    public configureSfdxProject() {
         // copies relevant files from the extension src/resources/sfdx folder to the sfdx project
 
         // copy jsconfig.json
