@@ -9,7 +9,7 @@
     "clean": "rm -rf lib",
     "build": "tsc -p . && cp -r src/resources lib/",
     "prepare": "npm run clean && npm run build",
-    "test": "jest --silent --verbose src",
+    "test": "jest --silent --verbose --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --single-quote --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\"",
     "prepush": "npm run prepare && npm run lint && npm test"
