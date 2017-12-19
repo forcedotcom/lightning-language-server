@@ -1,4 +1,4 @@
-# LWC Language Server [![CircleCI](https://circleci.com/gh/rsalvador/lwc-language-server.svg?style=svg&circle-token=4c439893a544d5cbd3cbc9502620f3232213484c)](https://circleci.com/gh/rsalvador/lwc-language-server)
+# LWC Language Server [![CircleCI](https://circleci.com/gh/salesforce/lwc-language-server.svg?style=svg&circle-token=51282d5c6eca47a3a5886b2c1d49493eb5514560)](https://circleci.com/gh/salesforce/lwc-language-server)
 
 This project is an implementation of the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) for LWC projects. 
 
