@@ -39,7 +39,7 @@
     "typescript": "2.6.1"
   },
   "publishConfig": {
-    "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
+    "registry": "https://npm.lwcjs.org"
   },
   "jest": {
     "transform": {
