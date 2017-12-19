@@ -4,3 +4,4 @@ lib
 .sfdx
 .project
 coverage/
+src/resources/sfdx/typings/engine.d.ts
