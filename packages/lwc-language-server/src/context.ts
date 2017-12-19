@@ -84,10 +84,11 @@ export class WorkspaceContext {
 
         // copy jsconfig.json
         // TODO: allow user modifications in jsonfig.json
-        fs.copySync(utils.getSfdxResource('jsconfig-sfdx.json'), join(this.workspaceRoot, 'jsconfig.json'));
+        fs.copySync(utils.getSfdxResource('jsconfig-sfdx.json'), join(this.workspaceRoot, 'force-app', 'main', 'default', 'lightningcomponents'
+            , 'jsconfig.json'));
 
-        // copy engine.d.ts, lwc.d.ts to ./typings
-        const typingsDir = join(this.workspaceRoot, 'typings');
+        // copy engine.d.ts, lwc.d.ts to .sfdx/typings/lwc
+        const typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
         fs.ensureDir(typingsDir);
         fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
         fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));

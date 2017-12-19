@@ -4,7 +4,7 @@ import { write } from './file-flush-util';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 
-const STATIC_RESOURCE_DECLARATION_FILE = 'typings/staticresources.d.ts';
+const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
 const STATIC_RESOURCE_GLOB_PATTERN = '**/staticresources/*.resource';
 const STATIC_RESOURCES: Set<string> = new Set();
 
