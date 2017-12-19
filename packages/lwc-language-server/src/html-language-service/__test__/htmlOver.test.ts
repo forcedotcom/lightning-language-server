@@ -31,7 +31,7 @@ function assertHover(value: string, expectedHoverValue: string | undefined, expe
 }
 
 it('UC: hover is shown for standard and custom tags', async () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
 
     // standard tags
     await loadStandardLwc();

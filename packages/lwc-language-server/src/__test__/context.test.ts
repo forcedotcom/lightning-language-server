@@ -1,20 +1,22 @@
 import { WorkspaceContext } from '../context';
 import { readAsTextDocument } from './test-utils';
 
+const META_ROOT = 'test-workspaces/sfdx-workspace/force-app/main/default';
+
 function namespaceRoots(context: WorkspaceContext): string[] {
     // tslint:disable-next-line:no-string-literal
     return context['namespaceRoots'];
 }
 
 it('WorkspaceContext', async () => {
-    let context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+    let context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
     expect(context.workspaceRoot).toBeAbsolute();
     let roots = namespaceRoots(context);
     expect(roots[0]).toBeAbsolute();
-    expect(roots[0]).toEndWith('test-workspaces/test-force-app-metadata/lightningcomponents');
+    expect(roots[0]).toEndWith(META_ROOT + '/lightningcomponents');
     let modules = context.findAllModules();
-    expect(modules[0]).toEndWith('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.js');
-    expect(modules[9]).toEndWith('test-workspaces/test-force-app-metadata/lightningcomponents/wire_lds/wire_lds.js');
+    expect(modules[0]).toEndWith(META_ROOT + '/lightningcomponents/hello_world/hello_world.js');
+    expect(modules[9]).toEndWith(META_ROOT + '/lightningcomponents/wire_lds/wire_lds.js');
     expect(modules.length).toBe(10);
 
     context = WorkspaceContext.createFrom('test-workspaces/regular-workspace');
@@ -41,53 +43,53 @@ it('WorkspaceContext', async () => {
     // console.log('core roots:', utils.findNamespaceRoots('/Users/rsalvador/blt/app/main/core'));
 });
 
-it('utils.isInsideModulesRoots()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+it('isInsideModulesRoots()', () => {
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
 
-    let document = readAsTextDocument('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(META_ROOT + '/lightningcomponents/hello_world/hello_world.js');
     expect(context.isInsideModulesRoots(document)).toBeTruthy();
 
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(META_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(context.isInsideModulesRoots(document)).toBeFalsy();
 });
 
-it('utils.isLWCTemplate()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+it('isLWCTemplate()', () => {
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
 
     // .js is not a template
-    let document = readAsTextDocument('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(META_ROOT + '/lightningcomponents/hello_world/hello_world.js');
     expect(context.isLWCTemplate(document)).toBeFalsy();
 
     // .html is a template
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.html');
+    document = readAsTextDocument(META_ROOT + '/lightningcomponents/hello_world/hello_world.html');
     expect(context.isLWCTemplate(document)).toBeTruthy();
 
     // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(META_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(context.isLWCTemplate(document)).toBeFalsy();
 
     // html outside namespace roots is not a template
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/aura/todoApp/randomHtmlInAuraFolder.html');
+    document = readAsTextDocument(META_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
     expect(context.isLWCTemplate(document)).toBeFalsy();
 });
 
-it('utils.isLWCJavascript()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+it('isLWCJavascript()', () => {
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
 
     // lwc .js
-    let document = readAsTextDocument('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(META_ROOT + '/lightningcomponents/hello_world/hello_world.js');
     expect(context.isLWCJavascript(document)).toBeTruthy();
 
     // lwc .htm
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/lightningcomponents/hello_world/hello_world.html');
+    document = readAsTextDocument(META_ROOT + '/lightningcomponents/hello_world/hello_world.html');
     expect(context.isLWCJavascript(document)).toBeFalsy();
 
     // aura cmps
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(META_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(context.isLWCJavascript(document)).toBeFalsy();
 
     // .js outside namespace roots
-    document = readAsTextDocument('test-workspaces/test-force-app-metadata/aura/todoApp/randomJsInAuraFolder.js');
+    document = readAsTextDocument(META_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
     expect(context.isLWCJavascript(document)).toBeFalsy();
 });
 

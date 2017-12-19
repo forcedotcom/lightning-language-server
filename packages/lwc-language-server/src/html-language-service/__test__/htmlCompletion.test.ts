@@ -74,7 +74,7 @@ it('complete', async () => {
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
     ]);
 
-    const context = WorkspaceContext.createFrom('test-workspaces/test-force-app-metadata');
+    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
     await loadStandardLwc();
     await indexCustomComponents(context);
     expect(context.isSfdxProject).toBeTruthy();

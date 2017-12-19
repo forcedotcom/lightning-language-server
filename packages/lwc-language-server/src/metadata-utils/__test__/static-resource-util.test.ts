@@ -13,5 +13,5 @@ it('fush test', async (done) => {
     export default resourceUrl;
 }
 `;
-    validate(indexStaticResources, 'test-force-app-metadata', 'staticresources.d.ts', expectedDTS, done);
+    validate(indexStaticResources, 'test-workspaces/sfdx-workspace/force-app/main/default', 'staticresources.d.ts', expectedDTS, done);
 });
