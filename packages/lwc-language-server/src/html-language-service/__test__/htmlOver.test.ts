@@ -45,4 +45,10 @@ it('UC: hover is shown for standard and custom tags', async () => {
     assertHover('|<c-todo_item></c-todo_item>', undefined);
     assertHover('<|c-todo_item></c-todo_item>', '<c-todo_item>', undefined, 1);
     assertHover('<c-todo_it|em></c-todo_item>', '<c-todo_item>', undefined, 1);
+
+    // custom tags from utils package
+    await indexCustomComponents(context);
+    assertHover('|<c-todo_util></c-todo_util>', undefined);
+    assertHover('<|c-todo_util></c-todo_util>', '<c-todo_util>', undefined, 1);
+    assertHover('<c-todo_ut|il></c-todo_util>', '<c-todo_util>', undefined, 1);
 });

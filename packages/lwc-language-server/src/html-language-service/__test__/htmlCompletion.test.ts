@@ -88,4 +88,8 @@ it('complete', async () => {
     testCompletion('<template><c-todo_item tod|', [
         { label: 'todo', result: '<template><c-todo_item todo=$1' },
     ]);
+
+    testCompletion('<template><c-todo_util inf|', [
+        { label: 'info', result: '<template><c-todo_util info=$1' },
+    ]);
 });
