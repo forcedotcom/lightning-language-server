@@ -1,8 +1,9 @@
 import {mockFileUtilHooks} from './mock-file-util';
 import { join } from 'path';
 
-export async function validate(indexer: (path: string) => Promise<void>,
+export async function validate(indexer: (path: string, sfdxPackageDirsPattern: string) => Promise<void>,
                                testWorkspace: string,
+                               sfdxPackageDirsPattern: string,
                                expectedTypeDeclarationFileName: string,
                                expectedTypeDeclarations: string,
                                done: any) {
@@ -11,6 +12,6 @@ export async function validate(indexer: (path: string) => Promise<void>,
         expect(path).toContain(expectedTypeDeclarationFileName);
         return Promise.resolve();
     };
-    await indexer(join(process.cwd(), 'test-workspaces', testWorkspace));
+    await indexer(join(process.cwd(), 'test-workspaces', testWorkspace), sfdxPackageDirsPattern);
     done();
 }

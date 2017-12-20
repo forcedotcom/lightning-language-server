@@ -4,6 +4,6 @@
     },
     "include": [
         "**/*",
-        "../../../../.sfdx/typings/lwc/**/*.d.ts"
+        "${project_root}/.sfdx/typings/lwc/**/*.d.ts"
     ]
 }

@@ -6,12 +6,12 @@ import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
 import { loadStandardLwc, indexCustomComponents } from './metadata-utils/custom-components-util';
 import { TextDocument } from 'vscode-languageserver';
-
+import { GlobSync } from 'glob';
+import * as _ from 'lodash';
 /**
  * Holds information and utility methods for a LWC workspace
  */
 export class WorkspaceContext {
-
     /**
      * Creates a new WorkspaceContext representing the workspace at workspaceRoot
      */
@@ -21,6 +21,8 @@ export class WorkspaceContext {
         return new WorkspaceContext(workspaceRoot, sfdxProject, namespaceRoots);
     }
 
+    private sfdxProjectConfig: ISfdxProjectConfig;
+    private sfdxPackageDirsPattern: string;
     private constructor(public readonly workspaceRoot: string
                       , public readonly isSfdxProject: boolean
                       , private readonly namespaceRoots: string[]) {
@@ -36,8 +38,8 @@ export class WorkspaceContext {
         indexingTasks.push(loadStandardLwc());
         indexingTasks.push(indexCustomComponents(this));
         if (this.isSfdxProject) {
-            indexingTasks.push(indexStaticResources(this.workspaceRoot));
-            indexingTasks.push(indexCustomLabels(this.workspaceRoot));
+            indexingTasks.push(indexStaticResources(this.workspaceRoot, this.sfdxPackageDirsPattern));
+            indexingTasks.push(indexCustomLabels(this.workspaceRoot, this.sfdxPackageDirsPattern));
         }
         await Promise.all(indexingTasks);
     }
@@ -80,12 +82,10 @@ export class WorkspaceContext {
      * Configures a sfdx project
      */
     public configureSfdxProject() {
-        // copies relevant files from the extension src/resources/sfdx folder to the sfdx project
+        this.initSfdxProject();
 
-        // copy jsconfig.json
         // TODO: allow user modifications in jsonfig.json
-        fs.copySync(utils.getSfdxResource('jsconfig-sfdx.json'), join(this.workspaceRoot, 'force-app', 'main', 'default', 'lightningcomponents'
-            , 'jsconfig.json'));
+        this.writeJsonConfigFiles();
 
         // copy engine.d.ts, lwc.d.ts to .sfdx/typings/lwc
         const typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
@@ -93,6 +93,50 @@ export class WorkspaceContext {
         fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
         fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
     }
+
+    private writeJsonConfigFiles() {
+        const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
+        _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
+
+        const compiled = _.template(jsConfigTemplate);
+        new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
+           const variableMap = {project_root : this.workspaceRoot };
+           const jsConfigContent = compiled( variableMap );
+           fs.writeFileSync(join(this.workspaceRoot, dirPath, 'jsconfig.json'), jsConfigContent);
+        });
+    }
+
+    private initSfdxProject() {
+        this.sfdxProjectConfig = readSfdxProjectConfig(this.workspaceRoot);
+
+        // initializing the packageDirs glob pattern prefix
+        const packageDirs = getSfdxPackageDirs(this.sfdxProjectConfig);
+        this.sfdxPackageDirsPattern = packageDirs.join();
+        if (packageDirs.length > 1) {
+            // {} brackets are only needed if there are multiple paths
+            this.sfdxPackageDirsPattern = `{${this.sfdxPackageDirsPattern}}`;
+        }
+    }
+}
+
+interface ISfdxPackageDirectoryConfig {
+    path: string;
+}
+
+interface ISfdxProjectConfig {
+    packageDirectories: ISfdxPackageDirectoryConfig[];
+}
+
+function readSfdxProjectConfig(workspaceRoot: string): ISfdxProjectConfig {
+    return JSON.parse(fs.readFileSync(join(workspaceRoot, 'sfdx-project.json'), 'utf8'));
+}
+
+function getSfdxPackageDirs(sfdxProjectConfig: ISfdxProjectConfig) {
+    const packageDirs: string[] = [];
+    sfdxProjectConfig.packageDirectories.forEach((packageDir) => {
+        packageDirs.push(packageDir.path);
+    });
+    return packageDirs;
 }
 
 /**

@@ -5,7 +5,6 @@ import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
-const STATIC_RESOURCE_GLOB_PATTERN = '**/staticresources/*.resource';
 const STATIC_RESOURCES: Set<string> = new Set();
 
 function getResourceName(resourceFile: string) {
@@ -36,7 +35,8 @@ async function processStaticResources(workspace: string) {
     }
 }
 
-export function indexStaticResources(workspacePath: string): Promise<void> {
+export function indexStaticResources(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
+    const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource`;
     return new Promise((resolve, reject) => {
         /* tslint:disable */
         new Glob(STATIC_RESOURCE_GLOB_PATTERN, {cwd: workspacePath}, async (err: Error, files: string[]) => {

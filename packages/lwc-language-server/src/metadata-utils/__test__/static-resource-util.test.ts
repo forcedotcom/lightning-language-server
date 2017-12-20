@@ -6,12 +6,12 @@ jest.mock('../file-flush-util', () => {
     return mockFileUtil();
 });
 
-it('fush test', async (done) => {
+it('indexStaticResources', async (done) => {
     const expectedDTS =
 `declare module "@resource-url/todocss" {
     var resourceUrl: string;
     export default resourceUrl;
 }
 `;
-    validate(indexStaticResources, 'test-workspaces/sfdx-workspace/force-app/main/default', 'staticresources.d.ts', expectedDTS, done);
+    validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS, done);
 });

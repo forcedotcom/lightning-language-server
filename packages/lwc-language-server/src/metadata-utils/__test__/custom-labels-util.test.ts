@@ -6,7 +6,7 @@ jest.mock('../file-flush-util', () => {
     return mockFileUtil();
 });
 
-it('fush test', async (done) => {
+it('indexCustomLabels', async (done) => {
     const expectedDTS =
 `declare module "@label/c.greeting" {
     var labelName: string;
@@ -17,5 +17,5 @@ declare module "@label/c.greeting2" {
     export default labelName;
 }
 `;
-    validate(indexCustomLabels, 'test-force-app-metadata', 'customlabels.d.ts', expectedDTS, done);
+    validate(indexCustomLabels, 'sfdx-workspace', 'force-app', 'customlabels.d.ts', expectedDTS, done);
 });

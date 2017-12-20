@@ -19,7 +19,6 @@ interface ILabel {
 const CUSTOM_LABELS: Set<string> = new Set();
 const CUSTOM_LABEL_FILES: Set<string> = new Set();
 const CUSTOM_LABELS_DECLARATION_FILE = '.sfdx/typings/lwc/customlabels.d.ts';
-const CUSTOM_LABEL_GLOB_PATTERN = '**/labels/CustomLabels.labels-meta.xml';
 
 function getGlob(globPattern: string, workspace: string, callBack: (err: Error, files: string[]) => void) {
     const options: IOptions = {};
@@ -28,7 +27,8 @@ function getGlob(globPattern: string, workspace: string, callBack: (err: Error, 
     return new Glob(globPattern, options, callBack);
 }
 
-export function indexCustomLabels(workspacePath: string): Promise<void> {
+export function indexCustomLabels(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
+    const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
     return new Promise((resolve, reject) => {
         getGlob(CUSTOM_LABEL_GLOB_PATTERN, workspacePath, async (err: Error, files: string[]) => {
             if (err) {
