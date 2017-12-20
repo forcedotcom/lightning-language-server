@@ -2,7 +2,7 @@ import { isAbsolute } from 'path';
 import * as fs from 'fs';
 
 expect.extend({
-    toExist(path) {
+    fileToExist(path) {
         const pass = fs.existsSync(path);
         if (pass) {
             return {
@@ -17,7 +17,7 @@ expect.extend({
             };
         }
     },
-    toBeAbsolute(path) {
+    pathToBeAbsolute(path) {
         const pass = isAbsolute(path);
         if (pass) {
             return {

@@ -12,9 +12,9 @@ function namespaceRoots(context: WorkspaceContext): string[] {
 
 it('WorkspaceContext', async () => {
     let context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
-    expect(context.workspaceRoot).toBeAbsolute();
+    expect(context.workspaceRoot).pathToBeAbsolute();
     let roots = namespaceRoots(context);
-    expect(roots[0]).toBeAbsolute();
+    expect(roots[0]).pathToBeAbsolute();
     expect(roots[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents');
     let modules = context.findAllModules();
     expect(modules[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
@@ -112,10 +112,12 @@ it('configureSfdxProject()', () => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
 
-    // make sure no typings/jsconfig.json are there from previous run
+    // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
     fs.removeSync(jsconfigPathUtils);
+    fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 
     // verify typings/jsconfig after configuration:
@@ -125,6 +127,7 @@ it('configureSfdxProject()', () => {
     // tslint:disable-next-line no-string-literal
     expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils}');
 
+    // jsconfig.json files
     const configForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, { encoding: 'utf-8' }));
     expect(configForceApp.compilerOptions.experimentalDecorators).toBe(true);
     expect(configForceApp.include[0]).toBe('**/*');
@@ -134,8 +137,14 @@ it('configureSfdxProject()', () => {
     expect(configUtils.include[0]).toBe('**/*');
     expect(configUtils.include[1]).toMatch(/test-workspaces\/sfdx-workspace\/.sfdx\/typings\/lwc\/\*\*\/\*.d.ts$/);
 
-    expect(sfdxTypingsPath + '/engine.d.ts').toExist();
-    expect(sfdxTypingsPath + '/lwc.d.ts').toExist();
+    // .forceignore
+    const forceignoreContent = fs.readFileSync(forceignorePath, { encoding: 'utf-8' });
+    expect(forceignoreContent).toContain('force-app/main/default/lightningcomponents/jsconfig.json');
+    expect(forceignoreContent).toContain('utils/meta/lightningcomponents/jsconfig.json');
+
+    // typings
+    expect(sfdxTypingsPath + '/engine.d.ts').fileToExist();
+    expect(sfdxTypingsPath + '/lwc.d.ts').fileToExist();
 });
 
 // TODO: .js outside namespace roots:

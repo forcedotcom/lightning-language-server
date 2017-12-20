@@ -1,4 +1,5 @@
 import { extname, join, resolve } from 'path';
+import * as fs from 'fs';
 import { TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 
@@ -24,6 +25,24 @@ export function getlwcStandardResourcePath() {
 
 export function getSfdxResource(resourceName: string) {
     return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
+}
+
+export function appendLineIfMissing(file: string, line: string) {
+    if (!fs.existsSync(file)) {
+        fs.writeFileSync(file, line + '\n');
+    } else if (!fileContainsLine(file, line)) {
+        fs.appendFileSync(file, '\n' + line + '\n');
+    }
+}
+
+function fileContainsLine(file: string, expectLine: string) {
+    const trimmed = expectLine.trim();
+    for (const line of fs.readFileSync(file).toString().split('\n')) {
+        if (line.trim() === trimmed) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**

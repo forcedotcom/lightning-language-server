@@ -99,10 +99,14 @@ export class WorkspaceContext {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
 
         const compiled = _.template(jsConfigTemplate);
+
         const variableMap = {project_root : this.workspaceRoot };
         const jsConfigContent = compiled( variableMap );
+        const forceignore = join(this.workspaceRoot, '.forceignore');
         new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
-           fs.writeFileSync(join(this.workspaceRoot, dirPath, 'jsconfig.json'), jsConfigContent);
+           const jsConfigPath = join(dirPath, 'jsconfig.json');
+           fs.writeFileSync(join(this.workspaceRoot, jsConfigPath), jsConfigContent);
+           utils.appendLineIfMissing(forceignore, jsConfigPath);
         });
     }
 
