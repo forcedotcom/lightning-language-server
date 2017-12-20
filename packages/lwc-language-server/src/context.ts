@@ -99,9 +99,9 @@ export class WorkspaceContext {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
 
         const compiled = _.template(jsConfigTemplate);
+        const variableMap = {project_root : this.workspaceRoot };
+        const jsConfigContent = compiled( variableMap );
         new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
-           const variableMap = {project_root : this.workspaceRoot };
-           const jsConfigContent = compiled( variableMap );
            fs.writeFileSync(join(this.workspaceRoot, dirPath, 'jsconfig.json'), jsConfigContent);
         });
     }
