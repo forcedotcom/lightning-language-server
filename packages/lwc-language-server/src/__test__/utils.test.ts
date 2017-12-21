@@ -14,12 +14,12 @@ it('test canonicalizing in nodejs', () => {
     expect(canonical.endsWith('/tmp/a')).toBe(true);
 });
 
-it ('appendLineIfMissing()', () => {
+it('appendLineIfMissing()', () => {
     const file = tmp.tmpNameSync();
     tmp.setGracefulCleanup();
 
     // creates with line if file doesn't exist
-    expect(file).not.fileToExist();
+    expect(file).not.toExist();
     utils.appendLineIfMissing(file, 'line 1');
     expect(fs.readFileSync(file).toString()).toBe('line 1\n');
 
@@ -30,4 +30,58 @@ it ('appendLineIfMissing()', () => {
     // doesn't add line if already there
     utils.appendLineIfMissing(file, 'line 1');
     expect(fs.readFileSync(file).toString()).toBe('line 1\n\nline 2\n');
+});
+
+it('deepMerge()', () => {
+    // simplest
+    let to: any = { a: 1 };
+    let from: any = { b: 2 };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: 1, b: 2 });
+    expect(utils.deepMerge({ a: 1 }, { a: 1 })).toBeFalsy();
+
+    // overwrite scalar
+    to = { a: 1 };
+    from = { a: 2 };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: 2 });
+
+    // nested object gets copied
+    to = { a: 1 };
+    from = { o: { n: 1 } };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: 1, o: { n: 1 } });
+    expect(utils.deepMerge({ o: { n: 1 } }, { o: { n: 1 } })).toBeFalsy();
+
+    // nested object gets merged if in both
+    to = { a: 1, o: { x: 2 } };
+    from = { o: { n: 1 } };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: 1, o: { x: 2, n: 1 } });
+
+    // array elements get merged
+    to = { a: [1, 2] };
+    from = { a: [3, 4] };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: [1, 2, 3, 4] });
+    expect(utils.deepMerge({ a: [1, 2] }, { a: [1, 2] })).toBeFalsy();
+
+    // if from has array but to has scalar then also results in array
+    to = { a: 0 };
+    from = { a: [3, 4] };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: [0, 3, 4] });
+
+    // if to has array but from has scalar then also results in array
+    to = { a: [1, 2] };
+    from = { a: 3 };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: [1, 2, 3] });
+
+    // object array elements
+    to = { a: [{ x: 1 }] };
+    from = { a: [{ y: 2 }] };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: [{ x: 1 }, { y: 2 }] });
+    expect(utils.deepMerge({ a: [{ y: 2 }] }, { a: [{ y: 2 }] })).toBeFalsy();
 });

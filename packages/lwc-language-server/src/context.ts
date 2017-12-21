@@ -105,9 +105,22 @@ export class WorkspaceContext {
         const forceignore = join(this.workspaceRoot, '.forceignore');
         new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
            const jsConfigPath = join(dirPath, 'jsconfig.json');
-           fs.writeFileSync(join(this.workspaceRoot, jsConfigPath), jsConfigContent);
+           this.updateJsonConfigFile(jsConfigPath, jsConfigContent);
            utils.appendLineIfMissing(forceignore, jsConfigPath);
         });
+    }
+
+    private updateJsonConfigFile(configPath: string, config: string) {
+        const configFile = join(this.workspaceRoot, configPath);
+        const configJson = JSON.parse(config);
+        if (!fs.existsSync(configFile)) {
+            fs.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
+        } else {
+            const fileConfig = JSON.parse(fs.readFileSync(configFile).toString());
+            if (utils.deepMerge(fileConfig, configJson)) {
+                fs.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
+            }
+        }
     }
 
     private initSfdxProject() {

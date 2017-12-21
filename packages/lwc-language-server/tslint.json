@@ -6,7 +6,8 @@
         "quotemark": [true, "single"],
         "ordered-imports": [false],
         "object-literal-sort-keys": false,
-        "max-line-length": [true, 160]
+        "max-line-length": [true, 160],
+	"eofline": false
     },
     "linterOptions": {
         "exclude": [

@@ -1,7 +1,7 @@
 declare namespace jest {
     interface Matchers<R> {
-        fileToExist(): R;
-        pathToBeAbsolute(): R;
+        toExist(): R;
+        toBeAbsolutePath(): R;
         toEndWith(suffix: string): R;
     }
 }
