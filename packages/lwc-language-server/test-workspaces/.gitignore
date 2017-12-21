@@ -1,2 +1,3 @@
 **/lightningcomponents/jsconfig.json
+**/lightningcomponents/.eslintrc.json
 sfdx-workspace/.forceignore

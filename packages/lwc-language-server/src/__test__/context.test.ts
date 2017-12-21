@@ -112,18 +112,24 @@ it('configureSfdxProject()', () => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lightningcomponents/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';
+    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/.eslintrc.json';
+    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lightningcomponents/eslintrc-orig.json';
+    const eslintrcPathUtils = UTILS_ROOT + '/lightningcomponents/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
     fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
     fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 
     // verify typings/jsconfig after configuration:
 
     expect(jsconfigPathUtils).toExist();
+    expect(eslintrcPathUtils).toExist();
     context.configureSfdxProject();
 
     // tslint:disable-next-line no-string-literal
@@ -146,10 +152,26 @@ it('configureSfdxProject()', () => {
     expect(jsconfigUtils.include[1]).toBe('**/*');
     expect(jsconfigUtils.include[2]).toMatch(/test-workspaces\/sfdx-workspace\/.sfdx\/typings\/lwc\/\*\*\/\*.d.ts$/);
 
+    // verify newly created .eslintrc.json
+    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, { encoding: 'utf-8' });
+    expect(eslintrcForceAppContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
+    const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
+    expect(eslintrcForceApp.extends).toBe('plugin:lwc/recommended');
+    expect(eslintrcForceApp.plugins[0]).toBe('lwc');
+    // verify updated .eslintrc.json
+    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, { encoding: 'utf-8' });
+    expect(eslintrcUtilsContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
+    const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
+    expect(eslintrcUtils.extends).toBe('plugin:lwc/recommended');
+    expect(eslintrcUtils.plugins[0]).toBe('lwc');
+    expect(eslintrcUtils.rules.semi).toBe('error');
+
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, { encoding: 'utf-8' });
     expect(forceignoreContent).toContain('force-app/main/default/lightningcomponents/jsconfig.json');
     expect(forceignoreContent).toContain('utils/meta/lightningcomponents/jsconfig.json');
+    expect(forceignoreContent).toContain('force-app/main/default/lightningcomponents/.eslintrc.json');
+    expect(forceignoreContent).toContain('utils/meta/lightningcomponents/.eslintrc.json');
 
     // typings
     expect(sfdxTypingsPath + '/engine.d.ts').toExist();

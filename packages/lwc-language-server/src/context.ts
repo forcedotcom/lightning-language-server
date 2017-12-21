@@ -84,8 +84,7 @@ export class WorkspaceContext {
     public configureSfdxProject() {
         this.initSfdxProject();
 
-        // TODO: allow user modifications in jsonfig.json
-        this.writeJsonConfigFiles();
+        this.writeConfigFiles();
 
         // copy engine.d.ts, lwc.d.ts to .sfdx/typings/lwc
         const typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
@@ -94,8 +93,9 @@ export class WorkspaceContext {
         fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
     }
 
-    private writeJsonConfigFiles() {
+    private writeConfigFiles() {
         const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
+        const eslintrcTemplate = fs.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
 
         const compiled = _.template(jsConfigTemplate);
@@ -104,13 +104,18 @@ export class WorkspaceContext {
         const jsConfigContent = compiled( variableMap );
         const forceignore = join(this.workspaceRoot, '.forceignore');
         new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
+            // write/update jsconfig.json
            const jsConfigPath = join(dirPath, 'jsconfig.json');
-           this.updateJsonConfigFile(jsConfigPath, jsConfigContent);
+           this.updateConfigFile(jsConfigPath, jsConfigContent);
            utils.appendLineIfMissing(forceignore, jsConfigPath);
+           // write/update .eslintrc.json
+           const eslintrcPath = join(dirPath, '.eslintrc.json');
+           this.updateConfigFile(eslintrcPath, eslintrcTemplate);
+           utils.appendLineIfMissing(forceignore, eslintrcPath);
         });
     }
 
-    private updateJsonConfigFile(configPath: string, config: string) {
+    private updateConfigFile(configPath: string, config: string) {
         const configFile = join(this.workspaceRoot, configPath);
         const configJson = JSON.parse(config);
         if (!fs.existsSync(configFile)) {
