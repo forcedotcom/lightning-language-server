@@ -15,7 +15,7 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
 
 it('indexLwc', async () => {
     // test indexing of core-like workspace
-    const context = WorkspaceContext.createFrom('test-workspaces/core-like-workspace');
+    const context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
     await indexCustomComponents(context);
     expect(getLwcByTag('app-nav-bar').attributes).toEqual([]);
     expect(getLwcByTag('input-phone').attributes).toEqual([ 'value' ]);

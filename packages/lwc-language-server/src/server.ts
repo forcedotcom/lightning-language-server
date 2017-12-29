@@ -48,16 +48,16 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
     // Early exit if no workspace is opened
     const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).path : rootPath);
     if (!workspaceRoot) {
-        console.log(`No workspace found`);
+        console.warn(`No workspace found`);
         return { capabilities: {} };
     }
 
-    console.log(`Starting language server at ${workspaceRoot}`);
+    console.info(`Starting language server at ${workspaceRoot}`);
     const startTime = process.hrtime();
-    context = WorkspaceContext.createFrom(workspaceRoot);
+    context = new WorkspaceContext(workspaceRoot);
     context.configureAndIndex();
     htmlLS = getLanguageService();
-    console.log('     ... language server started in ' + utils.elapsedMillis(startTime), context);
+    console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
 
     // Return the language server capabilities
     return {
@@ -125,7 +125,7 @@ connection.onHover((textDocumentPosition: TextDocumentPositionParams): Hover => 
 connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    console.log('onDidChangeWatchedFiles...');
+    console.info('onDidChangeWatchedFiles...');
     return Promise.all([
         updateStaticResourceIndex(change.changes, context),
         updateLabelsIndex(change.changes, context),

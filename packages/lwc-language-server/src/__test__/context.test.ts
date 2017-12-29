@@ -1,4 +1,4 @@
-import { WorkspaceContext } from '../context';
+import { WorkspaceContext, WorkspaceType } from '../context';
 import { readAsTextDocument } from './test-utils';
 import * as fs from 'fs-extra';
 
@@ -11,29 +11,34 @@ function namespaceRoots(context: WorkspaceContext): string[] {
 }
 
 it('WorkspaceContext', async () => {
-    let context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoot).toBeAbsolutePath();
     let roots = namespaceRoots(context);
     expect(roots[0]).toBeAbsolutePath();
     expect(roots[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents');
+    expect(roots[1]).toEndWith(UTILS_ROOT + '/lightningcomponents');
+    expect(roots.length).toBe(2);
     let modules = context.findAllModules();
     expect(modules[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
     expect(modules[9]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents/wire_lds/wire_lds.js');
     expect(modules[10]).toEndWith(UTILS_ROOT + '/lightningcomponents/todo_util/todo_util.js');
     expect(modules.length).toBe(11);
 
-    context = WorkspaceContext.createFrom('test-workspaces/regular-workspace');
+    context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = namespaceRoots(context);
-    expect(roots[0]).toEndWith('test-workspaces/regular-workspace/src/modules/example');
-    expect(roots[1]).toEndWith('test-workspaces/regular-workspace/src/modules/other');
+    expect(context.type).toBe(WorkspaceType.STANDARD);
+    expect(roots[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example');
+    expect(roots[1]).toEndWith('test-workspaces/standard-workspace/src/modules/other');
     expect(roots.length).toBe(2);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith('test-workspaces/regular-workspace/src/modules/example/app/app.js');
-    expect(modules[1]).toEndWith('test-workspaces/regular-workspace/src/modules/example/line/line.js');
-    expect(modules[2]).toEndWith('test-workspaces/regular-workspace/src/modules/other/text/text.js');
+    expect(modules[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example/app/app.js');
+    expect(modules[1]).toEndWith('test-workspaces/standard-workspace/src/modules/example/line/line.js');
+    expect(modules[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other/text/text.js');
     expect(modules.length).toBe(3);
 
-    context = WorkspaceContext.createFrom('test-workspaces/core-like-workspace');
+    context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
+    expect(context.type).toBe(WorkspaceType.CORE_ALL);
     roots = namespaceRoots(context);
     expect(roots[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-force-components/modules/force');
     expect(roots[1]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one');
@@ -43,11 +48,20 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
     expect(modules.length).toBe(2);
 
+    context = new WorkspaceContext('test-workspaces/core-like-workspace/core/ui-global-components');
+    expect(context.type).toBe(WorkspaceType.CORE_PROJECT);
+    roots = namespaceRoots(context);
+    expect(roots[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one');
+    expect(roots.length).toBe(1);
+    modules = context.findAllModules();
+    expect(modules[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(modules.length).toBe(1);
+
     // console.log('core roots:', utils.findNamespaceRoots('/Users/rsalvador/blt/app/main/core'));
 });
 
 it('isInsideModulesRoots()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
     expect(context.isInsideModulesRoots(document)).toBeTruthy();
@@ -60,7 +74,7 @@ it('isInsideModulesRoots()', () => {
 });
 
 it('isLWCTemplate()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // .js is not a template
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
@@ -84,7 +98,7 @@ it('isLWCTemplate()', () => {
 });
 
 it('isLWCJavascript()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // lwc .js
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
@@ -108,7 +122,7 @@ it('isLWCJavascript()', () => {
 });
 
 it('configureSfdxProject()', () => {
-    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lightningcomponents/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';

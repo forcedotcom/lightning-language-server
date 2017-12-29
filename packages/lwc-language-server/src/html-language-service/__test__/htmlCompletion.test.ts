@@ -6,7 +6,7 @@ import {
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
 import { loadStandardLwc, indexCustomComponents } from '../../metadata-utils/custom-components-util';
-import { WorkspaceContext } from '../../context';
+import { WorkspaceContext, WorkspaceType } from '../../context';
 
 interface ICompletionMatcher {
     label: string;
@@ -74,10 +74,10 @@ it('complete', async () => {
         { label: 'if:true', result: '<template><div if:true={isTrue}' },
     ]);
 
-    const context = WorkspaceContext.createFrom('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     await loadStandardLwc();
     await indexCustomComponents(context);
-    expect(context.isSfdxProject).toBeTruthy();
+    expect(context.type).toBe(WorkspaceType.SFDX);
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
 

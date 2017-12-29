@@ -8,36 +8,63 @@ import { loadStandardLwc, indexCustomComponents } from './metadata-utils/custom-
 import { TextDocument } from 'vscode-languageserver';
 import { GlobSync } from 'glob';
 import * as _ from 'lodash';
+
+export const WorkspaceType = Object.freeze({
+    STANDARD: Symbol('STANDARD'),
+    SFDX: Symbol('SFDX'),
+    CORE_ALL: Symbol('CORE_ALL'),
+    CORE_PROJECT: Symbol('CORE_PROJECT'),
+    UNKNOWN: Symbol('UNKNOWN'),
+});
+
 /**
  * Holds information and utility methods for a LWC workspace
  */
 export class WorkspaceContext {
+
+    // fields common to all projec types
+    public readonly type: symbol;
+    public readonly workspaceRoot: string;
+    public readonly namespaceRoots: string[];
+
+    // fields for sfdx projects
+    private sfdxProjectConfig: ISfdxProjectConfig;
+    private sfdxPackageDirsPattern: string;
+
     /**
      * Creates a new WorkspaceContext representing the workspace at workspaceRoot
      */
-    public static createFrom(workspaceRoot: string): WorkspaceContext {
-        const namespaceRoots = findNamespaceRoots(workspaceRoot);
-        const sfdxProject = fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'));
-        return new WorkspaceContext(workspaceRoot, sfdxProject, namespaceRoots);
-    }
-
-    private sfdxProjectConfig: ISfdxProjectConfig;
-    private sfdxPackageDirsPattern: string;
-    private constructor(public readonly workspaceRoot: string
-                      , public readonly isSfdxProject: boolean
-                      , private readonly namespaceRoots: string[]) {
+    public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
+
+        // detect workspace type
+        if (fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'))) {
+            this.type = WorkspaceType.SFDX;
+            this.initSfdxProject();
+        } else if (fs.existsSync(path.join(workspaceRoot, 'workspace-user.xml'))) {
+            this.type = WorkspaceType.CORE_ALL;
+        } else if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
+            this.type = WorkspaceType.CORE_PROJECT;
+        } else if (fs.existsSync(path.join(workspaceRoot, 'package.json'))) {
+            this.type = WorkspaceType.STANDARD;
+        } else {
+            console.error('unknown workspace type:', workspaceRoot);
+            this.type = WorkspaceType.UNKNOWN;
+        }
+
+        this.namespaceRoots = this.findNamespaceRootsUsingType();
     }
 
     public async configureAndIndex() {
-        if (this.isSfdxProject) {
+        if (this.type === WorkspaceType.SFDX) {
             this.configureSfdxProject();
         }
 
+        // indexing:
         const indexingTasks: Array<Promise<void>> = [];
         indexingTasks.push(loadStandardLwc());
         indexingTasks.push(indexCustomComponents(this));
-        if (this.isSfdxProject) {
+        if (this.type === WorkspaceType.SFDX) {
             indexingTasks.push(indexStaticResources(this.workspaceRoot, this.sfdxPackageDirsPattern));
             indexingTasks.push(indexCustomLabels(this.workspaceRoot, this.sfdxPackageDirsPattern));
         }
@@ -82,8 +109,6 @@ export class WorkspaceContext {
      * Configures a sfdx project
      */
     public configureSfdxProject() {
-        this.initSfdxProject();
-
         this.writeConfigFiles();
 
         // copy engine.d.ts, lwc.d.ts to .sfdx/typings/lwc
@@ -137,6 +162,38 @@ export class WorkspaceContext {
         if (packageDirs.length > 1) {
             // {} brackets are only needed if there are multiple paths
             this.sfdxPackageDirsPattern = `{${this.sfdxPackageDirsPattern}}`;
+        }
+    }
+
+    private findNamespaceRootsUsingType() {
+        const roots: string[] = [];
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                // optimization: search only inside package directories
+                for (const pkg of this.sfdxProjectConfig.packageDirectories) {
+                    const pkgDir = join(this.workspaceRoot, pkg.path);
+                    for (const root of findNamespaceRoots(pkgDir)) {
+                        roots.push(root);
+                    }
+                }
+                return roots;
+            case WorkspaceType.CORE_ALL:
+                // optimization: search only inside project/modules/
+                for (const project of fs.readdirSync(this.workspaceRoot)) {
+                    const modulesDir = join(this.workspaceRoot, project, 'modules');
+                    if (fs.existsSync(modulesDir)) {
+                        for (const root of findNamespaceRoots(modulesDir, 2)) {
+                            roots.push(root);
+                        }
+                    }
+                }
+                return roots;
+            case WorkspaceType.CORE_PROJECT:
+                // optimization: search only inside modules/
+                return findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+            case WorkspaceType.STANDARD:
+            case WorkspaceType.UNKNOWN:
+                return findNamespaceRoots(this.workspaceRoot);
         }
     }
 }
