@@ -28,6 +28,10 @@ export function getSfdxResource(resourceName: string) {
     return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
 }
 
+export function getCoreResource(resourceName: string) {
+    return join(__dirname, RESOURCES_DIR, 'core', resourceName);
+}
+
 export function appendLineIfMissing(file: string, line: string) {
     if (!fs.existsSync(file)) {
         fs.writeFileSync(file, line + '\n');

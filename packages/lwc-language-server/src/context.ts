@@ -56,9 +56,7 @@ export class WorkspaceContext {
     }
 
     public async configureAndIndex() {
-        if (this.type === WorkspaceType.SFDX) {
-            this.configureSfdxProject();
-        }
+        this.configureProject();
 
         // indexing:
         const indexingTasks: Array<Promise<void>> = [];
@@ -108,39 +106,83 @@ export class WorkspaceContext {
     /**
      * Configures a sfdx project
      */
-    public configureSfdxProject() {
+    public configureProject() {
         this.writeConfigFiles();
+        this.writeTypings();
+    }
 
-        // copy engine.d.ts, lwc.d.ts to .sfdx/typings/lwc
-        const typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
-        fs.ensureDir(typingsDir);
-        fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
-        fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
+    private writeTypings() {
+        let typingsDir: string;
+
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
+                break;
+            case WorkspaceType.CORE_PROJECT:
+                typingsDir = this.coreTypingsDir();
+                break;
+            case WorkspaceType.CORE_ALL:
+                typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
+                break;
+        }
+
+        if (typingsDir) {
+            // copy engine.d.ts, lwc.d.ts to typingsDir
+            fs.ensureDir(typingsDir);
+            fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
+            fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
+        }
+    }
+
+    private coreTypingsDir() {
+        return join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
     }
 
     private writeConfigFiles() {
-        const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
-        const eslintrcTemplate = fs.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
-        _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
+        if (this.type === WorkspaceType.SFDX) {
+            const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
+            const eslintrcTemplate = fs.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, this.workspaceRoot);
 
-        const compiled = _.template(jsConfigTemplate);
+            const forceignore = join(this.workspaceRoot, '.forceignore');
+            new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
+                // write/update jsconfig.json
+                const jsConfigPath = join(dirPath, 'jsconfig.json');
+                this.updateConfigFile(jsConfigPath, jsConfigContent, forceignore);
+                // write/update .eslintrc.json
+                const eslintrcPath = join(dirPath, '.eslintrc.json');
+                this.updateConfigFile(eslintrcPath, eslintrcTemplate, forceignore);
+            });
+        }
 
-        const variableMap = {project_root : this.workspaceRoot };
-        const jsConfigContent = compiled( variableMap );
-        const forceignore = join(this.workspaceRoot, '.forceignore');
-        new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, {cwd: this.workspaceRoot}).found.forEach(dirPath => {
-            // write/update jsconfig.json
-           const jsConfigPath = join(dirPath, 'jsconfig.json');
-           this.updateConfigFile(jsConfigPath, jsConfigContent);
-           utils.appendLineIfMissing(forceignore, jsConfigPath);
-           // write/update .eslintrc.json
-           const eslintrcPath = join(dirPath, '.eslintrc.json');
-           this.updateConfigFile(eslintrcPath, eslintrcTemplate);
-           utils.appendLineIfMissing(forceignore, eslintrcPath);
-        });
+        if (this.type === WorkspaceType.CORE_PROJECT) {
+            const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, join(this.workspaceRoot, '..'));
+            const jsConfigPath = join('modules', 'jsconfig.json');
+            this.updateConfigFile(jsConfigPath, jsConfigContent);
+        }
+
+        if (this.type === WorkspaceType.CORE_ALL) {
+            const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, this.workspaceRoot);
+            for (const project of fs.readdirSync(this.workspaceRoot)) {
+                const modulesDir = join(project, 'modules');
+                if (fs.existsSync(join(this.workspaceRoot, modulesDir))) {
+                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
+                    this.updateConfigFile(jsConfigPath, jsConfigContent);
+                }
+            }
+        }
     }
 
-    private updateConfigFile(configPath: string, config: string) {
+    private processTemplate(template: string, projectRoot: string) {
+        _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
+        const compiled = _.template(template);
+        const variableMap = { project_root: projectRoot};
+        return compiled(variableMap);
+    }
+
+    private updateConfigFile(configPath: string, config: string, ignoreFile?: string) {
         const configFile = join(this.workspaceRoot, configPath);
         const configJson = JSON.parse(config);
         if (!fs.existsSync(configFile)) {
@@ -150,6 +192,9 @@ export class WorkspaceContext {
             if (utils.deepMerge(fileConfig, configJson)) {
                 fs.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
             }
+        }
+        if (ignoreFile) {
+            utils.appendLineIfMissing(ignoreFile, configPath);
         }
     }
 

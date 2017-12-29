@@ -4,6 +4,8 @@ import * as fs from 'fs-extra';
 
 const FORCE_APP_ROOT = 'test-workspaces/sfdx-workspace/force-app/main/default';
 const UTILS_ROOT = 'test-workspaces/sfdx-workspace/utils/meta';
+const CORE_ALL_ROOT = 'test-workspaces/core-like-workspace/core';
+const CORE_PROJECT_ROOT = CORE_ALL_ROOT + '/ui-global-components';
 
 function namespaceRoots(context: WorkspaceContext): string[] {
     // tslint:disable-next-line:no-string-literal
@@ -37,24 +39,24 @@ it('WorkspaceContext', async () => {
     expect(modules[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other/text/text.js');
     expect(modules.length).toBe(3);
 
-    context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
+    context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
     roots = namespaceRoots(context);
-    expect(roots[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-force-components/modules/force');
-    expect(roots[1]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one');
+    expect(roots[0]).toEndWith(CORE_ALL_ROOT + '/ui-force-components/modules/force');
+    expect(roots[1]).toEndWith(CORE_ALL_ROOT + '/ui-global-components/modules/one');
     expect(roots.length).toBe(2);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-force-components/modules/force/input-phone/input-phone.js');
-    expect(modules[1]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(modules[0]).toEndWith(CORE_ALL_ROOT + '/ui-force-components/modules/force/input-phone/input-phone.js');
+    expect(modules[1]).toEndWith(CORE_ALL_ROOT + '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
     expect(modules.length).toBe(2);
 
-    context = new WorkspaceContext('test-workspaces/core-like-workspace/core/ui-global-components');
+    context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_PROJECT);
     roots = namespaceRoots(context);
-    expect(roots[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one');
+    expect(roots[0]).toEndWith(CORE_PROJECT_ROOT + '/modules/one');
     expect(roots.length).toBe(1);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith('test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(modules[0]).toEndWith(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.js');
     expect(modules.length).toBe(1);
 
     // console.log('core roots:', utils.findNamespaceRoots('/Users/rsalvador/blt/app/main/core'));
@@ -144,7 +146,7 @@ it('configureSfdxProject()', () => {
 
     expect(jsconfigPathUtils).toExist();
     expect(eslintrcPathUtils).toExist();
-    context.configureSfdxProject();
+    context.configureProject();
 
     // tslint:disable-next-line no-string-literal
     expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils}');
@@ -191,3 +193,54 @@ it('configureSfdxProject()', () => {
     expect(sfdxTypingsPath + '/engine.d.ts').toExist();
     expect(sfdxTypingsPath + '/lwc.d.ts').toExist();
 });
+
+it('configureCoreProject()', () => {
+    const context = new WorkspaceContext(CORE_PROJECT_ROOT);
+    const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
+    const typingsPath = 'test-workspaces/core-like-workspace/core/.vscode/typings/lwc';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPath);
+    fs.removeSync(typingsPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    context.configureProject();
+
+    verifyJsconfigCore(jsconfigPath);
+    verifyTypingsCore();
+});
+
+it('configureCoreAll()', () => {
+    const context = new WorkspaceContext(CORE_ALL_ROOT);
+    const jsconfigPathGlobal = CORE_ALL_ROOT + '/ui-global-components/modules/jsconfig.json';
+    const jsconfigPathForce = CORE_ALL_ROOT + '/ui-force-components/modules/jsconfig.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathGlobal);
+    fs.removeSync(jsconfigPathForce);
+
+    // configure and verify typings/jsconfig after configuration:
+    context.configureProject();
+
+    // verify newly created jsconfig.json
+    verifyJsconfigCore(jsconfigPathGlobal);
+    verifyJsconfigCore(jsconfigPathForce);
+    verifyTypingsCore();
+});
+
+function verifyJsconfigCore(jsconfigPath: string) {
+    const jsconfigContent = fs.readFileSync(jsconfigPath, { encoding: 'utf-8' });
+    expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
+    const jsconfig = JSON.parse(jsconfigContent);
+    expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfig.include[0]).toBe('**/*');
+    expect(jsconfig.include[1]).toMatch(/test-workspaces\/core-like-workspace\/core\/.vscode\/typings\/lwc\/\*\*\/\*.d.ts$/);
+    fs.removeSync(jsconfigPath);
+}
+
+function verifyTypingsCore() {
+    const typingsPath = 'test-workspaces/core-like-workspace/core/.vscode/typings/lwc';
+    expect(typingsPath + '/engine.d.ts').toExist();
+    expect(typingsPath + '/lwc.d.ts').toExist();
+    fs.removeSync(typingsPath);
+}
