@@ -7,6 +7,10 @@ import URI from 'vscode-uri';
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
+export function fullTagName(namespace: string, tag: string) {
+    return namespace + '-' + tag;
+}
+
 export function toResolvedPath(uri: string): string {
     return resolve(URI.parse(uri).path);
 }

@@ -13,7 +13,7 @@ import {
     Hover,
 } from 'vscode-languageserver';
 
-import { WorkspaceContext } from './context';
+import { WorkspaceContext, WorkspaceType } from './context';
 
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument, extractAttributes } from './javascript/compiler';
@@ -87,11 +87,18 @@ documents.onDidChangeContent(async change => {
         connection.sendDiagnostics({ uri, diagnostics });
         if (result) {
             const attributes = extractAttributes(result.metadata);
-            // TODO: use namespace+tagName to also work outside sfdx custom components
-            const tagName = uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'));
-            if (attributes.length > 0 || getLwcByTag(tagName)) {
+            const lastSlash = uri.lastIndexOf('/');
+            const tagName = uri.substring(lastSlash + 1, uri.lastIndexOf('.'));
+            let namespace;
+            if (context.type === WorkspaceType.SFDX) {
+                namespace = 'c';
+            } else {
+                const namespaceEnd = uri.lastIndexOf('/', lastSlash - 1);
+                namespace = uri.substring(uri.lastIndexOf('/', namespaceEnd - 1) + 1, namespaceEnd);
+            }
+            if (attributes.length > 0 || getLwcByTag(utils.fullTagName(namespace, tagName))) {
                 // has @apis or known tag => assuming is the main .js file for the module
-                setCustomAttributes(tagName, attributes, context);
+                setCustomAttributes(namespace, tagName, attributes);
             }
         }
     }

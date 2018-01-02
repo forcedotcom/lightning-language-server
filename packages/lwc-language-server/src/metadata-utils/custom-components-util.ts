@@ -63,16 +63,15 @@ export function loadStandardLwc(): Promise<void> {
     });
 }
 
-function addCustomTag(tag: string, attributes: string[], sfdxProject: boolean) {
-    // TODO: handle namespaces
-    LWC_TAGS.set(sfdxProject ? 'c-' + tag : tag, new TagInfo(attributes));
+function addCustomTag(namespace: string, tag: string, attributes: string[]) {
+    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes));
 }
-function removeCustomTag(tag: string, sfdxProject: boolean) {
-    LWC_TAGS.delete(sfdxProject ? 'c-' + tag : tag);
+function removeCustomTag(namespace: string, tag: string) {
+    LWC_TAGS.delete(utils.fullTagName(namespace, tag));
 }
 
-export function setCustomAttributes(tag: string, attributes: string[], { type }: WorkspaceContext) {
-    LWC_TAGS.set(type === WorkspaceType.SFDX ? 'c-' + tag : tag, new TagInfo(attributes));
+export function setCustomAttributes(namespace: string, tag: string, attributes: string[]) {
+    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
@@ -92,7 +91,8 @@ async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean
 export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
     const filePath = parse(file);
     const fileName = filePath.name;
-    const parentDirName = filePath.dir.split(sep).pop();
+    const pathElements = filePath.dir.split(sep);
+    const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         // get attributes from compiler metadata
         const rv = await compileFile(file);
@@ -100,15 +100,18 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
         if (rv.diagnostics.length > 0) {
             console.log('error compiling ' + file + ': ', rv.diagnostics);
         }
-        addCustomTag(parentDirName, attributes, sfdxProject);
+        const namespace = sfdxProject ? 'c' : pathElements.pop();
+        addCustomTag(namespace, parentDirName, attributes);
     }
 }
 
 function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
     const filePath = parse(file);
     const fileName = filePath.name;
-    const parentDirName = filePath.dir.split(sep).pop();
+    const pathElements = filePath.dir.split(sep);
+    const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
-        removeCustomTag(parentDirName, sfdxProject);
+        const namespace = sfdxProject ? 'c' : pathElements.pop();
+        removeCustomTag(namespace, parentDirName);
     }
 }

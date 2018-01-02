@@ -17,6 +17,6 @@ it('indexLwc', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
     await indexCustomComponents(context);
-    expect(getLwcByTag('app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('input-phone').attributes).toEqual([ 'value' ]);
+    expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
+    expect(getLwcByTag('force-input-phone').attributes).toEqual([ 'value' ]);
 });
