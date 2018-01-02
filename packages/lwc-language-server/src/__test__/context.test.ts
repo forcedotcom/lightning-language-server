@@ -214,10 +214,12 @@ it('configureCoreAll()', () => {
     const context = new WorkspaceContext(CORE_ALL_ROOT);
     const jsconfigPathGlobal = CORE_ALL_ROOT + '/ui-global-components/modules/jsconfig.json';
     const jsconfigPathForce = CORE_ALL_ROOT + '/ui-force-components/modules/jsconfig.json';
+    const settingsPath = CORE_ALL_ROOT + '/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathGlobal);
     fs.removeSync(jsconfigPathForce);
+    fs.removeSync(settingsPath);
 
     // configure and verify typings/jsconfig after configuration:
     context.configureProject();
@@ -226,6 +228,11 @@ it('configureCoreAll()', () => {
     verifyJsconfigCore(jsconfigPathGlobal);
     verifyJsconfigCore(jsconfigPathForce);
     verifyTypingsCore();
+
+    // verify settings.json
+    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
+    const settings = JSON.parse(settingsContent);
+    expect(settings['files.watcherExclude']).toBeDefined();
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {

@@ -172,6 +172,9 @@ export class WorkspaceContext {
                     this.updateConfigFile(jsConfigPath, jsConfigContent);
                 }
             }
+            const settingsContent = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
+            const settingsPath = join('.vscode', 'settings.json');
+            this.updateConfigFile(settingsPath, settingsContent);
         }
     }
 
