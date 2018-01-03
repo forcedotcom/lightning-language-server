@@ -1,4 +1,4 @@
-import { IHTMLTagProvider } from './htmlTags';
+import { IHTMLTagProvider, TagInfo } from './htmlTags';
 import { CompletionItem } from 'vscode-languageserver';
 import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
 
@@ -33,9 +33,9 @@ const LWC_DIRECTIVES: LwcCompletionItem[] = [
 ];
 
 export function getLwcTagProvider(): IHTMLTagProvider {
-    function addTags(collector: (tag: string, label: string) => void) {
+    function addTags(collector: (tag: string, info: TagInfo) => void) {
         for (const [tag, tagInfo] of getLwcTags()) {
-            collector(tag, tagInfo.documentation);
+            collector(tag, tagInfo);
         }
     }
 
@@ -57,7 +57,7 @@ export function getLwcTagProvider(): IHTMLTagProvider {
     return {
         getId: () => 'lwc',
         isApplicable: (languageId) => languageId === 'html',
-        collectTags: (collector: (tag: string, label: string) => void) => {
+        collectTags: (collector: (tag: string, info: TagInfo) => void) => {
             addTags(collector);
         },
         collectAttributes: (tag: string, collector: (attribute: string, type: string) => void) => {

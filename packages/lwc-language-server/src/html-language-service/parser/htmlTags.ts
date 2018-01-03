@@ -42,10 +42,19 @@ export function isEmptyElement(e: string): boolean {
 	return !!e && arrays.binarySearch(EMPTY_ELEMENTS, e.toLowerCase(), (s1: string, s2: string) => s1.localeCompare(s2)) >= 0;
 }
 
+export class TagInfo {
+    constructor(
+        public attributes: string[],
+        public definitionUri?: string,
+        public documentation: string = '[doc placeholder]',
+    ) {
+    }
+}
+
 export interface IHTMLTagProvider {
 	getId(): string;
 	isApplicable(languageId: string) : boolean;
-	collectTags(collector: (tag: string, label: string) => void): void;
+	collectTags(collector: (tag: string, info: TagInfo) => void): void;
 	collectAttributes(tag: string, collector: (attribute: string, type?: string) => void): void;
 	collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
 }

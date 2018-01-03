@@ -11,6 +11,7 @@ import {
     CompletionItem,
     DidChangeWatchedFilesParams,
     Hover,
+    Location,
 } from 'vscode-languageserver';
 
 import { WorkspaceContext, WorkspaceType } from './context';
@@ -67,6 +68,7 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
                 resolveProvider: true,
             },
             hoverProvider: true,
+            definitionProvider: true,
         },
     };
 });
@@ -98,7 +100,7 @@ documents.onDidChangeContent(async change => {
             }
             if (attributes.length > 0 || getLwcByTag(utils.fullTagName(namespace, tagName))) {
                 // has @apis or known tag => assuming is the main .js file for the module
-                setCustomAttributes(namespace, tagName, attributes);
+                setCustomAttributes(namespace, tagName, attributes, uri);
             }
         }
     }
@@ -126,6 +128,15 @@ connection.onHover((textDocumentPosition: TextDocumentPositionParams): Hover => 
     }
     const htmlDocument = htmlLS.parseHTMLDocument(document);
     return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+});
+
+connection.onDefinition((textDocumentPosition: TextDocumentPositionParams): Location => {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!context.isLWCTemplate(document)) {
+        return null;
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
 });
 
 // Listen on the connection

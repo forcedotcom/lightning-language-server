@@ -1,34 +1,30 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
 'use strict';
 
 import { HTMLDocument } from '../parser/htmlParser';
 import { TokenType, createScanner } from '../parser/htmlScanner';
-import { TextDocument, Range, Position, Hover, MarkedString } from 'vscode-languageserver-types';
+import { TextDocument, Range, Position, Location } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 
-export function doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover| null {
+const TOP_OF_FILE: Range = Range.create(Position.create(0, 0), Position.create(0, 0));
+
+export function findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null {
     const offset = document.offsetAt(position);
     const node = htmlDocument.findNodeAt(offset);
     if (!node || !node.tag) {
         return null;
     }
     const tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
-    function getTagHover(tag: string, range: Range, open: boolean): Hover | null {
+    function getTagLocation(tag: string): Location | null {
         tag = tag.toLowerCase();
         for (const provider of tagProviders) {
-            let hover = null;
+            let location = null;
             provider.collectTags((t, info) => {
-                if (t === tag) {
-                    const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                    const documentation = info.documentation;
-                    hover = { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(documentation)], range };
+                if (t === tag  && info.definitionUri) {
+                    location = Location.create(info.definitionUri, TOP_OF_FILE);
                 }
             });
-            if (hover) {
-                return hover;
+            if (location) {
+                return location;
             }
         }
         return null;
@@ -49,14 +45,14 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     if (node.endTagStart && offset >= node.endTagStart) {
         const endTagRange = getTagNameRange(TokenType.EndTag, node.endTagStart);
         if (endTagRange) {
-            return getTagHover(node.tag, endTagRange, false);
+            return getTagLocation(node.tag);
         }
         return null;
     }
 
     const tagRange = getTagNameRange(TokenType.StartTag, node.start);
     if (tagRange) {
-        return getTagHover(node.tag, tagRange, true);
+        return getTagLocation(node.tag);
     }
     return null;
 }

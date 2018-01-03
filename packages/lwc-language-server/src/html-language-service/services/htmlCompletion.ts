@@ -42,12 +42,12 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		let range = getReplaceRange(afterOpenBracket, tagNameEnd);
 		tagProviders.forEach((provider) => {
 			const detail = provider.getId() === 'lwc'? 'LWC tag' : undefined;
-			provider.collectTags((tag, label) => {
+			provider.collectTags((tag, info) => {
 				result.items.push({
 					label: tag,
 					kind: CompletionItemKind.Property,
 					detail,
-					documentation: label,
+					documentation: info.documentation,
 					textEdit: TextEdit.replace(range, tag),
 					insertTextFormat: InsertTextFormat.PlainText
 				});
@@ -105,11 +105,11 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		}
 
 		tagProviders.forEach(provider => {
-			provider.collectTags((tag, label) => {
+			provider.collectTags((tag, info) => {
 				result.items.push({
 					label: '/' + tag,
 					kind: CompletionItemKind.Property,
-					documentation: label,
+					documentation: info.documentation,
 					filterText: '/' + tag + closeTag,
 					textEdit: TextEdit.replace(range, '/' + tag + closeTag),
 					insertTextFormat: InsertTextFormat.PlainText

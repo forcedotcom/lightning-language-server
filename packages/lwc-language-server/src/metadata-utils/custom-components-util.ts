@@ -1,21 +1,18 @@
-import { sep, parse } from 'path';
+import * as path from 'path';
 import * as fs from 'fs';
 import * as utils from '../utils';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { compileFile, extractAttributes } from '../javascript/compiler';
 import { WorkspaceContext, WorkspaceType } from '../context';
-
-export class TagInfo {
-    constructor(public attributes: string[], public documentation: string = '[doc placeholder]') {
-    }
-}
+import URI from 'vscode-uri';
+import { TagInfo } from '../html-language-service/parser/htmlTags';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
 export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { type }: WorkspaceContext) {
     const isSfdxProject = type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
-        if (f.uri.match(`.*${sep}lightningcomponents${sep}.*.js`)) {
+        if (f.uri.match(`.*${path.sep}lightningcomponents${path.sep}.*.js`)) {
             if (f.type === FileChangeType.Created) {
                 addCustomTagFromFile(f.uri, isSfdxProject);
             } else if (f.type === FileChangeType.Deleted) {
@@ -63,15 +60,15 @@ export function loadStandardLwc(): Promise<void> {
     });
 }
 
-function addCustomTag(namespace: string, tag: string, attributes: string[]) {
-    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes));
+function addCustomTag(namespace: string, tag: string, attributes: string[], definitionUri: string) {
+    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes, definitionUri));
 }
 function removeCustomTag(namespace: string, tag: string) {
     LWC_TAGS.delete(utils.fullTagName(namespace, tag));
 }
 
-export function setCustomAttributes(namespace: string, tag: string, attributes: string[]) {
-    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes));
+export function setCustomAttributes(namespace: string, tag: string, attributes: string[], definitionUri: string) {
+    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes, definitionUri));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
@@ -89,9 +86,9 @@ async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean
 }
 
 export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
-    const filePath = parse(file);
+    const filePath = path.parse(file);
     const fileName = filePath.name;
-    const pathElements = filePath.dir.split(sep);
+    const pathElements = filePath.dir.split(path.sep);
     const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         // get attributes from compiler metadata
@@ -101,14 +98,15 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
             console.log('error compiling ' + file + ': ', rv.diagnostics);
         }
         const namespace = sfdxProject ? 'c' : pathElements.pop();
-        addCustomTag(namespace, parentDirName, attributes);
+        const definitionUri = URI.file(path.resolve(file)).toString();
+        addCustomTag(namespace, parentDirName, attributes, definitionUri);
     }
 }
 
 function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
-    const filePath = parse(file);
+    const filePath = path.parse(file);
     const fileName = filePath.name;
-    const pathElements = filePath.dir.split(sep);
+    const pathElements = filePath.dir.split(path.sep);
     const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         const namespace = sfdxProject ? 'c' : pathElements.pop();
