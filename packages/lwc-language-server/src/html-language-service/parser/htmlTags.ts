@@ -35,6 +35,7 @@ BEGIN THIRD PARTY
  *--------------------------------------------------------------------------------------------*/
 
 import arrays = require('../utils/arrays');
+import { Location } from 'vscode-languageserver';
 
 export const EMPTY_ELEMENTS: string[] = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 
@@ -43,26 +44,27 @@ export function isEmptyElement(e: string): boolean {
 }
 
 export class TagInfo {
-    constructor(
-        public attributes: string[],
-        public definitionUri?: string,
-        public documentation: string = '[doc placeholder]',
-    ) {
-    }
+	constructor(
+		public attributes: string[],
+		public location?: Location,
+		public documentation?: string,
+	) {
+	}
 }
 
 export interface IHTMLTagProvider {
 	getId(): string;
-	isApplicable(languageId: string) : boolean;
+	isApplicable(languageId: string): boolean;
 	collectTags(collector: (tag: string, info: TagInfo) => void): void;
 	collectAttributes(tag: string, collector: (attribute: string, type?: string) => void): void;
 	collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
+	getTagInfo(tag: string): TagInfo;
 }
 
 export interface ITagSet {
-	[tag: string]: HTMLTagSpecification;
+    [tag: string]: HTMLTagSpecification;
 }
 
 export class HTMLTagSpecification {
-	constructor(public label: string, public attributes: string[] = []) { }
+    constructor(public label: string, public attributes: string[] = []) { }
 }

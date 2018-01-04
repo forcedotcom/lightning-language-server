@@ -5,8 +5,6 @@ import { TokenType, createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, Position, Location } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 
-const TOP_OF_FILE: Range = Range.create(Position.create(0, 0), Position.create(0, 0));
-
 export function findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null {
     const offset = document.offsetAt(position);
     const node = htmlDocument.findNodeAt(offset);
@@ -17,14 +15,9 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
     function getTagLocation(tag: string): Location | null {
         tag = tag.toLowerCase();
         for (const provider of tagProviders) {
-            let location = null;
-            provider.collectTags((t, info) => {
-                if (t === tag  && info.definitionUri) {
-                    location = Location.create(info.definitionUri, TOP_OF_FILE);
-                }
-            });
-            if (location) {
-                return location;
+            const info = provider.getTagInfo(tag);
+            if (info && info.location) {
+                return info.location;
             }
         }
         return null;

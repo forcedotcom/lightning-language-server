@@ -69,5 +69,6 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
         },
+        getTagInfo: (tag: string) => getLwcByTag(tag),
     };
 }

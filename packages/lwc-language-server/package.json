@@ -38,7 +38,7 @@
     "babel-types": "6.25.0",
     "husky": "0.14.3",
     "jest": "^21.1.5",
-    "lwc-engine": "0.17.3",
+    "lwc-engine": "0.17.6",
     "prettier": "1.7.4",
     "ts-jest": "21.1.4",
     "tslint": "5.8.0",

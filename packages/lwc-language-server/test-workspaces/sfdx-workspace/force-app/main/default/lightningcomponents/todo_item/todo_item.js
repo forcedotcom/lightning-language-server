@@ -1,6 +1,9 @@
 import { Element, api, track } from 'engine';
 import { ENTER_KEY, ESCAPE_KEY } from 'c-utils';
 
+/**
+ * TodoItem doc
+ */
 export default class TodoItem extends Element {
     @track
     editing = false;

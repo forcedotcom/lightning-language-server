@@ -20,7 +20,7 @@ function assertHover(value: string, expectedHoverValue: string | undefined, expe
         const contents: any = hover.contents;
         expect(contents[0].value).toEqual(expectedHoverValue);
         if (expectedHoverLabel) {
-            expect(contents[1]).toBe('[doc placeholder]');
+            expect(contents[1]).toBe(expectedHoverLabel);
         }
         if (expectedHoverOffset) {
             expect(document.offsetAt(hover.range.start)).toBe(expectedHoverOffset);
@@ -36,18 +36,18 @@ it('UC: hover is shown for standard and custom tags', async () => {
     // standard tags
     await loadStandardLwc();
     assertHover('|<lightning-button></lightning-button>', undefined);
-    assertHover('<lightning-bu|tton></lightning-button>', '<lightning-button>', undefined, 1);
+    assertHover('<lightning-bu|tton></lightning-button>', undefined);
     assertHover('<lightning-button cl|ass="one"></lightning-button>', undefined);
     assertHover('<ht|ml></html>', undefined);
 
     // custom tags
     await indexCustomComponents(context);
     assertHover('|<c-todo_item></c-todo_item>', undefined);
-    assertHover('<|c-todo_item></c-todo_item>', '<c-todo_item>', undefined, 1);
-    assertHover('<c-todo_it|em></c-todo_item>', '<c-todo_item>', undefined, 1);
+    assertHover('<|c-todo_item></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
+    assertHover('<c-todo_it|em></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
 
     // custom tags from utils package
     assertHover('|<c-todo_util></c-todo_util>', undefined);
-    assertHover('<|c-todo_util></c-todo_util>', '<c-todo_util>', undefined, 1);
-    assertHover('<c-todo_ut|il></c-todo_util>', '<c-todo_util>', undefined, 1);
+    assertHover('<|c-todo_util></c-todo_util>', '<c-todo_util>', 'LWC tag', 1);
+    assertHover('<c-todo_ut|il></c-todo_util>', '<c-todo_util>', 'LWC tag', 1);
 });

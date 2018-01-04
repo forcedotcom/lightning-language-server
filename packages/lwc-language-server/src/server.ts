@@ -17,14 +17,13 @@ import {
 import { WorkspaceContext, WorkspaceType } from './context';
 
 import templateLinter from './template/linter';
-import { compileDocument as javascriptCompileDocument, extractAttributes } from './javascript/compiler';
+import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import * as utils from './utils';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import {
     updateCustomComponentIndex,
-    setCustomAttributes,
-    getLwcByTag,
+    addCustomTagFromResults,
 } from './metadata-utils/custom-components-util';
 import {
     getLanguageService,
@@ -88,20 +87,7 @@ documents.onDidChangeContent(async change => {
         const { result, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (result) {
-            const attributes = extractAttributes(result.metadata);
-            const lastSlash = uri.lastIndexOf('/');
-            const tagName = uri.substring(lastSlash + 1, uri.lastIndexOf('.'));
-            let namespace;
-            if (context.type === WorkspaceType.SFDX) {
-                namespace = 'c';
-            } else {
-                const namespaceEnd = uri.lastIndexOf('/', lastSlash - 1);
-                namespace = uri.substring(uri.lastIndexOf('/', namespaceEnd - 1) + 1, namespaceEnd);
-            }
-            if (attributes.length > 0 || getLwcByTag(utils.fullTagName(namespace, tagName))) {
-                // has @apis or known tag => assuming is the main .js file for the module
-                setCustomAttributes(namespace, tagName, attributes, uri);
-            }
+            addCustomTagFromResults(uri, result.metadata, context.type === WorkspaceType.SFDX);
         }
     }
 });

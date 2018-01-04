@@ -7,6 +7,8 @@ import URI from 'vscode-uri';
 
 export interface ICompilerMetadata {
     apiProperties: Array<{ name: string }>;
+    doc: string;
+    declarationLoc: { start: { line: number, column: number }, end: { line: number, column: number } };
 }
 
 export interface ICompilerResult {
@@ -14,6 +16,9 @@ export interface ICompilerResult {
     result?: { map: { names: string[] }, metadata: ICompilerMetadata };
 }
 
+/**
+ * Use to compile a live document (contents may be different from current file in disk)
+ */
 export async function compileDocument(document: TextDocument): Promise<ICompilerResult> {
     const file = URI.parse(document.uri).path;
     const filePath = path.parse(file);

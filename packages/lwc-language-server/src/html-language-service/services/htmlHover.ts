@@ -19,16 +19,10 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     function getTagHover(tag: string, range: Range, open: boolean): Hover | null {
         tag = tag.toLowerCase();
         for (const provider of tagProviders) {
-            let hover = null;
-            provider.collectTags((t, info) => {
-                if (t === tag) {
-                    const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                    const documentation = info.documentation;
-                    hover = { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(documentation)], range };
-                }
-            });
-            if (hover) {
-                return hover;
+            const info = provider.getTagInfo(tag);
+            if (info && info.documentation) {
+                const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
+                return { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(info.documentation)], range };
             }
         }
         return null;

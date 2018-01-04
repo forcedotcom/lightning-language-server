@@ -88,6 +88,7 @@ it('linter returns empty diagnostics on correct file', async () => {
 it('returns javascript metadata', async () => {
     const content = `
         import { Element } from 'engine';
+        /** Foo doc */
         export default class Foo extends Element {
             _privateTodo;
             @api get todo () {
@@ -102,7 +103,10 @@ it('returns javascript metadata', async () => {
     `;
 
     const { result } = await compileSource(content);
-    expect(result.metadata.apiProperties).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+    const metadata = result.metadata;
+    expect(metadata.apiProperties).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+    expect(metadata.doc).toBe('Foo doc');
+    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 14 }});
 });
 
 it('use compileDocument()', async () => {
