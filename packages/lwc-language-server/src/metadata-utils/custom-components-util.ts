@@ -39,17 +39,16 @@ export function loadStandardLwc(): Promise<void> {
             } else {
                 try {
                     const lwcStandard = JSON.parse(data);
-                    for (const property in lwcStandard) {
-                        if (lwcStandard.hasOwnProperty(property) && typeof property === 'string') {
-                            const val = new TagInfo([]);
-                            if (lwcStandard[property].attributes) {
-                                lwcStandard[property].attributes.map((a: any) => {
-                                    const attrName =
-                                        a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                                    val.attributes.push(attrName);
+                    for (const tag in lwcStandard) {
+                        if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
+                            const info = new TagInfo([]);
+                            if (lwcStandard[tag].attributes) {
+                                lwcStandard[tag].attributes.map((a: any) => {
+                                    const attrName = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+                                    info.attributes.push(attrName);
                                 });
                             }
-                            LWC_TAGS.set('lightning-' + property, val);
+                            LWC_TAGS.set('lightning-' + tag, info);
                         }
                     }
                     resolve();
@@ -62,7 +61,11 @@ export function loadStandardLwc(): Promise<void> {
 }
 
 function removeCustomTag(namespace: string, tag: string) {
-    LWC_TAGS.delete(utils.fullTagName(namespace, tag));
+    LWC_TAGS.delete(fullTagName(namespace, tag));
+}
+
+export function removeAllTags() {
+    LWC_TAGS.clear();
 }
 
 export function addCustomTag(namespace: string, tag: string, uri: string, metadata: ICompilerMetadata) {
@@ -72,11 +75,12 @@ export function addCustomTag(namespace: string, tag: string, uri: string, metada
     }
     const attributes = extractAttributes(metadata);
     if (!metadata.declarationLoc) {
+        // i.e. if declaration doesn't extend Element
         console.info('no declarationLoc for ' + uri);
     }
     const startLine = metadata.declarationLoc ? metadata.declarationLoc.start.line - 1 : 0;
     const location = Location.create(uri, Range.create(Position.create(startLine, 0), Position.create(startLine, 0)));
-    LWC_TAGS.set(utils.fullTagName(namespace, tag), new TagInfo(attributes, location, doc));
+    LWC_TAGS.set(fullTagName(namespace, tag), new TagInfo(attributes, location, doc));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
@@ -134,4 +138,13 @@ function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
         const namespace = sfdxProject ? 'c' : pathElements.pop();
         removeCustomTag(namespace, parentDirName);
     }
+}
+
+function fullTagName(namespace: string, tag: string) {
+    if (namespace === 'interop') {
+        // treat interop as lightning, i.e. needed when using extension with lightning-global
+        // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
+        namespace = 'lightning';
+    }
+    return namespace + '-' + tag;
 }

@@ -60,7 +60,9 @@ export class WorkspaceContext {
 
         // indexing:
         const indexingTasks: Array<Promise<void>> = [];
-        indexingTasks.push(loadStandardLwc());
+        if (this.type !== WorkspaceType.STANDARD) {
+            indexingTasks.push(loadStandardLwc());
+        }
         indexingTasks.push(indexCustomComponents(this));
         if (this.type === WorkspaceType.SFDX) {
             indexingTasks.push(indexStaticResources(this.workspaceRoot, this.sfdxPackageDirsPattern));
@@ -119,7 +121,7 @@ export class WorkspaceContext {
                 typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_PROJECT:
-                typingsDir = this.coreTypingsDir();
+                typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_ALL:
                 typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
@@ -132,10 +134,6 @@ export class WorkspaceContext {
             fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
             fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
         }
-    }
-
-    private coreTypingsDir() {
-        return join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
     }
 
     private writeConfigFiles() {
@@ -173,6 +171,7 @@ export class WorkspaceContext {
                 }
             }
             const settingsContent = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
+            fs.ensureDir(join(this.workspaceRoot, '.vscode'));
             const settingsPath = join('.vscode', 'settings.json');
             this.updateConfigFile(settingsPath, settingsContent);
         }

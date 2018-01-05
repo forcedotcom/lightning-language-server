@@ -55,7 +55,8 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
     console.info(`Starting language server at ${workspaceRoot}`);
     const startTime = process.hrtime();
     context = new WorkspaceContext(workspaceRoot);
-    context.configureAndIndex();
+    // wait for indexing to finish before returning from onInitialize()
+    await context.configureAndIndex();
     htmlLS = getLanguageService();
     console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
 
@@ -78,6 +79,7 @@ documents.onDidClose(event => {
 });
 
 documents.onDidChangeContent(async change => {
+    // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
     const { document } = change;
     const { uri } = document;
     if (context.isLWCTemplate(document)) {

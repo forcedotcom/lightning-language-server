@@ -31,13 +31,15 @@ it('WorkspaceContext', async () => {
     roots = namespaceRoots(context);
     expect(context.type).toBe(WorkspaceType.STANDARD);
     expect(roots[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example');
-    expect(roots[1]).toEndWith('test-workspaces/standard-workspace/src/modules/other');
-    expect(roots.length).toBe(2);
+    expect(roots[1]).toEndWith('test-workspaces/standard-workspace/src/modules/interop');
+    expect(roots[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other');
+    expect(roots.length).toBe(3);
     modules = context.findAllModules();
     expect(modules[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example/app/app.js');
     expect(modules[1]).toEndWith('test-workspaces/standard-workspace/src/modules/example/line/line.js');
-    expect(modules[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other/text/text.js');
-    expect(modules.length).toBe(3);
+    expect(modules[2]).toEndWith('test-workspaces/standard-workspace/src/modules/interop/ito/ito.js');
+    expect(modules[3]).toEndWith('test-workspaces/standard-workspace/src/modules/other/text/text.js');
+    expect(modules.length).toBe(4);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);

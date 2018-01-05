@@ -1,4 +1,4 @@
-import { getLwcByTag, addCustomTagFromFile, indexCustomComponents } from '../custom-components-util';
+import { getLwcByTag, addCustomTagFromFile, removeAllTags } from '../custom-components-util';
 import { WorkspaceContext } from '../../context';
 import URI from 'vscode-uri';
 
@@ -18,15 +18,52 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
     expect(location.range.start.line).toBe(6);
 });
 
-it('indexLwc', async () => {
+it('indexSfdx', async () => {
+    // test indexing of core-like workspace
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    removeAllTags();
+    await context.configureAndIndex();
+    // check attributes
+    expect(getLwcByTag('c-todo_item').attributes).toEqual([ 'todo' ]);
+    expect(getLwcByTag('c-todo_util').attributes).toEqual([ 'info' ]);
+    // check standard components
+    expect(getLwcByTag('lightning-button')).not.toBeUndefined();
+    // check Location
+    const uri = getLwcByTag('c-todo_item').location.uri;
+    expect(URI.parse(uri).path).toExist();
+    expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+});
+
+it('indexCore', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
-    await indexCustomComponents(context);
+    removeAllTags();
+    await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
     expect(getLwcByTag('force-input-phone').attributes).toEqual([ 'value' ]);
+    // check standard components
+    expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check Location
     const uri = getLwcByTag('one-app-nav-bar').location.uri;
     expect(URI.parse(uri).path).toExist();
     expect(uri).toEndWith('/test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+});
+
+it('indexStandard', async () => {
+    const context = new WorkspaceContext('test-workspaces/standard-workspace');
+    removeAllTags();
+    await context.configureAndIndex();
+    // check attributes
+    expect(getLwcByTag('example-line').attributes).toEqual([ 'hover', 'text' ]);
+    expect(getLwcByTag('lightning-ito').attributes).toEqual([ 'attr' ]);
+    // check standard components
+    expect(getLwcByTag('lightning-button')).toBeUndefined();
+    // check Location
+    let uri = getLwcByTag('example-line').location.uri;
+    expect(URI.parse(uri).path).toExist();
+    expect(uri).toEndWith('/test-workspaces/standard-workspace/src/modules/example/line/line.js');
+    uri = getLwcByTag('lightning-ito').location.uri;
+    expect(URI.parse(uri).path).toExist();
+    expect(uri).toEndWith('/test-workspaces/standard-workspace/src/modules/interop/ito/ito.js');
 });
