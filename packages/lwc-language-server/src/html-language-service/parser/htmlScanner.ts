@@ -201,6 +201,7 @@ export interface Scanner {
 	getTokenText(): string;
 	getTokenError(): string | undefined;
 	getScannerState(): ScannerState;
+	getLastAttributeName(): string | undefined;
 }
 
 const htmlScriptContents: { [key: string]: boolean } = {
@@ -461,6 +462,7 @@ export function createScanner(input: string, initialOffset = 0, initialState: Sc
 		getTokenEnd: () => stream.pos(),
 		getTokenText: () => stream.getSource().substring(tokenOffset, stream.pos()),
 		getScannerState: () => state,
-		getTokenError: () => tokenError
+		getTokenError: () => tokenError,
+		getLastAttributeName: () => lastAttributeName
 	};
 }

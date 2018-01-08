@@ -24,6 +24,15 @@ const LWC_DIRECTIVES: AttributeInfo[] = [
     ),
 ];
 
+export function getDirectiveInfo(label: string): AttributeInfo | null {
+    for (const info of LWC_DIRECTIVES) {
+        if (label === info.name) {
+            return info;
+        }
+    }
+    return null;
+}
+
 export function getLwcTagProvider(): IHTMLTagProvider {
     function addTags(collector: (tag: string, info: TagInfo) => void) {
         for (const [tag, tagInfo] of getLwcTags()) {

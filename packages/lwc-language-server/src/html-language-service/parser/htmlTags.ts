@@ -59,6 +59,15 @@ export class TagInfo {
 		public documentation?: string,
 	) {
 	}
+	getAttributeInfo(attribute: string): AttributeInfo | null {
+		attribute = attribute.toLowerCase();
+		for (const info of this.attributes) {
+			if (attribute === info.name.toLowerCase()){
+				return info;
+			}
+		}
+		return null;
+	}
 }
 
 export interface IHTMLTagProvider {
