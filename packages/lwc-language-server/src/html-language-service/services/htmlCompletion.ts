@@ -151,7 +151,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '=$1';
 		let tag = currentTag.toLowerCase();
 		tagProviders.forEach(provider => {
-			provider.collectAttributes(tag, (attribute, type?: string) => {
+			provider.collectAttributes(tag, (attribute, info, type?: string) => {
 				let codeSnippet = attribute;
 				if (type !== 'v' && value.length) {
 					codeSnippet = codeSnippet + value;
@@ -159,6 +159,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 				result.items.push({
 					label: attribute,
 					detail: 'LWC attribute',
+					documentation: info.documentation,
 					kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
 					textEdit: TextEdit.replace(range, codeSnippet),
 					insertTextFormat: InsertTextFormat.Snippet

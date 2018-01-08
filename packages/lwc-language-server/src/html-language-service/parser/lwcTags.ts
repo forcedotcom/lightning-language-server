@@ -1,32 +1,24 @@
-import { IHTMLTagProvider, TagInfo } from './htmlTags';
-import { CompletionItem } from 'vscode-languageserver';
+import { IHTMLTagProvider, TagInfo, AttributeInfo } from './htmlTags';
 import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
 
-class LwcCompletionItem implements CompletionItem {
-    constructor(
-        readonly label: string,
-        readonly documentation: string,
-    ) { }
-}
-
-const LWC_DIRECTIVES: LwcCompletionItem[] = [
-    new LwcCompletionItem(
+const LWC_DIRECTIVES: AttributeInfo[] = [
+    new AttributeInfo(
         'for:each',
         'Renders the element or template block multiple times based on the expression value.',
     ),
-    new LwcCompletionItem(
+    new AttributeInfo(
         'for:item',
         'Bind the current iteration item to an identifier.',
     ),
-    new LwcCompletionItem(
+    new AttributeInfo(
         'for:index',
         'Bind the current iteration index to an identifier.',
     ),
-    new LwcCompletionItem(
+    new AttributeInfo(
         'if:true',
         'Renders the element or template if the expression value is thruthy.',
     ),
-    new LwcCompletionItem(
+    new AttributeInfo(
         'if:false',
         'Renders the element or template if the expression value is falsy.',
     ),
@@ -39,18 +31,18 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         }
     }
 
-    function addAttributes(tag: string, collector: (attribute: string, type: string) => void) {
+    function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         const cTag = getLwcByTag(tag);
         if (cTag) {
-            cTag.attributes.map((a) => {
-                collector(a, '');
+            cTag.attributes.map(info => {
+                collector(info.name, info, '');
             });
         }
     }
 
-    function addDirectives(collector: (attribute: string, type: string) => void) {
-        LWC_DIRECTIVES.map(d => {
-            collector(d.label, null);
+    function addDirectives(collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+        LWC_DIRECTIVES.map(info => {
+            collector(info.name, info, null);
         });
     }
 
@@ -60,7 +52,7 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         collectTags: (collector: (tag: string, info: TagInfo) => void) => {
             addTags(collector);
         },
-        collectAttributes: (tag: string, collector: (attribute: string, type: string) => void) => {
+        collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) => {
             addDirectives(collector);
             if (tag) {
                 addAttributes(tag, collector);

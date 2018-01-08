@@ -4,6 +4,7 @@ import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-lang
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import * as path from 'path';
 import URI from 'vscode-uri';
+import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 
 export interface ICompilerMetadata {
     apiProperties: Array<{ name: string }>;
@@ -42,8 +43,8 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
     }
 }
 
-export function extractAttributes(metadata: ICompilerMetadata): string[] {
-    return metadata.apiProperties.map(x => x.name);
+export function extractAttributes(metadata: ICompilerMetadata): AttributeInfo[] {
+    return metadata.apiProperties.map(x => new AttributeInfo(x.name));
 }
 
 // TODO: proper type for 'err' (i.e. SyntaxError)

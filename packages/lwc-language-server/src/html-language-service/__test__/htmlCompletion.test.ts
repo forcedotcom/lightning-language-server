@@ -11,6 +11,7 @@ import { WorkspaceContext, WorkspaceType } from '../../context';
 interface ICompletionMatcher {
     label: string;
     result: string;
+    documentation?: string;
 }
 
 function applyEdit(document: TextDocument, edit: TextEdit): string {
@@ -40,6 +41,9 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
     matchers.forEach(matcher => {
         const item = items.items.find(candidate => matcher.label === candidate.label);
         expect(item).toBeDefined();
+        if (matcher.documentation) {
+            expect(item.documentation).toContain(matcher.documentation);
+        }
         expect(applyEdit(document, item.textEdit)).toEqual(matcher.result);
     });
 
@@ -56,7 +60,7 @@ it('complete', async () => {
     expect(res).toHaveLength(5);
 
     testCompletion('<template><div |', [
-        { label: 'if:true', result: '<template><div if:true=$1' },
+        { label: 'if:true', result: '<template><div if:true=$1', documentation: 'Renders the element or template if the expression value is thruthy.' },
         { label: 'for:item', result: '<template><div for:item=$1' },
     ]);
 
@@ -82,7 +86,8 @@ it('complete', async () => {
     expect(res.length).toBeGreaterThan(10);
 
     testCompletion('<template><lightning-button-icon-stateful a', [
-        { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1' },
+        { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1'
+            , documentation: 'The alternative text used to describe the icon.' },
     ]);
 
     testCompletion('<template><c-todo_item tod|', [

@@ -5,7 +5,7 @@ import { FileEvent, FileChangeType, Location, Position, Range } from 'vscode-lan
 import { compileFile, extractAttributes } from '../javascript/compiler';
 import { WorkspaceContext, WorkspaceType } from '../context';
 import URI from 'vscode-uri';
-import { TagInfo } from '../html-language-service/parser/htmlTags';
+import { TagInfo, AttributeInfo } from '../html-language-service/parser/htmlTags';
 import { ICompilerMetadata } from '../javascript/compiler';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
@@ -45,7 +45,7 @@ export function loadStandardLwc(): Promise<void> {
                             if (lwcStandard[tag].attributes) {
                                 lwcStandard[tag].attributes.map((a: any) => {
                                     const attrName = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                                    info.attributes.push(attrName);
+                                    info.attributes.push(new AttributeInfo(attrName, a.description));
                                 });
                             }
                             info.documentation = lwcStandard[tag].description;

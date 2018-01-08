@@ -11,7 +11,7 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
     await addCustomTagFromFile('test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js',
         true);
     tagInfo = getLwcByTag('c-todo_item');
-    expect(tagInfo).toMatchObject({ attributes: ['todo'], documentation: 'TodoItem doc' });
+    expect(tagInfo).toMatchObject({ attributes: [{name: 'todo'}], documentation: 'TodoItem doc' });
     const location = tagInfo.location;
     expect(URI.parse(location.uri).path).toExist();
     expect(location.uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
@@ -24,11 +24,14 @@ it('indexSfdx', async () => {
     removeAllTags();
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('c-todo_item').attributes).toEqual([ 'todo' ]);
-    expect(getLwcByTag('c-todo_util').attributes).toEqual([ 'info' ]);
+    expect(getLwcByTag('c-todo_item').attributes).toEqual([ {name: 'todo'} ]);
+    expect(getLwcByTag('c-todo_util').attributes).toEqual([ {name: 'info'} ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');
+    expect(getLwcByTag('lightning-button').attributes[0]).toEqual(
+        {name: 'accesskey', documentation: 'Specifies a shortcut key to activate or focus an element.'},
+    );
     // check Location
     const uri = getLwcByTag('c-todo_item').location.uri;
     expect(URI.parse(uri).path).toExist();
@@ -42,7 +45,7 @@ it('indexCore', async () => {
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('force-input-phone').attributes).toEqual([ 'value' ]);
+    expect(getLwcByTag('force-input-phone').attributes).toEqual([ {name: 'value'} ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check Location
@@ -56,8 +59,8 @@ it('indexStandard', async () => {
     removeAllTags();
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('example-line').attributes).toEqual([ 'hover', 'text' ]);
-    expect(getLwcByTag('lightning-ito').attributes).toEqual([ 'attr' ]);
+    expect(getLwcByTag('example-line').attributes).toEqual([ {name: 'hover'}, {name: 'text'} ]);
+    expect(getLwcByTag('lightning-ito').attributes).toEqual([ {name: 'attr'} ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).toBeUndefined();
     // check Location
