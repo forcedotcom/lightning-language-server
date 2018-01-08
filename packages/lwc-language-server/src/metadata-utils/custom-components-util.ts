@@ -27,7 +27,7 @@ export function getLwcTags(): Map<string, TagInfo> {
     return LWC_TAGS;
 }
 
-export function getLwcByTag(tagName: string) {
+export function getLwcByTag(tagName: string): TagInfo {
     return LWC_TAGS.get(tagName);
 }
 
@@ -48,6 +48,7 @@ export function loadStandardLwc(): Promise<void> {
                                     info.attributes.push(attrName);
                                 });
                             }
+                            info.documentation = lwcStandard[tag].description;
                             LWC_TAGS.set('lightning-' + tag, info);
                         }
                     }

@@ -36,7 +36,7 @@ it('UC: hover is shown for standard and custom tags', async () => {
     // standard tags
     await loadStandardLwc();
     assertHover('|<lightning-button></lightning-button>', undefined);
-    assertHover('<lightning-bu|tton></lightning-button>', undefined);
+    assertHover('<lightning-bu|tton></lightning-button>', '<lightning-button>', 'Represents a button element\\.');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', undefined);
     assertHover('<ht|ml></html>', undefined);
 

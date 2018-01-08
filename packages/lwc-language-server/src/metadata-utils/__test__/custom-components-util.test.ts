@@ -28,6 +28,7 @@ it('indexSfdx', async () => {
     expect(getLwcByTag('c-todo_util').attributes).toEqual([ 'info' ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
+    expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');
     // check Location
     const uri = getLwcByTag('c-todo_item').location.uri;
     expect(URI.parse(uri).path).toExist();
