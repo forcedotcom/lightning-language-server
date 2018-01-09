@@ -140,52 +140,55 @@ export class WorkspaceContext {
         if (this.type === WorkspaceType.SFDX) {
             const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
             const eslintrcTemplate = fs.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, this.workspaceRoot);
 
             const forceignore = join(this.workspaceRoot, '.forceignore');
             new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
                 // write/update jsconfig.json
-                const jsConfigPath = join(dirPath, 'jsconfig.json');
-                this.updateConfigFile(jsConfigPath, jsConfigContent, forceignore);
+                const relativeJsConfigPath = join(dirPath, 'jsconfig.json');
+                const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
+                const relativeWorkspaceRoot = path.relative(path.dirname(jsConfigPath), this.workspaceRoot);
+                const jsConfigContent = this.processTemplate(jsConfigTemplate, relativeWorkspaceRoot);
+                this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
+
                 // write/update .eslintrc.json
-                const eslintrcPath = join(dirPath, '.eslintrc.json');
-                this.updateConfigFile(eslintrcPath, eslintrcTemplate, forceignore);
+                const relativeEslintrcPath = join(dirPath, '.eslintrc.json');
+                this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate, forceignore);
             });
         }
 
         if (this.type === WorkspaceType.CORE_PROJECT) {
             const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, join(this.workspaceRoot, '..'));
-            const jsConfigPath = join('modules', 'jsconfig.json');
-            this.updateConfigFile(jsConfigPath, jsConfigContent);
+            const relativeJsConfigPath = join('modules', 'jsconfig.json');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
+            this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
         }
 
         if (this.type === WorkspaceType.CORE_ALL) {
             const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, this.workspaceRoot);
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
             for (const project of fs.readdirSync(this.workspaceRoot)) {
                 const modulesDir = join(project, 'modules');
                 if (fs.existsSync(join(this.workspaceRoot, modulesDir))) {
-                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
-                    this.updateConfigFile(jsConfigPath, jsConfigContent);
+                    const relativeJsConfigPath = join(modulesDir, 'jsconfig.json');
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
             }
             const settingsContent = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
             fs.ensureDir(join(this.workspaceRoot, '.vscode'));
-            const settingsPath = join('.vscode', 'settings.json');
-            this.updateConfigFile(settingsPath, settingsContent);
+            const relativeSettingsPath = join('.vscode', 'settings.json');
+            this.updateConfigFile(relativeSettingsPath, settingsContent);
         }
     }
 
-    private processTemplate(template: string, projectRoot: string) {
+    private processTemplate(template: string, relativeWorkspaceRoot: string) {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
         const compiled = _.template(template);
-        const variableMap = { project_root: projectRoot};
+        const variableMap = { project_root: relativeWorkspaceRoot};
         return compiled(variableMap);
     }
 
-    private updateConfigFile(configPath: string, config: string, ignoreFile?: string) {
-        const configFile = join(this.workspaceRoot, configPath);
+    private updateConfigFile(relativeConfigPath: string, config: string, ignoreFile?: string) {
+        const configFile = join(this.workspaceRoot, relativeConfigPath);
         const configJson = JSON.parse(config);
         if (!fs.existsSync(configFile)) {
             fs.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
@@ -196,7 +199,7 @@ export class WorkspaceContext {
             }
         }
         if (ignoreFile) {
-            utils.appendLineIfMissing(ignoreFile, configPath);
+            utils.appendLineIfMissing(ignoreFile, relativeConfigPath);
         }
     }
 

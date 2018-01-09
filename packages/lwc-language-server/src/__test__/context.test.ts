@@ -159,7 +159,7 @@ it('configureSfdxProject()', () => {
     const jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
     expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigForceApp.include[0]).toBe('**/*');
-    expect(jsconfigForceApp.include[1]).toMatch(/test-workspaces\/sfdx-workspace\/.sfdx\/typings\/lwc\/\*\*\/\*.d.ts$/);
+    expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
     // verify updated jsconfig.json
     const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, { encoding: 'utf-8' });
     expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
@@ -168,7 +168,7 @@ it('configureSfdxProject()', () => {
     expect(jsconfigUtils.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigUtils.include[0]).toBe('util/*.js');
     expect(jsconfigUtils.include[1]).toBe('**/*');
-    expect(jsconfigUtils.include[2]).toMatch(/test-workspaces\/sfdx-workspace\/.sfdx\/typings\/lwc\/\*\*\/\*.d.ts$/);
+    expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
 
     // verify newly created .eslintrc.json
     const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, { encoding: 'utf-8' });
@@ -243,7 +243,7 @@ function verifyJsconfigCore(jsconfigPath: string) {
     const jsconfig = JSON.parse(jsconfigContent);
     expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfig.include[0]).toBe('**/*');
-    expect(jsconfig.include[1]).toMatch(/test-workspaces\/core-like-workspace\/core\/.vscode\/typings\/lwc\/\*\*\/\*.d.ts$/);
+    expect(jsconfig.include[1]).toBe('../../.vscode/typings/lwc/**/*.d.ts');
     fs.removeSync(jsconfigPath);
 }
 
