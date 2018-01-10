@@ -4,16 +4,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export enum WorkspaceType {
+    /** standard workspace with a package.json but no lwc dependencies */
     STANDARD,
+    /** standard workspace with a package.json and lwc dependencies */
     STANDARD_LWC,
+    /** sfdx workspace */
     SFDX,
+    /** workspace including all core projects */
     CORE_ALL,
-    CORE_PROJECT,
+    /** workspace including only one single core project */
+    CORE_SINGLE_PROJECT,
     UNKNOWN,
 }
 
 export function isLWC(type: WorkspaceType): boolean {
-    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PROJECT;
+    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
 }
 
 export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
@@ -24,7 +29,7 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
         return WorkspaceType.CORE_ALL;
     }
     if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
-        return WorkspaceType.CORE_PROJECT;
+        return WorkspaceType.CORE_SINGLE_PROJECT;
     }
 
     const packageJson = path.join(workspaceRoot, 'package.json');

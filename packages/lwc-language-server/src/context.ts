@@ -106,7 +106,7 @@ export class WorkspaceContext {
             case WorkspaceType.SFDX:
                 typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_PROJECT:
+            case WorkspaceType.CORE_SINGLE_PROJECT:
                 typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_ALL:
@@ -142,7 +142,7 @@ export class WorkspaceContext {
             });
         }
 
-        if (this.type === WorkspaceType.CORE_PROJECT) {
+        if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
             const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
             const relativeJsConfigPath = join('modules', 'jsconfig.json');
             const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
@@ -233,7 +233,7 @@ export class WorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_PROJECT:
+            case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
                 return findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
             case WorkspaceType.STANDARD_LWC:

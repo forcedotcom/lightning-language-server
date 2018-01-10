@@ -54,7 +54,7 @@ it('WorkspaceContext', async () => {
     expect(modules.length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
-    expect(context.type).toBe(WorkspaceType.CORE_PROJECT);
+    expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
     roots = namespaceRoots(context);
     expect(roots[0]).toEndWith(CORE_PROJECT_ROOT + '/modules/one');
     expect(roots.length).toBe(1);
