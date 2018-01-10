@@ -1,7 +1,7 @@
 import {TextDocument, Location} from 'vscode-languageserver-types';
 import { getLanguageService } from '../htmlLanguageService';
 import { WorkspaceContext } from '../../context';
-import { loadStandardLwc, indexCustomComponents } from '../../metadata-utils/custom-components-util';
+import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 
 function assertDefinition(value: string, expectedUri: string | undefined): void {
     const offset = value.indexOf('|');
@@ -26,7 +26,7 @@ it('UC: goto definition for custom tags', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // standard tags
-    await loadStandardLwc();
+    await loadStandardComponents();
     assertDefinition('|<lightning-button></lightning-button>', undefined);
     assertDefinition('<lightning-bu|tton></lightning-button>', undefined);
     assertDefinition('<lightning-button cl|ass="one"></lightning-button>', undefined);

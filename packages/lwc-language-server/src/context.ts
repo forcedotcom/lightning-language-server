@@ -4,18 +4,11 @@ import { join } from 'path';
 import * as utils from './utils';
 import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
-import { loadStandardLwc, indexCustomComponents } from './metadata-utils/custom-components-util';
+import { loadStandardComponents, indexCustomComponents } from './metadata-utils/custom-components-util';
 import { TextDocument } from 'vscode-languageserver';
+import { WorkspaceType, detectWorkspaceType, isLWC } from './shared';
 import { GlobSync } from 'glob';
 import * as _ from 'lodash';
-
-export const WorkspaceType = Object.freeze({
-    STANDARD: Symbol('STANDARD'),
-    SFDX: Symbol('SFDX'),
-    CORE_ALL: Symbol('CORE_ALL'),
-    CORE_PROJECT: Symbol('CORE_PROJECT'),
-    UNKNOWN: Symbol('UNKNOWN'),
-});
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -23,7 +16,7 @@ export const WorkspaceType = Object.freeze({
 export class WorkspaceContext {
 
     // fields common to all projec types
-    public readonly type: symbol;
+    public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
     public readonly namespaceRoots: string[];
 
@@ -36,22 +29,13 @@ export class WorkspaceContext {
      */
     public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
-
-        // detect workspace type
-        if (fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'))) {
-            this.type = WorkspaceType.SFDX;
+        this.type = detectWorkspaceType(workspaceRoot);
+        if (this.type === WorkspaceType.SFDX) {
             this.initSfdxProject();
-        } else if (fs.existsSync(path.join(workspaceRoot, 'workspace-user.xml'))) {
-            this.type = WorkspaceType.CORE_ALL;
-        } else if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
-            this.type = WorkspaceType.CORE_PROJECT;
-        } else if (fs.existsSync(path.join(workspaceRoot, 'package.json'))) {
-            this.type = WorkspaceType.STANDARD;
-        } else {
-            console.error('unknown workspace type:', workspaceRoot);
-            this.type = WorkspaceType.UNKNOWN;
         }
-
+        if (!isLWC(this.type)) {
+            console.error('not a LWC workspace:', workspaceRoot);
+        }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
     }
 
@@ -60,8 +44,8 @@ export class WorkspaceContext {
 
         // indexing:
         const indexingTasks: Array<Promise<void>> = [];
-        if (this.type !== WorkspaceType.STANDARD) {
-            indexingTasks.push(loadStandardLwc());
+        if (this.type !== WorkspaceType.STANDARD_LWC) {
+            indexingTasks.push(loadStandardComponents());
         }
         indexingTasks.push(indexCustomComponents(this));
         if (this.type === WorkspaceType.SFDX) {
@@ -241,7 +225,7 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_PROJECT:
                 // optimization: search only inside modules/
                 return findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
-            case WorkspaceType.STANDARD:
+            case WorkspaceType.STANDARD_LWC:
             case WorkspaceType.UNKNOWN:
                 return findNamespaceRoots(this.workspaceRoot);
         }

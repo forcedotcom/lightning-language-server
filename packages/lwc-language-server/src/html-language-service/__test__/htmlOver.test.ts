@@ -1,7 +1,7 @@
 import {TextDocument} from 'vscode-languageserver-types';
 import { getLanguageService } from '../htmlLanguageService';
 import { WorkspaceContext } from '../../context';
-import { loadStandardLwc, indexCustomComponents } from '../../metadata-utils/custom-components-util';
+import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { Hover } from 'vscode-languageserver';
 
 function assertHover(value: string, expectedHoverValue: string | undefined, expectedHoverLabel?: string, expectedHoverOffset?: number): void {
@@ -35,7 +35,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // standard tags
-    await loadStandardLwc();
+    await loadStandardComponents();
 
     assertHover('|<lightning-button></lightning-button>', undefined);
     assertHover('<lightning-bu|tton></lightning-button>', '<lightning-button>', 'Represents a button element\\.');

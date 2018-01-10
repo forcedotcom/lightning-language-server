@@ -1,4 +1,5 @@
-import { WorkspaceContext, WorkspaceType } from '../context';
+import { WorkspaceContext } from '../context';
+import { WorkspaceType } from '../shared';
 import { readAsTextDocument } from './test-utils';
 import * as fs from 'fs-extra';
 
@@ -29,7 +30,7 @@ it('WorkspaceContext', async () => {
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = namespaceRoots(context);
-    expect(context.type).toBe(WorkspaceType.STANDARD);
+    expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
     expect(roots[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example');
     expect(roots[1]).toEndWith('test-workspaces/standard-workspace/src/modules/interop');
     expect(roots[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other');

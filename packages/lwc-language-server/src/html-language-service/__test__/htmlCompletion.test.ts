@@ -5,8 +5,9 @@ import {
     TextEdit,
 } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
-import { loadStandardLwc, indexCustomComponents } from '../../metadata-utils/custom-components-util';
-import { WorkspaceContext, WorkspaceType } from '../../context';
+import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
+import { WorkspaceContext } from '../../context';
+import { WorkspaceType } from '../../shared';
 
 interface ICompletionMatcher {
     label: string;
@@ -79,7 +80,7 @@ it('complete', async () => {
     ]);
 
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    await loadStandardLwc();
+    await loadStandardComponents();
     await indexCustomComponents(context);
     expect(context.type).toBe(WorkspaceType.SFDX);
     res = testCompletion('<template><lightning-');

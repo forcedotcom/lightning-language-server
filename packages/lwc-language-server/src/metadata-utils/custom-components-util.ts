@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import * as utils from '../utils';
 import { FileEvent, FileChangeType, Location, Position, Range } from 'vscode-languageserver';
 import { compileFile, extractAttributes } from '../javascript/compiler';
-import { WorkspaceContext, WorkspaceType } from '../context';
+import { WorkspaceContext } from '../context';
+import { WorkspaceType } from '../shared';
 import URI from 'vscode-uri';
 import { TagInfo, AttributeInfo } from '../html-language-service/parser/htmlTags';
 import { ICompilerMetadata } from '../javascript/compiler';
@@ -31,7 +32,7 @@ export function getLwcByTag(tagName: string): TagInfo {
     return LWC_TAGS.get(tagName);
 }
 
-export function loadStandardLwc(): Promise<void> {
+export function loadStandardComponents(): Promise<void> {
     return new Promise((resolve, reject) => {
         fs.readFile(utils.getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
