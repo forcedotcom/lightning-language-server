@@ -3,3 +3,4 @@
 **/modules/jsconfig.json
 sfdx-workspace/.forceignore
 core-like-workspace/core/.vscode/
+core-like-workspace/core/ui-global-components/.vscode/

@@ -1,5 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as os from 'os';
+import * as semver from 'semver';
 import { join } from 'path';
 import * as utils from './utils';
 import { indexCustomLabels } from './metadata-utils/custom-labels-util';
@@ -145,6 +147,7 @@ export class WorkspaceContext {
             const relativeJsConfigPath = join('modules', 'jsconfig.json');
             const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
             this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+            this.updateCoreSettings();
         }
 
         if (this.type === WorkspaceType.CORE_ALL) {
@@ -157,17 +160,25 @@ export class WorkspaceContext {
                     this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
             }
-            const settingsContent = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
-            fs.ensureDir(join(this.workspaceRoot, '.vscode'));
-            const relativeSettingsPath = join('.vscode', 'settings.json');
-            this.updateConfigFile(relativeSettingsPath, settingsContent);
+            this.updateCoreSettings();
         }
     }
 
-    private processTemplate(template: string, relativeWorkspaceRoot: string) {
+    private updateCoreSettings() {
+        const settingsTemplate = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
+        const settingsContent = this.processTemplate(settingsTemplate, undefined, findCoreESLint());
+        fs.ensureDir(join(this.workspaceRoot, '.vscode'));
+        const relativeSettingsPath = join('.vscode', 'settings.json');
+        this.updateConfigFile(relativeSettingsPath, settingsContent);
+    }
+
+    private processTemplate(template: string, relativeWorkspaceRoot: string, eslintNodePath?: string) {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
         const compiled = _.template(template);
-        const variableMap = { project_root: relativeWorkspaceRoot};
+        const variableMap: { project_root: string, eslint_node_path?: string} = { project_root: relativeWorkspaceRoot};
+        if (eslintNodePath) {
+            variableMap.eslint_node_path = eslintNodePath;
+        }
         return compiled(variableMap);
     }
 
@@ -326,4 +337,28 @@ function findSubdirectories(dir: string): string[] {
         }
     }
     return subdirs;
+}
+
+function findCoreESLint(): string {
+    // use highest version in ~/tools/eslint-tool/{version}
+    const homedir = os.homedir();
+    const eslintToolDir = path.join(homedir, 'tools', 'eslint-tool');
+    if (!fs.existsSync(eslintToolDir)) {
+        console.warn('core eslint-tool not installed: ' + eslintToolDir);
+        return '/core/eslint-tool/not-installed/run/mvn/tools/eslint-lwc';
+    }
+    let highestVersion;
+    for (const file of fs.readdirSync(eslintToolDir)) {
+        const subdir = path.join(eslintToolDir, file);
+        if (fs.statSync(subdir).isDirectory()) {
+            if (!highestVersion || semver.lt(highestVersion, file)) {
+                highestVersion = file;
+            }
+        }
+    }
+    if (!highestVersion) {
+        console.warn('cannot find core eslint in ' + eslintToolDir);
+        return null;
+    }
+    return path.join(eslintToolDir, highestVersion, 'node_modules');
 }

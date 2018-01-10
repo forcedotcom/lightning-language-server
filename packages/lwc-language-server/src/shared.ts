@@ -2,8 +2,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
-import * as semver from 'semver';
 
 export enum WorkspaceType {
     STANDARD,
@@ -46,24 +44,4 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
 
     console.error('unknown workspace type:', workspaceRoot);
     return WorkspaceType.UNKNOWN;
-}
-
-export function findCoreESLint(): string {
-    // use highest version in ~/tools/eslint-tool/{version}
-    const homedir = os.homedir();
-    const eslintToolDir = path.join(homedir, 'tools', 'eslint-tool');
-    let highestVersion;
-    for (const file of fs.readdirSync(eslintToolDir)) {
-        const subdir = path.join(eslintToolDir, file);
-        if (fs.statSync(subdir).isDirectory()) {
-            if (!highestVersion || semver.lt(highestVersion, file)) {
-                highestVersion = file;
-            }
-        }
-    }
-    if (!highestVersion) {
-        console.warn('cannot find core eslint in ' + eslintToolDir);
-        return null;
-    }
-    return path.join(eslintToolDir, highestVersion, 'node_modules');
 }

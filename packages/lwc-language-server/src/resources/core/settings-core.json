@@ -17,5 +17,6 @@
         "**/core/ext/**": true,
         "**/target/**": true
     },
-    "files.useExperimentalFileWatcher": true
+    "files.useExperimentalFileWatcher": true,
+    "eslint.nodePath": "${eslint_node_path}"
 }

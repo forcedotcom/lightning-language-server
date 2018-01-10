@@ -201,6 +201,7 @@ it('configureCoreProject()', () => {
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
     const typingsPath = 'test-workspaces/core-like-workspace/core/.vscode/typings/lwc';
+    const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPath);
@@ -211,6 +212,8 @@ it('configureCoreProject()', () => {
 
     verifyJsconfigCore(jsconfigPath);
     verifyTypingsCore();
+
+    verifyCoreSettings(settingsPath);
 });
 
 it('configureCoreAll()', () => {
@@ -232,10 +235,7 @@ it('configureCoreAll()', () => {
     verifyJsconfigCore(jsconfigPathForce);
     verifyTypingsCore();
 
-    // verify settings.json
-    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
-    const settings = JSON.parse(settingsContent);
-    expect(settings['files.watcherExclude']).toBeDefined();
+    verifyCoreSettings(settingsPath);
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {
@@ -253,4 +253,11 @@ function verifyTypingsCore() {
     expect(typingsPath + '/engine.d.ts').toExist();
     expect(typingsPath + '/lwc.d.ts').toExist();
     fs.removeSync(typingsPath);
+}
+
+function verifyCoreSettings(settingsPath: string) {
+    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
+    const settings = JSON.parse(settingsContent);
+    expect(settings['files.watcherExclude']).toBeDefined();
+    expect(settings['eslint.nodePath']).toBeDefined();
 }
