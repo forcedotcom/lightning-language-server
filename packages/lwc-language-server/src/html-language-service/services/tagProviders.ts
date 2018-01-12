@@ -7,6 +7,4 @@
 import { IHTMLTagProvider } from '../parser/htmlTags';
 import { getLwcTagProvider } from '../parser/lwcTags';
 
-export let allTagProviders: IHTMLTagProvider[] = [
-    getLwcTagProvider(),
-];
+export let allTagProviders: IHTMLTagProvider[] = [getLwcTagProvider()];

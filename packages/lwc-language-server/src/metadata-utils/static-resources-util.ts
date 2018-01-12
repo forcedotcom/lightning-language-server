@@ -39,7 +39,7 @@ export function indexStaticResources(workspacePath: string, sfdxPackageDirsPatte
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource`;
     return new Promise((resolve, reject) => {
         /* tslint:disable */
-        new Glob(STATIC_RESOURCE_GLOB_PATTERN, {cwd: workspacePath}, async (err: Error, files: string[]) => {
+        new Glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
             if (err) {
                 console.log(`Error queing up indexing of static resources.Error detatils: ${err}`);
                 reject(err);
@@ -64,8 +64,7 @@ function generateResourceTypeDeclarations(): string {
 }
 
 function generateResourceTypeDeclaration(resourceName: string) {
-    const result =
-        `declare module "@resource-url/${resourceName}" {
+    const result = `declare module "@resource-url/${resourceName}" {
     var resourceUrl: string;
     export default resourceUrl;
 }

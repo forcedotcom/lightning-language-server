@@ -26,7 +26,7 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
     function getTagNameRange(tokenType: TokenType, startOffset: number): Range | null {
         const scanner = createScanner(document.getText(), startOffset);
         let token = scanner.scan();
-        while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || scanner.getTokenEnd() === offset && token !== tokenType)) {
+        while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || (scanner.getTokenEnd() === offset && token !== tokenType))) {
             token = scanner.scan();
         }
         if (token === tokenType && offset <= scanner.getTokenEnd()) {

@@ -1,10 +1,5 @@
 import { templateCompiler } from '../resources/lwc/compiler';
-import {
-    TextDocument,
-    Diagnostic,
-    DiagnosticSeverity,
-    Range,
-} from 'vscode-languageserver';
+import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 
 const LEVEL_MAPPING = {
@@ -25,13 +20,6 @@ export default function lint(document: TextDocument): Diagnostic[] {
     }));
 }
 
-function toRange(
-    textDocument: TextDocument,
-    start: number,
-    length: number,
-): Range {
-    return Range.create(
-        textDocument.positionAt(start),
-        textDocument.positionAt(start + length),
-    );
+function toRange(textDocument: TextDocument, start: number, length: number): Range {
+    return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
 }

@@ -6,10 +6,9 @@ jest.mock('../file-flush-util', () => {
     return mockFileUtil();
 });
 
-it('indexCustomLabels', async (done) => {
+it('indexCustomLabels', async done => {
     // workspace with one package
-    const expectedDTS =
-`declare module "@label/c.greeting" {
+    const expectedDTS = `declare module "@label/c.greeting" {
     var labelName: string;
     export default labelName;
 }
@@ -21,8 +20,7 @@ declare module "@label/c.greeting2" {
     await validate(indexCustomLabels, 'sfdx-workspace', 'force-app', 'customlabels.d.ts', expectedDTS, done);
 
     // workspace with 2 packages
-    const expectedDTS2 =
-`declare module "@label/c.greeting" {
+    const expectedDTS2 = `declare module "@label/c.greeting" {
     var labelName: string;
     export default labelName;
 }

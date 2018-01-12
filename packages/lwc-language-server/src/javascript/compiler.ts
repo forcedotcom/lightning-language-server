@@ -9,12 +9,12 @@ import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 export interface ICompilerMetadata {
     apiProperties: Array<{ name: string }>;
     doc: string;
-    declarationLoc: { start: { line: number, column: number }, end: { line: number, column: number } };
+    declarationLoc: { start: { line: number; column: number }; end: { line: number; column: number } };
 }
 
 export interface ICompilerResult {
     diagnostics?: Diagnostic[];
-    result?: { map: { names: string[] }, metadata: ICompilerMetadata };
+    result?: { map: { names: string[] }; metadata: ICompilerMetadata };
 }
 
 /**

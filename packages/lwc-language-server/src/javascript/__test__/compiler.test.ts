@@ -44,9 +44,7 @@ it('transform(src, id, options) throws exceptions on errors', async () => {
         fail('expects exception');
     } catch (err) {
         // verify err has the info we need
-        expect(err.message).toMatch(
-            /Wrong lifecycle method name connectCallback. You probably meant connectedCallback/,
-        );
+        expect(err.message).toMatch(/Wrong lifecycle method name connectCallback. You probably meant connectedCallback/);
         expect(err.loc).toEqual({ line: 4, column: 8 });
     }
 });
@@ -63,9 +61,7 @@ it('returns list of javascript compilation errors', async () => {
     const { diagnostics } = await compileDocument(document);
 
     expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].message).toMatch(
-        /example.js: Wrong lifecycle method name connectCallback. You probably meant connectedCallback/,
-    );
+    expect(diagnostics[0].message).toMatch(/example.js: Wrong lifecycle method name connectCallback. You probably meant connectedCallback/);
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 8 },
         end: { character: Number.MAX_VALUE },
@@ -106,7 +102,7 @@ it('returns javascript metadata', async () => {
     const metadata = result.metadata;
     expect(metadata.apiProperties).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
     expect(metadata.doc).toBe('Foo doc');
-    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 14 }});
+    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 14 } });
 });
 
 it('use compileDocument()', async () => {
@@ -130,7 +126,8 @@ it('use compileFile()', async () => {
 });
 
 function pretify(str: string) {
-    return str.toString()
+    return str
+        .toString()
         .replace(/^\s+|\s+$/, '')
         .split('\n')
         .map(line => line.trim())

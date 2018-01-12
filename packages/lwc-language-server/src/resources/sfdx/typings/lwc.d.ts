@@ -3,7 +3,6 @@
  * (e.g. @wire adapters for salesforce metadata and data)
  */
 declare module 'engine' {
-
     /**
      * Decorator to wire a property or method to the 'record' adapter
      * @param adapterId 'record' adapter id

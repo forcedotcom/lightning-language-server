@@ -95,8 +95,7 @@ async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean
     for (const file of filePaths) {
         await addCustomTagFromFile(file, sfdxProject);
     }
-    console.log('loadCustomTagsFromFiles: processed ' + filePaths.length + ' files in '
-        + utils.elapsedMillis(startTime));
+    console.log('loadCustomTagsFromFiles: processed ' + filePaths.length + ' files in ' + utils.elapsedMillis(startTime));
 }
 
 export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {

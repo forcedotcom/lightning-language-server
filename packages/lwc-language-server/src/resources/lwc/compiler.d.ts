@@ -13,7 +13,10 @@ export interface CompilationWarning {
 
 export type WarningLevel = 'info' | 'warning' | 'error';
 
-export function templateCompiler(source: string, config: Config): {
+export function templateCompiler(
+    source: string,
+    config: Config,
+): {
     code: string;
     warnings: CompilationWarning[];
 };

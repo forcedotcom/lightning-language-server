@@ -1,4 +1,4 @@
-import {TextDocument, Location} from 'vscode-languageserver-types';
+import { TextDocument, Location } from 'vscode-languageserver-types';
 import { getLanguageService } from '../htmlLanguageService';
 import { WorkspaceContext } from '../../context';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';

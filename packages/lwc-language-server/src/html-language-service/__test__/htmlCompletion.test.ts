@@ -1,9 +1,4 @@
-import {
-    TextDocument,
-    Position,
-    CompletionItem,
-    TextEdit,
-} from 'vscode-languageserver';
+import { TextDocument, Position, CompletionItem, TextEdit } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { WorkspaceContext } from '../../context';
@@ -19,21 +14,13 @@ function applyEdit(document: TextDocument, edit: TextEdit): string {
     let text = document.getText();
     const startOffset = document.offsetAt(edit.range.start);
     const endOffset = document.offsetAt(edit.range.end);
-    text =
-        text.substring(0, startOffset) +
-        edit.newText +
-        text.substring(endOffset, text.length);
+    text = text.substring(0, startOffset) + edit.newText + text.substring(endOffset, text.length);
     return text;
 }
 
 function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
     const [before, after] = content.split('|');
-    const document = TextDocument.create(
-        'test://test.html',
-        'html',
-        0,
-        before + after,
-    );
+    const document = TextDocument.create('test://test.html', 'html', 0, before + after);
     const position = Position.create(0, before.length);
     const ls = getLanguageService();
     const htmlDocument = ls.parseHTMLDocument(document);
@@ -75,9 +62,7 @@ it('complete', async () => {
         { label: 'if:false', result: '<template><div if:false=$1' },
     ]);
 
-    testCompletion('<template><div if:|true={isTrue}', [
-        { label: 'if:true', result: '<template><div if:true={isTrue}' },
-    ]);
+    testCompletion('<template><div if:|true={isTrue}', [{ label: 'if:true', result: '<template><div if:true={isTrue}' }]);
 
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     await loadStandardComponents();
@@ -87,15 +72,14 @@ it('complete', async () => {
     expect(res.length).toBeGreaterThan(10);
 
     testCompletion('<template><lightning-button-icon-stateful a', [
-        { label: 'alternative-text', result: '<template><lightning-button-icon-stateful alternative-text=$1'
-            , documentation: 'The alternative text used to describe the icon.' },
+        {
+            label: 'alternative-text',
+            result: '<template><lightning-button-icon-stateful alternative-text=$1',
+            documentation: 'The alternative text used to describe the icon.',
+        },
     ]);
 
-    testCompletion('<template><c-todo_item tod|', [
-        { label: 'todo', result: '<template><c-todo_item todo=$1' },
-    ]);
+    testCompletion('<template><c-todo_item tod|', [{ label: 'todo', result: '<template><c-todo_item todo=$1' }]);
 
-    testCompletion('<template><c-todo_util inf|', [
-        { label: 'info', result: '<template><c-todo_util info=$1' },
-    ]);
+    testCompletion('<template><c-todo_util inf|', [{ label: 'info', result: '<template><c-todo_util info=$1' }]);
 });

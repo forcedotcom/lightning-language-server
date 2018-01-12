@@ -16,7 +16,6 @@ import * as _ from 'lodash';
  * Holds information and utility methods for a LWC workspace
  */
 export class WorkspaceContext {
-
     // fields common to all projec types
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
@@ -62,7 +61,7 @@ export class WorkspaceContext {
      */
     public findAllModules(): string[] {
         const files: string[] = [];
-        this.namespaceRoots.forEach((namespaceRoot) => {
+        this.namespaceRoots.forEach(namespaceRoot => {
             files.push.apply(files, findModulesIn(namespaceRoot));
         });
         return files;
@@ -175,7 +174,7 @@ export class WorkspaceContext {
     private processTemplate(template: string, relativeWorkspaceRoot: string, eslintNodePath?: string) {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
         const compiled = _.template(template);
-        const variableMap: { project_root: string, eslint_node_path?: string} = { project_root: relativeWorkspaceRoot};
+        const variableMap: { project_root: string; eslint_node_path?: string } = { project_root: relativeWorkspaceRoot };
         if (eslintNodePath) {
             variableMap.eslint_node_path = eslintNodePath;
         }
@@ -257,7 +256,7 @@ function readSfdxProjectConfig(workspaceRoot: string): ISfdxProjectConfig {
 
 function getSfdxPackageDirs(sfdxProjectConfig: ISfdxProjectConfig) {
     const packageDirs: string[] = [];
-    sfdxProjectConfig.packageDirectories.forEach((packageDir) => {
+    sfdxProjectConfig.packageDirectories.forEach(packageDir => {
         packageDirs.push(packageDir.path);
     });
     return packageDirs;
@@ -290,8 +289,14 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
 
         // skip traversing node_modules and similar
         const filename = path.basename(candidate);
-        if (filename === 'node_modules' || filename === 'bin' || filename === 'target'
-            || filename === 'jest-modules' || filename === 'components' || filename === 'repository') {
+        if (
+            filename === 'node_modules' ||
+            filename === 'bin' ||
+            filename === 'target' ||
+            filename === 'jest-modules' ||
+            filename === 'components' ||
+            filename === 'repository'
+        ) {
             return;
         }
 

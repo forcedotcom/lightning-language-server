@@ -57,7 +57,7 @@ export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRo
             if (f.type === FileChangeType.Created) {
                 CUSTOM_LABEL_FILES.add(Files.uriToFilePath(f.uri));
             } else if (f.type === FileChangeType.Deleted) {
-                CUSTOM_LABEL_FILES.delete((Files.uriToFilePath(f.uri)));
+                CUSTOM_LABEL_FILES.delete(Files.uriToFilePath(f.uri));
             }
         }
     });
@@ -91,8 +91,7 @@ function readLabelFile(filePath: string) {
                 parseString(data, (parseErr: any, result: ICustomLabelsResult) => {
                     if (parseErr) {
                         // if we can't parse the file, let's just proceed without it.
-                        console.log(
-                            `Error parsing the contents of label file at ${filePath}. Error detatils: ${parseErr}`);
+                        console.log(`Error parsing the contents of label file at ${filePath}. Error detatils: ${parseErr}`);
                         resolve();
                     } else {
                         result.CustomLabels.labels.map(l => {
@@ -118,8 +117,7 @@ function generateLabelTypeDeclarations(): string {
 
 function generateLabelTypeDeclaration(labelName: string) {
     const ns = 'c';
-    const result =
-        `declare module "@label/${ns}.${labelName}" {
+    const result = `declare module "@label/${ns}.${labelName}" {
     var labelName: string;
     export default labelName;
 }

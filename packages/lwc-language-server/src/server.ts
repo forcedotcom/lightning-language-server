@@ -21,14 +21,8 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import * as utils from './utils';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
-import {
-    updateCustomComponentIndex,
-    addCustomTagFromResults,
-} from './metadata-utils/custom-components-util';
-import {
-    getLanguageService,
-    LanguageService,
-} from './html-language-service/htmlLanguageService';
+import { updateCustomComponentIndex, addCustomTagFromResults } from './metadata-utils/custom-components-util';
+import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
 
 import { WorkspaceType } from './shared';
@@ -101,16 +95,14 @@ documents.onDidChangeContent(async change => {
     }
 });
 
-connection.onCompletion(
-    (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
-            return { isIncomplete: false, items: [] };
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
-    },
-);
+connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionList => {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!context.isLWCTemplate(document)) {
+        return { isIncomplete: false, items: [] };
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
+});
 
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
     return item;

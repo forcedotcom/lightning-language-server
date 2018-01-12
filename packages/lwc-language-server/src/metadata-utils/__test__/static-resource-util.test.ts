@@ -6,10 +6,9 @@ jest.mock('../file-flush-util', () => {
     return mockFileUtil();
 });
 
-it('indexStaticResources', async (done) => {
+it('indexStaticResources', async done => {
     // workspace with 1 package
-    const expectedDTS =
-`declare module "@resource-url/todocss" {
+    const expectedDTS = `declare module "@resource-url/todocss" {
     var resourceUrl: string;
     export default resourceUrl;
 }
@@ -17,8 +16,7 @@ it('indexStaticResources', async (done) => {
     await validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS, done);
 
     // workspace with 2 packages
-    const expectedDTS2 =
-`declare module "@resource-url/todocss" {
+    const expectedDTS2 = `declare module "@resource-url/todocss" {
     var resourceUrl: string;
     export default resourceUrl;
 }

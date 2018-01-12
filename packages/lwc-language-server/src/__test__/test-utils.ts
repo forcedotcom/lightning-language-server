@@ -15,9 +15,13 @@ function languageId(path: string): string {
         return '';
     }
     switch (suffix.substring(1)) {
-        case 'js': return 'javascript';
-        case 'html': return 'html';
-        case 'app': case 'cmp': return 'html'; // aura cmps
+        case 'js':
+            return 'javascript';
+        case 'html':
+            return 'html';
+        case 'app':
+        case 'cmp':
+            return 'html'; // aura cmps
     }
     throw new Error('todo: ' + path);
 }
