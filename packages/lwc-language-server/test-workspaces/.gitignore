@@ -2,5 +2,5 @@
 **/lightningcomponents/.eslintrc.json
 **/modules/jsconfig.json
 sfdx-workspace/.forceignore
-core-like-workspace/core/.vscode/
-core-like-workspace/core/ui-global-components/.vscode/
+core-like-workspace/app/main/core/.vscode/
+core-like-workspace/app/main/core/ui-global-components/.vscode/

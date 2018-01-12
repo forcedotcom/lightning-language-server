@@ -18,5 +18,12 @@
         "**/target/**": true
     },
     "files.useExperimentalFileWatcher": true,
-    "eslint.nodePath": "${eslint_node_path}"
+    "eslint.nodePath": "${eslint_node_path}",
+    "perforce.maxBuffer": 10485760,
+    "perforce.editOnFileModified": true,
+    "perforce.addOnFileCreate": true,
+    "perforce.deleteOnFileDelete": true,
+    "perforce.client": "${p4_client}",
+    "perforce.user": "${p4_user}",
+    "perforce.port": "${p4_port}"
 }

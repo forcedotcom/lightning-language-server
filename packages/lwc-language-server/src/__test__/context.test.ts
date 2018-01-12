@@ -5,7 +5,7 @@ import * as fs from 'fs-extra';
 
 const FORCE_APP_ROOT = 'test-workspaces/sfdx-workspace/force-app/main/default';
 const UTILS_ROOT = 'test-workspaces/sfdx-workspace/utils/meta';
-const CORE_ALL_ROOT = 'test-workspaces/core-like-workspace/core';
+const CORE_ALL_ROOT = 'test-workspaces/core-like-workspace/app/main/core';
 const CORE_PROJECT_ROOT = CORE_ALL_ROOT + '/ui-global-components';
 
 function namespaceRoots(context: WorkspaceContext): string[] {
@@ -200,7 +200,7 @@ it('configureSfdxProject()', () => {
 it('configureCoreProject()', () => {
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
-    const typingsPath = 'test-workspaces/core-like-workspace/core/.vscode/typings/lwc';
+    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
     const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
@@ -249,7 +249,7 @@ function verifyJsconfigCore(jsconfigPath: string) {
 }
 
 function verifyTypingsCore() {
-    const typingsPath = 'test-workspaces/core-like-workspace/core/.vscode/typings/lwc';
+    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
     expect(typingsPath + '/engine.d.ts').toExist();
     expect(typingsPath + '/lwc.d.ts').toExist();
     fs.removeSync(typingsPath);
@@ -260,4 +260,7 @@ function verifyCoreSettings(settingsPath: string) {
     const settings = JSON.parse(settingsContent);
     expect(settings['files.watcherExclude']).toBeDefined();
     expect(settings['eslint.nodePath']).toBeDefined();
+    expect(settings['perforce.client']).toBe('username-localhost-blt');
+    expect(settings['perforce.user']).toBe('username');
+    expect(settings['perforce.port']).toBe('ssl:host:port');
 }

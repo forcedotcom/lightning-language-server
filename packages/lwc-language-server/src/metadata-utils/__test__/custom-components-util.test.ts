@@ -40,7 +40,7 @@ it('indexSfdx', async () => {
 
 it('indexCore', async () => {
     // test indexing of core-like workspace
-    const context = new WorkspaceContext('test-workspaces/core-like-workspace/core');
+    const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
     removeAllTags();
     await context.configureAndIndex();
     // check attributes
@@ -51,7 +51,7 @@ it('indexCore', async () => {
     // check Location
     const uri = getLwcByTag('one-app-nav-bar').location.uri;
     expect(URI.parse(uri).path).toExist();
-    expect(uri).toEndWith('/test-workspaces/core-like-workspace/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(uri).toEndWith('/test-workspaces/core-like-workspace/app/main/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
 });
 
 it('indexStandard', async () => {

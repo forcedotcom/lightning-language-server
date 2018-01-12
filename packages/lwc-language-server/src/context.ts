@@ -11,6 +11,7 @@ import { TextDocument } from 'vscode-languageserver';
 import { WorkspaceType, detectWorkspaceType, isLWC } from './shared';
 import { GlobSync } from 'glob';
 import * as _ from 'lodash';
+import * as properties from 'properties';
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -132,7 +133,7 @@ export class WorkspaceContext {
                 const relativeJsConfigPath = join(dirPath, 'jsconfig.json');
                 const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
                 const relativeWorkspaceRoot = path.relative(path.dirname(jsConfigPath), this.workspaceRoot);
-                const jsConfigContent = this.processTemplate(jsConfigTemplate, relativeWorkspaceRoot);
+                const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
                 this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
 
                 // write/update .eslintrc.json
@@ -144,14 +145,14 @@ export class WorkspaceContext {
         if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
             const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
             const relativeJsConfigPath = join('modules', 'jsconfig.json');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
             this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
             this.updateCoreSettings();
         }
 
         if (this.type === WorkspaceType.CORE_ALL) {
             const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, '../..');
+            const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
             for (const project of fs.readdirSync(this.workspaceRoot)) {
                 const modulesDir = join(project, 'modules');
                 if (fs.existsSync(join(this.workspaceRoot, modulesDir))) {
@@ -164,20 +165,35 @@ export class WorkspaceContext {
     }
 
     private updateCoreSettings() {
+        // configure perforce for core: p4_port/p4_client/p4_user from ~/blt/config.blt
+        const relativeBltDir = this.type === WorkspaceType.CORE_ALL ? '../../..' : '../../../..';
+        const configBltContent = fs.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
+        const configBlt = properties.parse(configBltContent);
+        const variableMap = {
+            eslint_node_path: findCoreESLint(),
+            p4_port: configBlt['p4.port'],
+            p4_client: configBlt['p4.client'],
+            p4_user: configBlt['p4.user'],
+        };
         const settingsTemplate = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
-        const settingsContent = this.processTemplate(settingsTemplate, undefined, findCoreESLint());
+        const settingsContent = this.processTemplate(settingsTemplate, variableMap);
         fs.ensureDir(join(this.workspaceRoot, '.vscode'));
         const relativeSettingsPath = join('.vscode', 'settings.json');
         this.updateConfigFile(relativeSettingsPath, settingsContent);
     }
 
-    private processTemplate(template: string, relativeWorkspaceRoot: string, eslintNodePath?: string) {
+    private processTemplate(
+        template: string,
+        variableMap: {
+            project_root?: string;
+            eslint_node_path?: string;
+            p4_port?: string;
+            p4_client?: string;
+            p4_user?: string;
+        },
+    ) {
         _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
         const compiled = _.template(template);
-        const variableMap: { project_root: string; eslint_node_path?: string } = { project_root: relativeWorkspaceRoot };
-        if (eslintNodePath) {
-            variableMap.eslint_node_path = eslintNodePath;
-        }
         return compiled(variableMap);
     }
 

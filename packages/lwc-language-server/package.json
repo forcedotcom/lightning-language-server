@@ -20,6 +20,7 @@
     "fs-extra": "4.0.2",
     "glob": "7.1.2",
     "lodash": "4.17.4",
+    "properties": "1.2.1",
     "semver": "5.4.1",
     "tmp": "0.0.33",
     "vscode-languageserver": "3.5.0",
