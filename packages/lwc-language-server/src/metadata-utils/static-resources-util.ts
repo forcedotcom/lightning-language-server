@@ -57,7 +57,8 @@ export function indexStaticResources(workspacePath: string, sfdxPackageDirsPatte
 
 function generateResourceTypeDeclarations(): string {
     let resTypeDecs = '';
-    STATIC_RESOURCES.forEach(res => {
+    const sortedStaticResources = Array.from(STATIC_RESOURCES).sort();
+    sortedStaticResources.forEach(res => {
         resTypeDecs += generateResourceTypeDeclaration(res);
     });
     return resTypeDecs;

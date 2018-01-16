@@ -116,7 +116,7 @@ export class WorkspaceContext {
 
         if (typingsDir) {
             // copy engine.d.ts, lwc.d.ts to typingsDir
-            fs.ensureDir(typingsDir);
+            fs.ensureDirSync(typingsDir);
             fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
             fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
         }
@@ -177,7 +177,7 @@ export class WorkspaceContext {
         };
         const settingsTemplate = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
         const settingsContent = this.processTemplate(settingsTemplate, variableMap);
-        fs.ensureDir(join(this.workspaceRoot, '.vscode'));
+        fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         const relativeSettingsPath = join('.vscode', 'settings.json');
         this.updateConfigFile(relativeSettingsPath, settingsContent);
     }

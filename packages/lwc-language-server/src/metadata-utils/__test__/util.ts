@@ -7,7 +7,6 @@ export async function validate(
     sfdxPackageDirsPattern: string,
     expectedTypeDeclarationFileName: string,
     expectedTypeDeclarations: string,
-    done: any,
 ) {
     mockFileUtilHooks.writeCallback = (path, callback) => {
         expect(callback()).toBe(expectedTypeDeclarations);
@@ -15,5 +14,4 @@ export async function validate(
         return Promise.resolve();
     };
     await indexer(join(process.cwd(), 'test-workspaces', testWorkspace), sfdxPackageDirsPattern);
-    done();
 }

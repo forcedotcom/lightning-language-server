@@ -17,7 +17,7 @@ declare module "@label/c.greeting2" {
     export default labelName;
 }
 `;
-    await validate(indexCustomLabels, 'sfdx-workspace', 'force-app', 'customlabels.d.ts', expectedDTS, done);
+    await validate(indexCustomLabels, 'sfdx-workspace', 'force-app', 'customlabels.d.ts', expectedDTS);
 
     // workspace with 2 packages
     const expectedDTS2 = `declare module "@label/c.greeting" {
@@ -33,5 +33,6 @@ declare module "@label/c.utils" {
     export default labelName;
 }
 `;
-    await validate(indexCustomLabels, 'sfdx-workspace', '{force-app,utils}', 'customlabels.d.ts', expectedDTS2, done);
+    await validate(indexCustomLabels, 'sfdx-workspace', '{force-app,utils}', 'customlabels.d.ts', expectedDTS2);
+    done();
 });

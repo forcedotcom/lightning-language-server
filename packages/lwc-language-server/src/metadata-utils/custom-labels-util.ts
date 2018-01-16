@@ -109,7 +109,8 @@ function readLabelFile(filePath: string) {
 
 function generateLabelTypeDeclarations(): string {
     let resTypeDecs = '';
-    CUSTOM_LABELS.forEach(res => {
+    const sortedCustomLabels = Array.from(CUSTOM_LABELS).sort();
+    sortedCustomLabels.forEach(res => {
         resTypeDecs += generateLabelTypeDeclaration(res);
     });
     return resTypeDecs;

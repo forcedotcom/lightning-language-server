@@ -13,7 +13,7 @@ it('indexStaticResources', async done => {
     export default resourceUrl;
 }
 `;
-    await validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS, done);
+    await validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS);
 
     // workspace with 2 packages
     const expectedDTS2 = `declare module "@resource-url/todocss" {
@@ -25,5 +25,6 @@ declare module "@resource-url/todoutil" {
     export default resourceUrl;
 }
 `;
-    await validate(indexStaticResources, 'sfdx-workspace', '{force-app,utils}', 'staticresources.d.ts', expectedDTS2, done);
+    await validate(indexStaticResources, 'sfdx-workspace', '{force-app,utils}', 'staticresources.d.ts', expectedDTS2);
+    done();
 });
