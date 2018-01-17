@@ -45,8 +45,7 @@ export function loadStandardComponents(): Promise<void> {
                             const info = new TagInfo([]);
                             if (lwcStandard[tag].attributes) {
                                 lwcStandard[tag].attributes.map((a: any) => {
-                                    const attrName = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                                    info.attributes.push(new AttributeInfo(attrName, a.description));
+                                    info.attributes.push(new AttributeInfo(a.name, a.description));
                                 });
                             }
                             info.documentation = lwcStandard[tag].description;

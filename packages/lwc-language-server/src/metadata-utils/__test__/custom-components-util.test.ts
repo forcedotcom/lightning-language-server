@@ -24,7 +24,7 @@ it('indexSfdx', async () => {
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('c-todo_item').attributes).toEqual([{ name: 'todo' }]);
-    expect(getLwcByTag('c-todo_util').attributes).toEqual([{ name: 'info' }]);
+    expect(getLwcByTag('c-todo_util').attributes).toEqual([{ name: 'info' }, { name: 'icon-name' }, { name: 'upper-c-a-s-e' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');

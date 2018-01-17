@@ -80,6 +80,7 @@ it('complete', async () => {
     ]);
 
     testCompletion('<template><c-todo_item tod|', [{ label: 'todo', result: '<template><c-todo_item todo=$1' }]);
-
     testCompletion('<template><c-todo_util inf|', [{ label: 'info', result: '<template><c-todo_util info=$1' }]);
+    testCompletion('<template><c-todo_util ico|', [{ label: 'icon-name', result: '<template><c-todo_util icon-name=$1' }]);
+    testCompletion('<template><c-todo_util upp|', [{ label: 'upper-c-a-s-e', result: '<template><c-todo_util upper-c-a-s-e=$1' }]);
 });
