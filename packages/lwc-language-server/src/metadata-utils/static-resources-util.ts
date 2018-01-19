@@ -66,8 +66,8 @@ function generateResourceTypeDeclarations(): string {
 
 function generateResourceTypeDeclaration(resourceName: string) {
     const result = `declare module "@resource-url/${resourceName}" {
-    var resourceUrl: string;
-    export default resourceUrl;
+    var ${resourceName}: string;
+    export default ${resourceName};
 }
 `;
     return result;

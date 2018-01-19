@@ -8,7 +8,7 @@
         <value>Aloha!</value>
     </labels>
     <labels>
-        <fullName>greeting2</fullName>
+        <fullName>other_greeting</fullName>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>greeting</shortDescription>
