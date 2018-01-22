@@ -53,6 +53,6 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
 
     // custom tags from utils package
     assertHover('|<c-todo_util></c-todo_util>', undefined);
-    assertHover('<|c-todo_util></c-todo_util>', '<c-todo_util>', 'LWC tag', 1);
-    assertHover('<c-todo_ut|il></c-todo_util>', '<c-todo_util>', 'LWC tag', 1);
+    assertHover('<|c-todo_util></c-todo_util>', undefined);
+    assertHover('<c-todo_ut|il></c-todo_util>', undefined);
 });

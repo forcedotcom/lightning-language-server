@@ -70,10 +70,7 @@ export function removeAllTags() {
 }
 
 export function addCustomTag(namespace: string, tag: string, uri: string, metadata: ICompilerMetadata) {
-    let doc = metadata.doc;
-    if (!doc) {
-        doc = 'LWC tag';
-    }
+    const doc = metadata.doc;
     const attributes = extractAttributes(metadata);
     if (!metadata.declarationLoc) {
         // i.e. if declaration doesn't extend Element
