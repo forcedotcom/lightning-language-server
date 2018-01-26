@@ -28,10 +28,6 @@ import URI from 'vscode-uri';
 import { WorkspaceType } from './shared';
 export * from './shared';
 
-export function definedInServer() {
-    console.log('definedInServer.ts');
-}
-
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 const connection: IConnection = createConnection();

@@ -69,7 +69,7 @@ export function deepMerge(to: object, from: object): boolean {
             modified = true;
         } else if (Array.isArray(fromVal)) {
             // assign 'from' array values to the 'to' array (create array if 'to' is a scalar)
-            const toArray = Array.isArray(toVal) ? toVal as any[] : ((to as any)[key] = [toVal]);
+            const toArray = Array.isArray(toVal) ? (toVal as any[]) : ((to as any)[key] = [toVal]);
             for (const e of fromVal as any[]) {
                 if (!toArray.some(value => equal(value, e))) {
                     toArray.push(e);
