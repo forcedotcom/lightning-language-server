@@ -162,6 +162,8 @@ export class WorkspaceContext {
             }
             this.updateCoreSettings();
         }
+
+        this.updateWorkspaceSettings();
     }
 
     private updateCoreSettings() {
@@ -177,6 +179,13 @@ export class WorkspaceContext {
         };
         const settingsTemplate = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
         const settingsContent = this.processTemplate(settingsTemplate, variableMap);
+        fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
+        const relativeSettingsPath = join('.vscode', 'settings.json');
+        this.updateConfigFile(relativeSettingsPath, settingsContent);
+    }
+
+    private updateWorkspaceSettings() {
+        const settingsContent = fs.readFileSync(utils.getResourcePath(join('common', 'settings.json')), 'utf8');
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         const relativeSettingsPath = join('.vscode', 'settings.json');
         this.updateConfigFile(relativeSettingsPath, settingsContent);

@@ -136,6 +136,7 @@ it('configureSfdxProject()', () => {
     const eslintrcPathUtils = UTILS_ROOT + '/lightningcomponents/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+    const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
@@ -195,6 +196,8 @@ it('configureSfdxProject()', () => {
     // typings
     expect(sfdxTypingsPath + '/engine.d.ts').toExist();
     expect(sfdxTypingsPath + '/lwc.d.ts').toExist();
+
+    verifyWorkspaceSettings(settingsPath);
 });
 
 it('configureCoreProject()', () => {
@@ -214,6 +217,7 @@ it('configureCoreProject()', () => {
     verifyTypingsCore();
 
     verifyCoreSettings(settingsPath);
+    verifyWorkspaceSettings(settingsPath);
 });
 
 it('configureCoreAll()', () => {
@@ -236,6 +240,7 @@ it('configureCoreAll()', () => {
     verifyTypingsCore();
 
     verifyCoreSettings(settingsPath);
+    verifyWorkspaceSettings(settingsPath);
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {
@@ -263,4 +268,11 @@ function verifyCoreSettings(settingsPath: string) {
     expect(settings['perforce.client']).toBe('username-localhost-blt');
     expect(settings['perforce.user']).toBe('username');
     expect(settings['perforce.port']).toBe('ssl:host:port');
+}
+
+function verifyWorkspaceSettings(settingsPath: string) {
+    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
+    const settings = JSON.parse(settingsContent);
+    expect(settings['html.suggest.angular1']).toBe(false);
+    expect(settings['html.suggest.ionic']).toBe(false);
 }
