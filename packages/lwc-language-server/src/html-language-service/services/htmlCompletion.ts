@@ -158,7 +158,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 				}
 				result.items.push({
 					label: attribute,
-					detail: 'LWC attribute',
+					detail: info.detail? info.detail : 'LWC attribute',
 					documentation: info.documentation,
 					kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
 					textEdit: TextEdit.replace(range, codeSnippet),

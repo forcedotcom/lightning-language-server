@@ -1,12 +1,14 @@
 import { IHTMLTagProvider, TagInfo, AttributeInfo } from './htmlTags';
 import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
 
+const LWC_DIRECTIVE = 'LWC directive';
+
 const LWC_DIRECTIVES: AttributeInfo[] = [
-    new AttributeInfo('for:each', 'Renders the element or template block multiple times based on the expression value.'),
-    new AttributeInfo('for:item', 'Bind the current iteration item to an identifier.'),
-    new AttributeInfo('for:index', 'Bind the current iteration index to an identifier.'),
-    new AttributeInfo('if:true', 'Renders the element or template if the expression value is thruthy.'),
-    new AttributeInfo('if:false', 'Renders the element or template if the expression value is falsy.'),
+    new AttributeInfo('for:each', 'Renders the element or template block multiple times based on the expression value.', undefined, LWC_DIRECTIVE),
+    new AttributeInfo('for:item', 'Bind the current iteration item to an identifier.', undefined, LWC_DIRECTIVE),
+    new AttributeInfo('for:index', 'Bind the current iteration index to an identifier.', undefined, LWC_DIRECTIVE),
+    new AttributeInfo('if:true', 'Renders the element or template if the expression value is thruthy.', undefined, LWC_DIRECTIVE),
+    new AttributeInfo('if:false', 'Renders the element or template if the expression value is falsy.', undefined, LWC_DIRECTIVE),
 ];
 
 export function getDirectiveInfo(label: string): AttributeInfo | null {

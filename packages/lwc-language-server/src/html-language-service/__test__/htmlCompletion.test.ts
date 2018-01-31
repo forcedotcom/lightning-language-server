@@ -8,6 +8,7 @@ interface ICompletionMatcher {
     label: string;
     result: string;
     documentation?: string;
+    detail?: string;
 }
 
 function applyEdit(document: TextDocument, edit: TextEdit): string {
@@ -32,6 +33,9 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
         if (matcher.documentation) {
             expect(item.documentation).toContain(matcher.documentation);
         }
+        if (matcher.detail) {
+            expect(item.detail).toBe(matcher.detail);
+        }
         expect(applyEdit(document, item.textEdit)).toEqual(matcher.result);
     });
 
@@ -48,7 +52,12 @@ it('complete', async () => {
     expect(res).toHaveLength(5);
 
     testCompletion('<template><div |', [
-        { label: 'if:true', result: '<template><div if:true=$1', documentation: 'Renders the element or template if the expression value is thruthy.' },
+        {
+            label: 'if:true',
+            result: '<template><div if:true=$1',
+            documentation: 'Renders the element or template if the expression value is thruthy.',
+            detail: 'LWC directive',
+        },
         { label: 'for:item', result: '<template><div for:item=$1' },
     ]);
 
@@ -76,6 +85,7 @@ it('complete', async () => {
             label: 'alternative-text',
             result: '<template><lightning-button-icon-stateful alternative-text=$1',
             documentation: 'The alternative text used to describe the icon.',
+            detail: 'LWC attribute',
         },
     ]);
 

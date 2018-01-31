@@ -48,6 +48,7 @@ export class AttributeInfo {
 		public name: string,
 		public documentation?: string,
 		public location?: Location,
+		public detail?: string,
 	) {
         this.name = name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
 	}
