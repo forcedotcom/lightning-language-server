@@ -8,11 +8,11 @@ const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
 export function toResolvedPath(uri: string): string {
-    return resolve(URI.parse(uri).path);
+    return resolve(URI.parse(uri).fsPath);
 }
 
 export function getExtension(textDocument: TextDocument): string {
-    const filePath = URI.parse(textDocument.uri).path;
+    const filePath = URI.parse(textDocument.uri).fsPath;
     return filePath ? extname(filePath) : '';
 }
 

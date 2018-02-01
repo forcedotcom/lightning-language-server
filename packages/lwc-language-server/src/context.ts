@@ -122,6 +122,10 @@ export class WorkspaceContext {
         }
     }
 
+    private unixify(filePath: string): string {
+        return filePath.replace(/\\/g, '/');
+    }
+
     private writeConfigFiles() {
         if (this.type === WorkspaceType.SFDX) {
             const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
@@ -132,7 +136,7 @@ export class WorkspaceContext {
                 // write/update jsconfig.json
                 const relativeJsConfigPath = join(dirPath, 'jsconfig.json');
                 const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
-                const relativeWorkspaceRoot = path.relative(path.dirname(jsConfigPath), this.workspaceRoot);
+                const relativeWorkspaceRoot = this.unixify(path.relative(path.dirname(jsConfigPath), this.workspaceRoot));
                 const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
                 this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
 

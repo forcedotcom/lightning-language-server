@@ -43,7 +43,7 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
     const { rootUri, rootPath } = params;
 
     // Early exit if no workspace is opened
-    const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).path : rootPath);
+    const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
     if (!workspaceRoot) {
         console.warn(`No workspace found`);
         return { capabilities: {} };
