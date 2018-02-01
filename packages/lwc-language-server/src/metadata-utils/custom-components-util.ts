@@ -15,10 +15,11 @@ export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { ty
     const isSfdxProject = type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${path.sep}lightningcomponents${path.sep}.*.js`)) {
+            const file = URI.parse(f.uri).path;
             if (f.type === FileChangeType.Created) {
-                addCustomTagFromFile(f.uri, isSfdxProject);
+                addCustomTagFromFile(file, isSfdxProject);
             } else if (f.type === FileChangeType.Deleted) {
-                removeCustomTagFromFile(f.uri, isSfdxProject);
+                removeCustomTagFromFile(file, isSfdxProject);
             }
         }
     });
@@ -72,10 +73,7 @@ export function removeAllTags() {
 export function addCustomTag(namespace: string, tag: string, uri: string, metadata: ICompilerMetadata) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata);
-    if (!metadata.declarationLoc) {
-        // i.e. if declaration doesn't extend Element
-        console.info('no declarationLoc for ' + uri);
-    }
+    // declarationLoc may be undefined if live file doesn't extend Element yet
     const startLine = metadata.declarationLoc ? metadata.declarationLoc.start.line - 1 : 0;
     const location = Location.create(uri, Range.create(Position.create(startLine, 0), Position.create(startLine, 0)));
     LWC_TAGS.set(fullTagName(namespace, tag), new TagInfo(attributes, location, doc));
@@ -101,15 +99,19 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
     const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         // get attributes from compiler metadata
-        const { result, diagnostics } = await compileFile(file);
-        if (diagnostics.length > 0) {
-            console.log('error compiling ' + file + ': ', diagnostics);
-        }
-        if (result) {
-            const metadata = result.metadata;
-            const namespace = sfdxProject ? 'c' : pathElements.pop();
-            const uri = URI.file(path.resolve(file)).toString();
-            addCustomTag(namespace, parentDirName, uri, metadata);
+        try {
+            const { result, diagnostics } = await compileFile(file);
+            if (diagnostics.length > 0) {
+                console.log('error compiling ' + file + ': ', diagnostics);
+            }
+            if (result) {
+                const metadata = result.metadata;
+                const namespace = sfdxProject ? 'c' : pathElements.pop();
+                const uri = URI.file(path.resolve(file)).toString();
+                addCustomTag(namespace, parentDirName, uri, metadata);
+            }
+        } catch (error) {
+            console.log('error compiling ' + file, error);
         }
     }
 }
