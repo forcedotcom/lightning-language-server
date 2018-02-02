@@ -214,11 +214,11 @@ export class WorkspaceContext {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         const configJson = JSON.parse(config);
         if (!fs.existsSync(configFile)) {
-            fs.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
+            utils.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
         } else {
             const fileConfig = JSON.parse(fs.readFileSync(configFile).toString());
             if (utils.deepMerge(fileConfig, configJson)) {
-                fs.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
+                utils.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
             }
         }
         if (ignoreFile) {

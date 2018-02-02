@@ -1,8 +1,8 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
-import { write } from './file-flush-util';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
+import * as utils from '../utils';
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
 const STATIC_RESOURCES: Set<string> = new Set();
@@ -25,13 +25,13 @@ export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { wor
         }
     });
     if (didChange) {
-        await processStaticResources(workspaceRoot);
+        processStaticResources(workspaceRoot);
     }
 }
 
-async function processStaticResources(workspace: string) {
+function processStaticResources(workspace: string) {
     if (STATIC_RESOURCES.size > 0) {
-        await write(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations);
+        utils.writeFileSync(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
     }
 }
 
@@ -47,7 +47,7 @@ export function indexStaticResources(workspacePath: string, sfdxPackageDirsPatte
                 files.map((file: string) => {
                     STATIC_RESOURCES.add(getResourceName(file));
                 });
-                await processStaticResources(workspacePath);
+                processStaticResources(workspacePath);
                 resolve();
             }
         });

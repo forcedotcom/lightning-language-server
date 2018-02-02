@@ -8,8 +8,8 @@ export async function validate(
     expectedTypeDeclarationFileName: string,
     expectedTypeDeclarations: string,
 ) {
-    mockFileUtilHooks.writeCallback = (path, callback) => {
-        expect(callback()).toBe(expectedTypeDeclarations);
+    mockFileUtilHooks.writeContents = (path, contents) => {
+        expect(contents).toBe(expectedTypeDeclarations);
         expect(path).toContain(expectedTypeDeclarationFileName);
         return Promise.resolve();
     };

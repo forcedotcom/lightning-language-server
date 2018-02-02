@@ -2,7 +2,7 @@ import { mockFileUtil } from './mock-file-util';
 import { indexCustomLabels } from '../custom-labels-util';
 import { validate } from './util';
 
-jest.mock('../file-flush-util', () => {
+jest.mock('../../utils', () => {
     return mockFileUtil();
 });
 

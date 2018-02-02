@@ -1,11 +1,17 @@
 import { extname, join, resolve } from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
+import { dirname } from 'path';
 import equal = require('deep-equal');
 import { TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
+
+export function writeFileSync(file: string, contents: string) {
+    fs.ensureDirSync(dirname(file));
+    fs.writeFileSync(file, contents);
+}
 
 export function pathStartsWith(path: string, root: string) {
     if (process.platform === 'win32') {
@@ -41,7 +47,7 @@ export function getCoreResource(resourceName: string) {
 
 export function appendLineIfMissing(file: string, line: string) {
     if (!fs.existsSync(file)) {
-        fs.writeFileSync(file, line + '\n');
+        writeFileSync(file, line + '\n');
     } else if (!fileContainsLine(file, line)) {
         fs.appendFileSync(file, '\n' + line + '\n');
     }
