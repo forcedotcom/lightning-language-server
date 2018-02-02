@@ -12,13 +12,14 @@
     "test": "jest --silent --verbose --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --single-quote --print-width 160 --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\"",
-    "precommit": "npm run format",
+    "precommit": "lint-staged",
     "prepush": "npm run prepare && npm run lint && npm test"
   },
   "dependencies": {
     "deep-equal": "1.0.1",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
+    "lint-staged": "6.1.0",
     "lodash": "4.17.4",
     "properties": "1.2.1",
     "semver": "5.5.0",
@@ -62,5 +63,11 @@
       "json"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "npm run format",
+      "git add"
+    ]
   }
 }
