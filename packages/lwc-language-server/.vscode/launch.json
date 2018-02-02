@@ -20,7 +20,7 @@
             "name": "Launch Tests",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest",
             "args": [
                 "src",
                 "--verbose",

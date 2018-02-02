@@ -15,7 +15,7 @@ export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { ty
     const isSfdxProject = type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${path.sep}lightningcomponents${path.sep}.*.js`)) {
-            const file = URI.parse(f.uri).path;
+            const file = URI.parse(f.uri).fsPath;
             if (f.type === FileChangeType.Created) {
                 addCustomTagFromFile(file, isSfdxProject);
             } else if (f.type === FileChangeType.Deleted) {
@@ -117,7 +117,7 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
 }
 
 export function addCustomTagFromResults(uri: string, metadata: ICompilerMetadata, sfdxProject: boolean) {
-    const file = URI.parse(uri).path;
+    const file = URI.parse(uri).fsPath;
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = filePath.dir.split(path.sep);

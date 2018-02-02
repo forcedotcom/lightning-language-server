@@ -1,7 +1,7 @@
 import * as utils from '../utils';
 import * as tmp from 'tmp';
 import * as fs from 'fs';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { TextDocument } from 'vscode-languageserver';
 
 it('getExtension()', () => {
@@ -10,8 +10,8 @@ it('getExtension()', () => {
 });
 
 it('test canonicalizing in nodejs', () => {
-    const canonical = resolve('tmp/./a/b/..');
-    expect(canonical.endsWith('/tmp/a')).toBe(true);
+    const canonical = resolve(join('tmp', '.', 'a', 'b', '..'));
+    expect(canonical.endsWith(join('tmp', 'a'))).toBe(true);
 });
 
 it('appendLineIfMissing()', () => {

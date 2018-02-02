@@ -1,6 +1,7 @@
 import { getLwcByTag, addCustomTagFromFile, removeAllTags } from '../custom-components-util';
 import { WorkspaceContext } from '../../context';
 import URI from 'vscode-uri';
+import { join } from 'path';
 
 it('addCustomTagFromFile(): adds custom tag attributes and documentation', async () => {
     // custom tag is not indexed initially
@@ -8,11 +9,14 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
     expect(tagInfo).toBeUndefined();
 
     // index todo_item.js ==> custom tag and attributes are added to the index
-    await addCustomTagFromFile('test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js', true);
+    await addCustomTagFromFile(
+        join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default', 'lightningcomponents', 'todo_item', 'todo_item.js'),
+        true,
+    );
     tagInfo = getLwcByTag('c-todo_item');
     expect(tagInfo).toMatchObject({ attributes: [{ name: 'todo' }], documentation: 'TodoItem doc' });
     const location = tagInfo.location;
-    expect(URI.parse(location.uri).path).toExist();
+    expect(URI.parse(location.uri).fsPath).toExist();
     expect(location.uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
     expect(location.range.start.line).toBe(6);
 });
@@ -34,7 +38,7 @@ it('indexSfdx', async () => {
     });
     // check Location
     const uri = getLwcByTag('c-todo_item').location.uri;
-    expect(URI.parse(uri).path).toExist();
+    expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
 });
 
@@ -50,7 +54,7 @@ it('indexCore', async () => {
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check Location
     const uri = getLwcByTag('one-app-nav-bar').location.uri;
-    expect(URI.parse(uri).path).toExist();
+    expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/core-like-workspace/app/main/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
 });
 
@@ -65,9 +69,9 @@ it('indexStandard', async () => {
     expect(getLwcByTag('lightning-button')).toBeUndefined();
     // check Location
     let uri = getLwcByTag('example-line').location.uri;
-    expect(URI.parse(uri).path).toExist();
+    expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/standard-workspace/src/modules/example/line/line.js');
     uri = getLwcByTag('lightning-ito').location.uri;
-    expect(URI.parse(uri).path).toExist();
+    expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/standard-workspace/src/modules/interop/ito/ito.js');
 });

@@ -7,6 +7,13 @@ import URI from 'vscode-uri';
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
+export function pathStartsWith(path: string, root: string) {
+    if (process.platform === 'win32') {
+        return path.toLowerCase().startsWith(root.toLowerCase());
+    }
+    return path.startsWith(root);
+}
+
 export function toResolvedPath(uri: string): string {
     return resolve(URI.parse(uri).fsPath);
 }

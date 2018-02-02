@@ -1,12 +1,14 @@
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import { readAsTextDocument } from './test-utils';
+import { join } from 'path';
 import * as fs from 'fs-extra';
 
-const FORCE_APP_ROOT = 'test-workspaces/sfdx-workspace/force-app/main/default';
-const UTILS_ROOT = 'test-workspaces/sfdx-workspace/utils/meta';
-const CORE_ALL_ROOT = 'test-workspaces/core-like-workspace/app/main/core';
-const CORE_PROJECT_ROOT = CORE_ALL_ROOT + '/ui-global-components';
+const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
+const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'meta');
+const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app', 'main', 'core');
+const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
+const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
 
 function namespaceRoots(context: WorkspaceContext): string[] {
     // tslint:disable-next-line:no-string-literal
@@ -19,47 +21,47 @@ it('WorkspaceContext', async () => {
     expect(context.workspaceRoot).toBeAbsolutePath();
     let roots = namespaceRoots(context);
     expect(roots[0]).toBeAbsolutePath();
-    expect(roots[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents');
-    expect(roots[1]).toEndWith(UTILS_ROOT + '/lightningcomponents');
+    expect(roots[0]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents'));
+    expect(roots[1]).toEndWith(join(UTILS_ROOT, 'lightningcomponents'));
     expect(roots.length).toBe(2);
     let modules = context.findAllModules();
-    expect(modules[0]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
-    expect(modules[9]).toEndWith(FORCE_APP_ROOT + '/lightningcomponents/wire_lds/wire_lds.js');
-    expect(modules[10]).toEndWith(UTILS_ROOT + '/lightningcomponents/todo_util/todo_util.js');
+    expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lightningcomponents/hello_world/hello_world.js'));
+    expect(modules[9]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents/wire_lds/wire_lds.js'));
+    expect(modules[10]).toEndWith(join(UTILS_ROOT, '/lightningcomponents/todo_util/todo_util.js'));
     expect(modules.length).toBe(11);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = namespaceRoots(context);
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
-    expect(roots[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example');
-    expect(roots[1]).toEndWith('test-workspaces/standard-workspace/src/modules/interop');
-    expect(roots[2]).toEndWith('test-workspaces/standard-workspace/src/modules/other');
+    expect(roots[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
+    expect(roots[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
+    expect(roots[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
     expect(roots.length).toBe(3);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith('test-workspaces/standard-workspace/src/modules/example/app/app.js');
-    expect(modules[1]).toEndWith('test-workspaces/standard-workspace/src/modules/example/line/line.js');
-    expect(modules[2]).toEndWith('test-workspaces/standard-workspace/src/modules/interop/ito/ito.js');
-    expect(modules[3]).toEndWith('test-workspaces/standard-workspace/src/modules/other/text/text.js');
+    expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
+    expect(modules[1]).toEndWith(join(STANDARDS_ROOT, 'example', 'line', 'line.js'));
+    expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
+    expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
     roots = namespaceRoots(context);
-    expect(roots[0]).toEndWith(CORE_ALL_ROOT + '/ui-force-components/modules/force');
-    expect(roots[1]).toEndWith(CORE_ALL_ROOT + '/ui-global-components/modules/one');
+    expect(roots[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
+    expect(roots[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
     expect(roots.length).toBe(2);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith(CORE_ALL_ROOT + '/ui-force-components/modules/force/input-phone/input-phone.js');
-    expect(modules[1]).toEndWith(CORE_ALL_ROOT + '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
+    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
     roots = namespaceRoots(context);
-    expect(roots[0]).toEndWith(CORE_PROJECT_ROOT + '/modules/one');
+    expect(roots[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.length).toBe(1);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
 
     // console.log('core roots:', utils.findNamespaceRoots('/Users/rsalvador/blt/app/main/core'));
@@ -188,10 +190,10 @@ it('configureSfdxProject()', () => {
 
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, { encoding: 'utf-8' });
-    expect(forceignoreContent).toContain('force-app/main/default/lightningcomponents/jsconfig.json');
-    expect(forceignoreContent).toContain('utils/meta/lightningcomponents/jsconfig.json');
-    expect(forceignoreContent).toContain('force-app/main/default/lightningcomponents/.eslintrc.json');
-    expect(forceignoreContent).toContain('utils/meta/lightningcomponents/.eslintrc.json');
+    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', 'jsconfig.json'));
+    expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', 'jsconfig.json'));
+    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', '.eslintrc.json'));
+    expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', '.eslintrc.json'));
 
     // typings
     expect(sfdxTypingsPath + '/engine.d.ts').toExist();
