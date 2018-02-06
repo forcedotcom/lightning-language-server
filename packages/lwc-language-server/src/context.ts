@@ -115,10 +115,11 @@ export class WorkspaceContext {
         }
 
         if (typingsDir) {
-            // copy engine.d.ts, lwc.d.ts to typingsDir
+            // copy typings to typingsDir
             fs.ensureDirSync(typingsDir);
             fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
             fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
+            fs.copySync(utils.getSfdxResource(join('typings', 'lds.d.ts')), join(typingsDir, 'lds.d.ts'));
         }
     }
 
