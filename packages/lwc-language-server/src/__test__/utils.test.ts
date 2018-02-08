@@ -40,11 +40,11 @@ it('deepMerge()', () => {
     expect(to).toEqual({ a: 1, b: 2 });
     expect(utils.deepMerge({ a: 1 }, { a: 1 })).toBeFalsy();
 
-    // overwrite scalar
+    // do not overwrite scalar
     to = { a: 1 };
     from = { a: 2 };
-    expect(utils.deepMerge(to, from)).toBeTruthy();
-    expect(to).toEqual({ a: 2 });
+    expect(utils.deepMerge(to, from)).toBeFalsy();
+    expect(to).toEqual({ a: 1 });
 
     // nested object gets copied
     to = { a: 1 };
@@ -84,4 +84,14 @@ it('deepMerge()', () => {
     expect(utils.deepMerge(to, from)).toBeTruthy();
     expect(to).toEqual({ a: [{ x: 1 }, { y: 2 }] });
     expect(utils.deepMerge({ a: [{ y: 2 }] }, { a: [{ y: 2 }] })).toBeFalsy();
+
+    // don't add scalar to array if already in array
+    to = { a: [1, 2] };
+    from = { a: 2 };
+    expect(utils.deepMerge(to, from)).toBeFalsy();
+    expect(to).toEqual({ a: [1, 2] });
+    to = { a: 2 };
+    from = { a: [1, 2] };
+    expect(utils.deepMerge(to, from)).toBeTruthy();
+    expect(to).toEqual({ a: [2, 1] });
 });

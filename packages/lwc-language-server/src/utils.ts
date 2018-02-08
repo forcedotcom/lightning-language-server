@@ -91,18 +91,17 @@ export function deepMerge(to: object, from: object): boolean {
             }
         } else if (Array.isArray(toVal)) {
             // if 'to' is array and 'from' scalar, push 'from' to the array
-            (toVal as any[]).push(fromVal);
-            modified = true;
+            if (!toVal.includes(fromVal)) {
+                toVal.push(fromVal);
+                modified = true;
+            }
         } else if (fromVal != null && typeof fromVal === 'object') {
             // merge object values
             if (deepMerge(toVal, fromVal)) {
                 modified = true;
             }
-        } else if (fromVal !== toVal) {
-            // 'from' overwrites 'to' if 'to' and 'from' have different scalar values
-            (to as any)[key] = fromVal;
-            modified = true;
         }
+        // do not overwrite existing values
     }
     return modified;
 }
