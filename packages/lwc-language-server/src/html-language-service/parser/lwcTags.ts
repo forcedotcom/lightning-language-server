@@ -36,6 +36,15 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         }
     }
 
+    function addExpressions(tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+        const cTag = getLwcByTag(`c-${tag}`);
+        if (cTag) {
+            cTag.attributes.map(info => {
+                collector(info.jsName, info, '');
+            });
+        }
+    }
+
     function addDirectives(collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         LWC_DIRECTIVES.map(info => {
             collector(info.name, info, null);
@@ -56,6 +65,9 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         },
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
+        },
+        collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
+            addExpressions(templateTag, collector);
         },
         getTagInfo: (tag: string) => getLwcByTag(tag),
     };

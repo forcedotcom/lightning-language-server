@@ -44,13 +44,14 @@ export function isEmptyElement(e: string): boolean {
 }
 
 export class AttributeInfo {
+	public name: string;
 	constructor(
-		public name: string,
+		public jsName: string,
 		public documentation?: string,
 		public location?: Location,
 		public detail?: string,
 	) {
-        this.name = name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+        this.name = jsName.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
 	}
 }
 
@@ -78,6 +79,7 @@ export interface IHTMLTagProvider {
 	collectTags(collector: (tag: string, info: TagInfo) => void): void;
 	collectAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void;
 	collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
+	collectExpressionValues(templateTag: string, collector: (value: string) => void): void;
 	getTagInfo(tag: string): TagInfo;
 }
 

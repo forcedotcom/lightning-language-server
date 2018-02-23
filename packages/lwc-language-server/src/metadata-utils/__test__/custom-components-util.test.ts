@@ -27,13 +27,18 @@ it('indexSfdx', async () => {
     removeAllTags();
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('c-todo_item').attributes).toEqual([{ name: 'todo' }]);
-    expect(getLwcByTag('c-todo_util').attributes).toEqual([{ name: 'info' }, { name: 'icon-name' }, { name: 'upper-c-a-s-e' }]);
+    expect(getLwcByTag('c-todo_item').attributes).toEqual([{ name: 'todo', jsName: 'todo' }]);
+    expect(getLwcByTag('c-todo_util').attributes).toEqual([
+        { name: 'info', jsName: 'info' },
+        { name: 'icon-name', jsName: 'iconName' },
+        { name: 'upper-c-a-s-e', jsName: 'upperCASE' },
+    ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');
     expect(getLwcByTag('lightning-button').attributes[0]).toEqual({
         name: 'accesskey',
+        jsName: 'accesskey',
         documentation: 'Specifies a shortcut key to activate or focus an element.',
     });
     // check Location
@@ -49,7 +54,7 @@ it('indexCore', async () => {
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('force-input-phone').attributes).toEqual([{ name: 'value' }]);
+    expect(getLwcByTag('force-input-phone').attributes).toEqual([{ name: 'value', jsName: 'value' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check Location
@@ -63,8 +68,8 @@ it('indexStandard', async () => {
     removeAllTags();
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('example-line').attributes).toEqual([{ name: 'hover' }, { name: 'text' }]);
-    expect(getLwcByTag('lightning-ito').attributes).toEqual([{ name: 'attr' }]);
+    expect(getLwcByTag('example-line').attributes).toEqual([{ name: 'hover', jsName: 'hover' }, { name: 'text', jsName: 'text' }]);
+    expect(getLwcByTag('lightning-ito').attributes).toEqual([{ name: 'attr', jsName: 'attr' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).toBeUndefined();
     // check Location

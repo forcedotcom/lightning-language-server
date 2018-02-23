@@ -3,7 +3,7 @@ import { getLanguageService } from '../htmlLanguageService';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { WorkspaceContext } from '../../context';
 import { WorkspaceType } from '../../shared';
-
+import * as path from 'path';
 interface ICompletionMatcher {
     label: string;
     result: string;
@@ -19,9 +19,9 @@ function applyEdit(document: TextDocument, edit: TextEdit): string {
     return text;
 }
 
-function testCompletion(content: string, matchers: ICompletionMatcher[] = []) {
+function testCompletion(content: string, matchers: ICompletionMatcher[] = [], docName: string = 'test://test.html') {
     const [before, after] = content.split('|');
-    const document = TextDocument.create('test://test.html', 'html', 0, before + after);
+    const document = TextDocument.create(docName, 'html', 0, before + after);
     const position = Position.create(0, before.length);
     const ls = getLanguageService();
     const htmlDocument = ls.parseHTMLDocument(document);
@@ -93,4 +93,15 @@ it('complete', async () => {
     testCompletion('<template><c-todo_util inf|', [{ label: 'info', result: '<template><c-todo_util info=$1' }]);
     testCompletion('<template><c-todo_util ico|', [{ label: 'icon-name', result: '<template><c-todo_util icon-name=$1' }]);
     testCompletion('<template><c-todo_util upp|', [{ label: 'upper-c-a-s-e', result: '<template><c-todo_util upper-c-a-s-e=$1' }]);
+
+    testCompletion(
+        '<template>{|}',
+        [
+            { label: 'info', result: '<template>{info}' },
+            { label: 'iconName', result: '<template>{iconName}' },
+            { label: 'upperCASE', result: '<template>{upperCASE}' },
+        ],
+        path.join('todo_util', 'todo_util.html'),
+    );
+    testCompletion('<template>{inf|}', [{ label: 'info', result: '<template>{info}' }], path.join('todo_util', 'todo_util.html'));
 });

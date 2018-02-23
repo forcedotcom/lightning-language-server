@@ -10,6 +10,7 @@ import { TokenType, createScanner, ScannerState } from '../parser/htmlScanner';
 import { isEmptyElement } from '../parser/htmlTags';
 import { allTagProviders } from './tagProviders';
 import { CompletionConfiguration } from '../htmlLanguageService';
+import * as path from 'path';
 
 export function doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings?: CompletionConfiguration): CompletionList {
 
@@ -168,10 +169,42 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		});
 		return result;
 	}
+	/**
+	 * If current offset is inside curly brackets expression, add public properties, private properties, handler
+	 * methods etc. to the suggestions list
+	 * @param valueStart starting index of the current text token
+	 * @returns returns true if expression suggestions are being provided, false otherwise
+	 */
+	function collectExpressionSuggestions(valueStart: number): Boolean {
+		if(valueStart >= 0 && offset < text.length && text[offset] === '}') {
+			const expressionEnd = offset - 1;
+			for(let i = expressionEnd; i >= valueStart; i--) {
+				if(text[i] === '{'){
+					const templateTagName = path.parse(document.uri).dir.split(path.sep).pop();
+					const range = getReplaceRange(i + 1, offset);
+					tagProviders.forEach(provider => {
+						provider.collectExpressionValues(templateTagName, value => {
+							result.items.push({
+								label: value,
+								kind: CompletionItemKind.Reference,
+								textEdit: TextEdit.replace(range, value),
+								insertTextFormat: InsertTextFormat.PlainText
+							});
+						});
+					});
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
 		let range: Range;
 		let addQuotes: boolean;
+		if(collectExpressionSuggestions(valueStart)){
+			return result;
+		}
 		if (offset > valueStart && offset <= valueEnd && text[valueStart] === '"') {
 			// inside attribute
 			if (valueEnd > offset && text[valueEnd - 1] === '"') {
@@ -290,7 +323,10 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 				}
 				break;
 			default:
-				if (offset <= scanner.getTokenEnd()) {
+				if (collectExpressionSuggestions(scanner.getTokenLength())) {
+					return result;
+				}
+				else if (offset <= scanner.getTokenEnd()) {
 					return result;
 				}
 				break;
