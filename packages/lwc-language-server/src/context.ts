@@ -213,17 +213,21 @@ export class WorkspaceContext {
 
     private updateConfigFile(relativeConfigPath: string, config: string, ignoreFile?: string) {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
-        const configJson = JSON.parse(config);
-        if (!fs.existsSync(configFile)) {
-            utils.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
-        } else {
-            const fileConfig = JSON.parse(fs.readFileSync(configFile).toString());
-            if (utils.deepMerge(fileConfig, configJson)) {
-                utils.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
+        try {
+            const configJson = JSON.parse(config);
+            if (!fs.existsSync(configFile)) {
+                utils.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
+            } else {
+                const fileConfig = JSON.parse(fs.readFileSync(configFile).toString());
+                if (utils.deepMerge(fileConfig, configJson)) {
+                    utils.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
+                }
             }
-        }
-        if (ignoreFile) {
-            utils.appendLineIfMissing(ignoreFile, relativeConfigPath);
+            if (ignoreFile) {
+                utils.appendLineIfMissing(ignoreFile, relativeConfigPath);
+            }
+        } catch (error) {
+            throw new Error('error updating ' + configFile + ': ' + error);
         }
     }
 
