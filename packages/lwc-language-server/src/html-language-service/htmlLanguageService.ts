@@ -107,7 +107,7 @@ export interface DocumentContext {
 export interface LanguageService {
 	createScanner(input: string): Scanner;
 	parseHTMLDocument(document: TextDocument): HTMLDocument;
-	doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, options?: CompletionConfiguration): CompletionList;
+	doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, sfdxWorkspace: boolean, options?: CompletionConfiguration): CompletionList;
 	doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover | null;
 	findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
 }

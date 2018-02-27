@@ -36,8 +36,8 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         }
     }
 
-    function addExpressions(tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
-        const cTag = getLwcByTag(`c-${tag}`);
+    function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+        const cTag = getLwcByTag(templateTag);
         if (cTag) {
             cTag.attributes.map(info => {
                 collector(info.jsName, info, '');

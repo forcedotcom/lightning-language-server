@@ -19,13 +19,13 @@ function applyEdit(document: TextDocument, edit: TextEdit): string {
     return text;
 }
 
-function testCompletion(content: string, matchers: ICompletionMatcher[] = [], docName: string = 'test://test.html') {
+function testCompletion(content: string, matchers: ICompletionMatcher[] = [], sfdxProject: boolean = true, docName: string = 'test://test.html') {
     const [before, after] = content.split('|');
     const document = TextDocument.create(docName, 'html', 0, before + after);
     const position = Position.create(0, before.length);
     const ls = getLanguageService();
     const htmlDocument = ls.parseHTMLDocument(document);
-    const items = ls.doComplete(document, position, htmlDocument);
+    const items = ls.doComplete(document, position, htmlDocument, sfdxProject);
 
     matchers.forEach(matcher => {
         const item = items.items.find(candidate => matcher.label === candidate.label);
@@ -44,7 +44,7 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = [], do
 
 let res: CompletionItem[];
 
-it('complete', async () => {
+it('completion', async () => {
     res = testCompletion('<template>|</template>');
     expect(res).toHaveLength(1);
 
@@ -72,7 +72,9 @@ it('complete', async () => {
     ]);
 
     testCompletion('<template><div if:|true={isTrue}', [{ label: 'if:true', result: '<template><div if:true={isTrue}' }]);
+});
 
+it('completion in sfdx workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     await loadStandardComponents();
     await indexCustomComponents(context);
@@ -89,11 +91,16 @@ it('complete', async () => {
         },
     ]);
 
+    // tag completion:
+    testCompletion('<template><c-todo_it', [{ label: 'c-todo_item', result: '<template><c-todo_item' }]);
+
+    // attribute completion:
     testCompletion('<template><c-todo_item tod|', [{ label: 'todo', result: '<template><c-todo_item todo=$1' }]);
     testCompletion('<template><c-todo_util inf|', [{ label: 'info', result: '<template><c-todo_util info=$1' }]);
     testCompletion('<template><c-todo_util ico|', [{ label: 'icon-name', result: '<template><c-todo_util icon-name=$1' }]);
     testCompletion('<template><c-todo_util upp|', [{ label: 'upper-c-a-s-e', result: '<template><c-todo_util upper-c-a-s-e=$1' }]);
 
+    // expression completion:
     testCompletion(
         '<template>{|}',
         [
@@ -101,7 +108,58 @@ it('complete', async () => {
             { label: 'iconName', result: '<template>{iconName}' },
             { label: 'upperCASE', result: '<template>{upperCASE}' },
         ],
+        true,
         path.join('todo_util', 'todo_util.html'),
     );
-    testCompletion('<template>{inf|}', [{ label: 'info', result: '<template>{info}' }], path.join('todo_util', 'todo_util.html'));
+    testCompletion('<template>{inf|}', [{ label: 'info', result: '<template>{info}' }], true, path.join('todo_util', 'todo_util.html'));
+});
+
+it('completion in core workspace', async () => {
+    const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
+    await loadStandardComponents();
+    await indexCustomComponents(context);
+    expect(context.type).toBe(WorkspaceType.CORE_ALL);
+    res = testCompletion('<template><lightning-');
+    expect(res.length).toBeGreaterThan(10);
+
+    testCompletion('<template><lightning-button-icon-stateful a', [
+        {
+            label: 'alternative-text',
+            result: '<template><lightning-button-icon-stateful alternative-text=$1',
+            documentation: 'The alternative text used to describe the icon.',
+            detail: 'LWC attribute',
+        },
+    ]);
+
+    // tag completion:
+    testCompletion('<template><force-inp', [{ label: 'force-input-phone', result: '<template><force-input-phone' }], false);
+    // attribute completion:
+    testCompletion('<template><force-input-phone val|', [{ label: 'value', result: '<template><force-input-phone value=$1' }], false);
+    // expression completion:
+    testCompletion('<template>{val|}', [{ label: 'value', result: '<template>{value}' }], false, path.join('force', 'input-phone', 'input-phone.html'));
+});
+
+it('completion in standard workspace', async () => {
+    const context = new WorkspaceContext('test-workspaces/standard-workspace');
+    await loadStandardComponents();
+    await indexCustomComponents(context);
+    expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
+    res = testCompletion('<template><lightning-');
+    expect(res.length).toBeGreaterThan(10);
+
+    testCompletion('<template><lightning-button-icon-stateful a', [
+        {
+            label: 'alternative-text',
+            result: '<template><lightning-button-icon-stateful alternative-text=$1',
+            documentation: 'The alternative text used to describe the icon.',
+            detail: 'LWC attribute',
+        },
+    ]);
+
+    // tag completion:
+    testCompletion('<template><example-lin', [{ label: 'example-line', result: '<template><example-line' }], false);
+    // attribute completion:
+    testCompletion('<template><example-line te|', [{ label: 'text', result: '<template><example-line text=$1' }], false);
+    // expression completion:
+    testCompletion('<template>{te|}', [{ label: 'text', result: '<template>{text}' }], false, path.join('example', 'line', 'line.html'));
 });

@@ -6,7 +6,7 @@ import { join } from 'path';
 import * as utils from './utils';
 import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
-import { loadStandardComponents, indexCustomComponents } from './metadata-utils/custom-components-util';
+import { loadStandardComponents, indexCustomComponents, removeAllTags } from './metadata-utils/custom-components-util';
 import { TextDocument } from 'vscode-languageserver';
 import { WorkspaceType, detectWorkspaceType, isLWC } from './shared';
 import { GlobSync } from 'glob';
@@ -39,6 +39,7 @@ export class WorkspaceContext {
             console.error('not a LWC workspace:', workspaceRoot);
         }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
+        removeAllTags();
     }
 
     public async configureAndIndex() {

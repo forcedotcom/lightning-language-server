@@ -1,4 +1,4 @@
-import { getLwcByTag, addCustomTagFromFile, removeAllTags } from '../custom-components-util';
+import { getLwcByTag, addCustomTagFromFile } from '../custom-components-util';
 import { WorkspaceContext } from '../../context';
 import URI from 'vscode-uri';
 import { join } from 'path';
@@ -24,7 +24,6 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
 it('indexSfdx', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    removeAllTags();
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('c-todo_item').attributes).toEqual([{ name: 'todo', jsName: 'todo' }]);
@@ -50,7 +49,6 @@ it('indexSfdx', async () => {
 it('indexCore', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    removeAllTags();
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
@@ -65,7 +63,6 @@ it('indexCore', async () => {
 
 it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    removeAllTags();
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('example-line').attributes).toEqual([{ name: 'hover', jsName: 'hover' }, { name: 'text', jsName: 'text' }]);

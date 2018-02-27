@@ -10,9 +10,10 @@ import { TokenType, createScanner, ScannerState } from '../parser/htmlScanner';
 import { isEmptyElement } from '../parser/htmlTags';
 import { allTagProviders } from './tagProviders';
 import { CompletionConfiguration } from '../htmlLanguageService';
-import * as path from 'path';
+import URI from 'vscode-uri';
+import { tagFromFile } from '../../metadata-utils/custom-components-util';
 
-export function doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings?: CompletionConfiguration): CompletionList {
+export function doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, sfdxWorkspace: boolean, settings?: CompletionConfiguration): CompletionList {
 
 	let result: CompletionList = {
 		isIncomplete: false,
@@ -179,20 +180,22 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 		if(valueStart >= 0 && offset < text.length && text[offset] === '}') {
 			const expressionEnd = offset - 1;
 			for(let i = expressionEnd; i >= valueStart; i--) {
-				if(text[i] === '{'){
-					const templateTagName = path.parse(document.uri).dir.split(path.sep).pop();
-					const range = getReplaceRange(i + 1, offset);
-					tagProviders.forEach(provider => {
-						provider.collectExpressionValues(templateTagName, value => {
-							result.items.push({
-								label: value,
-								kind: CompletionItemKind.Reference,
-								textEdit: TextEdit.replace(range, value),
-								insertTextFormat: InsertTextFormat.PlainText
-							});
+				if(text[i] === '{') {
+					const templateTag = tagFromFile(URI.parse(document.uri).fsPath, sfdxWorkspace);
+					if (templateTag) {
+						const range = getReplaceRange(i + 1, offset);
+						tagProviders.forEach(provider => {
+							provider.collectExpressionValues(templateTag, value => {
+								result.items.push({
+									label: value,
+									kind: CompletionItemKind.Reference,
+									textEdit: TextEdit.replace(range, value),
+									insertTextFormat: InsertTextFormat.PlainText
+								});
+						    });
 						});
-					});
-					return true;
+						return true;
+					}
 				}
 			}
 		}

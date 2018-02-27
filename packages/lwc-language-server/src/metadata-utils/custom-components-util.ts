@@ -29,8 +29,8 @@ export function getLwcTags(): Map<string, TagInfo> {
     return LWC_TAGS;
 }
 
-export function getLwcByTag(tagName: string): TagInfo {
-    return LWC_TAGS.get(tagName);
+export function getLwcByTag(tag: string): TagInfo {
+    return LWC_TAGS.get(tag);
 }
 
 export function loadStandardComponents(): Promise<void> {
@@ -62,21 +62,21 @@ export function loadStandardComponents(): Promise<void> {
     });
 }
 
-function removeCustomTag(namespace: string, tag: string) {
-    LWC_TAGS.delete(fullTagName(namespace, tag));
+function removeCustomTag(tag: string) {
+    LWC_TAGS.delete(tag);
 }
 
 export function removeAllTags() {
     LWC_TAGS.clear();
 }
 
-export function addCustomTag(namespace: string, tag: string, uri: string, metadata: ICompilerMetadata) {
+function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata);
     // declarationLoc may be undefined if live file doesn't extend Element yet
     const startLine = metadata.declarationLoc ? metadata.declarationLoc.start.line - 1 : 0;
     const location = Location.create(uri, Range.create(Position.create(startLine, 0), Position.create(startLine, 0)));
-    LWC_TAGS.set(fullTagName(namespace, tag), new TagInfo(attributes, location, doc));
+    LWC_TAGS.set(tag, new TagInfo(attributes, location, doc));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
@@ -93,11 +93,8 @@ async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean
 }
 
 export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
-    const filePath = path.parse(file);
-    const fileName = filePath.name;
-    const pathElements = filePath.dir.split(path.sep);
-    const parentDirName = pathElements.pop();
-    if (fileName === parentDirName) {
+    const tag = tagFromFile(file, sfdxProject);
+    if (tag) {
         // get attributes from compiler metadata
         try {
             const { result, diagnostics } = await compileFile(file);
@@ -106,9 +103,8 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
             }
             if (result) {
                 const metadata = result.metadata;
-                const namespace = sfdxProject ? 'c' : pathElements.pop();
                 const uri = URI.file(path.resolve(file)).toString();
-                addCustomTag(namespace, parentDirName, uri, metadata);
+                addCustomTag(tag, uri, metadata);
             }
         } catch (error) {
             console.log('error compiling ' + file, error);
@@ -117,29 +113,36 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
 }
 
 export function addCustomTagFromResults(uri: string, metadata: ICompilerMetadata, sfdxProject: boolean) {
-    const file = URI.parse(uri).fsPath;
-    const filePath = path.parse(file);
-    const fileName = filePath.name;
-    const pathElements = filePath.dir.split(path.sep);
-    const parentDirName = pathElements.pop();
-    if (fileName === parentDirName) {
-        const namespace = sfdxProject ? 'c' : pathElements.pop();
-        addCustomTag(namespace, parentDirName, uri, metadata);
+    const tag = tagFromFile(URI.parse(uri).fsPath, sfdxProject);
+    if (tag) {
+        addCustomTag(tag, uri, metadata);
     }
 }
 
 function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
+    const tag = tagFromFile(file, sfdxProject);
+    if (tag) {
+        removeCustomTag(tag);
+    }
+}
+
+/**
+ * @param file path to main .js/.html for component, i.e. card/card.js or card/card.html
+ * @return tag name, i.e. c-card or namespace-card, or null if not the .js/.html file for a component
+ */
+export function tagFromFile(file: string, sfdxProject: boolean) {
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = filePath.dir.split(path.sep);
     const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         const namespace = sfdxProject ? 'c' : pathElements.pop();
-        removeCustomTag(namespace, parentDirName);
+        return tagName(namespace, parentDirName);
     }
+    return null;
 }
 
-function fullTagName(namespace: string, tag: string) {
+function tagName(namespace: string, tag: string) {
     if (namespace === 'interop') {
         // treat interop as lightning, i.e. needed when using extension with lightning-global
         // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?

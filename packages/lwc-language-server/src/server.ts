@@ -97,7 +97,7 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
         return { isIncomplete: false, items: [] };
     }
     const htmlDocument = htmlLS.parseHTMLDocument(document);
-    return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
+    return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
 });
 
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
