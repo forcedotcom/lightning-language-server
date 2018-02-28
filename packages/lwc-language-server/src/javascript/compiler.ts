@@ -18,9 +18,17 @@ export interface ICompilerResult {
 }
 
 export function getPublicReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+    return getProperties(metadata, 'api');
+}
+
+export function getPrivateReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+    return getProperties(metadata, 'track');
+}
+
+function getProperties(metadata: ICompilerMetadata, type: string): Array<{ name: string }> {
     const props: Array<{ name: string }> = [];
     for (const element of metadata.decorators) {
-        if (element.type === 'api') {
+        if (element.type === type) {
             for (const target of element.targets) {
                 if (target.type === 'property') {
                     props.push(target);

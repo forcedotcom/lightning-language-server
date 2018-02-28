@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { transform } from '../../resources/lwc/compiler';
-import { compileSource, compileDocument, compileFile, getPublicReactiveProperties } from '../compiler';
+import { compileSource, compileDocument, compileFile, getPublicReactiveProperties, getPrivateReactiveProperties } from '../compiler';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
 
 it('can use transform(src, id, options) from lwc-compiler', async () => {
@@ -95,7 +95,7 @@ it('returns javascript metadata', async () => {
             index;
 
             @track
-            trackedIndex;
+            trackedPrivateIndex;
 
             onclickAction() {
             }
@@ -107,9 +107,9 @@ it('returns javascript metadata', async () => {
 
     const compilerResult = await compileSource(content);
     const metadata = compilerResult.result.metadata;
-    const publicProperties = getPublicReactiveProperties(metadata);
 
-    expect(publicProperties).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+    expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
     expect(metadata.doc).toBe('Foo doc');
     expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 23 } });
 });
