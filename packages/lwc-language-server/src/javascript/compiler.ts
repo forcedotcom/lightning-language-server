@@ -7,7 +7,7 @@ import URI from 'vscode-uri';
 import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 
 export interface ICompilerMetadata {
-    apiProperties: Array<{ name: string }>;
+    decorators: any;
     doc: string;
     declarationLoc: { start: { line: number; column: number }; end: { line: number; column: number } };
 }
@@ -15,6 +15,21 @@ export interface ICompilerMetadata {
 export interface ICompilerResult {
     diagnostics?: Diagnostic[];
     result?: { map: { names: string[] }; metadata: ICompilerMetadata };
+}
+
+export function getPublicReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+    const props: Array<{ name: string }> = [];
+    for (const element of metadata.decorators) {
+        if (element.type === 'api') {
+            for (const target of element.targets) {
+                if (target.type === 'property') {
+                    props.push(target);
+                }
+            }
+            break;
+        }
+    }
+    return props;
 }
 
 /**
@@ -44,7 +59,7 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
 }
 
 export function extractAttributes(metadata: ICompilerMetadata): AttributeInfo[] {
-    return metadata.apiProperties.map(x => new AttributeInfo(x.name));
+    return getPublicReactiveProperties(metadata).map(x => new AttributeInfo(x.name));
 }
 
 // TODO: proper type for 'err' (i.e. SyntaxError)

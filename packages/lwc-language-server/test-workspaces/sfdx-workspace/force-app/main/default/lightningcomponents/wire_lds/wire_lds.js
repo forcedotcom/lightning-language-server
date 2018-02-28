@@ -1,4 +1,4 @@
-import { Element } from 'engine';
+import { Element, track, wire } from 'engine';
 
 const ENTER_KEY = 13;
 
