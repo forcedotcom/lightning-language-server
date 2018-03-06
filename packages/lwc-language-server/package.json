@@ -11,7 +11,7 @@
     "prepare": "npm run clean && npm run build",
     "test": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
-    "format": "prettier --single-quote --print-width 160 --tab-width 4 --trailing-comma all --parser typescript --write \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
     "prepush": "npm run prepare && npm run lint && npm test"
   },
