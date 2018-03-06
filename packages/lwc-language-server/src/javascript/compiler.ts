@@ -8,6 +8,7 @@ import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 
 export interface ICompilerMetadata {
     decorators: any;
+    classMembers: any;
     doc: string;
     declarationLoc: { start: { line: number; column: number }; end: { line: number; column: number } };
 }
@@ -18,19 +19,31 @@ export interface ICompilerResult {
 }
 
 export function getPublicReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
-    return getProperties(metadata, 'api');
+    return getClassMembers(metadata, 'property', 'api');
 }
 
 export function getPrivateReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
-    return getProperties(metadata, 'track');
+    return getDecoratorsTargets(metadata, 'track', 'property');
 }
 
-function getProperties(metadata: ICompilerMetadata, type: string): Array<{ name: string }> {
+export function getApiMethods(metadata: ICompilerMetadata): Array<{ name: string }> {
+    return getDecoratorsTargets(metadata, 'api', 'method');
+}
+
+export function getProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+    return getClassMembers(metadata, 'property');
+}
+
+export function getMethods(metadata: ICompilerMetadata): Array<{ name: string }> {
+    return getClassMembers(metadata, 'method');
+}
+
+function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, targetType: string): Array<{ name: string }> {
     const props: Array<{ name: string }> = [];
     for (const element of metadata.decorators) {
-        if (element.type === type) {
+        if (element.type === elementType) {
             for (const target of element.targets) {
-                if (target.type === 'property') {
+                if (target.type === targetType) {
                     props.push(target);
                 }
             }
@@ -38,6 +51,18 @@ function getProperties(metadata: ICompilerMetadata, type: string): Array<{ name:
         }
     }
     return props;
+}
+
+function getClassMembers(metadata: ICompilerMetadata, memberType: string, memberDecorator?: string): Array<{ name: string }> {
+    const members: Array<{ name: string }> = [];
+    for (const member of metadata.classMembers) {
+        if (member.type === memberType) {
+            if (!memberDecorator || member.decorator === memberDecorator) {
+                members.push(member);
+            }
+        }
+    }
+    return members;
 }
 
 /**

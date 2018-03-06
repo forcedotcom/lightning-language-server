@@ -1,7 +1,16 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { transform } from '../../resources/lwc/compiler';
-import { compileSource, compileDocument, compileFile, getPublicReactiveProperties, getPrivateReactiveProperties } from '../compiler';
+import {
+    compileSource,
+    compileDocument,
+    compileFile,
+    getPublicReactiveProperties,
+    getPrivateReactiveProperties,
+    getApiMethods,
+    getProperties,
+    getMethods,
+} from '../compiler';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
 
 it('can use transform(src, id, options) from lwc-compiler', async () => {
@@ -100,18 +109,40 @@ it('returns javascript metadata', async () => {
             onclickAction() {
             }
 
-            @api focus() {
+            @api apiMethod() {
+            }
+
+            get privateComputedValue() {
+                return null;
+            }
+
+            methodWithArguments(a, b) {
             }
         }
     `;
 
+    // current metatada:
+    // - getPublicReactiveProperties
+    // - getPrivateReactiveProperties
+    // - getApiMethods
+
+    // needed metadata:
+    // - getPublicReactiveProperties
+    // - getProperties: all properties
+    // - getMethods: all methods
+
     const compilerResult = await compileSource(content);
     const metadata = compilerResult.result.metadata;
 
-    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
-    expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
     expect(metadata.doc).toBe('Foo doc');
-    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 23 } });
+    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 30 } });
+
+    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
+    expect(getProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }, { name: 'trackedPrivateIndex' }, { name: 'privateComputedValue' }]);
+    expect(getMethods(metadata)).toMatchObject([{ name: 'onclickAction' }, { name: 'apiMethod' }, { name: 'methodWithArguments' }]);
+
+    expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
+    expect(getApiMethods(metadata)).toMatchObject([{ name: 'apiMethod' }]);
 });
 
 it('use compileDocument()', async () => {
