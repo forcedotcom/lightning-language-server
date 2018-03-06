@@ -26,19 +26,20 @@ it('indexSfdx', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('c-todo_item').attributes).toEqual([{ name: 'todo', jsName: 'todo' }]);
+    expect(getLwcByTag('c-todo_item').attributes).toEqual([{ detail: 'LWC custom attribute', documentation: 'todo jsdoc', jsName: 'todo', name: 'todo' }]);
     expect(getLwcByTag('c-todo_util').attributes).toEqual([
-        { name: 'info', jsName: 'info' },
-        { name: 'icon-name', jsName: 'iconName' },
-        { name: 'upper-c-a-s-e', jsName: 'upperCASE' },
+        { detail: 'LWC custom attribute', jsName: 'info', name: 'info' },
+        { detail: 'LWC custom attribute', jsName: 'iconName', name: 'icon-name' },
+        { detail: 'LWC custom attribute', jsName: 'upperCASE', name: 'upper-c-a-s-e' },
     ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');
     expect(getLwcByTag('lightning-button').attributes[0]).toEqual({
-        name: 'accesskey',
-        jsName: 'accesskey',
+        detail: 'LWC standard attribute',
         documentation: 'Specifies a shortcut key to activate or focus an element.',
+        jsName: 'accesskey',
+        name: 'accesskey',
     });
     // check Location
     const uri = getLwcByTag('c-todo_item').location.uri;
@@ -52,7 +53,7 @@ it('indexCore', async () => {
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('force-input-phone').attributes).toEqual([{ name: 'value', jsName: 'value' }]);
+    expect(getLwcByTag('force-input-phone').attributes).toEqual([{ detail: 'LWC custom attribute', jsName: 'value', name: 'value' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check Location
@@ -65,8 +66,13 @@ it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('example-line').attributes).toEqual([{ name: 'hover', jsName: 'hover' }, { name: 'text', jsName: 'text' }]);
-    expect(getLwcByTag('lightning-ito').attributes).toEqual([{ name: 'attr', jsName: 'attr' }]);
+    expect(getLwcByTag('example-line').attributes).toEqual([
+        { detail: 'LWC custom attribute', jsName: 'hover', name: 'hover' },
+        { detail: 'LWC custom attribute', jsName: 'text', name: 'text' },
+    ]);
+    expect(getLwcByTag('lightning-ito').attributes).toEqual([
+        { detail: 'LWC custom attribute', documentation: undefined, jsName: 'attr', location: undefined, name: 'attr' },
+    ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).toBeUndefined();
     // check Location

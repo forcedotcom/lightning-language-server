@@ -11,6 +11,7 @@ export default class TodoItem extends Element {
     @track
     _todo;
 
+    /** todo jsdoc */
     @api
     get todo() {
         return this._todo;

@@ -46,7 +46,7 @@ export function loadStandardComponents(): Promise<void> {
                             const info = new TagInfo([]);
                             if (lwcStandard[tag].attributes) {
                                 lwcStandard[tag].attributes.map((a: any) => {
-                                    info.attributes.push(new AttributeInfo(a.name, a.description));
+                                    info.attributes.push(new AttributeInfo(a.name, a.description, undefined, 'LWC standard attribute'));
                                 });
                             }
                             info.documentation = lwcStandard[tag].description;

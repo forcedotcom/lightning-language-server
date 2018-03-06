@@ -6,6 +6,12 @@ import * as path from 'path';
 import URI from 'vscode-uri';
 import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 
+export interface IClassMemberMetadata {
+    name: string;
+    doc: string;
+    loc: { start: { line: number; column: number }; end: { line: number; column: number } };
+}
+
 export interface ICompilerMetadata {
     decorators: any;
     classMembers: any;
@@ -18,28 +24,28 @@ export interface ICompilerResult {
     result?: { map: { names: string[] }; metadata: ICompilerMetadata };
 }
 
-export function getPublicReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+export function getPublicReactiveProperties(metadata: ICompilerMetadata): IClassMemberMetadata[] {
     return getClassMembers(metadata, 'property', 'api');
 }
 
-export function getPrivateReactiveProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+export function getPrivateReactiveProperties(metadata: ICompilerMetadata): IClassMemberMetadata[] {
     return getDecoratorsTargets(metadata, 'track', 'property');
 }
 
-export function getApiMethods(metadata: ICompilerMetadata): Array<{ name: string }> {
+export function getApiMethods(metadata: ICompilerMetadata): IClassMemberMetadata[] {
     return getDecoratorsTargets(metadata, 'api', 'method');
 }
 
-export function getProperties(metadata: ICompilerMetadata): Array<{ name: string }> {
+export function getProperties(metadata: ICompilerMetadata): IClassMemberMetadata[] {
     return getClassMembers(metadata, 'property');
 }
 
-export function getMethods(metadata: ICompilerMetadata): Array<{ name: string }> {
+export function getMethods(metadata: ICompilerMetadata): IClassMemberMetadata[] {
     return getClassMembers(metadata, 'method');
 }
 
-function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, targetType: string): Array<{ name: string }> {
-    const props: Array<{ name: string }> = [];
+function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, targetType: string): IClassMemberMetadata[] {
+    const props: IClassMemberMetadata[] = [];
     for (const element of metadata.decorators) {
         if (element.type === elementType) {
             for (const target of element.targets) {
@@ -53,8 +59,8 @@ function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, 
     return props;
 }
 
-function getClassMembers(metadata: ICompilerMetadata, memberType: string, memberDecorator?: string): Array<{ name: string }> {
-    const members: Array<{ name: string }> = [];
+function getClassMembers(metadata: ICompilerMetadata, memberType: string, memberDecorator?: string): IClassMemberMetadata[] {
+    const members: IClassMemberMetadata[] = [];
     for (const member of metadata.classMembers) {
         if (member.type === memberType) {
             if (!memberDecorator || member.decorator === memberDecorator) {
@@ -92,7 +98,7 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
 }
 
 export function extractAttributes(metadata: ICompilerMetadata): AttributeInfo[] {
-    return getPublicReactiveProperties(metadata).map(x => new AttributeInfo(x.name));
+    return getPublicReactiveProperties(metadata).map(x => new AttributeInfo(x.name, x.doc, undefined, 'LWC custom attribute'));
 }
 
 // TODO: proper type for 'err' (i.e. SyntaxError)

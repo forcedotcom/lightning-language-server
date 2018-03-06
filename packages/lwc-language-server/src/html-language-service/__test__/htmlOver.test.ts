@@ -50,6 +50,8 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     assertHover('|<c-todo_item></c-todo_item>', undefined);
     assertHover('<|c-todo_item></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
     assertHover('<c-todo_it|em></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
+    // custom attributes
+    assertHover('<c-todo_item to|do></c-todo_item>', 'todo', 'todo jsdoc', 13);
 
     // custom tags from utils package
     assertHover('|<c-todo_util></c-todo_util>', undefined);

@@ -87,7 +87,7 @@ it('completion in sfdx workspace', async () => {
             label: 'alternative-text',
             result: '<template><lightning-button-icon-stateful alternative-text=$1',
             documentation: 'The alternative text used to describe the icon.',
-            detail: 'LWC attribute',
+            detail: 'LWC standard attribute',
         },
     ]);
 
@@ -95,7 +95,14 @@ it('completion in sfdx workspace', async () => {
     testCompletion('<template><c-todo_it', [{ label: 'c-todo_item', result: '<template><c-todo_item' }]);
 
     // attribute completion:
-    testCompletion('<template><c-todo_item tod|', [{ label: 'todo', result: '<template><c-todo_item todo=$1' }]);
+    testCompletion('<template><c-todo_item tod|', [
+        {
+            label: 'todo',
+            result: '<template><c-todo_item todo=$1',
+            documentation: 'todo jsdoc',
+            detail: 'LWC custom attribute',
+        },
+    ]);
     testCompletion('<template><c-todo_util inf|', [{ label: 'info', result: '<template><c-todo_util info=$1' }]);
     testCompletion('<template><c-todo_util ico|', [{ label: 'icon-name', result: '<template><c-todo_util icon-name=$1' }]);
     testCompletion('<template><c-todo_util upp|', [{ label: 'upper-c-a-s-e', result: '<template><c-todo_util upper-c-a-s-e=$1' }]);
@@ -127,7 +134,7 @@ it('completion in core workspace', async () => {
             label: 'alternative-text',
             result: '<template><lightning-button-icon-stateful alternative-text=$1',
             documentation: 'The alternative text used to describe the icon.',
-            detail: 'LWC attribute',
+            detail: 'LWC standard attribute',
         },
     ]);
 
@@ -152,7 +159,7 @@ it('completion in standard workspace', async () => {
             label: 'alternative-text',
             result: '<template><lightning-button-icon-stateful alternative-text=$1',
             documentation: 'The alternative text used to describe the icon.',
-            detail: 'LWC attribute',
+            detail: 'LWC standard attribute',
         },
     ]);
 

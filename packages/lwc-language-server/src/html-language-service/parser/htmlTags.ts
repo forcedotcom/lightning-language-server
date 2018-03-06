@@ -47,7 +47,7 @@ export class AttributeInfo {
 	public name: string;
 	constructor(
 		public jsName: string,
-		public documentation?: string,
+		public documentation: string,
 		public location?: Location,
 		public detail?: string,
 	) {
