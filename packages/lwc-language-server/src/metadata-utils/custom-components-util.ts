@@ -72,7 +72,7 @@ export function removeAllTags() {
 
 function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {
     const doc = metadata.doc;
-    const attributes = extractAttributes(metadata);
+    const attributes = extractAttributes(metadata, uri);
     // declarationLoc may be undefined if live file doesn't extend Element yet
     const startLine = metadata.declarationLoc ? metadata.declarationLoc.start.line - 1 : 0;
     const location = Location.create(uri, Range.create(Position.create(startLine, 0), Position.create(startLine, 0)));

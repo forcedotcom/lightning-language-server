@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { transform } from '../resources/lwc/compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
+import { TextDocument, Diagnostic, DiagnosticSeverity, Range, Location, Position } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import * as path from 'path';
 import URI from 'vscode-uri';
@@ -97,8 +97,14 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
     }
 }
 
-export function extractAttributes(metadata: ICompilerMetadata): AttributeInfo[] {
-    return getPublicReactiveProperties(metadata).map(x => new AttributeInfo(x.name, x.doc, undefined, 'LWC custom attribute'));
+export function extractAttributes(metadata: ICompilerMetadata, uri: string): AttributeInfo[] {
+    return getPublicReactiveProperties(metadata).map(x => {
+        const location = Location.create(
+            uri,
+            Range.create(Position.create(x.loc.start.line, x.loc.start.column), Position.create(x.loc.end.line, x.loc.end.column)),
+        );
+        return new AttributeInfo(x.name, x.doc, location, 'LWC custom attribute');
+    });
 }
 
 // TODO: proper type for 'err' (i.e. SyntaxError)

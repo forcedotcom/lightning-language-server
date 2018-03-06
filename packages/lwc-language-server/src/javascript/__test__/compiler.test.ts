@@ -121,16 +121,6 @@ it('returns javascript metadata', async () => {
         }
     `;
 
-    // current metatada:
-    // - getPublicReactiveProperties
-    // - getPrivateReactiveProperties
-    // - getApiMethods
-
-    // needed metadata:
-    // - getPublicReactiveProperties
-    // - getProperties: all properties
-    // - getMethods: all methods
-
     const compilerResult = await compileSource(content);
     const metadata = compilerResult.result.metadata;
 

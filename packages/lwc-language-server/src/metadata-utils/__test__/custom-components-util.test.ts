@@ -26,9 +26,26 @@ it('indexSfdx', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('c-todo_item').attributes).toEqual([{ detail: 'LWC custom attribute', documentation: 'todo jsdoc', jsName: 'todo', name: 'todo' }]);
-    expect(getLwcByTag('c-todo_util').attributes).toEqual([
-        { detail: 'LWC custom attribute', jsName: 'info', name: 'info' },
+    expect(getLwcByTag('c-todo_item').attributes).toMatchObject([
+        {
+            detail: 'LWC custom attribute',
+            documentation: 'todo jsdoc',
+            jsName: 'todo',
+            name: 'todo',
+            location: {
+                range: { start: { line: 15, character: 4 }, end: { line: 18, character: 5 } },
+            },
+        },
+    ]);
+    expect(getLwcByTag('c-todo_util').attributes).toMatchObject([
+        {
+            detail: 'LWC custom attribute',
+            jsName: 'info',
+            name: 'info',
+            location: {
+                range: { start: { line: 4, character: 4 }, end: { line: 5, character: 9 } },
+            },
+        },
         { detail: 'LWC custom attribute', jsName: 'iconName', name: 'icon-name' },
         { detail: 'LWC custom attribute', jsName: 'upperCASE', name: 'upper-c-a-s-e' },
     ]);
@@ -41,10 +58,12 @@ it('indexSfdx', async () => {
         jsName: 'accesskey',
         name: 'accesskey',
     });
-    // check Location
+    // check tag Location
     const uri = getLwcByTag('c-todo_item').location.uri;
     expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+    // check attribute location
+    expect(getLwcByTag('c-todo_item').attributes[0].location.uri).toBe(uri);
 });
 
 it('indexCore', async () => {
@@ -53,25 +72,35 @@ it('indexCore', async () => {
     await context.configureAndIndex();
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('force-input-phone').attributes).toEqual([{ detail: 'LWC custom attribute', jsName: 'value', name: 'value' }]);
+    expect(getLwcByTag('force-input-phone').attributes).toMatchObject([{ detail: 'LWC custom attribute', jsName: 'value', name: 'value' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
-    // check Location
+    // check tag Location
     const uri = getLwcByTag('one-app-nav-bar').location.uri;
     expect(URI.parse(uri).fsPath).toExist();
     expect(uri).toEndWith('/test-workspaces/core-like-workspace/app/main/core/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js');
+    // check attr Location
+    const attrUri = getLwcByTag('force-input-phone').location.uri;
+    expect(URI.parse(attrUri).fsPath).toExist();
+    expect(attrUri).toEndWith('/test-workspaces/core-like-workspace/app/main/core/ui-force-components/modules/force/input-phone/input-phone.js');
 });
 
 it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
     await context.configureAndIndex();
     // check attributes
-    expect(getLwcByTag('example-line').attributes).toEqual([
+    expect(getLwcByTag('example-line').attributes).toMatchObject([
         { detail: 'LWC custom attribute', jsName: 'hover', name: 'hover' },
         { detail: 'LWC custom attribute', jsName: 'text', name: 'text' },
     ]);
-    expect(getLwcByTag('lightning-ito').attributes).toEqual([
-        { detail: 'LWC custom attribute', documentation: undefined, jsName: 'attr', location: undefined, name: 'attr' },
+    expect(getLwcByTag('lightning-ito').attributes).toMatchObject([
+        {
+            detail: 'LWC custom attribute',
+            documentation: undefined,
+            jsName: 'attr',
+            name: 'attr',
+            location: { range: { start: { line: 5, character: 4 }, end: { line: 5, character: 14 } } },
+        },
     ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).toBeUndefined();

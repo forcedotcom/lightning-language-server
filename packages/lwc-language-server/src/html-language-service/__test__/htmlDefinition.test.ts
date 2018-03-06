@@ -22,7 +22,7 @@ function assertDefinition(value: string, expectedUri: string | undefined): void 
     }
 }
 
-it('UC: goto definition for custom tags', async () => {
+it('UC: goto definition for custom tags and attributes', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // standard tags
@@ -37,6 +37,9 @@ it('UC: goto definition for custom tags', async () => {
     assertDefinition('|<c-todo_item></c-todo_item>', undefined);
     assertDefinition('<|c-todo_item></c-todo_item>', '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
     assertDefinition('<c-todo_it|em></c-todo_item>', '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+    // custom attributes
+    assertDefinition('<c-todo_item |></c-todo_item>', undefined);
+    assertDefinition('<c-todo_item to|do></c-todo_item>', '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
 
     // custom tags from utils package
     assertDefinition('|<c-todo_util></c-todo_util>', undefined);

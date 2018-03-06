@@ -1,9 +1,10 @@
 'use strict';
 
 import { HTMLDocument } from '../parser/htmlParser';
-import { TokenType, createScanner } from '../parser/htmlScanner';
-import { TextDocument, Range, Position, Location } from 'vscode-languageserver-types';
+import { TokenType } from '../parser/htmlScanner';
+import { TextDocument, Position, Location } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
+import { getTokenInfo } from './htmlHover';
 
 export function findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null {
     const offset = document.offsetAt(position);
@@ -11,7 +12,9 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
     if (!node || !node.tag) {
         return null;
     }
+
     const tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
+
     function getTagLocation(tag: string): Location | null {
         tag = tag.toLowerCase();
         for (const provider of tagProviders) {
@@ -23,29 +26,37 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
         return null;
     }
 
-    function getTagNameRange(tokenType: TokenType, startOffset: number): Range | null {
-        const scanner = createScanner(document.getText(), startOffset);
-        let token = scanner.scan();
-        while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || (scanner.getTokenEnd() === offset && token !== tokenType))) {
-            token = scanner.scan();
-        }
-        if (token === tokenType && offset <= scanner.getTokenEnd()) {
-            return { start: document.positionAt(scanner.getTokenOffset()), end: document.positionAt(scanner.getTokenEnd()) };
+    function getAttributeLocation(tag: string, attribute: string): Location | null {
+        tag = tag.toLowerCase();
+        for (const provider of tagProviders) {
+            const tagInfo = provider.getTagInfo(tag);
+            if (tagInfo) {
+                const attrInfo = tagInfo.getAttributeInfo(attribute);
+                if (attrInfo && attrInfo.location) {
+                    return attrInfo.location;
+                }
+            }
         }
         return null;
     }
 
     if (node.endTagStart && offset >= node.endTagStart) {
-        const endTagRange = getTagNameRange(TokenType.EndTag, node.endTagStart);
-        if (endTagRange) {
+        const endTagInfo = getTokenInfo(document, offset, TokenType.EndTag, node.endTagStart);
+        if (endTagInfo) {
             return getTagLocation(node.tag);
         }
         return null;
     }
 
-    const tagRange = getTagNameRange(TokenType.StartTag, node.start);
-    if (tagRange) {
+    const startTagInfo = getTokenInfo(document, offset, TokenType.StartTag, node.start);
+    if (startTagInfo) {
         return getTagLocation(node.tag);
     }
+
+    const attributeInfo = getTokenInfo(document, offset, TokenType.AttributeName, node.start);
+    if (attributeInfo && attributeInfo.name) {
+        return getAttributeLocation(node.tag, attributeInfo.name);
+    }
+
     return null;
 }

@@ -10,9 +10,25 @@ import { TextDocument, Range, Position, Hover, MarkedString } from 'vscode-langu
 import { allTagProviders } from './tagProviders';
 import { getDirectiveInfo } from '../parser/lwcTags';
 
-interface ITokenInfo {
+export interface ITokenInfo {
     range: Range;
     name?: string;
+}
+
+export function getTokenInfo(document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): ITokenInfo | null {
+    const scanner = createScanner(document.getText(), startOffset);
+    let token = scanner.scan();
+    while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || scanner.getTokenEnd() === offset && token !== tokenType)) {
+        token = scanner.scan();
+    }
+    if (token === tokenType && offset <= scanner.getTokenEnd()) {
+        const tokenInfo: ITokenInfo = { range: { start: document.positionAt(scanner.getTokenOffset()), end: document.positionAt(scanner.getTokenEnd()) } };
+        if (tokenType === TokenType.AttributeName) {
+            tokenInfo.name = scanner.getLastAttributeName();
+        }
+        return tokenInfo;
+    }
+    return null;
 }
 
 export function doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover| null {
@@ -56,36 +72,20 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
         return null;
     }
 
-    function getTokenInfo(tokenType: TokenType, startOffset: number): ITokenInfo | null {
-        const scanner = createScanner(document.getText(), startOffset);
-        let token = scanner.scan();
-        while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || scanner.getTokenEnd() === offset && token !== tokenType)) {
-            token = scanner.scan();
-        }
-        if (token === tokenType && offset <= scanner.getTokenEnd()) {
-            const tokenInfo: ITokenInfo = { range: { start: document.positionAt(scanner.getTokenOffset()), end: document.positionAt(scanner.getTokenEnd()) } };
-            if (tokenType === TokenType.AttributeName) {
-                tokenInfo.name = scanner.getLastAttributeName();
-            }
-            return tokenInfo;
-        }
-        return null;
-    }
-
     if (node.endTagStart && offset >= node.endTagStart) {
-        const endTagInfo = getTokenInfo(TokenType.EndTag, node.endTagStart);
+        const endTagInfo = getTokenInfo(document, offset, TokenType.EndTag, node.endTagStart);
         if (endTagInfo) {
             return getTagHover(node.tag, endTagInfo.range, false);
         }
         return null;
     }
 
-    const startTagInfo = getTokenInfo(TokenType.StartTag, node.start);
+    const startTagInfo = getTokenInfo(document, offset, TokenType.StartTag, node.start);
     if (startTagInfo) {
         return getTagHover(node.tag, startTagInfo.range, true);
     }
 
-    const attributeInfo = getTokenInfo(TokenType.AttributeName, node.start);
+    const attributeInfo = getTokenInfo(document, offset, TokenType.AttributeName, node.start);
     if (attributeInfo) {
         return getAttributeHover(node.tag, attributeInfo);
     }
