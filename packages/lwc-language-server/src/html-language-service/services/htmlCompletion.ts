@@ -177,7 +177,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 	 * @returns returns true if expression suggestions are being provided, false otherwise
 	 */
 	function collectExpressionSuggestions(valueStart: number): Boolean {
-		if(valueStart >= 0 && offset < text.length && text[offset] === '}') {
+		if(valueStart >= 0 && offset < text.length && (text[offset] === '}' || text[offset] === '>')) {
 			const expressionEnd = offset - 1;
 			for(let i = expressionEnd; i >= valueStart; i--) {
 				if(text[i] === '{') {
@@ -189,7 +189,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 								result.items.push({
 									label: value,
 									kind: CompletionItemKind.Reference,
-									textEdit: TextEdit.replace(range, value),
+									textEdit: TextEdit.replace(range, value + ((text[offset] === '}')? '':'}')),
 									insertTextFormat: InsertTextFormat.PlainText
 								});
 						    });

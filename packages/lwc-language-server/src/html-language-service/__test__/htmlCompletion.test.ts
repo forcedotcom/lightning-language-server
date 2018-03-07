@@ -119,6 +119,9 @@ it('completion in sfdx workspace', async () => {
         path.join('todo_util', 'todo_util.html'),
     );
     testCompletion('<template>{inf|}', [{ label: 'info', result: '<template>{info}' }], true, path.join('todo_util', 'todo_util.html'));
+    testCompletion('<template class={in|}>', [{ label: 'info', result: '<template class={info}>' }], true, path.join('todo_util', 'todo_util.html'));
+    // missing clossing } at tag end:
+    testCompletion('<template class={in|>', [{ label: 'info', result: '<template class={info}>' }], true, path.join('todo_util', 'todo_util.html'));
 });
 
 it('completion in core workspace', async () => {
