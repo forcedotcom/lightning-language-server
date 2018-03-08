@@ -64,6 +64,15 @@ it('indexSfdx', async () => {
     expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
     // check attribute location
     expect(getLwcByTag('c-todo_item').attributes[0].location.uri).toBe(uri);
+    // check properties/methods
+    expect(getLwcByTag('c-todo_util').properties).toMatchObject([
+        { name: 'info' },
+        { name: 'iconName' },
+        { name: 'upperCASE' },
+        { name: 'trackProperty' },
+        { name: 'privateProperty' },
+    ]);
+    expect(getLwcByTag('c-todo_util').methods).toMatchObject([{ name: 'privateMethod' }]);
 });
 
 it('indexCore', async () => {

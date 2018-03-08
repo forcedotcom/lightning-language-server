@@ -1,4 +1,4 @@
-import { Element, api } from 'engine';
+import { Element, api, track } from 'engine';
 
 export default class TodoUtil extends Element {
     @api
@@ -9,4 +9,13 @@ export default class TodoUtil extends Element {
 
     @api
     upperCASE
+
+    @track
+    trackProperty;
+
+    privateProperty;
+
+    privateMethod() {
+        return 'privateMethod';
+    }
 }
