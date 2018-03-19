@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import { TextDocument } from 'vscode-languageserver';
 import { transform } from '../../resources/lwc/compiler';
 import {
@@ -89,50 +90,34 @@ it('linter returns empty diagnostics on correct file', async () => {
 });
 
 it('returns javascript metadata', async () => {
-    const content = `
-        import { Element, api, track } from 'engine';
-        /** Foo doc */
-        export default class Foo extends Element {
-            _privateTodo;
-            @api get todo () {
-                return this._privateTodo;
-            }
-            @api set todo (val) {
-                return this._privateTodo = val;
-            }
-            @api
-            index;
-
-            @track
-            trackedPrivateIndex;
-
-            onclickAction() {
-            }
-
-            @api apiMethod() {
-            }
-
-            get privateComputedValue() {
-                return null;
-            }
-
-            methodWithArguments(a, b) {
-            }
-        }
-    `;
+    const filepath = path.join('src', 'javascript', '__test__', 'fixtures', 'metadata.js');
+    const content = fs.readFileSync(filepath, { encoding: 'utf-8' });
 
     const compilerResult = await compileSource(content);
     const metadata = compilerResult.result.metadata;
+    const properties = getProperties(metadata);
 
     expect(metadata.doc).toBe('Foo doc');
-    expect(metadata.declarationLoc).toEqual({ start: { column: 8, line: 4 }, end: { column: 9, line: 30 } });
+    expect(metadata.declarationLoc).toEqual({ start: { column: 0, line: 3 }, end: { column: 1, line: 31 } });
 
-    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }]);
-    expect(getProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }, { name: 'trackedPrivateIndex' }, { name: 'privateComputedValue' }]);
+    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }, { name: 'indexSameLine' }]);
+    expect(properties).toMatchObject([
+        { name: 'todo' },
+        { name: 'index' },
+        { name: 'indexSameLine' },
+        { name: 'trackedPrivateIndex' },
+        { name: 'privateComputedValue' },
+    ]);
     expect(getMethods(metadata)).toMatchObject([{ name: 'onclickAction' }, { name: 'apiMethod' }, { name: 'methodWithArguments' }]);
 
     expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
     expect(getApiMethods(metadata)).toMatchObject([{ name: 'apiMethod' }]);
+
+    // location of @api properties
+    const indexProperty = properties[1];
+    expect(indexProperty).toMatchObject({ name: 'index', loc: { start: { column: 4, line: 11 }, end: { column: 10, line: 12 } } });
+    const indexSameLineProperty = properties[2];
+    expect(indexSameLineProperty).toMatchObject({ name: 'indexSameLine', loc: { start: { column: 4, line: 14 }, end: { column: 23, line: 14 } } });
 });
 
 it('use compileDocument()', async () => {

@@ -4,7 +4,7 @@ import { WorkspaceContext } from '../../context';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { Hover } from 'vscode-languageserver';
 
-function assertHover(value: string, expectedHoverValue: string | undefined, expectedHoverLabel?: string, expectedHoverOffset?: number): void {
+function assertHover(value: string, expectedHoverValue?: string, expectedHoverLabel?: string, expectedHoverOffset?: number): void {
     const offset = value.indexOf('|');
     value = value.substr(0, offset) + value.substr(offset + 1);
 
@@ -37,24 +37,24 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     // standard tags
     await loadStandardComponents();
 
-    assertHover('|<lightning-button></lightning-button>', undefined);
+    assertHover('|<lightning-button></lightning-button>');
     assertHover('<lightning-bu|tton></lightning-button>', '<lightning-button>', 'Represents a button element\\.');
     assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', 'icon-name', 'The Lightning Design System name of the icon\\.');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', 'class', 'A CSS class for the outer element, in addition to ');
     assertHover('<lightning-button if:tr|ue={e}></lightning-button>', 'if:true', 'Renders the element or template if the expression value is thruthy');
     assertHover('<template if:tr|ue={e}></template>', 'if:true', 'Renders the element or template if the expression value is thruthy');
-    assertHover('<ht|ml></html>', undefined);
+    assertHover('<ht|ml></html>');
 
     // custom tags
     await indexCustomComponents(context);
-    assertHover('|<c-todo_item></c-todo_item>', undefined);
+    assertHover('|<c-todo_item></c-todo_item>');
     assertHover('<|c-todo_item></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
     assertHover('<c-todo_it|em></c-todo_item>', '<c-todo_item>', 'TodoItem doc', 1);
     // custom attributes
     assertHover('<c-todo_item to|do></c-todo_item>', 'todo', 'todo jsdoc', 13);
 
     // custom tags from utils package
-    assertHover('|<c-todo_util></c-todo_util>', undefined);
-    assertHover('<|c-todo_util></c-todo_util>', undefined);
-    assertHover('<c-todo_ut|il></c-todo_util>', undefined);
+    assertHover('|<c-todo_util></c-todo_util>');
+    assertHover('<|c-todo_util></c-todo_util>');
+    assertHover('<c-todo_ut|il></c-todo_util>');
 });

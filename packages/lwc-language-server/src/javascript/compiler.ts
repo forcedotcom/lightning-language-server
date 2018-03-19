@@ -5,18 +5,19 @@ import { DIAGNOSTIC_SOURCE } from '../constants';
 import * as path from 'path';
 import URI from 'vscode-uri';
 import { AttributeInfo } from '../html-language-service/parser/htmlTags';
+import { SourceLocation } from 'babel-types';
 
 export interface IClassMemberMetadata {
     name: string;
     doc: string;
-    loc: { start: { line: number; column: number }; end: { line: number; column: number } };
+    loc: SourceLocation;
 }
 
 export interface ICompilerMetadata {
     decorators: any;
     classMembers: any;
     doc: string;
-    declarationLoc: { start: { line: number; column: number }; end: { line: number; column: number } };
+    declarationLoc: SourceLocation;
 }
 
 export interface ICompilerResult {
@@ -99,10 +100,7 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
 
 export function extractAttributes(metadata: ICompilerMetadata, uri: string): AttributeInfo[] {
     return getPublicReactiveProperties(metadata).map(x => {
-        const location = Location.create(
-            uri,
-            Range.create(Position.create(x.loc.start.line, x.loc.start.column), Position.create(x.loc.end.line, x.loc.end.column)),
-        );
+        const location = Location.create(uri, toVSCodeRange(x.loc));
         return new AttributeInfo(x.name, x.doc, location, 'LWC custom attribute');
     });
 }
@@ -119,4 +117,9 @@ function toDiagnostic(err: any): Diagnostic {
         source: DIAGNOSTIC_SOURCE,
         message: err.message,
     };
+}
+
+export function toVSCodeRange(babelRange: SourceLocation): Range {
+    // babel (column:0-based line:1-based) => vscode (character:0-based line:0-based)
+    return Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
 }

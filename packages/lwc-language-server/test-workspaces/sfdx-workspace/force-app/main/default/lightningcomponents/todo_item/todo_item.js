@@ -23,6 +23,11 @@ export default class TodoItem extends Element {
         this._todo = newValue;
     }
 
+    @api sameLine;
+    
+    @api
+    nextLine;
+
     fireUpdate() {
         const title = this.root.querySelector('input.edit').value.trim();
         const completed = this.root.querySelector('input.toggle').checked;

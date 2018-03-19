@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as utils from '../utils';
 import { FileEvent, FileChangeType, Location, Position, Range } from 'vscode-languageserver';
-import { compileFile, extractAttributes, getProperties, getMethods } from '../javascript/compiler';
+import { compileFile, extractAttributes, getProperties, getMethods, toVSCodeRange } from '../javascript/compiler';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import URI from 'vscode-uri';
@@ -74,8 +74,8 @@ function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata, uri);
     // declarationLoc may be undefined if live file doesn't extend Element yet
-    const startLine = metadata.declarationLoc ? metadata.declarationLoc.start.line - 1 : 0;
-    const location = Location.create(uri, Range.create(Position.create(startLine, 0), Position.create(startLine, 0)));
+    const range = metadata.declarationLoc ? toVSCodeRange(metadata.declarationLoc) : Range.create(Position.create(0, 0), Position.create(0, 0));
+    const location = Location.create(uri, range);
     LWC_TAGS.set(tag, new TagInfo(attributes, location, doc, getProperties(metadata), getMethods(metadata)));
 }
 

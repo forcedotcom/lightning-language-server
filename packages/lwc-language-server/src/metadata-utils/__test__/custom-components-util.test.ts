@@ -14,7 +14,7 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
         true,
     );
     tagInfo = getLwcByTag('c-todo_item');
-    expect(tagInfo).toMatchObject({ attributes: [{ name: 'todo' }], documentation: 'TodoItem doc' });
+    expect(tagInfo).toMatchObject({ attributes: [{ name: 'todo' }, { name: 'same-line' }, { name: 'next-line' }], documentation: 'TodoItem doc' });
     const location = tagInfo.location;
     expect(URI.parse(location.uri).fsPath).toExist();
     expect(location.uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
@@ -33,9 +33,11 @@ it('indexSfdx', async () => {
             jsName: 'todo',
             name: 'todo',
             location: {
-                range: { start: { line: 15, character: 4 }, end: { line: 18, character: 5 } },
+                range: { start: { line: 14, character: 4 }, end: { line: 17, character: 5 } },
             },
         },
+        { name: 'same-line' },
+        { name: 'next-line' },
     ]);
     expect(getLwcByTag('c-todo_util').attributes).toMatchObject([
         {
@@ -43,7 +45,7 @@ it('indexSfdx', async () => {
             jsName: 'info',
             name: 'info',
             location: {
-                range: { start: { line: 4, character: 4 }, end: { line: 5, character: 9 } },
+                range: { start: { line: 3, character: 4 }, end: { line: 4, character: 9 } },
             },
         },
         { detail: 'LWC custom attribute', jsName: 'iconName', name: 'icon-name' },
@@ -108,7 +110,7 @@ it('indexStandard', async () => {
             documentation: undefined,
             jsName: 'attr',
             name: 'attr',
-            location: { range: { start: { line: 5, character: 4 }, end: { line: 5, character: 14 } } },
+            location: { range: { start: { line: 4, character: 4 }, end: { line: 4, character: 14 } } },
         },
     ]);
     // check standard components
