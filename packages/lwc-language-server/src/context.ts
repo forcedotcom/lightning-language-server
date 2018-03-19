@@ -8,7 +8,7 @@ import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
 import { loadStandardComponents, indexCustomComponents, removeAllTags } from './metadata-utils/custom-components-util';
 import { TextDocument } from 'vscode-languageserver';
-import { WorkspaceType, detectWorkspaceType, isLWC } from './shared';
+import { WorkspaceType, detectWorkspaceType, isLWC, getSfdxProjectFile } from './shared';
 import { GlobSync } from 'glob';
 import * as _ from 'lodash';
 import * as properties from 'properties';
@@ -286,7 +286,11 @@ interface ISfdxProjectConfig {
 }
 
 function readSfdxProjectConfig(workspaceRoot: string): ISfdxProjectConfig {
-    return JSON.parse(fs.readFileSync(join(workspaceRoot, 'sfdx-project.json'), 'utf8'));
+    try {
+        return JSON.parse(fs.readFileSync(getSfdxProjectFile(workspaceRoot), 'utf8'));
+    } catch (e) {
+        throw new Error(`Sfdx project file seems invalid. Unable to parse ${getSfdxProjectFile(workspaceRoot)}. ${e.message}`);
+    }
 }
 
 function getSfdxPackageDirs(sfdxProjectConfig: ISfdxProjectConfig) {

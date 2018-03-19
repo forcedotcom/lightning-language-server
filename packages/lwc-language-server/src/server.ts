@@ -44,30 +44,33 @@ connection.onInitialize(async (params: InitializeParams): Promise<InitializeResu
 
     // Early exit if no workspace is opened
     const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
-    if (!workspaceRoot) {
-        console.warn(`No workspace found`);
-        return { capabilities: {} };
-    }
+    try {
+        if (!workspaceRoot) {
+            console.warn(`No workspace found`);
+            return { capabilities: {} };
+        }
 
-    console.info(`Starting language server at ${workspaceRoot}`);
-    const startTime = process.hrtime();
-    context = new WorkspaceContext(workspaceRoot);
-    // wait for indexing to finish before returning from onInitialize()
-    await context.configureAndIndex();
-    htmlLS = getLanguageService();
-    console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
-
-    // Return the language server capabilities
-    return {
-        capabilities: {
-            textDocumentSync: documents.syncKind,
-            completionProvider: {
-                resolveProvider: true,
+        console.info(`Starting language server at ${workspaceRoot}`);
+        const startTime = process.hrtime();
+        context = new WorkspaceContext(workspaceRoot);
+        // wait for indexing to finish before returning from onInitialize()
+        await context.configureAndIndex();
+        htmlLS = getLanguageService();
+        console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
+        // Return the language server capabilities
+        return {
+            capabilities: {
+                textDocumentSync: documents.syncKind,
+                completionProvider: {
+                    resolveProvider: true,
+                },
+                hoverProvider: true,
+                definitionProvider: true,
             },
-            hoverProvider: true,
-            definitionProvider: true,
-        },
-    };
+        };
+    } catch (e) {
+        throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
+    }
 });
 
 // Make sure to clear all the diagnostics when a document gets closed

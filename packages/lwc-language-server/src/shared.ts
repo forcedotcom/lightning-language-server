@@ -3,6 +3,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+const SFDX_PROJECT: string = 'sfdx-project.json';
+
 export enum WorkspaceType {
     /** standard workspace with a package.json but no lwc dependencies */
     STANDARD,
@@ -21,8 +23,12 @@ export function isLWC(type: WorkspaceType): boolean {
     return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
 }
 
+export function getSfdxProjectFile(workspaceRoot: string) {
+    return path.join(workspaceRoot, SFDX_PROJECT);
+}
+
 export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
-    if (fs.existsSync(path.join(workspaceRoot, 'sfdx-project.json'))) {
+    if (fs.existsSync(getSfdxProjectFile(workspaceRoot))) {
         return WorkspaceType.SFDX;
     }
     if (fs.existsSync(path.join(workspaceRoot, 'workspace-user.xml'))) {
@@ -34,17 +40,22 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
 
     const packageJson = path.join(workspaceRoot, 'package.json');
     if (fs.existsSync(packageJson)) {
-        // Check if package.json contains lwc-engine
-        const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
-        const dependencies = Object.keys(packageInfo.dependencies || {});
-        if (dependencies.includes('lwc-engine') || dependencies.includes('raptor-engine')) {
-            return WorkspaceType.STANDARD_LWC;
+        try {
+            // Check if package.json contains lwc-engine
+            const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
+            const dependencies = Object.keys(packageInfo.dependencies || {});
+            if (dependencies.includes('lwc-engine') || dependencies.includes('raptor-engine')) {
+                return WorkspaceType.STANDARD_LWC;
+            }
+            const devDependencies = Object.keys(packageInfo.devDependencies || {});
+            if (devDependencies.includes('lwc-engine') || devDependencies.includes('raptor-engine')) {
+                return WorkspaceType.STANDARD_LWC;
+            }
+            return WorkspaceType.STANDARD;
+        } catch (e) {
+            // Log error and fallback to setting workspace type to Unknown
+            console.error(`Error encountered while trying to detect workspace type ${e}`);
         }
-        const devDependencies = Object.keys(packageInfo.devDependencies || {});
-        if (devDependencies.includes('lwc-engine') || devDependencies.includes('raptor-engine')) {
-            return WorkspaceType.STANDARD_LWC;
-        }
-        return WorkspaceType.STANDARD;
     }
 
     console.error('unknown workspace type:', workspaceRoot);
