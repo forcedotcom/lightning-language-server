@@ -166,28 +166,57 @@ export class WorkspaceContext {
                     this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
             }
-            this.updateCoreSettings();
+            this.updateCoreCodeWorkspace();
+            this.updateCoreLaunch();
+        } else {
+            this.updateWorkspaceSettings();
         }
-
-        this.updateWorkspaceSettings();
     }
 
     private updateCoreSettings() {
-        // configure perforce for core: p4_port/p4_client/p4_user from ~/blt/config.blt
-        const relativeBltDir = this.type === WorkspaceType.CORE_ALL ? '../../..' : '../../../..';
-        const configBltContent = fs.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
-        const configBlt = properties.parse(configBltContent);
+        const configBlt = this.readConfigBlt();
         const variableMap = {
             eslint_node_path: findCoreESLint(),
             p4_port: configBlt['p4.port'],
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
         };
-        const settingsTemplate = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
-        const settingsContent = this.processTemplate(settingsTemplate, variableMap);
+        const template = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
+        const templateContent = this.processTemplate(template, variableMap);
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
-        const relativeSettingsPath = join('.vscode', 'settings.json');
-        this.updateConfigFile(relativeSettingsPath, settingsContent);
+        this.updateConfigFile(join('.vscode', 'settings.json'), templateContent);
+    }
+
+    private updateCoreCodeWorkspace() {
+        const configBlt = this.readConfigBlt();
+        const variableMap = {
+            eslint_node_path: findCoreESLint(),
+            p4_port: configBlt['p4.port'],
+            p4_client: configBlt['p4.client'],
+            p4_user: configBlt['p4.user'],
+            java_home: configBlt['eclipse.default.jdk'],
+            workspace_root: this.workspaceRoot,
+        };
+        const template = fs.readFileSync(utils.getCoreResource('core.code-workspace.json'), 'utf8');
+        const templateContent = this.processTemplate(template, variableMap);
+        this.updateConfigFile('core.code-workspace', templateContent);
+    }
+
+    private readConfigBlt() {
+        const isMain = this.workspaceRoot.indexOf(join('main', 'core')) !== -1;
+        let relativeBltDir = isMain ? join('..', '..', '..') : join('..', '..', '..', '..');
+        if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
+            relativeBltDir = join(relativeBltDir, '..');
+        }
+        const configBltContent = fs.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
+        return properties.parse(configBltContent);
+    }
+
+    private updateCoreLaunch() {
+        const launchContent = fs.readFileSync(utils.getCoreResource('launch-core.json'), 'utf8');
+        fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
+        const relativeLaunchPath = join('.vscode', 'launch.json');
+        this.updateConfigFile(relativeLaunchPath, launchContent);
     }
 
     private updateWorkspaceSettings() {

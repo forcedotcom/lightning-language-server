@@ -14,8 +14,9 @@ export enum WorkspaceType {
     SFDX,
     /** workspace including all core projects */
     CORE_ALL,
-    /** workspace including only one single core project */
+    /** workspace including only one single core project (should not be used in java mode) */
     CORE_SINGLE_PROJECT,
+
     UNKNOWN,
 }
 
@@ -44,11 +45,11 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
             // Check if package.json contains lwc-engine
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
             const dependencies = Object.keys(packageInfo.dependencies || {});
-            if (dependencies.includes('lwc-engine') || dependencies.includes('raptor-engine')) {
+            if (dependencies.includes('lwc-engine')) {
                 return WorkspaceType.STANDARD_LWC;
             }
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
-            if (devDependencies.includes('lwc-engine') || devDependencies.includes('raptor-engine')) {
+            if (devDependencies.includes('lwc-engine')) {
                 return WorkspaceType.STANDARD_LWC;
             }
             return WorkspaceType.STANDARD;

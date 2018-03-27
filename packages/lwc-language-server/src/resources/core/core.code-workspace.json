@@ -1,0 +1,64 @@
+{
+    "folders": [
+        {
+            "path": "${workspace_root}"
+        }
+    ],
+    "settings": {
+        "html.suggest.angular1": false,
+        "html.suggest.ionic": false,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/core/build/repository/**": true,
+            "**/core/ext/**": true,
+            "**/target/**": true,
+            "**/bin/**": true,
+            "META-INF/": true
+        },
+        "files.watcherExclude": {
+            "**/.git/objects/**": true,
+            "**/.git/subtree-cache/**": true,
+            "**/node_modules/**": true,
+            "**/core/build/repository/**": true,
+            "**/core/ext/**": true,
+            "**/target/**": true,
+            "**/bin/**": true
+        },
+        "files.useExperimentalFileWatcher": true,
+        "eslint.nodePath": "${eslint_node_path}",
+        "perforce.maxBuffer": 10485760,
+        "perforce.editOnFileModified": true,
+        "perforce.addOnFileCreate": true,
+        "perforce.deleteOnFileDelete": true,
+        "perforce.client": "${p4_client}",
+        "perforce.user": "${p4_user}",
+        "perforce.port": "${p4_port}",
+        "java.home": "${java_home}",
+        "java.import.maven.enabled": false,
+        "java.import.gradle.enabled": false,
+        "java.completion.favoriteStaticMembers": [],
+        "java.configuration.updateBuildConfiguration": "disabled",
+        "java.errors.incompleteClasspath.severity": "error",
+        "java.import.exclusions": [
+            "**/.git/objects/**",
+            "**/.git/subtree-cache/**",
+            "**/node_modules/**",
+            "**/core/build/repository/**",
+            "**/core/ext/**",
+            "**/.metadata/**",
+            "**/archetype-resources/**",
+            "**/META-INF/maven/**",
+            "**/target/**",
+            "**/bin/**"
+        ],
+        "java.debug.logLevel": "info",
+        "java.debug.settings.enableHotCodeReplace": true,
+        "java.jdt.ls.vmargs": "-noverify -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
+        "java.trace.server": "messages",
+        "extensions.ignoreRecommendations": true
+    }
+}

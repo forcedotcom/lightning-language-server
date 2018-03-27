@@ -1,5 +1,4 @@
 {
-    // don't run tslint on files copied from the html-language-service
     "tslint.exclude": [
         "**/src/html-language-service/htmlLanguageService.ts",
         "**/src/html-language-service/parser/htmlParser.ts",
@@ -13,5 +12,7 @@
     "search.exclude": {
         "**/node_modules": true,
         "lib": true
-    }
+    },
+    "html.suggest.angular1": false,
+    "html.suggest.ionic": false
 }

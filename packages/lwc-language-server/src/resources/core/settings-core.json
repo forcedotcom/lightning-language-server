@@ -7,7 +7,8 @@
         "**/.DS_Store": true,
         "**/core/build/repository/**": true,
         "**/core/ext/**": true,
-        "**/target/**": true
+        "**/target/**": true,
+        "**/bin/**": true
     },
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -15,7 +16,8 @@
         "**/node_modules/**": true,
         "**/core/build/repository/**": true,
         "**/core/ext/**": true,
-        "**/target/**": true
+        "**/target/**": true,
+        "**/bin/**": true
     },
     "files.useExperimentalFileWatcher": true,
     "eslint.nodePath": "${eslint_node_path}",

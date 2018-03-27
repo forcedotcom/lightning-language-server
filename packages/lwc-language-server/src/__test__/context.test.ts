@@ -63,8 +63,6 @@ it('WorkspaceContext', async () => {
     modules = context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
-
-    // console.log('core roots:', utils.findNamespaceRoots('/Users/rsalvador/blt/app/main/core'));
 });
 
 it('isInsideModulesRoots()', () => {
@@ -204,6 +202,10 @@ it('configureSfdxProject()', () => {
 });
 
 it('configureCoreProject()', () => {
+    if (process.platform === 'win32') {
+        return; // core dev not supported in windows
+    }
+
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
     const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
@@ -219,20 +221,27 @@ it('configureCoreProject()', () => {
     verifyJsconfigCore(jsconfigPath);
     verifyTypingsCore();
 
-    verifyCoreSettings(settingsPath);
+    const settings = JSON.parse(fs.readFileSync(settingsPath, { encoding: 'utf-8' }));
+    verifyCoreSettings(settings);
     verifyWorkspaceSettings(settingsPath);
 });
 
 it('configureCoreAll()', () => {
+    if (process.platform === 'win32') {
+        return; // core dev not supported in windows
+    }
+
     const context = new WorkspaceContext(CORE_ALL_ROOT);
     const jsconfigPathGlobal = CORE_ALL_ROOT + '/ui-global-components/modules/jsconfig.json';
     const jsconfigPathForce = CORE_ALL_ROOT + '/ui-force-components/modules/jsconfig.json';
-    const settingsPath = CORE_ALL_ROOT + '/.vscode/settings.json';
+    const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
+    const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathGlobal);
     fs.removeSync(jsconfigPathForce);
-    fs.removeSync(settingsPath);
+    fs.removeSync(codeWorkspacePath);
+    fs.removeSync(launchPath);
 
     // configure and verify typings/jsconfig after configuration:
     context.configureProject();
@@ -242,8 +251,12 @@ it('configureCoreAll()', () => {
     verifyJsconfigCore(jsconfigPathForce);
     verifyTypingsCore();
 
-    verifyCoreSettings(settingsPath);
-    verifyWorkspaceSettings(settingsPath);
+    verifyCodeWorkspace(codeWorkspacePath);
+    verifyCodeWorkspaceSettings(codeWorkspacePath);
+
+    // launch.json
+    const launchContent = fs.readFileSync(launchPath, { encoding: 'utf-8' });
+    expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {
@@ -264,14 +277,34 @@ function verifyTypingsCore() {
     fs.removeSync(typingsPath);
 }
 
-function verifyCoreSettings(settingsPath: string) {
-    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
-    const settings = JSON.parse(settingsContent);
+function verifyCodeWorkspace(path: string) {
+    const content = fs.readFileSync(path, { encoding: 'utf-8' });
+    const workspace = JSON.parse(content);
+    const folders = workspace.folders;
+    expect(folders.length).toBe(1);
+    const folderPath = folders[0].path;
+    expect(folderPath).toBeAbsolutePath();
+    expect(folderPath).toEndWith(CORE_ALL_ROOT);
+    const settings = workspace.settings;
+    expect(settings['java.home']).toBe('path_to_java_home');
+    expect(settings['extensions.ignoreRecommendations']).toBeTruthy();
+    verifyCoreSettings(settings);
+}
+
+function verifyCoreSettings(settings: any) {
     expect(settings['files.watcherExclude']).toBeDefined();
     expect(settings['eslint.nodePath']).toBeDefined();
     expect(settings['perforce.client']).toBe('username-localhost-blt');
     expect(settings['perforce.user']).toBe('username');
     expect(settings['perforce.port']).toBe('ssl:host:port');
+}
+
+function verifyCodeWorkspaceSettings(path: string) {
+    const content = fs.readFileSync(path, { encoding: 'utf-8' });
+    const workspace = JSON.parse(content);
+    const settings = workspace.settings;
+    expect(settings['html.suggest.angular1']).toBe(false);
+    expect(settings['html.suggest.ionic']).toBe(false);
 }
 
 function verifyWorkspaceSettings(settingsPath: string) {
