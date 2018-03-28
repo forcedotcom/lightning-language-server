@@ -17,17 +17,17 @@ import * as properties from 'properties';
  * Holds information and utility methods for a LWC workspace
  */
 export class WorkspaceContext {
-    // fields common to all projec types
+    // common to all project types
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
     public readonly namespaceRoots: string[];
 
-    // fields for sfdx projects
+    // for sfdx projects
     private sfdxProjectConfig: ISfdxProjectConfig;
     private sfdxPackageDirsPattern: string;
 
     /**
-     * Creates a new WorkspaceContext representing the workspace at workspaceRoot
+     * @return WorkspaceContext representing the workspace at workspaceRoot
      */
     public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
@@ -59,7 +59,7 @@ export class WorkspaceContext {
     }
 
     /**
-     * Find all return all the .js module files in the workspace
+     * @return all the .js module files in the workspace
      */
     public findAllModules(): string[] {
         const files: string[] = [];
@@ -93,7 +93,7 @@ export class WorkspaceContext {
     }
 
     /**
-     * Configures a sfdx project
+     * Configures a LWC project
      */
     public configureProject() {
         this.writeConfigFiles();

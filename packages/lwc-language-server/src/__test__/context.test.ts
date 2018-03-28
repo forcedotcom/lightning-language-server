@@ -11,16 +11,11 @@ const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app', 'mai
 const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
 const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
 
-function namespaceRoots(context: WorkspaceContext): string[] {
-    // tslint:disable-next-line:no-string-literal
-    return context['namespaceRoots'];
-}
-
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoot).toBeAbsolutePath();
-    let roots = namespaceRoots(context);
+    let roots = context.namespaceRoots;
     expect(roots[0]).toBeAbsolutePath();
     expect(roots[0]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents'));
     expect(roots[1]).toEndWith(join(UTILS_ROOT, 'lightningcomponents'));
@@ -32,7 +27,7 @@ it('WorkspaceContext', async () => {
     expect(modules.length).toBe(11);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
-    roots = namespaceRoots(context);
+    roots = context.namespaceRoots;
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
     expect(roots[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
     expect(roots[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
@@ -47,7 +42,7 @@ it('WorkspaceContext', async () => {
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
-    roots = namespaceRoots(context);
+    roots = context.namespaceRoots;
     expect(roots[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
     expect(roots[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
     expect(roots.length).toBe(2);
@@ -58,7 +53,7 @@ it('WorkspaceContext', async () => {
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
-    roots = namespaceRoots(context);
+    roots = context.namespaceRoots;
     expect(roots[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.length).toBe(1);
     modules = context.findAllModules();
