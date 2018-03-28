@@ -77,10 +77,6 @@ it('indexSfdx', async () => {
 });
 
 it('indexCore', async () => {
-    if (process.platform === 'win32') {
-        return; // core dev not supported in windows
-    }
-
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
     await context.configureAndIndex();

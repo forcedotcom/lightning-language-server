@@ -124,10 +124,6 @@ export class WorkspaceContext {
         }
     }
 
-    private unixify(filePath: string): string {
-        return filePath.replace(/\\/g, '/');
-    }
-
     private writeConfigFiles() {
         if (this.type === WorkspaceType.SFDX) {
             const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
@@ -138,7 +134,7 @@ export class WorkspaceContext {
                 // write/update jsconfig.json
                 const relativeJsConfigPath = join(dirPath, 'jsconfig.json');
                 const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
-                const relativeWorkspaceRoot = this.unixify(path.relative(path.dirname(jsConfigPath), this.workspaceRoot));
+                const relativeWorkspaceRoot = utils.unixify(path.relative(path.dirname(jsConfigPath), this.workspaceRoot));
                 const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
                 this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
 
@@ -195,7 +191,7 @@ export class WorkspaceContext {
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
             java_home: configBlt['eclipse.default.jdk'],
-            workspace_root: this.workspaceRoot,
+            workspace_root: utils.unixify(this.workspaceRoot),
         };
         const template = fs.readFileSync(utils.getCoreResource('core.code-workspace.json'), 'utf8');
         const templateContent = this.processTemplate(template, variableMap);

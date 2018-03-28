@@ -3,6 +3,7 @@ import { WorkspaceType } from '../shared';
 import { readAsTextDocument } from './test-utils';
 import { join } from 'path';
 import * as fs from 'fs-extra';
+import * as utils from '../utils';
 
 const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
 const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'meta');
@@ -202,10 +203,6 @@ it('configureSfdxProject()', () => {
 });
 
 it('configureCoreProject()', () => {
-    if (process.platform === 'win32') {
-        return; // core dev not supported in windows
-    }
-
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
     const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
@@ -227,10 +224,6 @@ it('configureCoreProject()', () => {
 });
 
 it('configureCoreAll()', () => {
-    if (process.platform === 'win32') {
-        return; // core dev not supported in windows
-    }
-
     const context = new WorkspaceContext(CORE_ALL_ROOT);
     const jsconfigPathGlobal = CORE_ALL_ROOT + '/ui-global-components/modules/jsconfig.json';
     const jsconfigPathForce = CORE_ALL_ROOT + '/ui-force-components/modules/jsconfig.json';
@@ -284,7 +277,7 @@ function verifyCodeWorkspace(path: string) {
     expect(folders.length).toBe(1);
     const folderPath = folders[0].path;
     expect(folderPath).toBeAbsolutePath();
-    expect(folderPath).toEndWith(CORE_ALL_ROOT);
+    expect(folderPath).toEndWith(utils.unixify(CORE_ALL_ROOT));
     const settings = workspace.settings;
     expect(settings['java.home']).toBe('path_to_java_home');
     expect(settings['extensions.ignoreRecommendations']).toBeTruthy();

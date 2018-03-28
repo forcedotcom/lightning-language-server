@@ -8,6 +8,10 @@ import URI from 'vscode-uri';
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
+export function unixify(filePath: string): string {
+    return filePath.replace(/\\/g, '/');
+}
+
 export function writeFileSync(file: string, contents: string) {
     fs.ensureDirSync(dirname(file));
     fs.writeFileSync(file, contents);
