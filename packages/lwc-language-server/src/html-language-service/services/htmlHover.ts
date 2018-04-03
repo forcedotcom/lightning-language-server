@@ -44,9 +44,10 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
         tag = tag.toLowerCase();
         for (const provider of tagProviders) {
             const info = provider.getTagInfo(tag);
-            if (info && info.documentation) {
+            if (info) {
+                const doc = info.documentation? info.documentation : 'LWC element';
                 const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                return { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(info.documentation)], range };
+                return { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(doc)], range };
             }
         }
         return null;
