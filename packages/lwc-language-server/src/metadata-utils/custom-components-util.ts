@@ -142,6 +142,16 @@ export function tagFromFile(file: string, sfdxProject: boolean) {
     return null;
 }
 
+/**
+ * @return true if file is the main .js file for a component
+ */
+export function isJSComponent(file: string): boolean {
+    if (!file.toLowerCase().endsWith('.js')) {
+        return false;
+    }
+    return tagFromFile(file, true) != null;
+}
+
 function tagName(namespace: string, tag: string) {
     if (namespace === 'interop') {
         // treat interop as lightning, i.e. needed when using extension with lightning-global

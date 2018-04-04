@@ -6,7 +6,7 @@ import { join } from 'path';
 import * as utils from './utils';
 import { indexCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources } from './metadata-utils/static-resources-util';
-import { loadStandardComponents, indexCustomComponents, removeAllTags } from './metadata-utils/custom-components-util';
+import { loadStandardComponents, indexCustomComponents, removeAllTags, isJSComponent } from './metadata-utils/custom-components-util';
 import { TextDocument } from 'vscode-languageserver';
 import { WorkspaceType, detectWorkspaceType, isLWC, getSfdxProjectFile } from './shared';
 import { GlobSync } from 'glob';
@@ -389,7 +389,7 @@ function findModulesIn(namespaceRoot: string): string[] {
     for (const subdir of subdirs) {
         const basename = path.basename(subdir);
         const modulePath = path.join(subdir, basename + '.js');
-        if (fs.existsSync(modulePath) && fs.existsSync(path.join(subdir, basename + '.html'))) {
+        if (fs.existsSync(modulePath) && isJSComponent(modulePath)) {
             // TODO: check contents for: from 'engine'?
             files.push(modulePath);
         }
