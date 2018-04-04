@@ -74,6 +74,8 @@ it('indexSfdx', async () => {
         { name: 'privateProperty' },
     ]);
     expect(getLwcByTag('c-todo_util').methods).toMatchObject([{ name: 'privateMethod' }]);
+    // indexing of components without .html file
+    expect(getLwcByTag('c-todo_utils')).not.toBeUndefined();
 });
 
 it('indexCore', async () => {

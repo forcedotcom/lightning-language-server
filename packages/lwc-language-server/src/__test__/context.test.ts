@@ -24,7 +24,7 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lightningcomponents/hello_world/hello_world.js'));
     expect(modules[9]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents/wire_lds/wire_lds.js'));
     expect(modules[10]).toEndWith(join(UTILS_ROOT, '/lightningcomponents/todo_util/todo_util.js'));
-    expect(modules.length).toBe(11);
+    expect(modules.length).toBe(12);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = context.namespaceRoots;

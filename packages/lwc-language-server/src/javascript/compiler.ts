@@ -47,14 +47,16 @@ export function getMethods(metadata: ICompilerMetadata): IClassMemberMetadata[] 
 
 function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, targetType: string): IClassMemberMetadata[] {
     const props: IClassMemberMetadata[] = [];
-    for (const element of metadata.decorators) {
-        if (element.type === elementType) {
-            for (const target of element.targets) {
-                if (target.type === targetType) {
-                    props.push(target);
+    if (metadata.decorators) {
+        for (const element of metadata.decorators) {
+            if (element.type === elementType) {
+                for (const target of element.targets) {
+                    if (target.type === targetType) {
+                        props.push(target);
+                    }
                 }
+                break;
             }
-            break;
         }
     }
     return props;
@@ -62,10 +64,12 @@ function getDecoratorsTargets(metadata: ICompilerMetadata, elementType: string, 
 
 function getClassMembers(metadata: ICompilerMetadata, memberType: string, memberDecorator?: string): IClassMemberMetadata[] {
     const members: IClassMemberMetadata[] = [];
-    for (const member of metadata.classMembers) {
-        if (member.type === memberType) {
-            if (!memberDecorator || member.decorator === memberDecorator) {
-                members.push(member);
+    if (metadata.classMembers) {
+        for (const member of metadata.classMembers) {
+            if (member.type === memberType) {
+                if (!memberDecorator || member.decorator === memberDecorator) {
+                    members.push(member);
+                }
             }
         }
     }
