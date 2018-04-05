@@ -1,7 +1,9 @@
-import { getLwcByTag, addCustomTagFromFile } from '../custom-components-util';
-import { WorkspaceContext } from '../../context';
-import URI from 'vscode-uri';
 import { join } from 'path';
+import URI from 'vscode-uri';
+import { FORCE_APP_ROOT, UTILS_ROOT } from '../../__test__/test-utils';
+import { WorkspaceContext } from '../../context';
+import * as utils from '../../utils';
+import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
 
 it('addCustomTagFromFile(): adds custom tag attributes and documentation', async () => {
     // custom tag is not indexed initially
@@ -76,6 +78,22 @@ it('indexSfdx', async () => {
     expect(getLwcByTag('c-todo_util').methods).toMatchObject([{ name: 'privateMethod' }]);
     // indexing of components without .html file
     expect(getLwcByTag('c-todo_utils')).not.toBeUndefined();
+
+    // verify modifycations in jsconfig.json when indexing
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
+    const jsconfigForceApp = JSON.parse(utils.readFileSync(jsconfigPathForceApp));
+    expect(jsconfigForceApp.compilerOptions.baseUrl).toBe('.');
+    expect(jsconfigForceApp.compilerOptions.paths).toMatchObject({
+        'c-hello_world': ['hello_world/hello_world.js'],
+        'c-todo_utils': ['../../../../utils/meta/lightningcomponents/todo_utils/todo_utils.js'],
+    });
+    const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';
+    const jsconfigUtils = JSON.parse(utils.readFileSync(jsconfigPathUtils));
+    expect(jsconfigUtils.compilerOptions.baseUrl).toBe('.');
+    expect(jsconfigUtils.compilerOptions.paths).toMatchObject({
+        'c-hello_world': ['../../../force-app/main/default/lightningcomponents/hello_world/hello_world.js'],
+        'c-todo_utils': ['todo_utils/todo_utils.js'],
+    });
 });
 
 it('indexCore', async () => {

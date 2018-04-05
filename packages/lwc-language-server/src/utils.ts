@@ -1,15 +1,22 @@
-import { extname, join, resolve } from 'path';
 import * as fs from 'fs-extra';
-import { dirname } from 'path';
-import equal = require('deep-equal');
+import { dirname, extname, join, relative, resolve } from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
+import equal = require('deep-equal');
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 
+export function relativePath(from: string, to: string): string {
+    return unixify(relative(from, to));
+}
+
 export function unixify(filePath: string): string {
     return filePath.replace(/\\/g, '/');
+}
+
+export function readFileSync(file: string): string {
+    return fs.readFileSync(file, { encoding: 'utf8' });
 }
 
 export function writeFileSync(file: string, contents: string) {
@@ -59,10 +66,7 @@ export function appendLineIfMissing(file: string, line: string) {
 
 function fileContainsLine(file: string, expectLine: string) {
     const trimmed = expectLine.trim();
-    for (const line of fs
-        .readFileSync(file)
-        .toString()
-        .split('\n')) {
+    for (const line of readFileSync(file).split('\n')) {
         if (line.trim() === trimmed) {
             return true;
         }

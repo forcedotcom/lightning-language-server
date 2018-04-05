@@ -1,6 +1,5 @@
 import * as utils from '../utils';
 import * as tmp from 'tmp';
-import * as fs from 'fs';
 import { join, resolve } from 'path';
 import { TextDocument } from 'vscode-languageserver';
 
@@ -21,15 +20,15 @@ it('appendLineIfMissing()', () => {
     // creates with line if file doesn't exist
     expect(file).not.toExist();
     utils.appendLineIfMissing(file, 'line 1');
-    expect(fs.readFileSync(file).toString()).toBe('line 1\n');
+    expect(utils.readFileSync(file)).toBe('line 1\n');
 
     // add second line
     utils.appendLineIfMissing(file, 'line 2');
-    expect(fs.readFileSync(file).toString()).toBe('line 1\n\nline 2\n');
+    expect(utils.readFileSync(file)).toBe('line 1\n\nline 2\n');
 
     // doesn't add line if already there
     utils.appendLineIfMissing(file, 'line 1');
-    expect(fs.readFileSync(file).toString()).toBe('line 1\n\nline 2\n');
+    expect(utils.readFileSync(file)).toBe('line 1\n\nline 2\n');
 });
 
 it('deepMerge()', () => {

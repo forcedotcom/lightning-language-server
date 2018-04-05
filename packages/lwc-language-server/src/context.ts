@@ -1,17 +1,18 @@
 import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as os from 'os';
-import * as semver from 'semver';
-import { join } from 'path';
-import * as utils from './utils';
-import { indexCustomLabels } from './metadata-utils/custom-labels-util';
-import { indexStaticResources } from './metadata-utils/static-resources-util';
-import { loadStandardComponents, indexCustomComponents, removeAllTags, isJSComponent } from './metadata-utils/custom-components-util';
-import { TextDocument } from 'vscode-languageserver';
-import { WorkspaceType, detectWorkspaceType, isLWC, getSfdxProjectFile } from './shared';
 import { GlobSync } from 'glob';
 import * as _ from 'lodash';
+import * as os from 'os';
+import * as path from 'path';
+import { join } from 'path';
 import * as properties from 'properties';
+import * as semver from 'semver';
+import { TextDocument } from 'vscode-languageserver';
+import { writeJsconfig } from './config';
+import { indexCustomComponents, isJSComponent, loadStandardComponents, removeAllTags } from './metadata-utils/custom-components-util';
+import { indexCustomLabels } from './metadata-utils/custom-labels-util';
+import { indexStaticResources } from './metadata-utils/static-resources-util';
+import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
+import * as utils from './utils';
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -22,7 +23,7 @@ export class WorkspaceContext {
     public readonly workspaceRoot: string;
     public readonly namespaceRoots: string[];
 
-    // for sfdx projects
+    // for sfdx projectsÍ
     private sfdxProjectConfig: ISfdxProjectConfig;
     private sfdxPackageDirsPattern: string;
 
@@ -96,8 +97,37 @@ export class WorkspaceContext {
      * Configures a LWC project
      */
     public configureProject() {
-        this.writeConfigFiles();
+        this.writeJsconfigJson();
+        this.writeSettings();
         this.writeTypings();
+    }
+
+    /**
+     * @return list of relative paths to LWC modules directories
+     */
+    public getRelativeModulesDirs(): string[] {
+        const list: string[] = [];
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
+                    list.push(dirPath);
+                });
+                break;
+
+            case WorkspaceType.CORE_ALL:
+                for (const project of fs.readdirSync(this.workspaceRoot)) {
+                    const modulesDir = join(project, 'modules');
+                    if (fs.existsSync(join(this.workspaceRoot, modulesDir))) {
+                        list.push(modulesDir);
+                    }
+                }
+                break;
+
+            case WorkspaceType.CORE_SINGLE_PROJECT:
+                list.push('modules');
+                break;
+        }
+        return list;
     }
 
     private writeTypings() {
@@ -124,48 +154,70 @@ export class WorkspaceContext {
         }
     }
 
-    private writeConfigFiles() {
-        if (this.type === WorkspaceType.SFDX) {
-            const jsConfigTemplate = fs.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
-            const eslintrcTemplate = fs.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
+    private writeJsconfigJson() {
+        let jsConfigTemplate: string;
+        let jsConfigContent: string;
+        const relativeModulesDirs = this.getRelativeModulesDirs();
 
-            const forceignore = join(this.workspaceRoot, '.forceignore');
-            new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
-                // write/update jsconfig.json
-                const relativeJsConfigPath = join(dirPath, 'jsconfig.json');
-                const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
-                const relativeWorkspaceRoot = utils.unixify(path.relative(path.dirname(jsConfigPath), this.workspaceRoot));
-                const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
-                this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                jsConfigTemplate = utils.readFileSync(utils.getSfdxResource('jsconfig-sfdx.json'));
+                const eslintrcTemplate = utils.readFileSync(utils.getSfdxResource('eslintrc-sfdx.json'));
+                const forceignore = join(this.workspaceRoot, '.forceignore');
+                relativeModulesDirs.forEach(relativeModulesDir => {
+                    // write/update jsconfig.json
+                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
+                    const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
+                    const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoot);
+                    jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
+                    // write/update .eslintrc.json
+                    const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
+                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate, forceignore);
+                });
+                break;
 
-                // write/update .eslintrc.json
-                const relativeEslintrcPath = join(dirPath, '.eslintrc.json');
-                this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate, forceignore);
-            });
-        }
-
-        if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
-            const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-            const relativeJsConfigPath = join('modules', 'jsconfig.json');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
-            this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
-            this.updateCoreSettings();
-        }
-
-        if (this.type === WorkspaceType.CORE_ALL) {
-            const jsConfigTemplate = fs.readFileSync(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-            const jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
-            for (const project of fs.readdirSync(this.workspaceRoot)) {
-                const modulesDir = join(project, 'modules');
-                if (fs.existsSync(join(this.workspaceRoot, modulesDir))) {
-                    const relativeJsConfigPath = join(modulesDir, 'jsconfig.json');
+            case WorkspaceType.CORE_ALL:
+                jsConfigTemplate = utils.readFileSync(utils.getCoreResource('jsconfig-core.json'));
+                jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
+                relativeModulesDirs.forEach(relativeModulesDir => {
+                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
                     this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
-                }
-            }
-            this.updateCoreCodeWorkspace();
-            this.updateCoreLaunch();
-        } else {
-            this.updateWorkspaceSettings();
+                });
+                break;
+
+            case WorkspaceType.CORE_SINGLE_PROJECT:
+                jsConfigTemplate = utils.readFileSync(utils.getCoreResource('jsconfig-core.json'));
+                jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
+                relativeModulesDirs.forEach(relativeModulesDir => {
+                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                });
+                break;
+        }
+    }
+
+    private writeSettings() {
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                this.updateWorkspaceSettings();
+                break;
+
+            case WorkspaceType.CORE_ALL:
+                this.updateWorkspaceSettings();
+                // updateCoreSettings is performed by core's setupVSCode
+                this.updateCoreCodeWorkspace();
+                this.updateCoreLaunch();
+                break;
+
+            case WorkspaceType.CORE_SINGLE_PROJECT:
+                this.updateWorkspaceSettings();
+                this.updateCoreSettings();
+                break;
+
+            default:
+                this.updateWorkspaceSettings();
+                break;
         }
     }
 
@@ -177,7 +229,7 @@ export class WorkspaceContext {
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
         };
-        const template = fs.readFileSync(utils.getCoreResource('settings-core.json'), 'utf8');
+        const template = utils.readFileSync(utils.getCoreResource('settings-core.json'));
         const templateContent = this.processTemplate(template, variableMap);
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         this.updateConfigFile(join('.vscode', 'settings.json'), templateContent);
@@ -193,7 +245,7 @@ export class WorkspaceContext {
             java_home: configBlt['eclipse.default.jdk'],
             workspace_root: utils.unixify(this.workspaceRoot),
         };
-        const template = fs.readFileSync(utils.getCoreResource('core.code-workspace.json'), 'utf8');
+        const template = utils.readFileSync(utils.getCoreResource('core.code-workspace.json'));
         const templateContent = this.processTemplate(template, variableMap);
         this.updateConfigFile('core.code-workspace', templateContent);
     }
@@ -204,19 +256,22 @@ export class WorkspaceContext {
         if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
             relativeBltDir = join(relativeBltDir, '..');
         }
-        const configBltContent = fs.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
+        const configBltContent = utils.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'));
         return properties.parse(configBltContent);
     }
 
     private updateCoreLaunch() {
-        const launchContent = fs.readFileSync(utils.getCoreResource('launch-core.json'), 'utf8');
+        const launchContent = utils.readFileSync(utils.getCoreResource('launch-core.json'));
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         const relativeLaunchPath = join('.vscode', 'launch.json');
         this.updateConfigFile(relativeLaunchPath, launchContent);
     }
 
+    /**
+     * Updates common workspace settings that apply to any LWC project
+     */
     private updateWorkspaceSettings() {
-        const settingsContent = fs.readFileSync(utils.getResourcePath(join('common', 'settings.json')), 'utf8');
+        const settingsContent = utils.readFileSync(utils.getResourcePath(join('common', 'settings.json')));
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         const relativeSettingsPath = join('.vscode', 'settings.json');
         this.updateConfigFile(relativeSettingsPath, settingsContent);
@@ -242,11 +297,11 @@ export class WorkspaceContext {
         try {
             const configJson = JSON.parse(config);
             if (!fs.existsSync(configFile)) {
-                utils.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
+                writeJsconfig(configFile, configJson);
             } else {
-                const fileConfig = JSON.parse(fs.readFileSync(configFile).toString());
+                const fileConfig = JSON.parse(utils.readFileSync(configFile));
                 if (utils.deepMerge(fileConfig, configJson)) {
-                    utils.writeFileSync(configFile, JSON.stringify(fileConfig, null, 4));
+                    writeJsconfig(configFile, fileConfig);
                 }
             }
             if (ignoreFile) {
@@ -312,7 +367,7 @@ interface ISfdxProjectConfig {
 
 function readSfdxProjectConfig(workspaceRoot: string): ISfdxProjectConfig {
     try {
-        return JSON.parse(fs.readFileSync(getSfdxProjectFile(workspaceRoot), 'utf8'));
+        return JSON.parse(utils.readFileSync(getSfdxProjectFile(workspaceRoot)));
     } catch (e) {
         throw new Error(`Sfdx project file seems invalid. Unable to parse ${getSfdxProjectFile(workspaceRoot)}. ${e.message}`);
     }

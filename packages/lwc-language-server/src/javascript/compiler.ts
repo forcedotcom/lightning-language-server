@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import { transform } from '../resources/lwc/compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range, Location, Position } from 'vscode-languageserver';
-import { DIAGNOSTIC_SOURCE } from '../constants';
-import * as path from 'path';
-import URI from 'vscode-uri';
-import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 import { SourceLocation } from 'babel-types';
+import * as path from 'path';
+import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
+import URI from 'vscode-uri';
+import { DIAGNOSTIC_SOURCE } from '../constants';
+import { AttributeInfo } from '../html-language-service/parser/htmlTags';
+import { transform } from '../resources/lwc/compiler';
+import * as utils from '../utils';
 
 export interface IClassMemberMetadata {
     name: string;
@@ -89,7 +89,7 @@ export async function compileDocument(document: TextDocument): Promise<ICompiler
 export async function compileFile(file: string): Promise<ICompilerResult> {
     const filePath = path.parse(file);
     const fileName = filePath.base;
-    return compileSource(fs.readFileSync(file, 'utf8'), fileName);
+    return compileSource(utils.readFileSync(file), fileName);
 }
 
 export async function compileSource(source: string, fileName: string = 'foo.js'): Promise<ICompilerResult> {

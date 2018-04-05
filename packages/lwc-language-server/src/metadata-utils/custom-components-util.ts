@@ -1,25 +1,29 @@
-import * as path from 'path';
 import * as fs from 'fs';
-import * as utils from '../utils';
-import { FileEvent, FileChangeType, Location, Position, Range } from 'vscode-languageserver';
-import { compileFile, extractAttributes, getProperties, getMethods, toVSCodeRange } from '../javascript/compiler';
-import { WorkspaceContext } from '../context';
-import { WorkspaceType } from '../shared';
+import * as path from 'path';
+import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import { TagInfo, AttributeInfo } from '../html-language-service/parser/htmlTags';
-import { ICompilerMetadata } from '../javascript/compiler';
+import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
+import { WorkspaceContext } from '../context';
+import { AttributeInfo, TagInfo } from '../html-language-service/parser/htmlTags';
+import { ICompilerMetadata, compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
+import { WorkspaceType } from '../shared';
+import * as utils from '../utils';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
-export async function updateCustomComponentIndex(updatedFiles: FileEvent[], { type }: WorkspaceContext) {
-    const isSfdxProject = type === WorkspaceType.SFDX;
+export async function updateCustomComponentIndex(updatedFiles: FileEvent[], context: WorkspaceContext) {
+    const isSfdxProject = context.type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${path.sep}lightningcomponents${path.sep}.*.js`)) {
             const file = URI.parse(f.uri).fsPath;
-            if (f.type === FileChangeType.Created) {
-                addCustomTagFromFile(file, isSfdxProject);
-            } else if (f.type === FileChangeType.Deleted) {
-                removeCustomTagFromFile(file, isSfdxProject);
+            if (isJSComponent(file)) {
+                if (f.type === FileChangeType.Created) {
+                    addCustomTagFromFile(file, isSfdxProject);
+                    onCreatedCustomComponent(context, file);
+                } else if (f.type === FileChangeType.Deleted) {
+                    removeCustomTagFromFile(file, isSfdxProject);
+                    onDeletedCustomComponent(context, file);
+                }
             }
         }
     });
@@ -82,6 +86,7 @@ function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
     const files = context.findAllModules();
     await loadCustomTagsFromFiles(files, context.type === WorkspaceType.SFDX);
+    onIndexCustomComponents(context, files);
 }
 
 async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean) {

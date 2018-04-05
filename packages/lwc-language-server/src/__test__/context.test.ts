@@ -1,15 +1,9 @@
+import * as fs from 'fs-extra';
+import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
-import { readAsTextDocument } from './test-utils';
-import { join } from 'path';
-import * as fs from 'fs-extra';
 import * as utils from '../utils';
-
-const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
-const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'meta');
-const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app', 'main', 'core');
-const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
-const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
+import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument } from './test-utils';
 
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
@@ -25,6 +19,7 @@ it('WorkspaceContext', async () => {
     expect(modules[10]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents/wire_lds/wire_lds.js'));
     expect(modules[11]).toEndWith(join(UTILS_ROOT, '/lightningcomponents/todo_util/todo_util.js'));
     expect(modules.length).toBe(13);
+    expect(context.getRelativeModulesDirs().length).toBe(2);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = context.namespaceRoots;
@@ -39,6 +34,7 @@ it('WorkspaceContext', async () => {
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
+    expect(context.getRelativeModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
@@ -50,6 +46,7 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(2);
+    expect(context.getRelativeModulesDirs().length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
@@ -59,6 +56,7 @@ it('WorkspaceContext', async () => {
     modules = context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
+    expect(context.getRelativeModulesDirs()).toEqual(['modules']);
 });
 
 it('isInsideModulesRoots()', () => {
@@ -152,14 +150,15 @@ it('configureSfdxProject()', () => {
     expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils}');
 
     // verify newly created jsconfig.json
-    const jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, { encoding: 'utf-8' });
+    const jsconfigForceAppContent = utils.readFileSync(jsconfigPathForceApp);
     expect(jsconfigForceAppContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
     expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigForceApp.include[0]).toBe('**/*');
     expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
     // verify updated jsconfig.json
-    const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, { encoding: 'utf-8' });
+    const jsconfigUtilsContent = utils.readFileSync(jsconfigPathUtils);
     expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfigUtils = JSON.parse(jsconfigUtilsContent);
     expect(jsconfigUtils.compilerOptions.target).toBe('es2017');
@@ -169,13 +168,13 @@ it('configureSfdxProject()', () => {
     expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
 
     // verify newly created .eslintrc.json
-    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, { encoding: 'utf-8' });
+    const eslintrcForceAppContent = utils.readFileSync(eslintrcPathForceApp);
     expect(eslintrcForceAppContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
     const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
     expect(eslintrcForceApp.extends).toBe('plugin:lwc/recommended');
     expect(eslintrcForceApp.plugins[0]).toBe('lwc');
     // verify updated .eslintrc.json
-    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, { encoding: 'utf-8' });
+    const eslintrcUtilsContent = utils.readFileSync(eslintrcPathUtils);
     expect(eslintrcUtilsContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
     const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
     expect(eslintrcUtils.extends).toBe('plugin:lwc/recommended');
@@ -183,7 +182,7 @@ it('configureSfdxProject()', () => {
     expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
-    const forceignoreContent = fs.readFileSync(forceignorePath, { encoding: 'utf-8' });
+    const forceignoreContent = utils.readFileSync(forceignorePath);
     expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', 'jsconfig.json'));
     expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', 'jsconfig.json'));
     expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', '.eslintrc.json'));
@@ -213,7 +212,7 @@ it('configureCoreProject()', () => {
     verifyJsconfigCore(jsconfigPath);
     verifyTypingsCore();
 
-    const settings = JSON.parse(fs.readFileSync(settingsPath, { encoding: 'utf-8' }));
+    const settings = JSON.parse(utils.readFileSync(settingsPath));
     verifyCoreSettings(settings);
     verifyWorkspaceSettings(settingsPath);
 });
@@ -243,12 +242,12 @@ it('configureCoreAll()', () => {
     verifyCodeWorkspaceSettings(codeWorkspacePath);
 
     // launch.json
-    const launchContent = fs.readFileSync(launchPath, { encoding: 'utf-8' });
+    const launchContent = utils.readFileSync(launchPath);
     expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {
-    const jsconfigContent = fs.readFileSync(jsconfigPath, { encoding: 'utf-8' });
+    const jsconfigContent = utils.readFileSync(jsconfigPath);
     expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfig = JSON.parse(jsconfigContent);
     expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
@@ -266,7 +265,7 @@ function verifyTypingsCore() {
 }
 
 function verifyCodeWorkspace(path: string) {
-    const content = fs.readFileSync(path, { encoding: 'utf-8' });
+    const content = utils.readFileSync(path);
     const workspace = JSON.parse(content);
     const folders = workspace.folders;
     expect(folders.length).toBe(1);
@@ -288,7 +287,7 @@ function verifyCoreSettings(settings: any) {
 }
 
 function verifyCodeWorkspaceSettings(path: string) {
-    const content = fs.readFileSync(path, { encoding: 'utf-8' });
+    const content = utils.readFileSync(path);
     const workspace = JSON.parse(content);
     const settings = workspace.settings;
     expect(settings['html.suggest.angular1']).toBe(false);
@@ -296,7 +295,7 @@ function verifyCodeWorkspaceSettings(path: string) {
 }
 
 function verifyWorkspaceSettings(settingsPath: string) {
-    const settingsContent = fs.readFileSync(settingsPath, { encoding: 'utf-8' });
+    const settingsContent = utils.readFileSync(settingsPath);
     const settings = JSON.parse(settingsContent);
     expect(settings['html.suggest.angular1']).toBe(false);
     expect(settings['html.suggest.ionic']).toBe(false);

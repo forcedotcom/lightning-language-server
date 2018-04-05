@@ -1,5 +1,4 @@
 // utility methods shared with the vscode extension
-
 import * as fs from 'fs';
 import * as path from 'path';
 

@@ -1,18 +1,18 @@
 import * as path from 'path';
-import * as fs from 'fs';
 import { TextDocument } from 'vscode-languageserver';
+import { DIAGNOSTIC_SOURCE } from '../../constants';
 import { transform } from '../../resources/lwc/compiler';
+import * as utils from '../../utils';
 import {
-    compileSource,
     compileDocument,
     compileFile,
-    getPublicReactiveProperties,
-    getPrivateReactiveProperties,
+    compileSource,
     getApiMethods,
-    getProperties,
     getMethods,
+    getPrivateReactiveProperties,
+    getProperties,
+    getPublicReactiveProperties,
 } from '../compiler';
-import { DIAGNOSTIC_SOURCE } from '../../constants';
 
 it('can use transform(src, id, options) from lwc-compiler', async () => {
     const actual = `
@@ -91,7 +91,7 @@ it('linter returns empty diagnostics on correct file', async () => {
 
 it('returns javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__test__', 'fixtures', 'metadata.js');
-    const content = fs.readFileSync(filepath, { encoding: 'utf-8' });
+    const content = utils.readFileSync(filepath);
 
     const compilerResult = await compileSource(content);
     const metadata = compilerResult.result.metadata;
