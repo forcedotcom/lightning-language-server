@@ -11,6 +11,10 @@ import * as utils from '../utils';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
+export function resetCustomComponents() {
+    LWC_TAGS.clear();
+}
+
 export async function updateCustomComponentIndex(updatedFiles: FileEvent[], context: WorkspaceContext) {
     const isSfdxProject = context.type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
@@ -68,10 +72,6 @@ export function loadStandardComponents(): Promise<void> {
 
 function removeCustomTag(tag: string) {
     LWC_TAGS.delete(tag);
-}
-
-export function removeAllTags() {
-    LWC_TAGS.clear();
 }
 
 function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {

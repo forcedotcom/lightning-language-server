@@ -1,11 +1,29 @@
 import * as fs from 'fs-extra';
 import { dirname, extname, join, relative, resolve } from 'path';
-import { TextDocument } from 'vscode-languageserver';
+import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import equal = require('deep-equal');
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
+
+/**
+ * @return true if changes include a directory delete
+ */
+export function includesWatchedDirectory(changes: FileEvent[]): boolean {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Deleted && isWatchedDirectory(event.uri)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function isWatchedDirectory(uri: string) {
+    // use heuristics: directory if doesn't have suffix
+    // (we can't use fs.stat because the directory has already been deleted)
+    return uri.indexOf('.') === -1;
+}
 
 export function relativePath(from: string, to: string): string {
     return unixify(relative(from, to));

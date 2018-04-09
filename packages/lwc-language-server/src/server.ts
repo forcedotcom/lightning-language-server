@@ -12,6 +12,8 @@ import {
     DidChangeWatchedFilesParams,
     Hover,
     Location,
+    ShowMessageNotification,
+    MessageType,
 } from 'vscode-languageserver';
 
 import { WorkspaceContext } from './context';
@@ -130,9 +132,17 @@ connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     console.info('onDidChangeWatchedFiles...');
-    return Promise.all([
-        updateStaticResourceIndex(change.changes, context),
-        updateLabelsIndex(change.changes, context),
-        updateCustomComponentIndex(change.changes, context),
-    ]);
+    const changes = change.changes;
+    try {
+        if (utils.includesWatchedDirectory(changes)) {
+            // re-index everything on directory deletions as no events are reported for contents of deleted directories
+            const startTime = process.hrtime();
+            await context.configureAndIndex();
+            console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
+        } else {
+            await Promise.all([updateStaticResourceIndex(changes, context), updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
+        }
+    } catch (e) {
+        connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
+    }
 });

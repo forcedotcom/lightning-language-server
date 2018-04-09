@@ -1,7 +1,25 @@
 import * as utils from '../utils';
 import * as tmp from 'tmp';
 import { join, resolve } from 'path';
-import { TextDocument } from 'vscode-languageserver';
+import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
+
+it('includesWatchedDirectory', () => {
+    const directoryDeletedEvent: FileEvent = {
+        type: FileChangeType.Deleted,
+        uri: 'file:///Users/user/test/dir',
+    };
+    const jsFileDeletedEvent: FileEvent = {
+        type: FileChangeType.Deleted,
+        uri: 'file:///Users/user/test/dir/file.js',
+    };
+    const htmlFileDeletedEvent: FileEvent = {
+        type: FileChangeType.Deleted,
+        uri: 'file:///Users/user/test/dir/file.html',
+    };
+    expect(utils.includesWatchedDirectory([jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
+    expect(utils.includesWatchedDirectory([jsFileDeletedEvent])).toBeFalsy();
+    expect(utils.includesWatchedDirectory([htmlFileDeletedEvent])).toBeFalsy();
+});
 
 it('getExtension()', () => {
     const jsDocument = TextDocument.create('file:///hello_world.js', 'javascript', 0, '');

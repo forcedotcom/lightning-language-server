@@ -7,6 +7,10 @@ import * as utils from '../utils';
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
 const STATIC_RESOURCES: Set<string> = new Set();
 
+export function resetStaticResources() {
+    STATIC_RESOURCES.clear();
+}
+
 function getResourceName(resourceFile: string) {
     return parse(resourceFile).name;
 }

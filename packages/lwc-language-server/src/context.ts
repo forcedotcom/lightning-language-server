@@ -8,9 +8,9 @@ import * as properties from 'properties';
 import * as semver from 'semver';
 import { TextDocument } from 'vscode-languageserver';
 import { writeJsconfig } from './config';
-import { indexCustomComponents, isJSComponent, loadStandardComponents, removeAllTags } from './metadata-utils/custom-components-util';
-import { indexCustomLabels } from './metadata-utils/custom-labels-util';
-import { indexStaticResources } from './metadata-utils/static-resources-util';
+import { indexCustomComponents, isJSComponent, loadStandardComponents, resetCustomComponents } from './metadata-utils/custom-components-util';
+import { indexCustomLabels, resetCustomLabels } from './metadata-utils/custom-labels-util';
+import { indexStaticResources, resetStaticResources } from './metadata-utils/static-resources-util';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
 import * as utils from './utils';
 
@@ -40,10 +40,10 @@ export class WorkspaceContext {
             console.error('not a LWC workspace:', workspaceRoot);
         }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
-        removeAllTags();
     }
 
     public async configureAndIndex() {
+        this.resetAllIndexes();
         this.configureProject();
 
         // indexing:
@@ -152,6 +152,12 @@ export class WorkspaceContext {
             fs.copySync(utils.getSfdxResource(join('typings', 'lwc.d.ts')), join(typingsDir, 'lwc.d.ts'));
             fs.copySync(utils.getSfdxResource(join('typings', 'lds.d.ts')), join(typingsDir, 'lds.d.ts'));
         }
+    }
+
+    private resetAllIndexes() {
+        resetCustomComponents();
+        resetCustomLabels();
+        resetStaticResources();
     }
 
     private writeJsconfigJson() {

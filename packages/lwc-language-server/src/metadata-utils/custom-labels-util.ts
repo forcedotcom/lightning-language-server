@@ -20,6 +20,11 @@ const CUSTOM_LABELS: Set<string> = new Set();
 const CUSTOM_LABEL_FILES: Set<string> = new Set();
 const CUSTOM_LABELS_DECLARATION_FILE = '.sfdx/typings/lwc/customlabels.d.ts';
 
+export function resetCustomLabels() {
+    CUSTOM_LABELS.clear();
+    CUSTOM_LABEL_FILES.clear();
+}
+
 function getGlob(globPattern: string, workspace: string, callBack: (err: Error, files: string[]) => void) {
     const options: IOptions = {};
     options.cwd = workspace;
