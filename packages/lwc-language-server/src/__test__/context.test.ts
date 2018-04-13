@@ -39,13 +39,15 @@ it('WorkspaceContext', async () => {
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
     roots = context.namespaceRoots;
-    expect(roots[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
-    expect(roots[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
-    expect(roots.length).toBe(2);
+    expect(roots[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/clients'));
+    expect(roots[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
+    expect(roots[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
+    expect(roots.length).toBe(3);
     modules = context.findAllModules();
-    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
-    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
-    expect(modules.length).toBe(2);
+    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
+    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
+    expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
+    expect(modules.length).toBe(3);
     expect(context.getRelativeModulesDirs().length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);

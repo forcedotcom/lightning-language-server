@@ -399,7 +399,7 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
         for (const subdir of subdirs) {
             const basename = path.basename(subdir);
             const modulePath = path.join(subdir, basename + '.js');
-            if (fs.existsSync(modulePath) && fs.existsSync(path.join(subdir, basename + '.html'))) {
+            if (fs.existsSync(modulePath)) {
                 // TODO: check contents for: from 'engine'?
                 return true;
             }
