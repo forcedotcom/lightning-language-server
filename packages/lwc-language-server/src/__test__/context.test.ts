@@ -192,7 +192,6 @@ it('configureSfdxProject()', () => {
 
     // typings
     expect(sfdxTypingsPath + '/engine.d.ts').toExist();
-    expect(sfdxTypingsPath + '/lwc.d.ts').toExist();
     expect(sfdxTypingsPath + '/lds.d.ts').toExist();
 
     verifyWorkspaceSettings(settingsPath);
@@ -261,7 +260,6 @@ function verifyJsconfigCore(jsconfigPath: string) {
 function verifyTypingsCore() {
     const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
     expect(typingsPath + '/engine.d.ts').toExist();
-    expect(typingsPath + '/lwc.d.ts').toExist();
     expect(typingsPath + '/lds.d.ts').toExist();
     fs.removeSync(typingsPath);
 }
