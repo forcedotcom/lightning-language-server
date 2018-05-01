@@ -6,7 +6,7 @@
 
 import { HTMLDocument } from '../parser/htmlParser';
 import { TokenType, createScanner } from '../parser/htmlScanner';
-import { TextDocument, Range, Position, Hover, MarkedString } from 'vscode-languageserver-types';
+import { TextDocument, Range, Position, Hover, MarkedString, MarkupKind } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 import { getDirectiveInfo } from '../parser/lwcTags';
 
@@ -45,9 +45,19 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
         for (const provider of tagProviders) {
             const info = provider.getTagInfo(tag);
             if (info) {
-                const doc = info.documentation? info.documentation : 'LWC element';
+                const doc = info.documentation ? info.documentation : 'LWC element';
                 const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                return { contents: [ { language: 'html', value: tagLabel }, MarkedString.fromPlainText(doc)], range };
+                const markdown = [
+                    '```html',
+                    tagLabel,
+                    '```',
+                    doc
+                ];
+                if (tag.startsWith('lightning-')) {
+                    markdown.push('\n');
+                    markdown.push('https://developer.salesforce.com/docs/component-library?page=' + tag.replace('-', ':'));
+                }
+                return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
             }
         }
         return null;
