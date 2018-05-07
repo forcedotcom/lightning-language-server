@@ -54,7 +54,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     assertHover('|<lightning-button></lightning-button>');
     assertHoverMarkdown(
         '<lightning-bu|tton></lightning-button>',
-        '```html\n<lightning-button>\n```\nRepresents a button element.\n\n\nhttps://developer.salesforce.com/docs/component-library?page=lightning:button',
+        '```html\n<lightning-button>\n```\nRepresents a button element.\n\n\nhttps://developer.salesforce.com/docs/component-library/bundle/lightning:button',
     );
     assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', 'icon-name', 'The Lightning Design System name of the icon\\.');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', 'class', 'A CSS class for the outer element, in addition to ');

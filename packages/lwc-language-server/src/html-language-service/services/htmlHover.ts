@@ -55,7 +55,7 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
                 ];
                 if (tag.startsWith('lightning-')) {
                     markdown.push('\n');
-                    markdown.push('https://developer.salesforce.com/docs/component-library?page=' + tag.replace('-', ':'));
+                    markdown.push('https://developer.salesforce.com/docs/component-library/bundle/' + tag.replace('-', ':'));
                 }
                 return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
             }
