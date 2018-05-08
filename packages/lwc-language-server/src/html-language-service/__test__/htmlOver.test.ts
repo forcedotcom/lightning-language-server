@@ -18,28 +18,16 @@ function doHover(src: string) {
     return { document, hover };
 }
 
-function assertHover(src: string, expectedHoverValue?: string, expectedHoverLabel?: string, expectedHoverOffset?: number): void {
-    const { document, hover } = doHover(src);
-    if (expectedHoverValue) {
-        expect(hover).not.toBeNull();
-        const contents: any = hover.contents;
-        expect(contents[0].value).toEqual(expectedHoverValue);
-        if (expectedHoverLabel) {
-            expect(contents[1]).toContain(expectedHoverLabel);
-        }
-        if (expectedHoverOffset) {
-            expect(document.offsetAt(hover.range.start)).toBe(expectedHoverOffset);
-        }
-    } else {
-        expect(hover).toBeNull();
-    }
+function assertNoHover(src: string): void {
+    const retval = doHover(src);
+    expect(retval.hover).toBeNull();
 }
 
-function assertHoverMarkdown(src: string, expectedMarkdownValue?: string, expectedHoverOffset?: number): void {
+function assertHover(src: string, expectedMarkdownValue?: string, expectedHoverOffset?: number): void {
     const { document, hover } = doHover(src);
     const contents: any = hover.contents;
     expect(contents.kind).toBe('markdown');
-    expect(contents.value).toBe(expectedMarkdownValue);
+    expect(contents.value).toContain(expectedMarkdownValue);
     if (expectedHoverOffset) {
         expect(document.offsetAt(hover.range.start)).toBe(expectedHoverOffset);
     }
@@ -51,26 +39,26 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     // standard tags
     await loadStandardComponents();
 
-    assertHover('|<lightning-button></lightning-button>');
-    assertHoverMarkdown(
+    assertNoHover('|<lightning-button></lightning-button>');
+    assertHover(
         '<lightning-bu|tton></lightning-button>',
         '```html\n<lightning-button>\n```\nRepresents a button element.\n\n\nhttps://developer.salesforce.com/docs/component-library/bundle/lightning:button',
     );
-    assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', 'icon-name', 'The Lightning Design System name of the icon\\.');
-    assertHover('<lightning-button cl|ass="one"></lightning-button>', 'class', 'A CSS class for the outer element, in addition to ');
-    assertHover('<lightning-button if:tr|ue={e}></lightning-button>', 'if:true', 'Renders the element or template if the expression value is thruthy');
-    assertHover('<template if:tr|ue={e}></template>', 'if:true', 'Renders the element or template if the expression value is thruthy');
-    assertHover('<ht|ml></html>');
+    assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', '**icon-name**\n\nThe Lightning Design System name of the icon');
+    assertHover('<lightning-button cl|ass="one"></lightning-button>', '**class**\n\nA CSS class for the outer element, in addition to ');
+    assertHover('<lightning-button if:tr|ue={e}></lightning-button>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
+    assertHover('<template if:tr|ue={e}></template>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
+    assertNoHover('<ht|ml></html>');
 
     // custom tags
     await indexCustomComponents(context);
-    assertHover('|<c-todo_item></c-todo_item>');
-    assertHoverMarkdown('<|c-todo_item></c-todo_item>', '```html\n<c-todo_item>\n```\nTodoItem doc', 1);
-    assertHoverMarkdown('<c-todo_it|em></c-todo_item>', '```html\n<c-todo_item>\n```\nTodoItem doc', 1);
+    assertNoHover('|<c-todo_item></c-todo_item>');
+    assertHover('<|c-todo_item></c-todo_item>', '```html\n<c-todo_item>\n```\nTodoItem doc', 1);
+    assertHover('<c-todo_it|em></c-todo_item>', '```html\n<c-todo_item>\n```\nTodoItem doc', 1);
     // custom attributes
-    assertHover('<c-todo_item to|do></c-todo_item>', 'todo', 'todo jsdoc', 13);
+    assertHover('<c-todo_item to|do></c-todo_item>', '**todo**\n\ntodo jsdoc', 13);
 
     // custom tags from utils package
-    assertHover('|<c-todo_util></c-todo_util>');
-    assertHoverMarkdown('<c-todo_ut|il></c-todo_util>', '```html\n<c-todo_util>\n```\nLWC element');
+    assertNoHover('|<c-todo_util></c-todo_util>');
+    assertHover('<c-todo_ut|il></c-todo_util>', '```html\n<c-todo_util>\n```\nLWC element');
 });

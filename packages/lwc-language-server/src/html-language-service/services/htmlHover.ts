@@ -6,7 +6,7 @@
 
 import { HTMLDocument } from '../parser/htmlParser';
 import { TokenType, createScanner } from '../parser/htmlScanner';
-import { TextDocument, Range, Position, Hover, MarkedString, MarkupKind } from 'vscode-languageserver-types';
+import { TextDocument, Range, Position, Hover, MarkupKind } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 import { getDirectiveInfo } from '../parser/lwcTags';
 
@@ -72,13 +72,23 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
             if (tagInfo) {
                 const attrInfo = tagInfo.getAttributeInfo(name);
                 if (attrInfo && attrInfo.documentation) {
-                    return { contents: [ { language: 'html', value: name }, MarkedString.fromPlainText(attrInfo.documentation)], range };
+                    const markdown = [
+                        '**' + name + '**',
+                        '',
+                        attrInfo.documentation
+                    ];
+                    return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
                 }
             }
         }
         const directiveInfo = getDirectiveInfo(name);
         if (directiveInfo) {
-            return { contents: [ { language: 'html', value: name }, MarkedString.fromPlainText(directiveInfo.documentation)], range };
+            const markdown = [
+                '**' + name + '**',
+                '',
+                directiveInfo.documentation
+            ];
+            return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
         }
         return null;
     }
