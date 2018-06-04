@@ -49,6 +49,12 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     assertHover('<lightning-button if:tr|ue={e}></lightning-button>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
     assertHover('<template if:tr|ue={e}></template>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
     assertNoHover('<ht|ml></html>');
+    // standard component with multiple -
+    assertHover(
+        '<lightning-formatted-num|ber></lightning-formatted-number>',
+        '```html\n<lightning-formatted-number>\n```\nDisplays formatted numbers for decimals, currency, and percentages.\n\n\n' +
+            'https://developer.salesforce.com/docs/component-library/bundle/lightning:formattedNumber',
+    );
 
     // custom tags
     await indexCustomComponents(context);

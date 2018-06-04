@@ -9,6 +9,7 @@ import { TokenType, createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, Position, Hover, MarkupKind } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 import { getDirectiveInfo } from '../parser/lwcTags';
+import * as toCamelCase from 'camelcase';
 
 export interface ITokenInfo {
     range: Range;
@@ -55,7 +56,7 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
                 ];
                 if (tag.startsWith('lightning-')) {
                     markdown.push('\n');
-                    markdown.push('https://developer.salesforce.com/docs/component-library/bundle/' + tag.replace('-', ':'));
+                    markdown.push('https://developer.salesforce.com/docs/component-library/bundle/' + toComponentLibraryName(tag));
                 }
                 return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
             }
@@ -112,4 +113,11 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     }
 
     return null;
+}
+
+function toComponentLibraryName(tag: string): string {
+    // e.g. lightning-formatted-number -> lightning:formattedNumber
+    const namespace = tag.substring(0, tag.indexOf('-'));
+    const name = tag.substring(tag.indexOf('-') + 1);
+    return namespace + ':' + toCamelCase(name);
 }
