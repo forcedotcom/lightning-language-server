@@ -123,7 +123,7 @@ function generateLabelTypeDeclarations(): string {
 
 function generateLabelTypeDeclaration(labelName: string) {
     const ns = 'c';
-    const result = `declare module "@label/${ns}.${labelName}" {
+    const result = `declare module "@salesforce/label/${ns}.${labelName}" {
     var ${labelName}: string;
     export default ${labelName};
 }

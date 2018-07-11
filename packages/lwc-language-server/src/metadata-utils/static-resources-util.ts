@@ -69,7 +69,7 @@ function generateResourceTypeDeclarations(): string {
 }
 
 function generateResourceTypeDeclaration(resourceName: string) {
-    const result = `declare module "@resource-url/${resourceName}" {
+    const result = `declare module "@salesforce/resource-url/${resourceName}" {
     var ${resourceName}: string;
     export default ${resourceName};
 }

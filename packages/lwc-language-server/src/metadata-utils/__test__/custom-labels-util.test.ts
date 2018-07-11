@@ -8,11 +8,11 @@ jest.mock('../../utils', () => {
 
 it('indexCustomLabels', async done => {
     // workspace with one package
-    const expectedDTS = `declare module "@label/c.greeting" {
+    const expectedDTS = `declare module "@salesforce/label/c.greeting" {
     var greeting: string;
     export default greeting;
 }
-declare module "@label/c.other_greeting" {
+declare module "@salesforce/label/c.other_greeting" {
     var other_greeting: string;
     export default other_greeting;
 }
@@ -20,15 +20,15 @@ declare module "@label/c.other_greeting" {
     await validate(indexCustomLabels, 'sfdx-workspace', 'force-app', 'customlabels.d.ts', expectedDTS);
 
     // workspace with 2 packages
-    const expectedDTS2 = `declare module "@label/c.greeting" {
+    const expectedDTS2 = `declare module "@salesforce/label/c.greeting" {
     var greeting: string;
     export default greeting;
 }
-declare module "@label/c.other_greeting" {
+declare module "@salesforce/label/c.other_greeting" {
     var other_greeting: string;
     export default other_greeting;
 }
-declare module "@label/c.utils" {
+declare module "@salesforce/label/c.utils" {
     var utils: string;
     export default utils;
 }

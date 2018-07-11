@@ -8,7 +8,7 @@ jest.mock('../../utils', () => {
 
 it('indexStaticResources', async done => {
     // workspace with 1 package
-    const expectedDTS = `declare module "@resource-url/todocss" {
+    const expectedDTS = `declare module "@salesforce/resource-url/todocss" {
     var todocss: string;
     export default todocss;
 }
@@ -16,11 +16,11 @@ it('indexStaticResources', async done => {
     await validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS);
 
     // workspace with 2 packages
-    const expectedDTS2 = `declare module "@resource-url/todocss" {
+    const expectedDTS2 = `declare module "@salesforce/resource-url/todocss" {
     var todocss: string;
     export default todocss;
 }
-declare module "@resource-url/todoutil" {
+declare module "@salesforce/resource-url/todoutil" {
     var todoutil: string;
     export default todoutil;
 }
