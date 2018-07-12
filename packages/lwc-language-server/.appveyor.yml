@@ -9,13 +9,13 @@ platform: x64
 
 install:
   - ps: Install-Product node 8 x64
-  - appveyor-retry npm install
+  - appveyor-retry yarn install
 
 build: off
 
 test_script:
   - node --version
-  - npm run test
+  - yarn test
 
 on_finish:
   - del C:\projects\devhub.key

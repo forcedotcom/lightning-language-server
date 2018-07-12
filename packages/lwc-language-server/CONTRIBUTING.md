@@ -1,17 +1,16 @@
 # Requirements
 
-* Node 6+
-* NPM 4+
+* Node 8+
+* yarn
 
 # Installation
 
 Before doing anything, make sure you have configure `npm` to download packages from Nexus. If it's not the case, follows the steps in this document: https://sfdc.co/npm-nexus.
 
 ```sh
-npm install                 # Install necessary packages
-npm run build               # Compile typescript code to javascript
-npm test                    # Run the test
-npm test -- --watch         # Run the test in watch mode
+yarn install                 # Install necessary packages
+yarn build                   # Compile typescript code to javascript
+yarn test                    # Run the test
 ```
 
 # Running
@@ -20,8 +19,8 @@ To run/debug this language server in VSCode you can launch it from the [lwc-vsco
 
 First setup lwc-vscode to use the live lwc-language-server source:
 ```sh
-cd ~/git/lwc-language-server; npm link
-cd ~/git/lwc-vscode; npm link lwc-language-server
+cd ~/git/lwc-language-server; yarn link
+cd ~/git/lwc-vscode; yarn link lwc-language-server
 ```
 
 and run/debug both projects using VSCode:

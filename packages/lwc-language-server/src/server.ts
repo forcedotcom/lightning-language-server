@@ -41,39 +41,41 @@ documents.listen(connection);
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
-connection.onInitialize(async (params: InitializeParams): Promise<InitializeResult> => {
-    const { rootUri, rootPath } = params;
+connection.onInitialize(
+    async (params: InitializeParams): Promise<InitializeResult> => {
+        const { rootUri, rootPath } = params;
 
-    // Early exit if no workspace is opened
-    const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
-    try {
-        if (!workspaceRoot) {
-            console.warn(`No workspace found`);
-            return { capabilities: {} };
-        }
+        // Early exit if no workspace is opened
+        const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
+        try {
+            if (!workspaceRoot) {
+                console.warn(`No workspace found`);
+                return { capabilities: {} };
+            }
 
-        console.info(`Starting language server at ${workspaceRoot}`);
-        const startTime = process.hrtime();
-        context = new WorkspaceContext(workspaceRoot);
-        // wait for indexing to finish before returning from onInitialize()
-        await context.configureAndIndex();
-        htmlLS = getLanguageService();
-        console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
-        // Return the language server capabilities
-        return {
-            capabilities: {
-                textDocumentSync: documents.syncKind,
-                completionProvider: {
-                    resolveProvider: true,
+            console.info(`Starting language server at ${workspaceRoot}`);
+            const startTime = process.hrtime();
+            context = new WorkspaceContext(workspaceRoot);
+            // wait for indexing to finish before returning from onInitialize()
+            await context.configureAndIndex();
+            htmlLS = getLanguageService();
+            console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
+            // Return the language server capabilities
+            return {
+                capabilities: {
+                    textDocumentSync: documents.syncKind,
+                    completionProvider: {
+                        resolveProvider: true,
+                    },
+                    hoverProvider: true,
+                    definitionProvider: true,
                 },
-                hoverProvider: true,
-                definitionProvider: true,
-            },
-        };
-    } catch (e) {
-        throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
-    }
-});
+            };
+        } catch (e) {
+            throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
+        }
+    },
+);
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -96,36 +98,44 @@ documents.onDidChangeContent(async change => {
     }
 });
 
-connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionList => {
-    const document = documents.get(textDocumentPosition.textDocument.uri);
-    if (!context.isLWCTemplate(document)) {
-        return { isIncomplete: false, items: [] };
-    }
-    const htmlDocument = htmlLS.parseHTMLDocument(document);
-    return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
-});
+connection.onCompletion(
+    (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (!context.isLWCTemplate(document)) {
+            return { isIncomplete: false, items: [] };
+        }
+        const htmlDocument = htmlLS.parseHTMLDocument(document);
+        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
+    },
+);
 
-connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-    return item;
-});
+connection.onCompletionResolve(
+    (item: CompletionItem): CompletionItem => {
+        return item;
+    },
+);
 
-connection.onHover((textDocumentPosition: TextDocumentPositionParams): Hover => {
-    const document = documents.get(textDocumentPosition.textDocument.uri);
-    if (!context.isLWCTemplate(document)) {
-        return null;
-    }
-    const htmlDocument = htmlLS.parseHTMLDocument(document);
-    return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
-});
+connection.onHover(
+    (textDocumentPosition: TextDocumentPositionParams): Hover => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (!context.isLWCTemplate(document)) {
+            return null;
+        }
+        const htmlDocument = htmlLS.parseHTMLDocument(document);
+        return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+    },
+);
 
-connection.onDefinition((textDocumentPosition: TextDocumentPositionParams): Location => {
-    const document = documents.get(textDocumentPosition.textDocument.uri);
-    if (!context.isLWCTemplate(document)) {
-        return null;
-    }
-    const htmlDocument = htmlLS.parseHTMLDocument(document);
-    return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
-});
+connection.onDefinition(
+    (textDocumentPosition: TextDocumentPositionParams): Location => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (!context.isLWCTemplate(document)) {
+            return null;
+        }
+        const htmlDocument = htmlLS.parseHTMLDocument(document);
+        return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+    },
+);
 
 // Listen on the connection
 connection.listen();

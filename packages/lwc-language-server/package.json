@@ -8,13 +8,13 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "tsc -p . && cp node_modules/lwc-engine/types/engine.d.ts src/resources/sfdx/typings/engine.d.ts && cp -r src/resources lib/",
-    "prepare": "npm run clean && npm run build",
+    "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
-    "prepush": "npm run prepare && npm run lint && npm test"
+    "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "camelcase": "5.0.0",
@@ -68,7 +68,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "npm run format",
+      "yarn format",
       "git add"
     ]
   }
