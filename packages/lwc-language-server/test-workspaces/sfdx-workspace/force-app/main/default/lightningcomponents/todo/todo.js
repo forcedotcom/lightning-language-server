@@ -1,5 +1,4 @@
 import { Element, track } from 'engine';
-import * as store from './store';
 import { ENTER_KEY, guid } from 'c-utils';
 
 // todo list filters. keys match <a href="#/[key]"> in template.
@@ -21,7 +20,6 @@ export default class Todo extends Element {
 
     constructor() {
         super();
-        this.todos = store.load();
         this.filter = getCurrentFilter();
         window.addEventListener('hashchange', () => (
             this.filter = getCurrentFilter()
@@ -77,7 +75,6 @@ export default class Todo extends Element {
     }
 
     setTodos(todos) {
-        store.save(todos);
         this.todos = todos;
     }
 

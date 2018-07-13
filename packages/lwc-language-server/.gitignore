@@ -5,3 +5,4 @@ lib
 .project
 coverage/
 src/resources/sfdx/typings/engine.d.ts
+yarn-error.log

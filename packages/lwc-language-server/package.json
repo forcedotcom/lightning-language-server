@@ -1,6 +1,6 @@
 {
   "name": "lwc-language-server",
-  "version": "1.6.0",
+  "version": "1.6.3",
   "description": "Language Server Protocol implementation for LWC projects",
   "main": "lib/shared.js",
   "typings": "lib/shared.d.ts",
@@ -28,7 +28,13 @@
     "vscode-languageserver": "4.3.0",
     "vscode-nls": "3.2.4",
     "vscode-uri": "1.0.5",
-    "xml2js": "0.4.19"
+    "lwc-compiler": "0.24.0-beta.d48d78f8",
+    "lwc-template-compiler": "0.24.0-beta.d48d78f8",
+    "lwc-engine": "0.24.0-beta.d48d78f8",
+    "babel-plugin-transform-lwc-class": "0.24.0-beta.d48d78f8",
+    "babel-core": "7.0.0-bridge.0",
+    "xml2js": "0.4.19",
+    "comment-parser": "0.5.0"
   },
   "devDependencies": {
     "@types/babel-types": "7.0.1",
@@ -45,7 +51,6 @@
     "husky": "0.14.3",
     "jest": "23.4.0",
     "lint-staged": "7.2.0",
-    "lwc-engine": "0.19.3",
     "prettier": "1.13.7",
     "ts-jest": "23.0.0",
     "tslint": "5.10.0",

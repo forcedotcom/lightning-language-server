@@ -5,7 +5,7 @@ export default class Line extends Element {
 
     internalText;
 
-    @api set text(value) {
+    set text(value) {
         this.internalText = value;
     }
 

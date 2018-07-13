@@ -1,4 +1,4 @@
-import { templateCompiler } from '../resources/lwc/compiler';
+import templateCompiler from 'lwc-template-compiler';
 import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 

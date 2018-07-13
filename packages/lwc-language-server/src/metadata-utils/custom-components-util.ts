@@ -5,7 +5,8 @@ import URI from 'vscode-uri';
 import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
 import { WorkspaceContext } from '../context';
 import { AttributeInfo, TagInfo } from '../html-language-service/parser/htmlTags';
-import { ICompilerMetadata, compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
+import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
+import { Metadata } from 'babel-plugin-transform-lwc-class';
 import { WorkspaceType } from '../shared';
 import * as utils from '../utils';
 
@@ -74,7 +75,7 @@ function removeCustomTag(tag: string) {
     LWC_TAGS.delete(tag);
 }
 
-function addCustomTag(tag: string, uri: string, metadata: ICompilerMetadata) {
+function addCustomTag(tag: string, uri: string, metadata: Metadata) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata, uri);
     // declarationLoc may be undefined if live file doesn't extend Element yet
@@ -102,12 +103,11 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
     if (tag) {
         // get attributes from compiler metadata
         try {
-            const { result, diagnostics } = await compileFile(file);
+            const { metadata, diagnostics } = await compileFile(file);
             if (diagnostics.length > 0) {
                 console.log('error compiling ' + file + ': ', diagnostics);
             }
-            if (result) {
-                const metadata = result.metadata;
+            if (metadata) {
                 const uri = URI.file(path.resolve(file)).toString();
                 addCustomTag(tag, uri, metadata);
             }
@@ -117,7 +117,7 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
     }
 }
 
-export function addCustomTagFromResults(uri: string, metadata: ICompilerMetadata, sfdxProject: boolean) {
+export function addCustomTagFromResults(uri: string, metadata: Metadata, sfdxProject: boolean) {
     const tag = tagFromFile(URI.parse(uri).fsPath, sfdxProject);
     if (tag) {
         addCustomTag(tag, uri, metadata);

@@ -36,7 +36,7 @@ BEGIN THIRD PARTY
 
 import arrays = require('../utils/arrays');
 import { Location } from 'vscode-languageserver';
-import { IClassMemberMetadata } from '../../javascript/compiler';
+import { ClassMember } from 'babel-plugin-transform-lwc-class';
 
 export const EMPTY_ELEMENTS: string[] = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 
@@ -62,8 +62,8 @@ export class TagInfo {
 		public location?: Location,
 		public documentation?: string,
 		// properties/methods in the associated .js file:
-		public properties?: IClassMemberMetadata[],
-		public methods?: IClassMemberMetadata[],
+		public properties?: ClassMember[],
+		public methods?: ClassMember[],
 	) {
 	}
 	getAttributeInfo(attribute: string): AttributeInfo | null {

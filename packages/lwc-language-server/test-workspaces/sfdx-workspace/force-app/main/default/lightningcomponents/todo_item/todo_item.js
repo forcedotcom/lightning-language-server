@@ -17,7 +17,7 @@ export default class TodoItem extends Element {
         return this._todo;
     }
 
-    @api
+
     set todo(newValue) {
         this.classList[newValue.completed ? "add" : "remove"]("completed");
         this._todo = newValue;

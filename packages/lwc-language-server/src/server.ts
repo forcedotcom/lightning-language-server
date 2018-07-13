@@ -90,10 +90,10 @@ documents.onDidChangeContent(async change => {
         const diagnostics = templateLinter(document);
         connection.sendDiagnostics({ uri, diagnostics });
     } else if (context.isLWCJavascript(document)) {
-        const { result, diagnostics } = await javascriptCompileDocument(document);
+        const { metadata, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
-        if (result) {
-            addCustomTagFromResults(uri, result.metadata, context.type === WorkspaceType.SFDX);
+        if (metadata) {
+            addCustomTagFromResults(uri, metadata, context.type === WorkspaceType.SFDX);
         }
     }
 });
