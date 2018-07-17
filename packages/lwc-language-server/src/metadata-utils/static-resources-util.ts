@@ -11,14 +11,15 @@ export function resetStaticResources() {
     STATIC_RESOURCES.clear();
 }
 
-function getResourceName(resourceFile: string) {
+function getResourceName(resourceMetaFile: string) {
+    const resourceFile = resourceMetaFile.substring(0, resourceMetaFile.lastIndexOf('-'));
     return parse(resourceFile).name;
 }
 
 export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext) {
     let didChange = false;
     updatedFiles.forEach(f => {
-        if (f.uri.endsWith('.resource')) {
+        if (f.uri.endsWith('.resource-meta.xml')) {
             if (f.type === FileChangeType.Created) {
                 didChange = true;
                 STATIC_RESOURCES.add(getResourceName(f.uri));
@@ -40,7 +41,7 @@ function processStaticResources(workspace: string) {
 }
 
 export function indexStaticResources(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
-    const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource`;
+    const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
     return new Promise((resolve, reject) => {
         /* tslint:disable */
         new Glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
