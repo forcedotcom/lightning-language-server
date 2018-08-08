@@ -147,9 +147,12 @@ export class WorkspaceContext {
 
         if (typingsDir) {
             // copy typings to typingsDir
+            const resourceTypingsDir = utils.getSfdxResource('typings');
             fs.ensureDirSync(typingsDir);
-            fs.copySync(utils.getSfdxResource(join('typings', 'engine.d.ts')), join(typingsDir, 'engine.d.ts'));
-            fs.copySync(utils.getSfdxResource(join('typings', 'lds.d.ts')), join(typingsDir, 'lds.d.ts'));
+            fs.copySync(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
+            for (const file of fs.readdirSync(join(resourceTypingsDir, 'copied'))) {
+                fs.copySync(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
+            }
         }
     }
 

@@ -190,8 +190,13 @@ it('configureSfdxProject()', () => {
     expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', '.eslintrc.json'));
 
     // typings
-    expect(sfdxTypingsPath + '/engine.d.ts').toExist();
-    expect(sfdxTypingsPath + '/lds.d.ts').toExist();
+    expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
+    const schemaContents = utils.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'));
+    expect(schemaContents).toContain('declare module "@salesforce/schema" {');
+    const apexContents = utils.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'));
+    expect(apexContents).not.toContain('declare type');
 
     verifyWorkspaceSettings(settingsPath);
 });

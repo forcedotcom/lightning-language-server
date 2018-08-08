@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "tsc -p . && cp node_modules/lwc-engine/types/engine.d.ts src/resources/sfdx/typings/engine.d.ts && cp -r src/resources lib/",
+    "build": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
@@ -34,7 +34,12 @@
     "babel-plugin-transform-lwc-class": "0.24.12",
     "babel-core": "7.0.0-bridge.0",
     "xml2js": "0.4.19",
-    "comment-parser": "0.5.0"
+    "comment-parser": "0.5.0",
+    "@salesforce/apex": "0.0.3",
+    "@salesforce/label": "0.0.3",
+    "@salesforce/resource-url": "0.0.3",
+    "@salesforce/schema": "0.0.3",
+    "@salesforce/user": "0.0.3"
   },
   "devDependencies": {
     "@types/babel-types": "7.0.1",

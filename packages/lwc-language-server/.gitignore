@@ -4,5 +4,5 @@ lib
 .sfdx
 .project
 coverage/
-src/resources/sfdx/typings/engine.d.ts
+src/resources/sfdx/typings/copied/
 yarn-error.log

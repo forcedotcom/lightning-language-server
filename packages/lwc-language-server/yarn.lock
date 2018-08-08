@@ -459,6 +459,26 @@
     lodash "^4.17.5"
     to-fast-properties "^2.0.0"
 
+"@salesforce/apex@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@salesforce/apex/-/apex-0.0.3.tgz#280eab9ecbad6a397427d97c5709c90b98636614"
+
+"@salesforce/label@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.3.tgz#6cf86eff0200cca753b0928a30198703d182b448"
+
+"@salesforce/resource-url@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@salesforce/resource-url/-/resource-url-0.0.3.tgz#fd9eda936d2ea3c221daaafad12b72fa96b5fe26"
+
+"@salesforce/schema@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/@salesforce/schema/-/schema-0.0.3.tgz#6f1295cce0cccbe645146aff89b812d95ddd2c8b"
+
+"@salesforce/user@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.3.tgz#a97afe69e6ef80a3f28901714b2276121989fbbf"
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "http://npm.lwcjs.org/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0/ecdf48d532c58ea477acfcab80348424f8d0662f.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"
