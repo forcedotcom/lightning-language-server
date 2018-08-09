@@ -25,13 +25,13 @@
     "properties": "1.2.1",
     "semver": "5.5.0",
     "tmp": "0.0.33",
-    "vscode-languageserver": "4.3.0",
+    "vscode-languageserver": "4.4.0",
     "vscode-nls": "3.2.4",
     "vscode-uri": "1.0.5",
-    "lwc-compiler": "0.24.12",
-    "lwc-template-compiler": "0.24.12",
-    "lwc-engine": "0.24.12",
-    "babel-plugin-transform-lwc-class": "0.24.12",
+    "lwc-compiler": "0.24.20",
+    "lwc-template-compiler": "0.24.20",
+    "lwc-engine": "0.24.20",
+    "babel-plugin-transform-lwc-class": "0.24.20",
     "babel-core": "7.0.0-bridge.0",
     "xml2js": "0.4.19",
     "comment-parser": "0.5.0",
@@ -42,31 +42,31 @@
     "@salesforce/user": "0.0.3"
   },
   "devDependencies": {
-    "@types/babel-types": "7.0.1",
+    "@types/babel-types": "7.0.4",
     "@types/deep-equal": "1.0.1",
-    "@types/fs-extra": "5.0.2",
+    "@types/fs-extra": "5.0.4",
     "@types/glob": "5.0.35",
-    "@types/jest": "23.1.5",
-    "@types/lodash": "4.14.108",
+    "@types/jest": "23.3.1",
+    "@types/lodash": "4.14.116",
     "@types/node": "8.10.0",
     "@types/semver": "5.5.0",
     "@types/tmp": "0.0.33",
-    "@types/xml2js": "0.4.2",
+    "@types/xml2js": "0.4.3",
     "babel-types": "6.26.0",
     "husky": "0.14.3",
-    "jest": "23.4.0",
+    "jest": "23.4.2",
     "lint-staged": "7.2.0",
-    "prettier": "1.13.7",
-    "ts-jest": "23.0.0",
-    "tslint": "5.10.0",
-    "typescript": "2.9.2"
+    "prettier": "1.14.2",
+    "ts-jest": "23.1.3",
+    "tslint": "5.11.0",
+    "typescript": "3.0.1"
   },
   "publishConfig": {
     "registry": "https://npm.lwcjs.org"
   },
   "jest": {
     "transform": {
-      ".ts": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".ts": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
     "moduleFileExtensions": [
@@ -74,7 +74,8 @@
       "js",
       "json"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts"
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts",
+    "testURL": "http://localhost"
   },
   "lint-staged": {
     "src/**/*.ts": [

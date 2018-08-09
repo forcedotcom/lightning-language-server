@@ -15,7 +15,8 @@
         "noUnusedLocals": true,
 
         "pretty": true,
-        "declaration": true
+        "declaration": true,
+        "esModuleInterop": true,
     },
 
     "include": [

@@ -9,7 +9,7 @@ import { TokenType, createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, Position, Hover, MarkupKind } from 'vscode-languageserver-types';
 import { allTagProviders } from './tagProviders';
 import { getDirectiveInfo } from '../parser/lwcTags';
-import * as toCamelCase from 'camelcase';
+import toCamelCase from 'camelcase';
 
 export interface ITokenInfo {
     range: Range;

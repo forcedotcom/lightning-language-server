@@ -9,7 +9,7 @@ import { CompilerOptions } from 'lwc-compiler/dist/types/compiler/options';
 import { ClassMember } from 'babel-plugin-transform-lwc-class';
 import * as utils from '../utils';
 import { Metadata } from 'babel-plugin-transform-lwc-class';
-import * as commentParser from 'comment-parser';
+import commentParser from 'comment-parser';
 
 export interface ICompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic
