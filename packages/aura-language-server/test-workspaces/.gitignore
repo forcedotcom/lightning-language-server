@@ -1,0 +1,10 @@
+**/lightningcomponents/jsconfig.json
+**/lightningcomponents/.eslintrc.json
+**/modules/jsconfig.json
+sfdx-workspace/.forceignore
+core-like-workspace/app/main/core/.vscode/
+core-like-workspace/app/main/core/ui-global-components/.vscode/
+sfdx-workspace/.vscode
+standard-workspace/.vscode
+core-like-workspace/app/main/core/core.code-workspace
+core-like-workspace/app/main/core/ui-global-components/core.code-workspace

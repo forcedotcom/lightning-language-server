@@ -1,0 +1,6 @@
+{
+    "extends": "plugin:lwc/recommended",
+    "plugins": [
+        "lwc"
+    ]
+}
