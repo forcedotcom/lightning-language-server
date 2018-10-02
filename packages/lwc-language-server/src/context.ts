@@ -276,7 +276,8 @@ export class WorkspaceContext {
     }
 
     /**
-     * Updates common workspace settings that apply to any LWC project
+     * Updates common workspace settings that apply to any LWC project.
+     * See src/resources/common/settings.json
      */
     private updateWorkspaceSettings() {
         const settingsContent = utils.readFileSync(utils.getResourcePath(join('common', 'settings.json')));
@@ -300,6 +301,10 @@ export class WorkspaceContext {
         return compiled(variableMap);
     }
 
+    /**
+     * Adds to the config file in 'relativeConfigPath' any missing properties in 'config'
+     * (existing properties are not updated)
+     */
     private updateConfigFile(relativeConfigPath: string, config: string, ignoreFile?: string) {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         try {
