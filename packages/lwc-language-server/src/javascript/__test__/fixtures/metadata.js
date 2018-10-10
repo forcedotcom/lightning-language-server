@@ -1,6 +1,6 @@
-import { Element, api, track } from 'engine';
+import { LightningElement, api, track } from 'lwc';
 /** Foo doc */
-export default class Foo extends Element {
+export default class Foo extends LightningElement {
     _privateTodo;
     @api get todo () {
         return this._privateTodo;

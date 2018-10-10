@@ -1,6 +1,6 @@
-import { Element } from "engine";
+import { LightningElement } from "lwc";
 
-export default class LightningTreeExample extends Element{
+export default class LightningTreeExample extends LightningElement{
     items = [{
         "label": "Western Sales Director",
         "name": "1",

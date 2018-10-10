@@ -1,4 +1,4 @@
-import { Element, track } from 'engine';
+import { LightningElement, track } from 'lwc';
 import { ENTER_KEY, guid } from 'c-utils';
 
 // todo list filters. keys match <a href="#/[key]"> in template.
@@ -14,7 +14,7 @@ function getCurrentFilter() {
     return FILTERS[location] || FILTERS.all;
 }
 
-export default class Todo extends Element {
+export default class Todo extends LightningElement {
     @track todos;
     @track filter;
 

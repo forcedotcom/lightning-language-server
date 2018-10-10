@@ -78,7 +78,7 @@ function removeCustomTag(tag: string) {
 function addCustomTag(tag: string, uri: string, metadata: Metadata) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata, uri);
-    // declarationLoc may be undefined if live file doesn't extend Element yet
+    // declarationLoc may be undefined if live file doesn't extend LightningElement yet
     const range = metadata.declarationLoc ? toVSCodeRange(metadata.declarationLoc) : Range.create(Position.create(0, 0), Position.create(0, 0));
     const location = Location.create(uri, range);
     LWC_TAGS.set(tag, new TagInfo(attributes, location, doc, getProperties(metadata), getMethods(metadata)));

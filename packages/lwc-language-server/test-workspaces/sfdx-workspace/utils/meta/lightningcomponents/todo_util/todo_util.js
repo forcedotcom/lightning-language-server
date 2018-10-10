@@ -1,6 +1,6 @@
-import { Element, api, track } from 'engine';
+import { LightningElement, api, track } from 'lwc';
 
-export default class TodoUtil extends Element {
+export default class TodoUtil extends LightningElement {
     @api
     info;
 

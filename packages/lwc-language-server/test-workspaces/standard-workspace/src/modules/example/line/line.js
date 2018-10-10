@@ -1,6 +1,6 @@
-import { Element, api } from 'engine';
+import { LightningElement, api } from 'lwc';
 
-export default class Line extends Element {
+export default class Line extends LightningElement {
     @api hover;
 
     internalText;

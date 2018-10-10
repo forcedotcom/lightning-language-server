@@ -1,6 +1,6 @@
-import { Element } from "engine";
+import { LightningElement } from "lwc";
 
-export default class LightningDatatableExample extends Element{
+export default class LightningDatatableExample extends LightningElement{
     columns = [
         {label: 'Opportunity name', fieldName: 'opportunityName', type: 'text'},
         {label: 'Confidence', fieldName: 'confidence', type: 'percent'},

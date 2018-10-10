@@ -1,10 +1,10 @@
-import { Element, api, track } from 'engine';
+import { LightningElement, api, track } from 'lwc';
 import { ENTER_KEY, ESCAPE_KEY } from 'c-utils';
 
 /**
  * TodoItem doc
  */
-export default class TodoItem extends Element {
+export default class TodoItem extends LightningElement {
     @track
     editing = false;
 
@@ -51,13 +51,13 @@ export default class TodoItem extends Element {
 
     handleEditModeInput() {
         this.editing = true;
-        // view vs edit elements are toggled via css
+        // view vs edit LightningElements are toggled via css
         this.classList.add('editing');
     }
 
     handleBlur() {
         this.editing = false;
-        // view vs edit elements are toggled via css
+        // view vs edit LightningElements are toggled via css
         this.classList.remove('editing');
     }
 

@@ -1,4 +1,4 @@
-import { createElement } from 'engine';
+import { createElement } from 'lwc';
 import App from 'example-app';
 
 const container = document.getElementById('main');

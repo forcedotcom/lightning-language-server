@@ -1,6 +1,6 @@
-import { Element } from 'engine';
+import { LightningElement } from 'lwc';
 
-export default class App extends Element {
+export default class App extends LightningElement {
     state = {
         title: 'Example App',
         titleHover: 'title hover',

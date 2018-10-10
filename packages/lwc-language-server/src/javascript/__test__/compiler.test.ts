@@ -20,15 +20,15 @@ import {
 } from '../compiler';
 
 const codeOk = `
-import { Element } from 'engine';
-export default class Foo extends Element {}
+import { LightningElement } from 'lwc';
+export default class Foo extends LightningElement {}
 `;
 
 it('can use transform from lwc-compiler', async () => {
     const expected = `
         import _tmpl from "./foo.html";
-        import { Element } from 'engine';
-        export default class Foo extends Element {
+        import { LightningElement } from 'lwc';
+        export default class Foo extends LightningElement {
             render() {
                 return _tmpl;
             }
@@ -47,7 +47,7 @@ it('can use transform from lwc-compiler', async () => {
 
 it('can use compile from lwc-compiler', async () => {
     const expected = `
-    define('x-foo', ['engine'], function (engine) {
+    define('x-foo', ['lwc'], function (lwc) {
 
     const style = undefined;
 
@@ -67,7 +67,7 @@ it('can use compile from lwc-compiler', async () => {
         document.head.appendChild(style$$1);
     }
 
-    class Foo extends engine.Element {
+    class Foo extends lwc.LightningElement {
       render() {
         return tmpl;
       }
@@ -93,16 +93,16 @@ it('can use compile from lwc-compiler', async () => {
 });
 
 const codeSyntaxError = `
-import { Element } from 'engine';
-export default class Foo extends Element {
+import { LightningElement } from 'lwc';
+export default class Foo extends LightningElement {
     connectCallb ack() {}
 }
 `;
 
 const codeError = `
-import { Element, api } from 'engine';
+import { LightningElement, api } from 'lwc';
 
-export default class Foo extends Element {
+export default class Foo extends LightningElement {
     @api property = true;
 }
 `;
@@ -205,8 +205,8 @@ it('compileDocument returns list of javascript regular errors', async () => {
 
 it('linter returns empty diagnostics on correct file', async () => {
     const content = `
-    import { Element } from 'engine';
-    export default class Foo extends Element {
+    import { LightningElement } from 'lwc';
+    export default class Foo extends LightningElement {
         connectedCallback() {}
     }
 `;
@@ -285,8 +285,8 @@ it('returns javascript metadata', async () => {
 
 it('use compileDocument()', async () => {
     const content = `
-        import { Element, api } from 'engine';
-        export default class Foo extends Element {
+        import { LightningElement, api } from 'lwc';
+        export default class Foo extends LightningElement {
             @api
             index;
         }

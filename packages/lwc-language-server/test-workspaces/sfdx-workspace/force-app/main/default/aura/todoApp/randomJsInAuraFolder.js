@@ -1,6 +1,6 @@
-import { Element } from 'engine';
+import { LightningElement } from 'lwc';
 
-export default class TodoApp extends Element {
+export default class TodoApp extends LightningElement {
     renderCallback() {
     }
 }
