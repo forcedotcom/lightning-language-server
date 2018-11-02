@@ -38,10 +38,10 @@ it('UC: goto definition for custom tags and attributes', async () => {
     // custom tags
     await indexCustomComponents(context);
     assertDefinition('|<c-todo_item></c-todo_item>');
-    assertDefinition('<|c-todo_item></c-todo_item>', '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+    assertDefinition('<|c-todo_item></c-todo_item>', '/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js');
     assertDefinition(
         '<c-todo_it|em></c-todo_item>',
-        '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js',
+        '/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js',
         Range.create(Position.create(6, 0), Position.create(90, 1)),
     );
 
@@ -49,22 +49,22 @@ it('UC: goto definition for custom tags and attributes', async () => {
     assertDefinition('<c-todo_item |></c-todo_item>');
     assertDefinition(
         '<c-todo_item to|do></c-todo_item>',
-        '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js',
+        '/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js',
         Range.create(Position.create(14, 4), Position.create(17, 5)),
     );
     assertDefinition(
         '<c-todo_item sa|me-line></c-todo_item>',
-        '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js',
+        '/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js',
         Range.create(Position.create(25, 4), Position.create(25, 18)),
     );
     assertDefinition(
         '<c-todo_item ne|xt-line></c-todo_item>',
-        '/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js',
+        '/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js',
         Range.create(Position.create(27, 4), Position.create(28, 13)),
     );
 
     // custom tags from utils package
     assertDefinition('|<c-todo_util></c-todo_util>');
-    assertDefinition('<|c-todo_util></c-todo_util>', '/test-workspaces/sfdx-workspace/utils/meta/lightningcomponents/todo_util/todo_util.js');
-    assertDefinition('<c-todo_ut|il></c-todo_util>', '/test-workspaces/sfdx-workspace/utils/meta/lightningcomponents/todo_util/todo_util.js');
+    assertDefinition('<|c-todo_util></c-todo_util>', '/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_util/todo_util.js');
+    assertDefinition('<c-todo_ut|il></c-todo_util>', '/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_util/todo_util.js');
 });

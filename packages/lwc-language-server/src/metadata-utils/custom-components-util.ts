@@ -19,7 +19,7 @@ export function resetCustomComponents() {
 export async function updateCustomComponentIndex(updatedFiles: FileEvent[], context: WorkspaceContext) {
     const isSfdxProject = context.type === WorkspaceType.SFDX;
     updatedFiles.forEach(f => {
-        if (f.uri.match(`.*${path.sep}lightningcomponents${path.sep}.*.js`)) {
+        if (f.uri.match(`.*${path.sep}lwc${path.sep}.*.js`)) {
             const file = URI.parse(f.uri).fsPath;
             if (isJSComponent(file)) {
                 if (f.type === FileChangeType.Created) {

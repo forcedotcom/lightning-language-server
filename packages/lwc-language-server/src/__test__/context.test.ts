@@ -11,12 +11,12 @@ it('WorkspaceContext', async () => {
     expect(context.workspaceRoot).toBeAbsolutePath();
     let roots = context.namespaceRoots;
     expect(roots[0]).toBeAbsolutePath();
-    expect(roots[0]).toEndWith(join(FORCE_APP_ROOT, 'lightningcomponents'));
-    expect(roots[1]).toEndWith(join(UTILS_ROOT, 'lightningcomponents'));
+    expect(roots[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
+    expect(roots[1]).toEndWith(join(UTILS_ROOT, 'lwc'));
     expect(roots.length).toBe(2);
     let modules = context.findAllModules();
-    expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lightningcomponents/hello_world/hello_world.js'));
-    expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lightningcomponents/todo_util/todo_util.js'));
+    expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
+    expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
     expect(context.getRelativeModulesDirs().length).toBe(2);
 
@@ -63,13 +63,13 @@ it('WorkspaceContext', async () => {
 it('isInsideModulesRoots()', () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(context.isInsideModulesRoots(document)).toBeTruthy();
 
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(context.isInsideModulesRoots(document)).toBeFalsy();
 
-    document = readAsTextDocument(UTILS_ROOT + '/lightningcomponents/todo_util/todo_util.js');
+    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(context.isInsideModulesRoots(document)).toBeTruthy();
 });
 
@@ -77,11 +77,11 @@ it('isLWCTemplate()', () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // .js is not a template
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(context.isLWCTemplate(document)).toBeFalsy();
 
     // .html is a template
-    document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.html');
+    document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
     expect(context.isLWCTemplate(document)).toBeTruthy();
 
     // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
@@ -93,7 +93,7 @@ it('isLWCTemplate()', () => {
     expect(context.isLWCTemplate(document)).toBeFalsy();
 
     // .html in utils folder is a template
-    document = readAsTextDocument(UTILS_ROOT + '/lightningcomponents/todo_util/todo_util.html');
+    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.html');
     expect(context.isLWCTemplate(document)).toBeTruthy();
 });
 
@@ -101,11 +101,11 @@ it('isLWCJavascript()', () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // lwc .js
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.js');
+    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(context.isLWCJavascript(document)).toBeTruthy();
 
     // lwc .htm
-    document = readAsTextDocument(FORCE_APP_ROOT + '/lightningcomponents/hello_world/hello_world.html');
+    document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
     expect(context.isLWCJavascript(document)).toBeFalsy();
 
     // aura cmps
@@ -117,18 +117,18 @@ it('isLWCJavascript()', () => {
     expect(context.isLWCJavascript(document)).toBeFalsy();
 
     // lwc .js in utils
-    document = readAsTextDocument(UTILS_ROOT + '/lightningcomponents/todo_util/todo_util.js');
+    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(context.isLWCJavascript(document)).toBeTruthy();
 });
 
 it('configureSfdxProject()', () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
-    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lightningcomponents/jsconfig-orig.json';
-    const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lightningcomponents/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lightningcomponents/.eslintrc.json';
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
+    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
     const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
@@ -184,10 +184,10 @@ it('configureSfdxProject()', () => {
 
     // .forceignore
     const forceignoreContent = utils.readFileSync(forceignorePath);
-    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', 'jsconfig.json'));
-    expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', 'jsconfig.json'));
-    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lightningcomponents', '.eslintrc.json'));
-    expect(forceignoreContent).toContain(join('utils', 'meta', 'lightningcomponents', '.eslintrc.json'));
+    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lwc', 'jsconfig.json'));
+    expect(forceignoreContent).toContain(join('utils', 'meta', 'lwc', 'jsconfig.json'));
+    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lwc', '.eslintrc.json'));
+    expect(forceignoreContent).toContain(join('utils', 'meta', 'lwc', '.eslintrc.json'));
 
     // typings
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();

@@ -109,7 +109,7 @@ export class WorkspaceContext {
         const list: string[] = [];
         switch (this.type) {
             case WorkspaceType.SFDX:
-                new GlobSync(`${this.sfdxPackageDirsPattern}/**/lightningcomponents/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
+                new GlobSync(`${this.sfdxPackageDirsPattern}/**/lwc/`, { cwd: this.workspaceRoot }).found.forEach(dirPath => {
                     list.push(dirPath);
                 });
                 break;

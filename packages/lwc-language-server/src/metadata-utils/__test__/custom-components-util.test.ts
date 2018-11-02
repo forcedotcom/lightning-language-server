@@ -11,15 +11,12 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
     expect(tagInfo).toBeUndefined();
 
     // index todo_item.js ==> custom tag and attributes are added to the index
-    await addCustomTagFromFile(
-        join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default', 'lightningcomponents', 'todo_item', 'todo_item.js'),
-        true,
-    );
+    await addCustomTagFromFile(join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default', 'lwc', 'todo_item', 'todo_item.js'), true);
     tagInfo = getLwcByTag('c-todo_item');
     expect(tagInfo).toMatchObject({ attributes: [{ name: 'todo' }, { name: 'same-line' }, { name: 'next-line' }], documentation: 'TodoItem doc' });
     const location = tagInfo.location;
     expect(URI.parse(location.uri).fsPath).toExist();
-    expect(location.uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+    expect(location.uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js');
     expect(location.range.start.line).toBe(6);
 });
 
@@ -64,7 +61,7 @@ it('indexSfdx', async () => {
     // check tag Location
     const uri = getLwcByTag('c-todo_item').location.uri;
     expect(URI.parse(uri).fsPath).toExist();
-    expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lightningcomponents/todo_item/todo_item.js');
+    expect(uri).toEndWith('/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js');
     // check attribute location
     expect(getLwcByTag('c-todo_item').attributes[0].location.uri).toBe(uri);
     // check properties/methods
@@ -80,18 +77,18 @@ it('indexSfdx', async () => {
     expect(getLwcByTag('c-todo_utils')).not.toBeUndefined();
 
     // verify modifycations in jsconfig.json when indexing
-    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lightningcomponents/jsconfig.json';
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigForceApp = JSON.parse(utils.readFileSync(jsconfigPathForceApp));
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigForceApp.compilerOptions.paths).toMatchObject({
         'c-hello_world': ['hello_world/hello_world.js'],
-        'c-todo_utils': ['../../../../utils/meta/lightningcomponents/todo_utils/todo_utils.js'],
+        'c-todo_utils': ['../../../../utils/meta/lwc/todo_utils/todo_utils.js'],
     });
-    const jsconfigPathUtils = UTILS_ROOT + '/lightningcomponents/jsconfig.json';
+    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
     const jsconfigUtils = JSON.parse(utils.readFileSync(jsconfigPathUtils));
     expect(jsconfigUtils.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigUtils.compilerOptions.paths).toMatchObject({
-        'c-hello_world': ['../../../force-app/main/default/lightningcomponents/hello_world/hello_world.js'],
+        'c-hello_world': ['../../../force-app/main/default/lwc/hello_world/hello_world.js'],
         'c-todo_utils': ['todo_utils/todo_utils.js'],
     });
 });

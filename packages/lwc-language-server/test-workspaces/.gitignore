@@ -1,5 +1,5 @@
-**/lightningcomponents/jsconfig.json
-**/lightningcomponents/.eslintrc.json
+**/lwc/jsconfig.json
+**/lwc/.eslintrc.json
 **/modules/jsconfig.json
 sfdx-workspace/.forceignore
 core-like-workspace/app/main/core/.vscode/
