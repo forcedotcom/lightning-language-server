@@ -48,34 +48,16 @@ it('can use transform from lwc-compiler', async () => {
 it('can use compile from lwc-compiler', async () => {
     const expected = `
     define('x/foo', ['lwc'], function (lwc) {
-
-    const style = undefined;
-
     function tmpl($api, $cmp, $slotset, $ctx) {
-
-      return [];
+    return [];
     }
     var _tmpl = lwc.registerTemplate(tmpl);
-    if (style) {
-        tmpl.hostToken = 'x-foo_foo-host';
-        tmpl.shadowToken = 'x-foo_foo';
-
-        const style$$1 = document.createElement('style');
-        style$$1.type = 'text/css';
-        style$$1.dataset.token = 'x-foo_foo';
-        style$$1.textContent = style('x-foo_foo');
-        document.head.appendChild(style$$1);
-    }
-
     class Foo extends lwc.LightningElement {
-      render() {
-        return _tmpl;
-      }
-
+    render() {
+    return _tmpl;
     }
-
+    }
     return Foo;
-
     });
     `;
 

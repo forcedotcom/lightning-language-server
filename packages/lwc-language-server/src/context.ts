@@ -407,7 +407,7 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
             const basename = path.basename(subdir);
             const modulePath = path.join(subdir, basename + '.js');
             if (fs.existsSync(modulePath)) {
-                // TODO: check contents for: from 'engine'?
+                // TODO: check contents for: from 'lwc'?
                 return true;
             }
         }
@@ -458,7 +458,7 @@ function findModulesIn(namespaceRoot: string): string[] {
         const basename = path.basename(subdir);
         const modulePath = path.join(subdir, basename + '.js');
         if (fs.existsSync(modulePath) && isJSComponent(modulePath)) {
-            // TODO: check contents for: from 'engine'?
+            // TODO: check contents for: from 'lwc'?
             files.push(modulePath);
         }
     }

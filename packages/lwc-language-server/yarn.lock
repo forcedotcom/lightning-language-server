@@ -1103,10 +1103,10 @@ babel-plugin-transform-inline-consecutive-adds@^0.5.0-alpha.5a128fd5:
   resolved "http://npm.lwcjs.org/babel-plugin-transform-inline-consecutive-adds/-/babel-plugin-transform-inline-consecutive-adds-0.5.0-alpha.e9f96ffe/d485c6ca183e15e865fec5731aadc831e2083022.tgz#d485c6ca183e15e865fec5731aadc831e2083022"
   integrity sha1-1IXGyhg+Fehl/sVzGq3IMeIIMCI=
 
-babel-plugin-transform-lwc-class@0.29.18:
-  version "0.29.18"
-  resolved "http://npm.lwcjs.org/babel-plugin-transform-lwc-class/-/babel-plugin-transform-lwc-class-0.29.18/a53086e1511b3a681a44495a6e355fdde75cbbcc.tgz#a53086e1511b3a681a44495a6e355fdde75cbbcc"
-  integrity sha512-KN1GBO2ZsxbG0HSXFgosm+GzJsTdyJjtPctwpiwrmNMsgSgTIKLzy4Yafr8tPG2BitZSMV7m1tr95ErwZFr0tQ==
+babel-plugin-transform-lwc-class@0.29.19:
+  version "0.29.19"
+  resolved "http://npm.lwcjs.org/babel-plugin-transform-lwc-class/-/babel-plugin-transform-lwc-class-0.29.19/50af0184335da65f475fc5798f59ad6a6b1cf569.tgz#50af0184335da65f475fc5798f59ad6a6b1cf569"
+  integrity sha512-VQn6KA3sz1GvRHt39uKXp+DEn3Oqw58ftUNZnX1IuLwO6Q6SJ/PXgk1W/o7WAzzuOeaQHM/eOLhnxr862lLMjg==
   dependencies:
     "@babel/helper-module-imports" "7.0.0"
     "@babel/plugin-proposal-class-properties" "7.1.0"
@@ -3729,38 +3729,38 @@ lru-cache@^4.0.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-lwc-compiler@0.29.18:
-  version "0.29.18"
-  resolved "http://npm.lwcjs.org/lwc-compiler/-/lwc-compiler-0.29.18/d3d4e849854dffd511fc55557a7b343f15bc8ed8.tgz#d3d4e849854dffd511fc55557a7b343f15bc8ed8"
-  integrity sha512-Jlzhx45jZMvWLRJoweW926jkvXVkbwCqIVI9/Z1juB1b56LEymwymc06dZHmxQtOLeJ9sbhhVyRXvyzbSJrT/A==
+lwc-compiler@0.29.19:
+  version "0.29.19"
+  resolved "http://npm.lwcjs.org/lwc-compiler/-/lwc-compiler-0.29.19/1ecd64074b3f72b525af01efc22c8c5f8886777f.tgz#1ecd64074b3f72b525af01efc22c8c5f8886777f"
+  integrity sha512-HPPLHd2mtpXS2hZB2pUT1UCORYSGTww9VD6kjjmeAQ9b9hVMaqx0srGJAXhXGV+oIPlKA0aaj0W4YbtwOxtT9g==
   dependencies:
     "@babel/core" "7.1.0"
     "@babel/plugin-proposal-class-properties" "7.1.0"
     "@babel/plugin-proposal-object-rest-spread" "7.0.0"
     "@types/chokidar" "^1.7.5"
-    babel-plugin-transform-lwc-class "0.29.18"
+    babel-plugin-transform-lwc-class "0.29.19"
     babel-preset-compat "0.20.6"
     babel-preset-minify "0.5.0-alpha.5a128fd5"
     cssnano "^3.10.0"
-    lwc-template-compiler "0.29.18"
+    lwc-template-compiler "0.29.19"
     parse5 "^3.0.3"
     postcss "~6.0.19"
-    postcss-plugin-lwc "0.29.18"
+    postcss-plugin-lwc "0.29.19"
     postcss-selector-parser "^3.1.1"
     rollup "0.66.2"
     rollup-plugin-replace "^2.0.0"
 
-lwc-engine@0.29.18:
-  version "0.29.18"
-  resolved "http://npm.lwcjs.org/lwc-engine/-/lwc-engine-0.29.18/fb8313e9c38d855362722fec25f70c8c412678d5.tgz#fb8313e9c38d855362722fec25f70c8c412678d5"
-  integrity sha512-e2upjHJRx0HtNx1XGD6T54K234nmoRwlhP3fPEU6OP9A1WutgvdA16ZRSOBPIpUJht7SJb3Lkvl1rfZpZSO2bw==
+lwc-engine@0.29.19:
+  version "0.29.19"
+  resolved "http://npm.lwcjs.org/lwc-engine/-/lwc-engine-0.29.19/151934580b6bd3298227a8990a557c04b236b622.tgz#151934580b6bd3298227a8990a557c04b236b622"
+  integrity sha512-MvugotvmIlDEiwQ6afx0saeYVI6zsiViM1zQM/Ee1uObjea/J0IzgLGP8e/dGaBHGkWKPFRy+Q0CAUoOE/gqRw==
   dependencies:
     observable-membrane "0.25.0"
 
-lwc-template-compiler@0.29.18:
-  version "0.29.18"
-  resolved "http://npm.lwcjs.org/lwc-template-compiler/-/lwc-template-compiler-0.29.18/502c29f37192e2f298102e1951a6e633584bb094.tgz#502c29f37192e2f298102e1951a6e633584bb094"
-  integrity sha512-B0gorwueMQGe/haTgaCebC/f0Yhp1dXL/0VnEc2ygvBZzozs6mgGd//H3reyFMZ0MXBQbEH6Tu+ejdSZkVuShQ==
+lwc-template-compiler@0.29.19:
+  version "0.29.19"
+  resolved "http://npm.lwcjs.org/lwc-template-compiler/-/lwc-template-compiler-0.29.19/38d9cf6fbeff798c706fabed12b6967c1fdc9372.tgz#38d9cf6fbeff798c706fabed12b6967c1fdc9372"
+  integrity sha512-8Q5Okg6agWEgPsS5u+uV+pqehgoGzoItj2LqVUwCv6wg63lQpfv0iv2hIO31ZLcYYKyDQxi1EHWyb45ILoOawg==
   dependencies:
     babel-generator "^6.26.1"
     babel-template "^6.26.0"
@@ -4598,10 +4598,10 @@ postcss-ordered-values@^2.1.0:
     postcss "^5.0.4"
     postcss-value-parser "^3.0.1"
 
-postcss-plugin-lwc@0.29.18:
-  version "0.29.18"
-  resolved "http://npm.lwcjs.org/postcss-plugin-lwc/-/postcss-plugin-lwc-0.29.18/2531974aa4182e0ae411d81a6e12bd04d12cb4bf.tgz#2531974aa4182e0ae411d81a6e12bd04d12cb4bf"
-  integrity sha512-lEArt84NLDbaCgjHIhRd/KqNlYJ+xrp/uAaPMsK6P86CmHAdBadLDCHo9MSkOjt7aobckYX3od7Rv+rlkcualw==
+postcss-plugin-lwc@0.29.19:
+  version "0.29.19"
+  resolved "http://npm.lwcjs.org/postcss-plugin-lwc/-/postcss-plugin-lwc-0.29.19/8f4ca02bfd30f785eb2522f7f5f72e0b94dd445e.tgz#8f4ca02bfd30f785eb2522f7f5f72e0b94dd445e"
+  integrity sha512-5iIleudpcCmsfj9XqtNj+hg0mjjsOKgII21/vznudexS/6UzMSX8FrAvqNXpYAlLfK6yQlWN/VAEydZUajh6LQ==
   dependencies:
     balanced-match "^1.0.0"
     postcss "^6.0.13"
