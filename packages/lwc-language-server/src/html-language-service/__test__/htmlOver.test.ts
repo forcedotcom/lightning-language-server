@@ -42,7 +42,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     assertNoHover('|<lightning-button></lightning-button>');
     assertHover(
         '<lightning-bu|tton></lightning-button>',
-        '```html\n<lightning-button>\n```\nRepresents a button element.\n\n\nhttps://developer.salesforce.com/docs/component-library/bundle/lightning:button',
+        '```html\n<lightning-button>\n```\nRepresents a button element.\n\n\nhttps://developer.salesforce.com/docs/component-library/bundle/lightning-button',
     );
     assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', '**icon-name**\n\nThe Lightning Design System name of the icon');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', '**class**\n\nA CSS class for the outer element, in addition to ');
@@ -53,7 +53,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     assertHover(
         '<lightning-formatted-num|ber></lightning-formatted-number>',
         '```html\n<lightning-formatted-number>\n```\nDisplays formatted numbers for decimals, currency, and percentages.\n\n\n' +
-            'https://developer.salesforce.com/docs/component-library/bundle/lightning:formattedNumber',
+            'https://developer.salesforce.com/docs/component-library/bundle/lightning-formatted-number',
     );
 
     // custom tags

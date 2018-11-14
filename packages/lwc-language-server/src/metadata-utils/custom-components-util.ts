@@ -9,6 +9,7 @@ import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRang
 import { Metadata } from 'babel-plugin-transform-lwc-class';
 import { WorkspaceType } from '../shared';
 import * as utils from '../utils';
+import decamelize from 'decamelize';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
@@ -163,5 +164,7 @@ function tagName(namespace: string, tag: string) {
         // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
         namespace = 'lightning';
     }
-    return namespace + '-' + tag;
+
+    // convert camel-case to hyphen-case/kebab-case
+    return namespace + '-' + decamelize(tag, '-');
 }
