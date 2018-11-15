@@ -526,30 +526,30 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@salesforce/apex@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@salesforce/apex/-/apex-0.0.7.tgz#6bbab169ebbbfd05c74ac76807ed54628550cfd1"
-  integrity sha512-DbB3CbU+NUjOO2ps1dtzqgQ9m4L0Ofwbj5JkgHcva6CIVqz2uQGpySpcsPmuedkAhmR7ytvL0L9oLCvyz5tzGA==
+"@salesforce/apex@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@salesforce/apex/-/apex-0.0.11.tgz#63b5b32628d5a0621b8c990daa2f3d44ba9d347e"
+  integrity sha512-o5gojXlREBmJC5aocw5QdY9+HWYVrpN9gy9M2QU26clzEmxW/jBMDQQkEHXiglLfjd1sda7WhgPvoLwI79Y7Rw==
 
-"@salesforce/label@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.7.tgz#35ee3cd805ebd9b3abb5ce4516f7aa18b43d8992"
-  integrity sha512-KETG7F1jc/wjZTlaOZGAORuwfT0eBHGKeyQfvz/4jnxuFPS+C85p1q2pwpHBvWW5OM8lt5AE4ACg4QjAnb+b1Q==
+"@salesforce/label@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.11.tgz#5e78b283af4fe6878132507345318a5adaff43a4"
+  integrity sha512-FT0j1Ms0SCPdAcce4IgNtxxEWc0Og80Ah+TxU5IqHFS2ImCDhfGUycTGxzONbw6p4vS4M6UWpv0vJzOWW3KUYg==
 
-"@salesforce/resourceurl@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.7.tgz#2e9b0903a998040a6c1d4b603c14d7c499b6e69d"
-  integrity sha512-91M76ZEQUYw+8SdOnIEVl9yxZfa4YNrrNGwr+jDl/suf/Q0Tt9rkbqsOjnkP12C33RDFPn4J5vSzI7TZNFrWbQ==
+"@salesforce/resourceurl@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.11.tgz#ce104588d1c11243d8cf31d7383b3f3c48a21ee7"
+  integrity sha512-s56Q6A6CD6T0qQ5enpmfiAzyxWfZmYS3b3PKRJ9O7/v4hx9a03htH1T/m24aiVHexQsivMRVxoOFEbUSN4vlKQ==
 
-"@salesforce/schema@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.7.tgz#57077d420abaa69d1cb99d11a5ea77f926e73529"
-  integrity sha512-puqMjMuF4f3VUqM8XzIhHXVYFtpJCnj78h6daWqhAttm4hbG9+1tfS9lZPKrFY+N4T2uGk8EzoMm/CTMMAAFig==
+"@salesforce/schema@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.11.tgz#7688e02300b6acfb0fa7648c1620078e3cc54a5a"
+  integrity sha512-U2f3UzSHdjlGnwX0X3d0SfYRnNDIm6EVvI0QXH1m+ReiqerDD/SyhyNW+uhAHYvLx++QdgObdZHDOHaw4qQDHw==
 
-"@salesforce/user@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.7.tgz#88b611bceab09ddc1b7cb617576aaf80f20c3b77"
-  integrity sha512-AlcZnHUAlabpel8yPHtFXqyoLsSYu5K6GSrH4NLiqn5ZIS2RqK+g9vBK6OxHrkA+fy7ypOooAQFCVQkCfRXVKg==
+"@salesforce/user@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.11.tgz#8e642e50b1994cb5c411b4c7ef1c9a648869a0a2"
+  integrity sha512-lbSysyNQ93YW3wbB+l34UT/7+QPXZHp3DFk6WW24I+AruI51Ie7WlYeoQ3sygHJG4HPYuhqPUFouUyxuuuFwBQ==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"

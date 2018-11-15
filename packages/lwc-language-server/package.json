@@ -6,7 +6,7 @@
   "typings": "lib/shared.d.ts",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf lib",
+    "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
@@ -17,11 +17,11 @@
     "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
-    "@salesforce/apex": "0.0.7",
-    "@salesforce/label": "0.0.7",
-    "@salesforce/resourceurl": "0.0.7",
-    "@salesforce/schema": "0.0.7",
-    "@salesforce/user": "0.0.7",
+    "@salesforce/apex": "0.0.11",
+    "@salesforce/label": "0.0.11",
+    "@salesforce/resourceurl": "0.0.11",
+    "@salesforce/schema": "0.0.11",
+    "@salesforce/user": "0.0.11",
     "babel-core": "7.0.0-bridge.0",
     "babel-plugin-transform-lwc-class": "0.29.19",
     "camelcase": "5.0.0",

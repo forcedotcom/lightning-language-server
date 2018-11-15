@@ -8,11 +8,11 @@ jest.mock('../../utils', () => {
 
 it('indexStaticResources', async done => {
     // workspace with 1 package
-    const expectedDTS = `declare module "@salesforce/resource-url/bike_assets" {
+    const expectedDTS = `declare module "@salesforce/resourceUrl/bike_assets" {
     var bike_assets: string;
     export default bike_assets;
 }
-declare module "@salesforce/resource-url/todocss" {
+declare module "@salesforce/resourceUrl/todocss" {
     var todocss: string;
     export default todocss;
 }
@@ -20,15 +20,15 @@ declare module "@salesforce/resource-url/todocss" {
     await validate(indexStaticResources, 'sfdx-workspace', 'force-app', 'staticresources.d.ts', expectedDTS);
 
     // workspace with 2 packages
-    const expectedDTS2 = `declare module "@salesforce/resource-url/bike_assets" {
+    const expectedDTS2 = `declare module "@salesforce/resourceUrl/bike_assets" {
     var bike_assets: string;
     export default bike_assets;
 }
-declare module "@salesforce/resource-url/todocss" {
+declare module "@salesforce/resourceUrl/todocss" {
     var todocss: string;
     export default todocss;
 }
-declare module "@salesforce/resource-url/todoutil" {
+declare module "@salesforce/resourceUrl/todoutil" {
     var todoutil: string;
     export default todoutil;
 }
