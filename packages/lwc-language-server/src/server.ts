@@ -23,6 +23,7 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import * as utils from './utils';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
+import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
 import { updateCustomComponentIndex, addCustomTagFromResults } from './metadata-utils/custom-components-util';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
@@ -150,7 +151,12 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             await context.configureAndIndex();
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
         } else {
-            await Promise.all([updateStaticResourceIndex(changes, context), updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
+            await Promise.all([
+                updateStaticResourceIndex(changes, context),
+                updateContentAssetIndex(changes, context),
+                updateLabelsIndex(changes, context),
+                updateCustomComponentIndex(changes, context),
+            ]);
         }
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });

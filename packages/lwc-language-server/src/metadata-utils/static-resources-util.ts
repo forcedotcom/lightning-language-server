@@ -46,7 +46,7 @@ export function indexStaticResources(workspacePath: string, sfdxPackageDirsPatte
         /* tslint:disable */
         new Glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
             if (err) {
-                console.log(`Error queing up indexing of static resources.Error detatils: ${err}`);
+                console.log(`Error queuing up indexing of static resources. Error details: ${err}`);
                 reject(err);
             } else {
                 files.map((file: string) => {

@@ -11,6 +11,7 @@ import { writeJsconfig } from './config';
 import { indexCustomComponents, isJSComponent, loadStandardComponents, resetCustomComponents } from './metadata-utils/custom-components-util';
 import { indexCustomLabels, resetCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources, resetStaticResources } from './metadata-utils/static-resources-util';
+import { indexContentAssets, resetContentAssets } from './metadata-utils/content-assets-util';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
 import * as utils from './utils';
 
@@ -54,6 +55,7 @@ export class WorkspaceContext {
         indexingTasks.push(indexCustomComponents(this));
         if (this.type === WorkspaceType.SFDX) {
             indexingTasks.push(indexStaticResources(this.workspaceRoot, this.sfdxPackageDirsPattern));
+            indexingTasks.push(indexContentAssets(this.workspaceRoot, this.sfdxPackageDirsPattern));
             indexingTasks.push(indexCustomLabels(this.workspaceRoot, this.sfdxPackageDirsPattern));
         }
         await Promise.all(indexingTasks);
@@ -160,6 +162,7 @@ export class WorkspaceContext {
         resetCustomComponents();
         resetCustomLabels();
         resetStaticResources();
+        resetContentAssets();
     }
 
     private writeJsconfigJson() {
