@@ -6,7 +6,7 @@ import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomCompon
 import { WorkspaceContext } from '../context';
 import { AttributeInfo, TagInfo } from '../html-language-service/parser/htmlTags';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
-import { Metadata } from 'babel-plugin-transform-lwc-class';
+import { Metadata } from '@lwc/babel-plugin-component';
 import { WorkspaceType } from '../shared';
 import * as utils from '../utils';
 import decamelize from 'decamelize';

@@ -1,10 +1,10 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE } from '../../constants';
-import { compile } from 'lwc-compiler';
-import { transform } from 'lwc-compiler';
-import { Metadata } from 'babel-plugin-transform-lwc-class';
-import { CompilerOptions } from 'lwc-compiler/dist/types/compiler/options';
+import { compile } from '@lwc/compiler';
+import { transform } from '@lwc/compiler';
+import { Metadata } from '@lwc/babel-plugin-component';
+import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import * as utils from '../../utils';
 import {
     compileDocument,
@@ -27,12 +27,12 @@ export default class Foo extends LightningElement {}
 it('can use transform from lwc-compiler', async () => {
     const expected = `
         import _tmpl from "./foo.html";
+        import { registerComponent as _registerComponent } from "lwc";
         import { LightningElement } from 'lwc';
-        export default class Foo extends LightningElement {
-            render() {
-                return _tmpl;
-            }
-        }
+        class Foo extends LightningElement {}
+        export default _registerComponent(Foo, {
+        tmpl: _tmpl
+        });
     `;
 
     const options: CompilerOptions = {
@@ -52,12 +52,16 @@ it('can use compile from lwc-compiler', async () => {
     return [];
     }
     var _tmpl = lwc.registerTemplate(tmpl);
-    class Foo extends lwc.LightningElement {
-    render() {
-    return _tmpl;
-    }
-    }
-    return Foo;
+    tmpl.stylesheets = [];
+    tmpl.stylesheetTokens = {
+    hostAttribute: \"x-foo_foo-host\",
+    shadowAttribute: \"x-foo_foo\"
+    };
+    class Foo extends lwc.LightningElement {}
+    var foo = lwc.registerComponent(Foo, {
+    tmpl: _tmpl
+    });
+    return foo;
     });
     `;
 
@@ -101,7 +105,7 @@ it('transform throws exceptions on syntax errors', async () => {
     } catch (err) {
         // verify err has the info we need
         const message = extractMessageFromBabelError(err.message);
-        expect(message).toBe('Unexpected token (4:17)');
+        expect(message).toMatch('Unexpected token (4:17)');
         expect(err.location).toEqual({ line: 4, column: 17 });
     }
 });
@@ -117,7 +121,7 @@ it('transform also throws exceptions for other errors', async () => {
     } catch (err) {
         // verify err has the info we need
         const message = extractMessageFromBabelError(err.message);
-        expect(message).toBe('Boolean public property must default to false.');
+        expect(message).toMatch('Boolean public property must default to false.');
         const location = extractLocationFromBabelError(err.message);
         expect(location).toEqual({ line: 5, column: 4 });
     }
@@ -164,7 +168,7 @@ it('compileDocument returns list of javascript syntax errors', async () => {
     const { diagnostics } = await compileDocument(document);
 
     expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].message).toBe('Unexpected token (4:17)');
+    expect(diagnostics[0].message).toMatch('Unexpected token (4:17)');
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 17 },
         end: { character: Number.MAX_VALUE },
@@ -177,7 +181,7 @@ it('compileDocument returns list of javascript regular errors', async () => {
     const { diagnostics } = await compileDocument(document);
 
     expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].message).toBe('Boolean public property must default to false.');
+    expect(diagnostics[0].message).toMatch('Boolean public property must default to false.');
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 4 },
         end: { character: Number.MAX_VALUE },

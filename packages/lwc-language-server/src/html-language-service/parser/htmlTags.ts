@@ -36,7 +36,7 @@ BEGIN THIRD PARTY
 
 import arrays = require('../utils/arrays');
 import { Location } from 'vscode-languageserver';
-import { ClassMember } from 'babel-plugin-transform-lwc-class';
+import { ClassMember } from '@lwc/babel-plugin-component';
 
 export const EMPTY_ELEMENTS: string[] = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 

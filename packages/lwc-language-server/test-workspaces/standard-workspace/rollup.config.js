@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const path = require('path');
-const lwcCompiler = require('rollup-plugin-lwc-compiler');
+const lwcCompiler = require('@lwc/rollup-plugin');
 
 module.exports = {
     input: path.resolve('src/main.js'),

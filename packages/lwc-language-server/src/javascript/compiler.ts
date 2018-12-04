@@ -4,11 +4,11 @@ import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument
 import URI from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import { AttributeInfo } from '../html-language-service/parser/htmlTags';
-import { transform } from 'lwc-compiler';
-import { CompilerOptions } from 'lwc-compiler/dist/types/compiler/options';
-import { ClassMember } from 'babel-plugin-transform-lwc-class';
+import { transform } from '@lwc/compiler';
+import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
+import { ClassMember } from '@lwc/babel-plugin-component';
 import * as utils from '../utils';
-import { Metadata } from 'babel-plugin-transform-lwc-class';
+import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 
 export interface ICompilerResult {
