@@ -21,6 +21,29 @@ it('includesWatchedDirectory', () => {
     expect(utils.includesWatchedDirectory([htmlFileDeletedEvent])).toBeFalsy();
 });
 
+it('isLWCRootDirectoryChange', () => {
+    const noLwcFolderCreated: FileEvent = {
+        type: FileChangeType.Created,
+        uri: 'file:///Users/user/test/dir',
+    };
+    const noLwcFolderDeleted: FileEvent = {
+        type: FileChangeType.Deleted,
+        uri: 'file:///Users/user/test/dir',
+    };
+    const lwcFolderCreated: FileEvent = {
+        type: FileChangeType.Created,
+        uri: 'file:///Users/user/test/dir/lwc',
+    };
+    const lwcFolderDeleted: FileEvent = {
+        type: FileChangeType.Deleted,
+        uri: 'file:///Users/user/test/dir/lwc',
+    };
+    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
+    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated])).toBeFalsy();
+    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();
+    expect(utils.isLWCRootDirectoryChange([lwcFolderCreated, lwcFolderDeleted])).toBeTruthy();
+});
+
 it('getExtension()', () => {
     const jsDocument = TextDocument.create('file:///hello_world.js', 'javascript', 0, '');
     expect(utils.getExtension(jsDocument)).toBe('.js');

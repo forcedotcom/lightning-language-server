@@ -181,10 +181,11 @@ export class WorkspaceContext {
                     const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoot);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent, forceignore);
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                     // write/update .eslintrc.json
                     const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
-                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate, forceignore);
+                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
+                    this.updateForceIgnoreFile(forceignore);
                 });
                 break;
 
@@ -308,7 +309,7 @@ export class WorkspaceContext {
      * Adds to the config file in 'relativeConfigPath' any missing properties in 'config'
      * (existing properties are not updated)
      */
-    private updateConfigFile(relativeConfigPath: string, config: string, ignoreFile?: string) {
+    private updateConfigFile(relativeConfigPath: string, config: string) {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         try {
             const configJson = JSON.parse(config);
@@ -320,12 +321,14 @@ export class WorkspaceContext {
                     writeJsconfig(configFile, fileConfig);
                 }
             }
-            if (ignoreFile) {
-                utils.appendLineIfMissing(ignoreFile, relativeConfigPath);
-            }
         } catch (error) {
             throw new Error('error updating ' + configFile + ': ' + error);
         }
+    }
+
+    private updateForceIgnoreFile(ignoreFile: string) {
+        utils.appendLineIfMissing(ignoreFile, '**/jsconfig.json');
+        utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
     }
 
     private initSfdxProject() {

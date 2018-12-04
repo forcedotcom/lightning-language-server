@@ -145,6 +145,9 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     console.info('onDidChangeWatchedFiles...');
     const changes = change.changes;
     try {
+        if (utils.isLWCRootDirectoryChange(changes)) {
+            await context.configureAndIndex();
+        }
         if (utils.includesWatchedDirectory(changes)) {
             // re-index everything on directory deletions as no events are reported for contents of deleted directories
             const startTime = process.hrtime();

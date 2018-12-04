@@ -19,6 +19,19 @@ export function includesWatchedDirectory(changes: FileEvent[]): boolean {
     return false;
 }
 
+export function isLWCRootDirectoryChange(changes: FileEvent[]) {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Created && isLwcDirectory(event.uri)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function isLwcDirectory(uri: string) {
+    return uri.endsWith('lwc');
+}
+
 function isWatchedDirectory(uri: string) {
     // use heuristics: directory if doesn't have suffix
     // (we can't use fs.stat because the directory has already been deleted)

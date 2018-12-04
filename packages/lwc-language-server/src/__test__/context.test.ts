@@ -170,24 +170,20 @@ it('configureSfdxProject()', () => {
 
     // verify newly created .eslintrc.json
     const eslintrcForceAppContent = utils.readFileSync(eslintrcPathForceApp);
-    expect(eslintrcForceAppContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
+    expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
     const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
-    expect(eslintrcForceApp.extends).toBe('plugin:lwc/recommended');
-    expect(eslintrcForceApp.plugins[0]).toBe('lwc');
+    expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     // verify updated .eslintrc.json
     const eslintrcUtilsContent = utils.readFileSync(eslintrcPathUtils);
-    expect(eslintrcUtilsContent).toContain('    "extends": "plugin:lwc/recommended",'); // check formatting
+    expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
     const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
-    expect(eslintrcUtils.extends).toBe('plugin:lwc/recommended');
-    expect(eslintrcUtils.plugins[0]).toBe('lwc');
+    expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
     const forceignoreContent = utils.readFileSync(forceignorePath);
-    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lwc', 'jsconfig.json'));
-    expect(forceignoreContent).toContain(join('utils', 'meta', 'lwc', 'jsconfig.json'));
-    expect(forceignoreContent).toContain(join('force-app', 'main', 'default', 'lwc', '.eslintrc.json'));
-    expect(forceignoreContent).toContain(join('utils', 'meta', 'lwc', '.eslintrc.json'));
+    expect(forceignoreContent).toContain('**/jsconfig.json');
+    expect(forceignoreContent).toContain('**/.eslintrc.json');
 
     // typings
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
