@@ -8,7 +8,7 @@
             "name": "Attach to LS",
             "type": "node",
             "request": "attach",
-            "port": 6009,
+            "port": 6020,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceRoot}/lib/**"
