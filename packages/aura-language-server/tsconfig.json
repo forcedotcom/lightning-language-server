@@ -10,9 +10,9 @@
         "outDir": "./lib",
 
         "strictNullChecks": false,
-        "noImplicitAny": true,
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
+        "noImplicitAny": false,
+        "noUnusedParameters": false,
+        "noUnusedLocals": false,
 
         "pretty": true,
         "declaration": true,

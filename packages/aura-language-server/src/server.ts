@@ -16,15 +16,7 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import { WorkspaceContext } from './context';
-
-import templateLinter from './template/linter';
-import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import * as utils from './utils';
-import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
-import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
-import { updateCustomComponentIndex, addCustomTagFromResults } from './metadata-utils/custom-components-util';
-import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
 
 import { WorkspaceType } from './shared';
@@ -37,9 +29,6 @@ const connection: IConnection = createConnection();
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
-
-let htmlLS: LanguageService;
-let context: WorkspaceContext;
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
@@ -55,11 +44,12 @@ connection.onInitialize(
 
             console.info(`Starting language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
-            context = new WorkspaceContext(workspaceRoot);
+
+            // context = new WorkspaceContext(workspaceRoot);
             // wait for indexing to finish before returning from onInitialize()
-            await context.configureAndIndex();
-            htmlLS = getLanguageService();
-            console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
+            // await context.configureAndIndex();
+            // htmlLS = getLanguageService();
+            console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
                 capabilities: {
@@ -86,26 +76,27 @@ documents.onDidChangeContent(async change => {
     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
     const { document } = change;
     const { uri } = document;
-    if (context.isLWCTemplate(document)) {
-        const diagnostics = templateLinter(document);
-        connection.sendDiagnostics({ uri, diagnostics });
-    } else if (context.isLWCJavascript(document)) {
-        const { metadata, diagnostics } = await javascriptCompileDocument(document);
-        connection.sendDiagnostics({ uri, diagnostics });
-        if (metadata) {
-            addCustomTagFromResults(uri, metadata, context.type === WorkspaceType.SFDX);
-        }
-    }
+    // if (context.isLWCTemplate(document)) {
+    //     const diagnostics = templateLinter(document);
+    //     connection.sendDiagnostics({ uri, diagnostics });
+    // } else if (context.isLWCJavascript(document)) {
+    //     const { metadata, diagnostics } = await javascriptCompileDocument(document);
+    //     connection.sendDiagnostics({ uri, diagnostics });
+    //     if (metadata) {
+    //         addCustomTagFromResults(uri, metadata, context.type === WorkspaceType.SFDX);
+    //     }
+    // }
 });
 
 connection.onCompletion(
     (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
-            return { isIncomplete: false, items: [] };
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
+        // if (!context.isLWCTemplate(document)) {
+        //     return { isIncomplete: false, items: [] };
+        // }
+        // const htmlDocument = htmlLS.parseHTMLDocument(document);
+        // return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
+        return;
     },
 );
 
@@ -118,22 +109,24 @@ connection.onCompletionResolve(
 connection.onHover(
     (textDocumentPosition: TextDocumentPositionParams): Hover => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+        // if (!context.isLWCTemplate(document)) {
+        //     return null;
+        // }
+        // const htmlDocument = htmlLS.parseHTMLDocument(document);
+        // return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+        return;
     },
 );
 
 connection.onDefinition(
     (textDocumentPosition: TextDocumentPositionParams): Location => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+        // if (!context.isLWCTemplate(document)) {
+        //     return null;
+        // }
+        // const htmlDocument = htmlLS.parseHTMLDocument(document);
+        // return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+        return;
     },
 );
 
@@ -143,16 +136,16 @@ connection.listen();
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     console.info('onDidChangeWatchedFiles...');
     const changes = change.changes;
-    try {
-        if (utils.includesWatchedDirectory(changes)) {
-            // re-index everything on directory deletions as no events are reported for contents of deleted directories
-            const startTime = process.hrtime();
-            await context.configureAndIndex();
-            console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
-        } else {
-            await Promise.all([updateStaticResourceIndex(changes, context), updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
-        }
-    } catch (e) {
-        connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
-    }
+    // try {
+    //     if (utils.includesWatchedDirectory(changes)) {
+    //         // re-index everything on directory deletions as no events are reported for contents of deleted directories
+    //         const startTime = process.hrtime();
+    //         await context.configureAndIndex();
+    //         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
+    //     } else {
+    //         // await Promise.all([updateStaticResourceIndex(changes, context), updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
+    //     }
+    // } catch (e) {
+    //     connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
+    // }
 });
