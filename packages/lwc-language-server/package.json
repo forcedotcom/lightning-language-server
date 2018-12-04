@@ -1,6 +1,6 @@
 {
   "name": "lwc-language-server",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Language Server Protocol implementation for LWC projects",
   "main": "lib/shared.js",
   "typings": "lib/shared.d.ts",
