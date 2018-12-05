@@ -22,9 +22,9 @@ declare module 'lightning/uiListApi' {
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_list_views_records_md.htm
      *
-     * @param objectApiName The API name of the List View's entity (must be specified along with listViewApiName).
-     * @param listViewApiName List View API name (must be specified with objectApiName).
-     * @param listViewId Id of the List View (may be specified without objectApiName or listViewApiName).
+     * @param objectApiName The API name of the List view's object (must be specified along with listViewApiName).
+     * @param listViewApiName The API name of the list view (must be specified with objectApiName).
+     * @param listViewId Id of the list view (may be specified without objectApiName or listViewApiName).
      * @param pageToken Page id of records to retrieve.
      * @param pageSize Number of records to retrieve at once. The default value is 50. Value can be 1–2000.
      * @param sortBy A qualified field API name on which to sort.
