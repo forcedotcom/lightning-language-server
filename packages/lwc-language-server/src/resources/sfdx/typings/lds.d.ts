@@ -22,17 +22,17 @@ declare module 'lightning/uiListApi' {
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_list_views_records_md.htm
      *
-     * @param objectApiName The API name of the List view's object (must be specified along with listViewApiName).
-     * @param listViewApiName The API name of the list view (must be specified with objectApiName).
-     * @param listViewId Id of the list view (may be specified without objectApiName or listViewApiName).
-     * @param pageToken Page id of records to retrieve.
+     * @param objectApiName API name of the list view's object (must be specified along with listViewApiName).
+     * @param listViewApiName API name of the list view (must be specified with objectApiName).
+     * @param listViewId ID of the list view (may be specified without objectApiName or listViewApiName).
+     * @param pageToken Page ID of records to retrieve.
      * @param pageSize Number of records to retrieve at once. The default value is 50. Value can be 1–2000.
-     * @param sortBy A qualified field API name on which to sort.
-     * @param fields An array of qualified field API names of fields to include. These fields don’t create visible columns.
-     *               If the field is not available to the user, an error occurs.
-     * @param optionalFields An array of qualified field API names of optional fields to include. These fields don’t create visible columns.
-     *                       If the field is not available to the user, no error occurs and the field isn’t included in the records.
-     * @param q Query string to filter list views (only for list of lists).
+     * @param sortBy Object-qualified field API name on which to sort.
+     * @param fields Object-qualified field API names to retrieve. These fields don’t create visible columns.
+     *               If a field isn’t accessible to the context user, it causes an error.
+     * @param optionalFields Object-qualified field API names to retrieve. These fields don’t create visible columns.
+     *                       If an optional field isn’t accessible to the context user, it isn’t included in the response, but it doesn’t cause an error.
+     * @param q Query string to filter list views (only for a list of lists).
      * @returns {Observable} See description.
      */
     export function getListUi(
@@ -81,8 +81,8 @@ declare module 'lightning/uiObjectInfoApi' {
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_picklist_values.htm
      *
-     * @param fieldApiName The picklist field's qualified API name.
-     * @param recordTypeId The record type id. Pass '012000000000000AAA' for the master record type.
+     * @param fieldApiName The picklist field's object-qualified API name.
+     * @param recordTypeId The record type ID. Pass '012000000000000AAA' for the master record type.
      */
     export function getPicklistValues(fieldApiName: string | FieldId, recordTypeId: string): void;
 
@@ -92,7 +92,7 @@ declare module 'lightning/uiObjectInfoApi' {
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_picklist_values_collection.htm
      *
      * @param objectApiName API name of the object.
-     * @param recordTypeId Record type id. Pass '012000000000000AAA' for the master record type.
+     * @param recordTypeId Record type ID. Pass '012000000000000AAA' for the master record type.
      */
     export function getPicklistValuesByRecordType(objectApiName: string, recordTypeId: string): void;
 }
@@ -292,11 +292,13 @@ declare module 'lightning/uiRecordApi' {
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_record_get.htm
      *
-     * @param recordId Id of the record to retrieve.
-     * @param fields Qualified field API names to retrieve. If any are inaccessible then an error is emitted. If specified must not specify layoutTypes.
-     * @param layoutTypes List of layoutTypes identifying the layouts from which to grab the field list. If specified must not specify fields.
-     * @param modes List of modes identifying the layouts from which to grab the field list.
-     * @param optionalFields Qualified field API names to retrieve. If any are inaccessible then they are silently omitted.
+     * @param recordId ID of the record to retrieve.
+     * @param fields Object-qualified field API names to retrieve. If a field isn’t accessible to the context user, it causes an error.
+     *               If specified, don't specify layoutTypes.
+     * @param layoutTypes Layouts defining the fields to retrieve. If specified, don't specify fields.
+     * @param modes Layout modes defining the fields to retrieve.
+     * @param optionalFields Object-qualified field API names to retrieve. If an optional field isn’t accessible to the context user,
+     *                       it isn’t included in the response, but it doesn’t cause an error.
      * @returns An observable of the record.
      */
     export function getRecord(
@@ -315,7 +317,8 @@ declare module 'lightning/uiRecordApi' {
      * @param objectApiName API name of the object.
      * @param formFactor Form factor. Possible values are 'Small', 'Medium', 'Large'. Large is default.
      * @param recordTypeId Record type id.
-     * @param optionalFields Qualified field API names. If any are inaccessible then they are silently omitted.
+     * @param optionalFields Object-qualified field API names to retrieve. If an optional field isn’t accessible to the context user,
+     *                       it isn’t included in the response, but it doesn’t cause an error.
      */
     export function getRecordCreateDefaults(
         objectApiName: string | ObjectId,
@@ -329,10 +332,11 @@ declare module 'lightning/uiRecordApi' {
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_record_ui.htm
      *
-     * @param recordIds Id of the records to retrieve.
+     * @param recordIds ID of the records to retrieve.
      * @param layoutTypes Layouts defining the fields to retrieve.
      * @param modes Layout modes defining the fields to retrieve.
-     * @param optionalFields Qualified field API names to retrieve. If any are inaccessible then they are silently omitted.
+     * @param optionalFields Object-qualified field API names to retrieve. If an optional field isn’t accessible to the context user,
+     *                       it isn’t included in the response, but it doesn’t cause an error.
      */
     export function getRecordUi(
         recordIds: string | string[],
@@ -345,8 +349,7 @@ declare module 'lightning/uiRecordApi' {
      * Updates a record using the properties in recordInput. recordInput.fields.Id must be specified.
      * @param recordInput The record input representation to use to update the record.
      * @param clientOptions Controls the update behavior. Specify ifUnmodifiedSince to fail the save if the record has changed since the provided value.
-     * @returns A promise that will resolve with the patched record. The record will contain data for the list of fields as defined by the
-     *          applicable layout for the record as well as any specified additionalFieldsToReturn.
+     * @returns A promise that will resolve with the patched record.
      */
     export function updateRecord(recordInput: RecordInput, clientOptions?: ClientOptions): Promise<RecordRepresentation>;
 
@@ -354,14 +357,12 @@ declare module 'lightning/uiRecordApi' {
      * Creates a new record using the properties in recordInput.
      * @param recordInput The RecordInput object to use to create the record.
      * @returns A promise that will resolve with the newly created record.
-     *          The record will contain data for the list of fields as defined by the applicable layout
-     *          for the record.
      */
     export function createRecord(recordInput: RecordInput): Promise<RecordRepresentation>;
 
     /**
-     * Deletes a record given the recordId.
-     * @param recordId The 18 char record ID for the record to be retrieved.
+     * Deletes a record with the specified recordId.
+     * @param recordId ID of the record to delete.
      * @returns A promise that will resolve to undefined.
      */
     export function deleteRecord(recordId: string): Promise<undefined>;
@@ -371,7 +372,7 @@ declare module 'lightning/uiRecordApi' {
      * This object can be used to create a record with createRecord().
      * @param record The record that contains the source data.
      * @param objectInfo The ObjectInfo corresponding to the apiName on the record. If provided, only fields that are createable=true
-     *        (excluding Id) will be assigned to the object return value.
+     *        (excluding Id) are assigned to the object return value.
      * @returns RecordInput
      */
     export function generateRecordInputForCreate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInput;
@@ -381,14 +382,14 @@ declare module 'lightning/uiRecordApi' {
      * This object can be used to update a record.
      * @param record The record that contains the source data.
      * @param objectInfo The ObjectInfo corresponding to the apiName on the record.
-     *        If provided, only fields that are updateable=true (excluding Id) will be assigned to the object return value.
+     *        If provided, only fields that are updateable=true (excluding Id) are assigned to the object return value.
      * @returns RecordInput.
      */
     export function generateRecordInputForUpdate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInput;
 
     /**
-     * Returns a new RecordInput that has a list of fields that has been filtered by edited fields. Only contains fields that have been
-     * edited from their original values (excluding Id which is always copied over.)
+     * Returns a new RecordInput containing a list of fields that have been edited from their original values. (Also contains the Id
+     * field, which is always copied over.)
      * @param recordInput The RecordInput object to filter.
      * @param originalRecord The Record object that contains the original field values.
      * @returns RecordInput.
@@ -398,7 +399,7 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Gets a field's value from a record.
      * @param record The record.
-     * @param field The qualified API name of the field to return.
+     * @param field Object-qualified API name of the field to return.
      * @returns The field's value (which may be a record in the case of spanning fields), or undefined if the field isn't found.
      */
     export function getFieldValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
@@ -406,7 +407,7 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Gets a field's display value from a record.
      * @param record The record.
-     * @param field The qualified API name of the field to return.
+     * @param field Object-qualified API name of the field to return.
      * @returns The field's display value, or undefined if the field isn't found.
      */
     export function getFieldDisplayValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
