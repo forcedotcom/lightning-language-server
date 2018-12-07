@@ -13,19 +13,19 @@ it('lifecycle', async () => {
     let jsconfigForceApp: config.IJsconfig = JSON.parse(utils.readFileSync(jsconfigPathForceApp));
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigForceApp.compilerOptions.paths).toMatchObject({
-        'c-hello_world': ['hello_world/hello_world.js'],
-        'c-todo_utils': ['../../../../utils/meta/lwc/todo_utils/todo_utils.js'],
+        'c/hello_world': ['hello_world/hello_world.js'],
+        'c/todo_utils': ['../../../../utils/meta/lwc/todo_utils/todo_utils.js'],
     });
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
     const jsconfigUtils = JSON.parse(utils.readFileSync(jsconfigPathUtils));
     expect(jsconfigUtils.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigUtils.compilerOptions.paths).toMatchObject({
-        'c-hello_world': ['../../../force-app/main/default/lwc/hello_world/hello_world.js'],
-        'c-todo_utils': ['todo_utils/todo_utils.js'],
+        'c/hello_world': ['../../../force-app/main/default/lwc/hello_world/hello_world.js'],
+        'c/todo_utils': ['todo_utils/todo_utils.js'],
     });
 
     // onCreateCustomComponent:
-    const newCompTag = 'c-new_comp';
+    const newCompTag = 'c/new_comp';
     const newCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
     config.onCreatedCustomComponent(context, newCompPath);
