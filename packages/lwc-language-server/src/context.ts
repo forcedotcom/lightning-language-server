@@ -22,7 +22,7 @@ export class WorkspaceContext {
     // common to all project types
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
-    public readonly namespaceRoots: string[];
+    public namespaceRoots: string[];
 
     // for sfdx projectsÍ
     private sfdxProjectConfig: ISfdxProjectConfig;
@@ -99,6 +99,7 @@ export class WorkspaceContext {
      * Configures a LWC project
      */
     public configureProject() {
+        this.namespaceRoots = this.findNamespaceRootsUsingType();
         this.writeJsconfigJson();
         this.writeSettings();
         this.writeTypings();
@@ -408,8 +409,8 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
     const roots: string[] = [];
 
     function isModuleRoot(subdirs: string[]): boolean {
-        // is a root if any subdir matches a name/name.js with name.js being a module
         for (const subdir of subdirs) {
+            // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
             const modulePath = path.join(subdir, basename + '.js');
             if (fs.existsSync(modulePath)) {
@@ -441,7 +442,10 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
         // module_root/name/name.js
 
         const subdirs = findSubdirectories(candidate);
-        if (isModuleRoot(subdirs)) {
+        // Is a root if we have a folder called lwc
+        if (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc') {
+            roots.push(path.resolve(candidate));
+        } else if (isModuleRoot(subdirs)) {
             roots.push(path.resolve(candidate));
         } else {
             for (const subdir of subdirs) {

@@ -3,7 +3,7 @@ import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import * as utils from '../utils';
-import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument } from './test-utils';
+import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument, REGISTERED_EMPTY_FOLDER_ROOT } from './test-utils';
 
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
@@ -13,12 +13,13 @@ it('WorkspaceContext', async () => {
     expect(roots[0]).toBeAbsolutePath();
     expect(roots[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
     expect(roots[1]).toEndWith(join(UTILS_ROOT, 'lwc'));
-    expect(roots.length).toBe(2);
+    expect(roots[2]).toEndWith(join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
+    expect(roots.length).toBe(3);
     let modules = context.findAllModules();
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
-    expect(context.getRelativeModulesDirs().length).toBe(2);
+    expect(context.getRelativeModulesDirs().length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = context.namespaceRoots;
@@ -148,7 +149,7 @@ it('configureSfdxProject()', () => {
     context.configureProject();
 
     // tslint:disable-next-line no-string-literal
-    expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils}');
+    expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils,registered-empty-folder}');
 
     // verify newly created jsconfig.json
     const jsconfigForceAppContent = utils.readFileSync(jsconfigPathForceApp);

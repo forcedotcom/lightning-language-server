@@ -6,6 +6,9 @@
     },
     {
       "path": "utils"
+    },
+    {
+      "path": "registered-empty-folder"
     }
   ],
   "namespace": "",

@@ -5,6 +5,7 @@ import * as utils from '../utils';
 
 export const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
 export const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'meta');
+export const REGISTERED_EMPTY_FOLDER_ROOT = join('test-workspaces', 'sfdx-workspace', 'registered-empty-folder', 'meta');
 export const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app', 'main', 'core');
 export const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
 export const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
