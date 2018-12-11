@@ -21,6 +21,7 @@ import URI from 'vscode-uri';
 
 import { WorkspaceType } from './shared';
 export * from './shared';
+import { startServer } from './tern-server';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -30,10 +31,15 @@ const connection: IConnection = createConnection();
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
+let ternServer;
+
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath } = params;
 
+        debugger;
+        console.log("starting server")
+        ternServer = startServer(rootPath);
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {

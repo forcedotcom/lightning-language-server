@@ -17,19 +17,21 @@
     "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
+    "@types/tern": "^0.22.1",
     "camelcase": "5.0.0",
+    "comment-parser": "0.5.0",
     "deep-equal": "1.0.1",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
     "lodash": "4.17.10",
     "properties": "1.2.1",
     "semver": "5.5.0",
+    "tern": "^0.23.0",
     "tmp": "0.0.33",
     "vscode-languageserver": "4.4.0",
     "vscode-nls": "3.2.4",
     "vscode-uri": "1.0.5",
-    "xml2js": "0.4.19",
-    "comment-parser": "0.5.0"
+    "xml2js": "0.4.19"
   },
   "devDependencies": {
     "@types/babel-types": "7.0.4",
