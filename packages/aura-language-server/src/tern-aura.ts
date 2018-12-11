@@ -3,6 +3,7 @@ import * as tern from 'tern/lib/tern';
 import * as walk from 'acorn/dist/walk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './indexer';
 
 const WG_IMPORT_DEFAULT_FALLBACK = 80;
 const WG_DEFAULT_EXPORT = 95;
@@ -36,58 +37,11 @@ const ForAllProps_Purgeable = infer.constraint({
         this.sources.push(source);
     },
 });
-//-- CALLBACK functions back into JAVA land --------------------------------
-async function getLibFile(file, library) {
-    if (global.J2V8 && global.J2V8.getLibrary) {
-        return await global.J2V8.getLibrary(file, library);
-    } else {
-        return libsi[library];
-    }
-}
-async function getLibraryForJS(jsfile) {
-    if (global.J2V8 && global.J2V8.getLibraryForJS) {
-        return await global.J2V8.getLibraryForJS(jsfile);
-    } else {
-        return jsToLib[jsfile];
-    }
-}
-async function getComponentForJS(jsfile) {
-    if (global.J2V8 && global.J2V8.getComponentForJS) {
-        return await global.J2V8.getComponentForJS(jsfile);
-    } else {
-        return jsToCmp[jsfile];
-    }
-}
-async function getLibIncludes(filename) {
-    if (global.J2V8 && global.J2V8.getLibIncludes) {
-        return await global.J2V8.getLibIncludes(filename);
-    } else {
-        throw Error('unsupported');
-    }
-}
-async function getLibImports(filename, bn) {
-    if (global.J2V8 && global.J2V8.getLibImports) {
-        return await global.J2V8.getLibImports(filename, bn);
-    } else {
-        throw Error('unsupported');
-    }
-}
-async function getCmpImports(filename) {
-    if (global.J2V8 && global.J2V8.getCmpImports) {
-        return await global.J2V8.getCmpImports(filename);
-    } else {
-        throw Error('unsupported');
-    }
-}
+
 async function readFile(filename) {
-    if (global.J2V8 && global.J2V8.readFile) {
-        return await global.J2V8.readFile(filename);
-    } else {
-        throw Error('unsupported');
-    }
+    return fs.readFileSync(filename, 'utf-8');
 }
 
-//-- end CALLBACK functions back into JAVA land --------------------------------
 function getFilename(filename) {
     if (server.options.projectDir.endsWith('/')) {
         return server.options.projectDir + filename;
@@ -383,7 +337,6 @@ function _debug(log) {
     // console.log(log);
 }
 async function connectModule(file, out) {
-
     if (isBlacklisted(file.name)) {
         return;
     }

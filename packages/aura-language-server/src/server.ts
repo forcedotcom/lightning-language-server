@@ -14,6 +14,8 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
+    TextDocumentChangeEvent,
+    CompletionParams,
 } from 'vscode-languageserver';
 
 import * as utils from './utils';
@@ -22,6 +24,8 @@ import URI from 'vscode-uri';
 import { WorkspaceType } from './shared';
 export * from './shared';
 import { startServer } from './tern-server';
+import * as util from 'util';
+import * as tern from 'tern';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -32,14 +36,38 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 let ternServer;
+let asyncTernRequest;
+
+function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
+    return { line, ch: character };
+}
+
+function uriToFile(uri: string): string {
+    return URI.parse(uri).fsPath;
+}
+
+function fileToUri(file: string): string {
+    return URI.file(file).toString();
+}
+
+async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
+    return await asyncTernRequest({
+        query: {
+            type,
+            file: uriToFile(event.textDocument.uri),
+            end: lsp2ternPos(event.position),
+            lineCharPositions: true,
+            ...options,
+        },
+    });
+}
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath } = params;
-
-        ;
-        console.log("starting server")
+        console.log('starting server');
         ternServer = await startServer(rootPath);
+        asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
@@ -78,31 +106,40 @@ documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
-documents.onDidChangeContent(async change => {
-    // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
-    const { document } = change;
-    const { uri } = document;
-    // if (context.isLWCTemplate(document)) {
-    //     const diagnostics = templateLinter(document);
-    //     connection.sendDiagnostics({ uri, diagnostics });
-    // } else if (context.isLWCJavascript(document)) {
-    //     const { metadata, diagnostics } = await javascriptCompileDocument(document);
-    //     connection.sendDiagnostics({ uri, diagnostics });
-    //     if (metadata) {
-    //         addCustomTagFromResults(uri, metadata, context.type === WorkspaceType.SFDX);
-    //     }
-    // }
+const refresh = (event: TextDocumentChangeEvent) => {
+    const document = event.document;
+    ternServer.addFile(uriToFile(document.uri), document.getText());
+};
+
+documents.onDidOpen(async (open: TextDocumentChangeEvent) => {
+     refresh(open);
+});
+
+documents.onDidChangeContent(async (change: TextDocumentChangeEvent) => {
+     refresh(change);
 });
 
 connection.onCompletion(
-    (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        // if (!context.isLWCTemplate(document)) {
+    async (completionParams: CompletionParams): Promise<CompletionList> => {
+
+        const { completions } = await ternRequest(completionParams, 'completions', {
+            types: true,
+            docs: true,
+            caseInsensitive: true,
+        });
+        return completions.map(completion => ({
+            documentation: completion.doc,
+            detail: completion.type,
+            label: completion.name,
+        }));
+
+        //const document = documents.get(textDocumentPosition.textDocument.uri);
+        // if (!context.isLWCTemplate(do            cument)) {
         //     return { isIncomplete: false, items: [] };
         // }
         // const htmlDocument = htmlLS.parseHTMLDocument(document);
         // return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
-        return;
+        // return;
     },
 );
 

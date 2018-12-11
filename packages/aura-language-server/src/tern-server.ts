@@ -1,9 +1,10 @@
 import fs from 'fs';
 import * as tern from 'tern';
 import path from 'path';
+import * as util from 'util';
 
 const defaultLibs = ['browser', 'ecmascript'];
-const defaultPlugins = { modules: {}, aura: {} };
+const defaultPlugins = { modules: {}, aura: {}, doc_comment: {} };
 
 const defaultConfig = {
     ecmaVersion: 6,
@@ -51,8 +52,10 @@ async function loadPlugins(defaultPlugins, rootPath) {
         const val = plugins[plugin];
         if (!val) continue;
 
-        if (!await loadLocal(plugin, rootPath)) {
-            await loadBuiltIn(plugin, rootPath);
+        if (!(await loadLocal(plugin, rootPath))) {
+            if (!(await loadBuiltIn(plugin, rootPath))) {
+                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+            }
         }
 
         options[path.basename(plugin)] = true;
@@ -67,7 +70,6 @@ async function loadLocal(plugin, rootPath) {
         // local resolution only here
         found = require.resolve('./tern-' + plugin);
     } catch (e) {
-        process.stderr.write('Failed to find plugin ' + plugin + '.\n');
         return false;
     }
 
