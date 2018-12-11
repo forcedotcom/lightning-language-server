@@ -37,9 +37,9 @@ connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath } = params;
 
-        debugger;
+        ;
         console.log("starting server")
-        ternServer = startServer(rootPath);
+        ternServer = await startServer(rootPath);
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {

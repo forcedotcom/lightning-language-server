@@ -2,18 +2,17 @@ import fs from 'fs';
 import * as tern from 'tern';
 import path from 'path';
 
+const defaultLibs = ['browser', 'ecmascript'];
+const defaultPlugins = { modules: {}, aura: {} };
+
 const defaultConfig = {
-    libs: ['browser', 'ecmascript'],
-    loadEagerly: false,
-    plugins: {},
-    ecmaScript: true,
     ecmaVersion: 6,
     stripCRs: false,
     disableLoadingLocal: true,
     verbose: true,
-    debug:  true,
+    debug: true,
     async: true,
-    dependencyBudget: 20000
+    dependencyBudget: 20000,
 };
 
 function readJSON(fileName) {
@@ -21,53 +20,97 @@ function readJSON(fileName) {
     try {
         return JSON.parse(file);
     } catch (e) {
-        console.warn("Bad JSON in " + fileName + ": " + e.message);
+        console.warn('Bad JSON in ' + fileName + ': ' + e.message);
     }
 }
 
-function findDefs(config) {
+function findDefs(libs) {
     const ternlibpath = require.resolve('tern');
-    const ternbasedir = path.join( ternlibpath, '../..');
+    const ternbasedir = path.join(ternlibpath, '../..');
 
-    const defs = [], src = config.libs.slice();
-    if (config.ecmaScript && src.indexOf("ecmascript") == -1)
-      src.unshift("ecmascript")
+    const defs = [],
+        src = libs.slice();
     for (let i = 0; i < src.length; ++i) {
         let file = src[i];
-        console.log("Loading library " + file);
-        if (!/\.json$/.test(file)) file = file + ".json";
+        console.log('Loading library ' + file);
+        if (!/\.json$/.test(file)) file = file + '.json';
         const def = path.join(ternbasedir, 'defs', file);
         if (fs.existsSync(def)) {
             defs.push(readJSON(def));
         } else {
-            console.log("Library not found: " + src[i]);
+            console.log('Library not found: ' + src[i]);
         }
     }
     return defs;
 }
 
-export function startServer(rootPath) {
-    debugger;
+async function loadPlugins(defaultPlugins, rootPath) {
+    const plugins = defaultPlugins,
+        options = {};
+    for (let plugin in plugins) {
+        const val = plugins[plugin];
+        if (!val) continue;
 
-    const config = {
-        ...defaultConfig,
-        defs: defs,
-        plugins: plugins,
-        // @ts-ignore 2345
-        projectDir: rootPath,
-        getFile: function (name, c) {
-            if (defaultConfig.async) {
-                fs.readFile(path.resolve(rootPath, name), "utf8", c);
-            } else {
-                return fs.readFileSync(path.resolve(rootPath, name), "utf8");
-            }
+        if (!await loadLocal(plugin, rootPath)) {
+            await loadBuiltIn(plugin, rootPath);
         }
-    };
 
-    var defs = findDefs(config );
-    var plugins = undefined;//loadAura();
+        options[path.basename(plugin)] = true;
+    }
 
-    var server = new tern.Server(config);
-    return server;
+    return options;
 }
 
+async function loadLocal(plugin, rootPath) {
+    let found;
+    try {
+        // local resolution only here
+        found = require.resolve('./tern-' + plugin);
+    } catch (e) {
+        process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+        return false;
+    }
+
+    const mod = await import(found);
+    if (mod.hasOwnProperty('initialize')) mod.initialize(rootPath);
+    return true;
+}
+
+async function loadBuiltIn(plugin, rootPath) {
+    const ternlibpath = require.resolve('tern');
+    const ternbasedir = path.join(ternlibpath, '../..');
+
+    const def = path.join(ternbasedir, 'plugin', plugin);
+
+    let found;
+    try {
+        // local resolution only here
+        found = require.resolve(def);
+    } catch (e) {
+        process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+        return;
+    }
+
+    const mod = await import(found);
+    if (mod.hasOwnProperty('initialize')) mod.initialize(rootPath);
+    return true;
+}
+
+export async function startServer(rootPath) {
+    var defs = findDefs(defaultLibs);
+    var plugins = await loadPlugins(defaultPlugins, rootPath);
+
+    const config: tern.ConstructorOptions = {
+        ...defaultConfig,
+        defs,
+        plugins,
+        // @ts-ignore 2345
+        projectDir: rootPath,
+        getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
+            fs.readFile(path.resolve(rootPath, filename), 'utf8', callback);
+        },
+    };
+
+    const server = new tern.Server(config);
+    return server;
+}
