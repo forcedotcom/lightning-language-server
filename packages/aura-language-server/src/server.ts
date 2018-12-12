@@ -16,6 +16,9 @@ import {
     MessageType,
     TextDocumentChangeEvent,
     CompletionParams,
+    Position,
+    Range,
+    ReferenceParams,
 } from 'vscode-languageserver';
 
 import * as utils from './utils';
@@ -40,9 +43,28 @@ documents.listen(connection);
 
 let ternServer;
 let asyncTernRequest;
+let theRootPath;
 
 function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
     return { line, ch: character };
+}
+
+function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
+    return { line, character: ch };
+}
+
+function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
+    return {
+        uri: fileToUri(file),
+        range: tern2lspRange({ start, end }),
+    };
+}
+
+function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
+    return {
+        start: tern2lspPos(start),
+        end: tern2lspPos(end),
+    };
 }
 
 function uriToFile(uri: string): string {
@@ -50,7 +72,8 @@ function uriToFile(uri: string): string {
 }
 
 function fileToUri(file: string): string {
-    return URI.file(file).toString();
+    // internally, tern will strip the project root, so we have to add it back
+    return URI.file(path.join(theRootPath, file)).toString();
 }
 
 async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
@@ -68,6 +91,8 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath } = params;
+        theRootPath = rootPath;
+
         console.log('starting server');
         ternServer = await startServer(rootPath);
         asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
@@ -94,8 +119,13 @@ connection.onInitialize(
                     completionProvider: {
                         resolveProvider: true,
                     },
+                    signatureHelpProvider: {
+                        triggerCharacters: ['('],
+                    },
+                    referencesProvider: true,
                     hoverProvider: true,
                     definitionProvider: true,
+                    typeDefinitionProvider: true,
                 },
             };
         } catch (e) {
@@ -132,6 +162,12 @@ connection.onCompletion(
         const { completions } = await ternRequest(completionParams, 'completions', {
             types: true,
             docs: true,
+            depths: true,
+            guess: true,
+            origins: true,
+            urls: true,
+            expandWordForward: false,
+            end: true,
             caseInsensitive: true,
         });
         return completions.map(completion => ({
@@ -139,14 +175,6 @@ connection.onCompletion(
             detail: completion.type,
             label: completion.name,
         }));
-
-        //const document = documents.get(textDocumentPosition.textDocument.uri);
-        // if (!context.isLWCTemplate(do            cument)) {
-        //     return { isIncomplete: false, items: [] };
-        // }
-        // const htmlDocument = htmlLS.parseHTMLDocument(document);
-        // return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
-        // return;
     },
 );
 
@@ -163,29 +191,25 @@ connection.onHover(
         const out = [];
         out.push(`${info.exprName || info.name}: ${info.type}`);
         if (info.doc) {
-            out.push( info.doc );
+            out.push(info.doc);
         }
         if (info.url) {
-            out.push( info.url );
+            out.push(info.url);
         }
-       
-        return { contents: out };
 
+        return { contents: out };
     },
 );
-
 
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
-        const {file, start, end} = await ternRequest(textDocumentPosition, 'definition');
-        if (file === undefined)
-            return null;
-       // TODO
+        const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
+        debugger;
+        if (file) {
+            return tern2lspLocation({ file, start, end });
+        }
     },
 );
-
-// Listen on the connection
-connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     console.info('onDidChangeWatchedFiles...');
@@ -203,3 +227,18 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     //     connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     // }
 });
+
+connection.onRequest((method: string, ...params: any[]) => {
+    debugger;
+});
+
+connection.onReferences(
+    async (reference: ReferenceParams): Promise<Location[]> => {
+        const { refs } = await ternRequest(reference, 'refs');
+        if (refs && refs.length > 0) {
+            return refs.map(ref => tern2lspLocation(ref));
+        }
+    },
+);
+// Listen on the connection
+connection.listen();
