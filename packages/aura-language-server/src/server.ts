@@ -26,10 +26,13 @@ export * from './shared';
 import { startServer } from './tern-server';
 import * as util from 'util';
 import * as tern from 'tern';
+import { interceptConsoleLogger } from './logger';
+import { isNoop } from 'babel-types';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 const connection: IConnection = createConnection();
+interceptConsoleLogger(connection);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -106,22 +109,26 @@ documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
-const refresh = (event: TextDocumentChangeEvent) => {
-    const document = event.document;
+const addFile = (event: TextDocumentChangeEvent) => {
+    const { document } = event;
     ternServer.addFile(uriToFile(document.uri), document.getText());
 };
 
 documents.onDidOpen(async (open: TextDocumentChangeEvent) => {
-     refresh(open);
+    addFile(open);
 });
 
 documents.onDidChangeContent(async (change: TextDocumentChangeEvent) => {
-     refresh(change);
+    addFile(change);
+});
+
+documents.onDidClose((close: TextDocumentChangeEvent) => {
+    const { document } = close;
+    ternServer.delFile(uriToFile(document.uri));
 });
 
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
-
         const { completions } = await ternRequest(completionParams, 'completions', {
             types: true,
             docs: true,
@@ -150,26 +157,30 @@ connection.onCompletionResolve(
 );
 
 connection.onHover(
-    (textDocumentPosition: TextDocumentPositionParams): Hover => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        // if (!context.isLWCTemplate(document)) {
-        //     return null;
-        // }
-        // const htmlDocument = htmlLS.parseHTMLDocument(document);
-        // return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
-        return;
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
+        const info = await ternRequest(textDocumentPosition, 'type');
+
+        const out = [];
+        out.push(`${info.exprName || info.name}: ${info.type}`);
+        if (info.doc) {
+            out.push( info.doc );
+        }
+        if (info.url) {
+            out.push( info.url );
+        }
+       
+        return { contents: out };
+
     },
 );
 
+
 connection.onDefinition(
-    (textDocumentPosition: TextDocumentPositionParams): Location => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        // if (!context.isLWCTemplate(document)) {
-        //     return null;
-        // }
-        // const htmlDocument = htmlLS.parseHTMLDocument(document);
-        // return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
-        return;
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+        const {file, start, end} = await ternRequest(textDocumentPosition, 'definition');
+        if (file === undefined)
+            return null;
+       // TODO
     },
 );
 
