@@ -1,6 +1,7 @@
 {
     "tslint.exclude": [
         "**/src/html-language-service/htmlLanguageService.ts",
+        "**/src/html-language-service/htmlLanguageTypes.ts",
         "**/src/html-language-service/parser/htmlParser.ts",
         "**/src/html-language-service/parser/htmlScanner.ts",
         "**/src/html-language-service/parser/htmlTags.ts",

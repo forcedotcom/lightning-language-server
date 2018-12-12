@@ -23,7 +23,7 @@ import {
 
 import * as utils from './utils';
 import URI from 'vscode-uri';
-
+import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import { WorkspaceType } from './shared';
 export * from './shared';
 import { startServer } from './tern-server';
@@ -88,6 +88,8 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
     });
 }
 
+let htmlLS: LanguageService;
+
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath } = params;
@@ -110,7 +112,7 @@ connection.onInitialize(
             // context = new WorkspaceContext(workspaceRoot);
             // wait for indexing to finish before returning from onInitialize()
             // await context.configureAndIndex();
-            // htmlLS = getLanguageService();
+            htmlLS = getLanguageService();
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
@@ -129,7 +131,7 @@ connection.onInitialize(
                 },
             };
         } catch (e) {
-            throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
+            throw new Error(`Aura Language Server initialization unsuccessful. Error message: ${e.message}`);
         }
     },
 );
