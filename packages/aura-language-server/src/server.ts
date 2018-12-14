@@ -19,6 +19,7 @@ import {
     Position,
     Range,
     ReferenceParams,
+    SignatureHelp,
 } from 'vscode-languageserver';
 
 import * as utils from './utils';
@@ -31,6 +32,10 @@ import * as util from 'util';
 import * as tern from 'tern';
 import { interceptConsoleLogger } from './logger';
 import { isNoop } from 'babel-types';
+import * as fs from 'fs';
+import * as infer from 'tern/lib/infer';
+import * as line from 'line-column';
+import { findWord, findPreviousWord } from './string-util';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -92,9 +97,8 @@ let htmlLS: LanguageService;
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath } = params;
+        const { rootUri, rootPath, capabilities } = params;
         theRootPath = rootPath;
-
         console.log('starting server');
         ternServer = await startServer(rootPath);
         asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
@@ -206,7 +210,6 @@ connection.onHover(
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
         const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
-        debugger;
         if (file) {
             return tern2lspLocation({ file, start, end });
         }
@@ -240,6 +243,38 @@ connection.onReferences(
         if (refs && refs.length > 0) {
             return refs.map(ref => tern2lspLocation(ref));
         }
+    },
+);
+
+connection.onSignatureHelp(
+    async (signatureParams: TextDocumentPositionParams): Promise<SignatureHelp> => {
+        const {
+            position,
+            textDocument: { uri },
+        } = signatureParams;
+        const sp = signatureParams;
+        const file = uriToFile(uri);
+        const contents = fs.readFileSync(file, 'utf-8');
+
+        const offset = new line.default(contents, { origin: 0 }).toIndex(position.line, position.character);
+
+        const word = findPreviousWord(contents, offset - 1);
+
+        const info = await asyncTernRequest({
+            query: {
+                type: 'type',
+                file,
+                end: word.start,
+            },
+        });
+
+        debugger;
+        console.log(infer.def);
+        const parser = new infer.def.TypeParser(info.type);
+        const parsed = parser.parseType(true);
+
+        infer.def.parse(info.type, 'Aura', '/stuff');
+        return undefined;
     },
 );
 // Listen on the connection

@@ -1,4 +1,3 @@
-
 export function interceptConsoleLogger(connection) {
     const console = global.console;
     if (!console) return;
@@ -8,9 +7,8 @@ export function interceptConsoleLogger(connection) {
             if (connection) {
                 connection.console[method].apply(connection.console, arguments);
             }
-            
+
             original.apply(console, arguments);
-            
         };
     }
     var methods = ['log', 'warn', 'error'];
