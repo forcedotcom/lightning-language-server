@@ -334,7 +334,7 @@ async function processIfComponent(file, modules) {
 }
 
 function _debug(log) {
-    console.log(log);
+    //console.log(log);
 }
 async function connectModule(file, out) {
     if (isBlacklisted(file.name)) {

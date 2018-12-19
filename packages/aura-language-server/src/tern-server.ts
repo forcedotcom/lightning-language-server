@@ -33,13 +33,13 @@ function findDefs(libs) {
         src = libs.slice();
     for (let i = 0; i < src.length; ++i) {
         let file = src[i];
-        console.log('Loading library ' + file);
+        console.log(`Loading support library: ${file}`);
         if (!/\.json$/.test(file)) file = file + '.json';
         const def = path.join(ternbasedir, 'defs', file);
         if (fs.existsSync(def)) {
             defs.push(readJSON(def));
         } else {
-            console.log('Library not found: ' + src[i]);
+            console.log(`Not found: ${src[i]}`);
         }
     }
     return defs;

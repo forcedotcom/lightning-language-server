@@ -54,6 +54,40 @@ export function findWord(str: string, offset: number) {
         };
     }
 }
+export function countPreviousCommas(str: string, offset: number) {
+    let commas: number = 0;
+    let pos: number = offset;
+    let c: number;
+    while (pos >= 0) {
+        c = str.charCodeAt(pos);
+        if (c === 10 || c === 13 || c === 40) {
+            // \n and \r and ()
+            break;
+        } else if (c === 44) {
+            // ,
+            commas++;
+        }
+        --pos;
+    }
+    return commas;
+}
+export function findPreviousLeftParan(str: string, offset: number) {
+    let start: number = -1;
+    let pos: number = offset;
+    let c: number;
+    while (pos >= 0) {
+        c = str.charCodeAt(pos);
+        if (c === 10 || c === 13) {
+            // \n and \r
+            break;
+        } else if (c === 40) {
+            start = pos;
+            break;
+        }
+        --pos;
+    }
+    return start;
+}
 
 export function findPreviousWord(str: string, offset: number) {
     let start: number = -1;
@@ -70,8 +104,8 @@ export function findPreviousWord(str: string, offset: number) {
         if (c === 10 || c === 13) {
             // \n and \r
             break;
-        } else if (c === 46 && !seenWordBoundary) {
-            // .
+        } else if ((c === 46 || c === 40) && !seenWordBoundary) {
+            // . and (
             seenWordBoundary = true;
             boundaryOffset = offset - pos + 1;
         } else if (!isAlphaNumberic(c)) {

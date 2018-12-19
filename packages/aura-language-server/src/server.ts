@@ -20,6 +20,8 @@ import {
     Range,
     ReferenceParams,
     SignatureHelp,
+    SignatureInformation,
+    ParameterInformation,
 } from 'vscode-languageserver';
 
 import * as utils from './utils';
@@ -35,7 +37,8 @@ import { isNoop } from 'babel-types';
 import * as fs from 'fs';
 import * as infer from 'tern/lib/infer';
 import * as line from 'line-column';
-import { findWord, findPreviousWord } from './string-util';
+import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
+import { css_beautify } from './html-language-service/beautify/beautify-css';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -48,6 +51,7 @@ documents.listen(connection);
 
 let ternServer;
 let asyncTernRequest;
+let asyncFlush;
 let theRootPath;
 
 function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
@@ -99,9 +103,10 @@ connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath, capabilities } = params;
         theRootPath = rootPath;
-        console.log('starting server');
+        console.log('Starting Aura LSP server');
         ternServer = await startServer(rootPath);
         asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
+        asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
@@ -165,22 +170,43 @@ documents.onDidClose((close: TextDocumentChangeEvent) => {
 
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
-        const { completions } = await ternRequest(completionParams, 'completions', {
-            types: true,
-            docs: true,
-            depths: true,
-            guess: true,
-            origins: true,
-            urls: true,
-            expandWordForward: false,
-            end: true,
-            caseInsensitive: true,
-        });
-        return completions.map(completion => ({
-            documentation: completion.doc,
-            detail: completion.type,
-            label: completion.name,
-        }));
+        try {
+            await asyncFlush();
+            const { completions } = await ternRequest(completionParams, 'completions', {
+                types: true,
+                docs: true,
+                depths: true,
+                guess: true,
+                origins: true,
+                urls: true,
+                expandWordForward: true,
+                caseInsensitive: true,
+            });
+            const items: CompletionItem[] = completions.map(completion => {
+                let kind = 10;
+                if (completion.type.startsWith('fn')) {
+                    kind = 3;
+                }
+                return {
+                    documentation: completion.doc,
+                    detail: completion.type,
+                    label: completion.name,
+                    kind,
+                };
+            });
+            return {
+                isIncomplete: true,
+                items,
+            };
+        } catch (e) {
+            if (e.message && e.message.startsWith('No type found')) {
+                return;
+            }
+            return {
+                isIncomplete: true,
+                items: [],
+            };
+        }
     },
 );
 
@@ -192,23 +218,31 @@ connection.onCompletionResolve(
 
 connection.onHover(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
-        const info = await ternRequest(textDocumentPosition, 'type');
+        try {
+            await asyncFlush();
+            const info = await ternRequest(textDocumentPosition, 'type');
 
-        const out = [];
-        out.push(`${info.exprName || info.name}: ${info.type}`);
-        if (info.doc) {
-            out.push(info.doc);
-        }
-        if (info.url) {
-            out.push(info.url);
-        }
+            const out = [];
+            out.push(`${info.exprName || info.name}: ${info.type}`);
+            if (info.doc) {
+                out.push(info.doc);
+            }
+            if (info.url) {
+                out.push(info.url);
+            }
 
-        return { contents: out };
+            return { contents: out };
+        } catch (e) {
+            if (e.message && e.message.startsWith('No type found')) {
+                return;
+            }
+        }
     },
 );
 
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+        await asyncFlush();
         const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
             return tern2lspLocation({ file, start, end });
@@ -239,6 +273,7 @@ connection.onRequest((method: string, ...params: any[]) => {
 
 connection.onReferences(
     async (reference: ReferenceParams): Promise<Location[]> => {
+        await asyncFlush();
         const { refs } = await ternRequest(reference, 'refs');
         if (refs && refs.length > 0) {
             return refs.map(ref => tern2lspLocation(ref));
@@ -252,29 +287,57 @@ connection.onSignatureHelp(
             position,
             textDocument: { uri },
         } = signatureParams;
-        const sp = signatureParams;
-        const file = uriToFile(uri);
-        const contents = fs.readFileSync(file, 'utf-8');
+        try {
+            await asyncFlush();
+            const sp = signatureParams;
+            const files = ternServer.files;
+            const fileName = ternServer.normalizeFilename(uriToFile(uri));
+            const file = files.find(f => f.name === fileName);
 
-        const offset = new line.default(contents, { origin: 0 }).toIndex(position.line, position.character);
+            const contents = file.text;
 
-        const word = findPreviousWord(contents, offset - 1);
+            const offset = new line.default(contents, { origin: 0 }).toIndex(position.line, position.character);
 
-        const info = await asyncTernRequest({
-            query: {
-                type: 'type',
-                file,
-                end: word.start,
-            },
-        });
+            const left = findPreviousLeftParan(contents, offset - 1);
+            const word = findPreviousWord(contents, left);
 
-        debugger;
-        console.log(infer.def);
-        const parser = new infer.def.TypeParser(info.type);
-        const parsed = parser.parseType(true);
+            const info = await asyncTernRequest({
+                query: {
+                    type: 'type',
+                    file: file.name,
+                    end: word.start,
+                    docs: true,
+                },
+            });
 
-        infer.def.parse(info.type, 'Aura', '/stuff');
-        return undefined;
+            const commas = countPreviousCommas(contents, offset - 1);
+            const cx = ternServer.cx;
+            let parsed;
+            infer.withContext(cx, () => {
+                const parser = new infer.def.TypeParser(info.type);
+                parsed = parser.parseType(true);
+            });
+
+            const params = parsed.args.map((arg, index) => {
+                const type = arg.getType();
+                return {
+                    label: parsed.argNames[index],
+                    documentation: type.toString() + '\n' + (type.doc || ''),
+                };
+            });
+
+            const sig: SignatureInformation = {
+                label: parsed.argNames[commas] || 'unknown param',
+                documentation: `${info.exprName || info.name}: ${info.doc}`,
+                parameters: params,
+            };
+            const sigs: SignatureHelp = {
+                signatures: [sig],
+                activeSignature: 0,
+                activeParameter: commas,
+            };
+            return sigs;
+        } catch (e) {}
     },
 );
 // Listen on the connection
