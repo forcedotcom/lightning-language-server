@@ -36,7 +36,7 @@ import { interceptConsoleLogger } from './logger';
 import { isNoop } from 'babel-types';
 import * as fs from 'fs';
 import * as infer from 'tern/lib/infer';
-import * as line from 'line-column';
+import * as lineColumn from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { css_beautify } from './html-language-service/beautify/beautify-css';
 
@@ -260,7 +260,8 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     //         await context.configureAndIndex();
     //         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
     //     } else {
-    //         // await Promise.all([updateStaticResourceIndex(changes, context), updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
+    //         // await Promise.all([updateStaticResourceIndex(changes, context),
+    //           updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
     //     }
     // } catch (e) {
     //     connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
@@ -268,7 +269,7 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
 });
 
 connection.onRequest((method: string, ...params: any[]) => {
-    debugger;
+    // debugger
 });
 
 connection.onReferences(
@@ -296,7 +297,7 @@ connection.onSignatureHelp(
 
             const contents = file.text;
 
-            const offset = new line.default(contents, { origin: 0 }).toIndex(position.line, position.character);
+            const offset = new lineColumn.default(contents, { origin: 0 }).toIndex(position.line, position.character);
 
             const left = findPreviousLeftParan(contents, offset - 1);
             const word = findPreviousWord(contents, left);
@@ -337,7 +338,9 @@ connection.onSignatureHelp(
                 activeParameter: commas,
             };
             return sigs;
-        } catch (e) {}
+        } catch (e) {
+            // ignore
+        }
     },
 );
 // Listen on the connection

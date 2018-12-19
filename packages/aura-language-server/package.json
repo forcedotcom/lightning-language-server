@@ -11,7 +11,7 @@
     "tsc": "tsc -p . && npm run copy-static-assets",
     "copy-static-assets": "ts-node copy-static-assets.ts",
     "prepare": "npm run clean && npm run build",
-    "test": "jest --runInBand src",
+    "test": "jest --passWithNoTests --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",

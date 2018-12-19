@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import { dirname, extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import equal = require('deep-equal');
+import equal from 'deep-equal';
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';

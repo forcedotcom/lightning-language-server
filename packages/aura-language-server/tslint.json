@@ -11,7 +11,9 @@
     },
     "linterOptions": {
         "exclude": [
-            "src/resources/**"
+            "src/resources/**",
+            "src/html-language-service/**",
+            "src/tern-aura.ts"
         ]
     }
 }

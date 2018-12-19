@@ -1,9 +1,11 @@
 export function interceptConsoleLogger(connection) {
     const console = global.console;
-    if (!console) return;
+    if (!console) {
+        return;
+    }
     function intercept(method) {
-        var original = console[method];
-        console[method] = function() {
+        const original = console[method];
+        console[method] = () => {
             if (connection) {
                 connection.console[method].apply(connection.console, arguments);
             }
@@ -11,6 +13,8 @@ export function interceptConsoleLogger(connection) {
             original.apply(console, arguments);
         };
     }
-    var methods = ['log', 'warn', 'error'];
-    for (var i = 0; i < methods.length; i++) intercept(methods[i]);
+    const methods = ['log', 'warn', 'error'];
+    for (const method of methods) {
+        intercept(method);
+    }
 }

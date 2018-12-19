@@ -35,14 +35,16 @@ export function findWord(str: string, offset: number) {
     start = pos;
 
     pos = offset;
-    let length = str.length;
+    const length = str.length;
 
     while (pos < length) {
         c = str.charCodeAt(pos);
         if (c === 10 || c === 13) {
             // \n and \r
             break;
-        } else if (!isAlphaNumberic(c)) break;
+        } else if (!isAlphaNumberic(c)) {
+            break;
+        }
         ++pos;
     }
     end = pos;
@@ -123,14 +125,16 @@ export function findPreviousWord(str: string, offset: number) {
     start = pos;
 
     pos = offset;
-    let length: number = str.length;
+    const length: number = str.length;
 
     while (pos < length) {
         c = str.charCodeAt(pos);
         if (c === 10 || c === 13) {
             // \n and \r
             break;
-        } else if (!isAlphaNumberic(c)) break;
+        } else if (!isAlphaNumberic(c)) {
+            break;
+        }
         ++pos;
     }
     end = pos;

@@ -1,7 +1,6 @@
 import fs from 'fs';
 import * as tern from 'tern';
 import path from 'path';
-import * as util from 'util';
 
 const defaultLibs = ['browser', 'ecmascript'];
 const defaultPlugins = { modules: {}, aura: {}, doc_comment: {} };
@@ -29,28 +28,30 @@ function findDefs(libs) {
     const ternlibpath = require.resolve('tern');
     const ternbasedir = path.join(ternlibpath, '../..');
 
-    const defs = [],
-        src = libs.slice();
-    for (let i = 0; i < src.length; ++i) {
-        let file = src[i];
+    const defs = [];
+    const src = libs.slice();
+    for (let file of src) {
         console.log(`Loading support library: ${file}`);
-        if (!/\.json$/.test(file)) file = file + '.json';
+        if (!/\.json$/.test(file)) {
+            file = file + '.json';
+        }
         const def = path.join(ternbasedir, 'defs', file);
         if (fs.existsSync(def)) {
             defs.push(readJSON(def));
         } else {
-            console.log(`Not found: ${src[i]}`);
+            console.log(`Not found: ${file}`);
         }
     }
     return defs;
 }
 
-async function loadPlugins(defaultPlugins, rootPath) {
-    const plugins = defaultPlugins,
-        options = {};
-    for (let plugin in plugins) {
+async function loadPlugins(plugins, rootPath) {
+    const options = {};
+    for (const plugin of Object.keys(plugins)) {
         const val = plugins[plugin];
-        if (!val) continue;
+        if (!val) {
+            continue;
+        }
 
         if (!(await loadLocal(plugin, rootPath))) {
             if (!(await loadBuiltIn(plugin, rootPath))) {
@@ -74,7 +75,9 @@ async function loadLocal(plugin, rootPath) {
     }
 
     const mod = await import(found);
-    if (mod.hasOwnProperty('initialize')) mod.initialize(rootPath);
+    if (mod.hasOwnProperty('initialize')) {
+        mod.initialize(rootPath);
+    }
     return true;
 }
 
@@ -94,13 +97,15 @@ async function loadBuiltIn(plugin, rootPath) {
     }
 
     const mod = await import(found);
-    if (mod.hasOwnProperty('initialize')) mod.initialize(rootPath);
+    if (mod.hasOwnProperty('initialize')) {
+        mod.initialize(rootPath);
+    }
     return true;
 }
 
 export async function startServer(rootPath) {
-    var defs = findDefs(defaultLibs);
-    var plugins = await loadPlugins(defaultPlugins, rootPath);
+    const defs = findDefs(defaultLibs);
+    const plugins = await loadPlugins(defaultPlugins, rootPath);
 
     const config: tern.ConstructorOptions = {
         ...defaultConfig,
