@@ -170,6 +170,11 @@ documents.onDidClose((close: TextDocumentChangeEvent) => {
 
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
+        const document = documents.get(completionParams.textDocument.uri);
+        if (utils.getExtension(document) === '.cmp') {
+            const htmlDocument = htmlLS.parseHTMLDocument(document);
+            return htmlLS.doComplete(document, completionParams.position, htmlDocument);
+        }
         try {
             await asyncFlush();
             const { completions } = await ternRequest(completionParams, 'completions', {
