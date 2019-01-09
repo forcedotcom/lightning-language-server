@@ -3,7 +3,7 @@ import * as tern from 'tern/lib/tern';
 import * as walk from 'acorn/dist/walk';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './indexer';
+import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './tern-indexer';
 
 const WG_IMPORT_DEFAULT_FALLBACK = 80;
 const WG_DEFAULT_EXPORT = 95;

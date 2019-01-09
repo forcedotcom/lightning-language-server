@@ -29,7 +29,7 @@ import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import { WorkspaceType } from './shared';
 export * from './shared';
-import { startServer } from './tern-server';
+import { startServer } from './tern-server/tern-server';
 import * as util from 'util';
 import * as tern from 'tern';
 import { interceptConsoleLogger } from './logger';
