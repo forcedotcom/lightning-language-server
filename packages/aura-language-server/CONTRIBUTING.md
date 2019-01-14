@@ -37,3 +37,5 @@ cd ./packages/salesforcedx-vscode-aura; npm link aura-language-server
 2. Rebuild aura-language-server (CMD+SHIFT+B)
 3. Relaunch salesforcedx-vscode
 4. Re-attach aura-language-server debugger
+
+Test GPG
