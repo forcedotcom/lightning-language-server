@@ -7,6 +7,7 @@ import equal from 'deep-equal';
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 const AURA_STANDARD: string = 'aura-standard.json';
+const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 /**
  * @return true if changes include a directory delete
@@ -57,6 +58,11 @@ export function toResolvedPath(uri: string): string {
 export function getExtension(textDocument: TextDocument): string {
     const filePath = URI.parse(textDocument.uri).fsPath;
     return filePath ? extname(filePath) : '';
+}
+
+export function isAuraMarkup(textDocument: TextDocument): boolean {
+    const fileExt = getExtension(textDocument);
+    return AURA_EXTENSIONS.includes(fileExt);
 }
 
 export function getResourcePath(resourceName: string) {

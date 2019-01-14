@@ -173,7 +173,7 @@ documents.onDidClose((close: TextDocumentChangeEvent) => {
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
         const document = documents.get(completionParams.textDocument.uri);
-        if (utils.getExtension(document) === '.cmp') {
+        if (utils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
             return htmlLS.doComplete(document, completionParams.position, htmlDocument);
         }
@@ -225,6 +225,11 @@ connection.onCompletionResolve(
 
 connection.onHover(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (utils.isAuraMarkup(document)) {
+            const htmlDocument = htmlLS.parseHTMLDocument(document);
+            return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+        }
         try {
             await asyncFlush();
             const info = await ternRequest(textDocumentPosition, 'type');
