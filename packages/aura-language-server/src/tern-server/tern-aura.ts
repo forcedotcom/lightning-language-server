@@ -10,6 +10,7 @@ const WG_DEFAULT_EXPORT = 95;
 let server = {};
 
 const shouldFilter = false;
+/* tslint:disable */
 
 /* this is necessary to inform the parameter types of the controller when
     the helper method is deleted */

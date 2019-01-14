@@ -6,6 +6,7 @@ import equal from 'deep-equal';
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
+const AURA_STANDARD: string = 'aura-standard.json';
 
 /**
  * @return true if changes include a directory delete
@@ -64,6 +65,10 @@ export function getResourcePath(resourceName: string) {
 
 export function getlwcStandardResourcePath() {
     return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
+}
+
+export function getAuraStandardResourcePath() {
+    return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
 }
 
 export function getSfdxResource(resourceName: string) {

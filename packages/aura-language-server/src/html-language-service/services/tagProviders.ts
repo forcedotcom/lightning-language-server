@@ -5,6 +5,14 @@
 'use strict';
 
 import { getHTML5TagProvider, getAngularTagProvider, getIonicTagProvider, IHTMLTagProvider } from '../parser/htmlTags';
+import { getAuraTagProvider } from '../../markup/auraTags';
 import { getRazorTagProvider } from '../parser/razorTags';
 
-export let allTagProviders: IHTMLTagProvider[] = [getHTML5TagProvider(), getAngularTagProvider(), getIonicTagProvider(), getRazorTagProvider()];
+// **** CHANGES TO HTML LANGUAGE SERVICE HERE ****
+export let allTagProviders: IHTMLTagProvider[] = [
+    getAuraTagProvider(),
+    getHTML5TagProvider(),
+    getAngularTagProvider(),
+    getIonicTagProvider(),
+    getRazorTagProvider(),
+];

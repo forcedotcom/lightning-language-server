@@ -39,6 +39,7 @@ import * as infer from 'tern/lib/infer';
 import * as lineColumn from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { css_beautify } from './html-language-service/beautify/beautify-css';
+import * as aura from './markup/auraTags';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -122,6 +123,7 @@ connection.onInitialize(
             // wait for indexing to finish before returning from onInitialize()
             // await context.configureAndIndex();
             htmlLS = getLanguageService();
+            await aura.loadStandardComponents();
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {

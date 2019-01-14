@@ -1,7 +1,8 @@
 import * as shell from "shelljs";
 
 shell.cp("-R", "src/tern-server/*.json", "lib/tern-server/");
-shell.cp("-R", "src/markup/*.json", "lib/markup/");
+shell.mkdir("-p", "lib/resources/");
+shell.cp("-R", "src/resources/*.json", "lib/resources/");
 // Copy Html Language Service files
 shell.cp("-R", "src/html-language-service/beautify/*.js", "lib/html-language-service/beautify/");
 shell.mkdir("-p", "lib/html-language-service/beautify/esm/");
