@@ -1,5 +1,5 @@
 import { IHTMLTagProvider } from '../html-language-service/parser/htmlTags';
-import * as utils from '../utils';
+import { utils } from 'lightning-lsp-common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TagInfo } from '../tagInfo';

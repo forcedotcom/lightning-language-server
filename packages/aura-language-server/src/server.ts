@@ -24,7 +24,7 @@ import {
     ParameterInformation,
 } from 'vscode-languageserver';
 
-import * as utils from './utils';
+import { utils } from 'lightning-lsp-common';
 import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import { WorkspaceType } from './shared';
@@ -328,6 +328,7 @@ connection.onSignatureHelp(
             const cx = ternServer.cx;
             let parsed;
             infer.withContext(cx, () => {
+                // @ts-ignore
                 const parser = new infer.def.TypeParser(info.type);
                 parsed = parser.parseType(true);
             });
