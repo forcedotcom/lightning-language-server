@@ -8,11 +8,11 @@ import { getHTML5TagProvider, getAngularTagProvider, getIonicTagProvider, IHTMLT
 import { getAuraTagProvider } from '../../markup/auraTags';
 import { getRazorTagProvider } from '../parser/razorTags';
 
-// **** CHANGES TO HTML LANGUAGE SERVICE HERE ****
+// **** CHANGES TO HTML LANGUAGE SERVICE HERE **** //
 export let allTagProviders: IHTMLTagProvider[] = [
     getAuraTagProvider(),
-    getHTML5TagProvider(),
-    getAngularTagProvider(),
-    getIonicTagProvider(),
-    getRazorTagProvider(),
+    // getHTML5TagProvider(),
+    // getAngularTagProvider(),
+    // getIonicTagProvider(),
+    // getRazorTagProvider(),
 ];
