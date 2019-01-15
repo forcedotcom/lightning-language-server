@@ -2,10 +2,13 @@ import * as fs from 'fs-extra';
 import { dirname, extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import equal = require('deep-equal');
+import equal from 'deep-equal';
 
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
+const AURA_STANDARD: string = 'aura-standard.json';
+const AURA_SYSTEM: string = 'aura-system.json';
+const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 /**
  * @return true if changes include a directory delete
@@ -71,12 +74,25 @@ export function getExtension(textDocument: TextDocument): string {
     return filePath ? extname(filePath) : '';
 }
 
+export function isAuraMarkup(textDocument: TextDocument): boolean {
+    const fileExt = getExtension(textDocument);
+    return AURA_EXTENSIONS.includes(fileExt);
+}
+
 export function getResourcePath(resourceName: string) {
     return join(__dirname, RESOURCES_DIR, resourceName);
 }
 
 export function getlwcStandardResourcePath() {
     return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
+}
+
+export function getAuraStandardResourcePath() {
+    return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
+}
+
+export function getAuraSystemResourcePath() {
+    return join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
 }
 
 export function getSfdxResource(resourceName: string) {
