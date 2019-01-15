@@ -1,5 +1,5 @@
 import { WorkspaceContext } from './context';
-import { moduleFromFile } from './metadata-utils/custom-components-util';
+import { moduleFromFile } from './custom-components-util';
 import { WorkspaceType } from './shared';
 import * as utils from './utils';
 import * as path from 'path';

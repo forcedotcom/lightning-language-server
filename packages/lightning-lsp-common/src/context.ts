@@ -1,19 +1,20 @@
 import * as fs from 'fs-extra';
 import { GlobSync } from 'glob';
-import * as _ from 'lodash';
-import * as os from 'os';
+import { homedir } from 'os';
 import * as path from 'path';
 import { join } from 'path';
-import * as properties from 'properties';
-import * as semver from 'semver';
-import { TextDocument } from 'vscode-languageserver';
-import { writeJsconfig } from './config';
-import { indexCustomComponents, isJSComponent, loadStandardComponents, resetCustomComponents } from './metadata-utils/custom-components-util';
-import { indexCustomLabels, resetCustomLabels } from './metadata-utils/custom-labels-util';
-import { indexStaticResources, resetStaticResources } from './metadata-utils/static-resources-util';
-import { indexContentAssets, resetContentAssets } from './metadata-utils/content-assets-util';
+import { lt } from 'semver';
+import { TextDocument } from 'vscode-languageserver'
+// @ts-ignore
+import * as templateSettings from 'lodash.templatesettings';
+// @ts-ignore
+import * as _template from 'lodash.template';
+// @ts-ignore
+import { parse } from 'properties';
+
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
 import * as utils from './utils';
+import { isJSComponent } from './custom-components-util';
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -41,24 +42,6 @@ export class WorkspaceContext {
             console.error('not a LWC workspace:', workspaceRoot);
         }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
-    }
-
-    public async configureAndIndex() {
-        this.resetAllIndexes();
-        this.configureProject();
-
-        // indexing:
-        const indexingTasks: Array<Promise<void>> = [];
-        if (this.type !== WorkspaceType.STANDARD_LWC) {
-            indexingTasks.push(loadStandardComponents());
-        }
-        indexingTasks.push(indexCustomComponents(this));
-        if (this.type === WorkspaceType.SFDX) {
-            indexingTasks.push(indexStaticResources(this.workspaceRoot, this.sfdxPackageDirsPattern));
-            indexingTasks.push(indexContentAssets(this.workspaceRoot, this.sfdxPackageDirsPattern));
-            indexingTasks.push(indexCustomLabels(this.workspaceRoot, this.sfdxPackageDirsPattern));
-        }
-        await Promise.all(indexingTasks);
     }
 
     /**
@@ -102,7 +85,6 @@ export class WorkspaceContext {
         this.namespaceRoots = this.findNamespaceRootsUsingType();
         this.writeJsconfigJson();
         this.writeSettings();
-        this.writeTypings();
     }
 
     /**
@@ -131,39 +113,6 @@ export class WorkspaceContext {
                 break;
         }
         return list;
-    }
-
-    private writeTypings() {
-        let typingsDir: string;
-
-        switch (this.type) {
-            case WorkspaceType.SFDX:
-                typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
-                break;
-            case WorkspaceType.CORE_SINGLE_PROJECT:
-                typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
-                break;
-            case WorkspaceType.CORE_ALL:
-                typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
-                break;
-        }
-
-        if (typingsDir) {
-            // copy typings to typingsDir
-            const resourceTypingsDir = utils.getSfdxResource('typings');
-            fs.ensureDirSync(typingsDir);
-            fs.copySync(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
-            for (const file of fs.readdirSync(join(resourceTypingsDir, 'copied'))) {
-                fs.copySync(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
-            }
-        }
-    }
-
-    private resetAllIndexes() {
-        resetCustomComponents();
-        resetCustomLabels();
-        resetStaticResources();
-        resetContentAssets();
     }
 
     private writeJsconfigJson() {
@@ -234,6 +183,10 @@ export class WorkspaceContext {
         }
     }
 
+    private writeJsconfig(file: string, jsconfig: {}) {
+        utils.writeFileSync(file, JSON.stringify(jsconfig, null, 4));
+    }
+    
     private updateCoreSettings() {
         const configBlt = this.readConfigBlt();
         const variableMap = {
@@ -270,7 +223,7 @@ export class WorkspaceContext {
             relativeBltDir = join(relativeBltDir, '..');
         }
         const configBltContent = utils.readFileSync(join(this.workspaceRoot, relativeBltDir, 'config.blt'));
-        return properties.parse(configBltContent);
+        return parse(configBltContent);
     }
 
     private updateCoreLaunch() {
@@ -301,8 +254,8 @@ export class WorkspaceContext {
             p4_user?: string;
         },
     ) {
-        _.templateSettings.interpolate = /\${([\s\S]+?)}/g;
-        const compiled = _.template(template);
+        templateSettings.interpolate = /\${([\s\S]+?)}/g;
+        const compiled = _template(template);
         return compiled(variableMap);
     }
 
@@ -315,11 +268,11 @@ export class WorkspaceContext {
         try {
             const configJson = JSON.parse(config);
             if (!fs.existsSync(configFile)) {
-                writeJsconfig(configFile, configJson);
+                this.writeJsconfig(configFile, configJson);
             } else {
                 const fileConfig = JSON.parse(utils.readFileSync(configFile));
                 if (utils.deepMerge(fileConfig, configJson)) {
-                    writeJsconfig(configFile, fileConfig);
+                    this.writeJsconfig(configFile, fileConfig);
                 }
             }
         } catch (error) {
@@ -488,8 +441,7 @@ function findSubdirectories(dir: string): string[] {
 
 function findCoreESLint(): string {
     // use highest version in ~/tools/eslint-tool/{version}
-    const homedir = os.homedir();
-    const eslintToolDir = path.join(homedir, 'tools', 'eslint-tool');
+    const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
     if (!fs.existsSync(eslintToolDir)) {
         console.warn('core eslint-tool not installed: ' + eslintToolDir);
         return '/core/eslint-tool/not-installed/run/mvn/tools/eslint-lwc';
@@ -498,7 +450,7 @@ function findCoreESLint(): string {
     for (const file of fs.readdirSync(eslintToolDir)) {
         const subdir = path.join(eslintToolDir, file);
         if (fs.statSync(subdir).isDirectory()) {
-            if (!highestVersion || semver.lt(highestVersion, file)) {
+            if (!highestVersion || lt(highestVersion, file)) {
                 highestVersion = file;
             }
         }
