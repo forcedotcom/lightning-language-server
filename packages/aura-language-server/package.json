@@ -26,7 +26,7 @@
     "deep-equal": "1.0.1",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
-    "lightning-lsp-common": "^1.0.1",
+    "lightning-lsp-common": "^1.0.2",
     "line-column": "^1.0.2",
     "lodash": "4.17.10",
     "properties": "1.2.1",
