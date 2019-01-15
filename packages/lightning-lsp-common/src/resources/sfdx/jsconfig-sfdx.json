@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true
+    },
+    "include": [
+        "**/*",
+        "${project_root}/.sfdx/typings/lwc/**/*.d.ts"
+    ]
+}
