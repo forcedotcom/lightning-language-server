@@ -39,6 +39,41 @@ export function loadStandardComponents(): Promise<void> {
     });
 }
 
+export function loadSystemTags(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(utils.getAuraSystemResourcePath(), { encoding: 'utf8' }, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                try {
+                    const auraSystem = JSON.parse(data);
+                    for (const tag in auraSystem) {
+                        // TODO need to account for LWC tags here
+                        if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
+                            const info = new TagInfo([]);
+                            if (auraSystem[tag].attributes) {
+                                const temp = auraSystem[tag].attributes;
+                                for (const v in temp) {
+                                    if (temp.hasOwnProperty(v)) {
+                                        const a = temp[v];
+                                        info.attributes.push(new AttributeInfo(a, a.description, a.type, undefined, 'AURA standard attribute'));
+                                    }
+                                }
+                            }
+                            info.documentation = auraSystem[tag].description;
+                            info.name = tag;
+                            AURA_TAGS.set(tag, info);
+                        }
+                    }
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
+            }
+        });
+    });
+}
+
 export function getAuraTags(): Map<string, TagInfo> {
     return AURA_TAGS;
 }

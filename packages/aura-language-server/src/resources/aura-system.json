@@ -1,5 +1,6 @@
 {
    "aura:application":{
+      "type": "system",
       "description":"An app is a special top-level component whose markup is in a .app file. The markup looks similar to HTML and can contain components as well as a set of supported HTML tags. The .app file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <aura:application> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_aura_application.htm",
       "attributes":{
@@ -82,6 +83,7 @@
       }
    },
    "aura:attribute":{
+      "type": "system",
       "description":"aura:attribute describes an attribute available on an app, interface, component, or event.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_aura_attribute.htm",
       "attributes":{
@@ -114,6 +116,7 @@
       }
    },
    "aura:component":{
+      "type": "system",
       "description":"A component is represented by the aura:component tag, which has the following optional attributes.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
       "attributes":{
@@ -188,6 +191,7 @@
       }
    },
    "aura:event":{
+      "type": "system",
       "description":"An event is represented by the aura:event tag, which has the following attributes.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/events_intro.htm",
       "attributes":{
@@ -215,6 +219,7 @@
       }
    },
    "aura:handler":{
+      "type": "system",
       "description":"A client-side controller handles events within a component. It’s a JavaScript file that defines the functions for all of the component's actions.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/js_client_side_controller.htm",
       "attributes":{
@@ -242,6 +247,7 @@
       }
    },
    "aura:import":{
+      "type": "system",
       "description":"Import an aura:library to be used within this component.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
       "attributes":{
@@ -262,6 +268,7 @@
       }
    },
    "aura:interface":{
+      "type": "system",
       "description":"Object-oriented languages, such as Java, support the concept of an interface that defines a set of method signatures. A class that implements the interface must provide the method implementations. An interface in Java can't be instantiated directly, but a class that implements the interface can. Similarly, Aura supports the concept of interfaces that define a component's shape by defining its attributes.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/oo_interfaces.htm",
       "attributes":{
@@ -288,6 +295,7 @@
       }
    },
    "aura:library":{
+      "type": "system",
       "description":"A collection of javascript functions that can be reused accross components.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
       "attributes":{
@@ -302,6 +310,7 @@
       }
    },
    "aura:clientLibrary":{
+      "type": "system",
       "description":"The <aura:clientLibrary> tag enables you to specify JavaScript or CSS libraries that you want to use. Use the tag in a .cmp or .app resource. Here is some example markup for including client libraries in a component.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_tag_clientlibrary.htm",
       "attributes":{
@@ -333,6 +342,7 @@
       }
    },
    "aura:method":{
+      "type": "system",
       "description":"Use <aura:method> to define a method as part of a component's API. This enables you to directly call a method in a component’s client-side controller instead of firing and handling a component event. Using <aura:method> simplifies the code needed for a parent component to call a method on a child component that it contains.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/js_cmp_methods.htm",
       "attributes":{
@@ -356,6 +366,7 @@
       }
    },
    "aura:registerEvent":{
+      "type": "system",
       "description":"Registers an event that your component will fire as part of its lifecycle.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/events_intro.htm",
       "attributes":{
@@ -376,6 +387,7 @@
       }
    },
    "aura:dependency":{
+      "type": "system",
       "description":"The <aura:dependency> tag enables you to declare dependencies that can't easily be discovered by the framework. The framework automatically tracks dependencies between definitions, such as components. This enables the framework to automatically reload when it detects that you've changed a definition during development. However, if a component uses a client- or server-side provider that instantiates components that are not directly referenced in the component’s markup, use <aura:dependency> in the component’s markup to explicitly tell the framework about the dependency. Adding the <aura:dependency> tag ensures that a component and its dependencies are sent to the client, when needed. For example, adding this tag to a component marks the aura:placeholder component as a dependency.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_tag_dependency.htm",
       "attributes":{
@@ -395,6 +407,7 @@
       }
    },
    "aura:set":{
+      "type": "system",
       "description":"Use <aura:set> in markup to set the value of an attribute inherited from a super component, event, or interface.",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_set_intro.htm",
       "attributes":{
@@ -410,6 +423,7 @@
       }
    },
    "aura:theme":{
+      "type": "system",
       "description":"",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
       "attributes":{
@@ -439,6 +453,7 @@
       }
    },
    "design:component":{
+      "type": "system",
       "description":"",
       "url":"http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
       "attributes":{

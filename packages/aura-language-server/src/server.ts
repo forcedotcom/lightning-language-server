@@ -124,6 +124,7 @@ connection.onInitialize(
             // await context.configureAndIndex();
             htmlLS = getLanguageService();
             await aura.loadStandardComponents();
+            await aura.loadSystemTags();
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {

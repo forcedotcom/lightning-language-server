@@ -7,6 +7,7 @@ import equal from 'deep-equal';
 const RESOURCES_DIR = 'resources';
 const LWC_STANDARD: string = 'lwc-standard.json';
 const AURA_STANDARD: string = 'aura-standard.json';
+const AURA_SYSTEM: string = 'aura-system.json';
 const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 /**
@@ -75,6 +76,10 @@ export function getlwcStandardResourcePath() {
 
 export function getAuraStandardResourcePath() {
     return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
+}
+
+export function getAuraSystemResourcePath() {
+    return join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
 }
 
 export function getSfdxResource(resourceName: string) {
