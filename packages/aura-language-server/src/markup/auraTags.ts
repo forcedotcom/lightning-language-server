@@ -85,7 +85,7 @@ export function getAuraByTag(tag: string): TagInfo {
 export function getAuraTagProvider(): IHTMLTagProvider {
     function addTags(collector: (tag: string, label: string) => void) {
         for (const [tag, tagInfo] of getAuraTags()) {
-            collector(tag, tagInfo.name);
+            collector(tag, tagInfo.documentation);
         }
     }
 
