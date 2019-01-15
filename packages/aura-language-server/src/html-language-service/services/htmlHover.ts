@@ -18,11 +18,12 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     }
     let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
     function getTagHover(tag: string, range: Range, open: boolean): Hover | null {
-        tag = tag.toLowerCase();
+        // **** CHANGES TO HTML LANGUAGE SERVICE HERE **** //
+        //tag = tag.toLowerCase();
         for (let provider of tagProviders) {
             let hover = null;
             provider.collectTags((t, label) => {
-                if (t === tag) {
+                if (t === tag || t === tag.toLowerCase()) {
                     let tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
                     hover = { contents: [{ language: 'html', value: tagLabel }, MarkedString.fromPlainText(label)], range };
                 }
