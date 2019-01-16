@@ -5,7 +5,6 @@ import URI from 'vscode-uri';
 import equal from 'deep-equal';
 
 const RESOURCES_DIR = 'resources';
-const LWC_STANDARD: string = 'lwc-standard.json';
 
 /**
  * @return true if changes include a directory delete
@@ -73,10 +72,6 @@ export function getExtension(textDocument: TextDocument): string {
 
 export function getResourcePath(resourceName: string) {
     return join(__dirname, RESOURCES_DIR, resourceName);
-}
-
-export function getlwcStandardResourcePath() {
-    return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
 }
 
 export function getSfdxResource(resourceName: string) {

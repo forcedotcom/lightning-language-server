@@ -1,4 +1,5 @@
 import * as utils from './utils';
-import * as context from './context';
+import { WorkspaceContext, Indexer } from './context';
+import * as shared from './shared';
 
-export { context, utils };
+export { WorkspaceContext, Indexer, utils, shared };

@@ -6,9 +6,9 @@ import { join } from 'path';
 import { lt } from 'semver';
 import { TextDocument } from 'vscode-languageserver';
 // @ts-ignore
-import * as templateSettings from 'lodash.templatesettings';
+import templateSettings from 'lodash.templatesettings';
 // @ts-ignore
-import * as _template from 'lodash.template';
+import template from 'lodash.template';
 // @ts-ignore
 import { parse } from 'properties';
 
@@ -16,6 +16,9 @@ import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from '.
 import * as utils from './utils';
 import { isJSComponent } from './custom-components-util';
 
+export interface Indexer {
+    configureAndIndex(): Promise<void>;
+}
 /**
  * Holds information and utility methods for a LWC workspace
  */
@@ -24,11 +27,11 @@ export class WorkspaceContext {
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
     public namespaceRoots: string[];
+    public indexers: Map<string, Indexer> = new Map();
+    public sfdxPackageDirsPattern: string;
 
     // for sfdx projectsÍ
     private sfdxProjectConfig: ISfdxProjectConfig;
-    private sfdxPackageDirsPattern: string;
-
     /**
      * @return WorkspaceContext representing the workspace at workspaceRoot
      */
@@ -42,6 +45,14 @@ export class WorkspaceContext {
             console.error('not a LWC workspace:', workspaceRoot);
         }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
+    }
+
+    public addIndexingProvider(provider: { name: string; indexer: Indexer }): void {
+        this.indexers.set(provider.name, provider.indexer);
+    }
+
+    public getIndexingProvider(name: string): Indexer {
+        return this.indexers.get(name);
     }
 
     /**
@@ -195,8 +206,8 @@ export class WorkspaceContext {
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
         };
-        const template = utils.readFileSync(utils.getCoreResource('settings-core.json'));
-        const templateContent = this.processTemplate(template, variableMap);
+        const templateString = utils.readFileSync(utils.getCoreResource('settings-core.json'));
+        const templateContent = this.processTemplate(templateString, variableMap);
         fs.ensureDirSync(join(this.workspaceRoot, '.vscode'));
         this.updateConfigFile(join('.vscode', 'settings.json'), templateContent);
     }
@@ -211,8 +222,8 @@ export class WorkspaceContext {
             java_home: configBlt['eclipse.default.jdk'],
             workspace_root: utils.unixify(this.workspaceRoot),
         };
-        const template = utils.readFileSync(utils.getCoreResource('core.code-workspace.json'));
-        const templateContent = this.processTemplate(template, variableMap);
+        const templateString = utils.readFileSync(utils.getCoreResource('core.code-workspace.json'));
+        const templateContent = this.processTemplate(templateString, variableMap);
         this.updateConfigFile('core.code-workspace', templateContent);
     }
 
@@ -245,7 +256,7 @@ export class WorkspaceContext {
     }
 
     private processTemplate(
-        template: string,
+        templateString: string,
         variableMap: {
             project_root?: string;
             eslint_node_path?: string;
@@ -255,7 +266,7 @@ export class WorkspaceContext {
         },
     ) {
         templateSettings.interpolate = /\${([\s\S]+?)}/g;
-        const compiled = _template(template);
+        const compiled = template(templateString);
         return compiled(variableMap);
     }
 

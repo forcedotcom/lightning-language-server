@@ -1,7 +1,7 @@
 import * as utils from '../utils';
 import * as config from '../config';
 import * as path from 'path';
-import { WorkspaceContext } from '../context';
+import WorkspaceContext from '../context';
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 
 it('lifecycle', async () => {
