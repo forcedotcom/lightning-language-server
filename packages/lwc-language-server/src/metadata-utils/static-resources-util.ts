@@ -1,8 +1,7 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext } from '../context';
-import * as utils from '../utils';
+import { utils, WorkspaceContext } from 'lightning-lsp-common';
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
 const STATIC_RESOURCES: Set<string> = new Set();

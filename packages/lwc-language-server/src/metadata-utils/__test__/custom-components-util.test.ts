@@ -1,8 +1,8 @@
 import { join } from 'path';
 import URI from 'vscode-uri';
+import LWCIndexer from '../../indexer';
 import { FORCE_APP_ROOT, UTILS_ROOT } from '../../__test__/test-utils';
-import { WorkspaceContext } from '../../context';
-import * as utils from '../../utils';
+import { WorkspaceContext, utils } from 'lightning-lsp-common';
 import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
 
 it('addCustomTagFromFile(): adds custom tag attributes and documentation', async () => {
@@ -22,7 +22,11 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
 
 it('indexSfdx', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     // check attributes
     expect(getLwcByTag('c-todo_item').attributes).toMatchObject([
         {
@@ -96,7 +100,11 @@ it('indexSfdx', async () => {
 it('indexCore', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
     expect(getLwcByTag('force-input-phone').attributes).toMatchObject([{ detail: 'LWC custom attribute', jsName: 'value', name: 'value' }]);
@@ -114,7 +122,11 @@ it('indexCore', async () => {
 
 it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     // check attributes
     expect(getLwcByTag('example-line').attributes).toMatchObject([
         { detail: 'LWC custom attribute', jsName: 'hover', name: 'hover' },

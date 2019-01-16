@@ -1,6 +1,6 @@
 import { TextDocument } from 'vscode-languageserver-types';
 import { getLanguageService } from '../htmlLanguageService';
-import { WorkspaceContext } from '../../context';
+import { WorkspaceContext } from 'lightning-lsp-common';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { Hover } from 'vscode-languageserver';
 

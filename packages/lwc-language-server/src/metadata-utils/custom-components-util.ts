@@ -3,14 +3,14 @@ import * as path from 'path';
 import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
-import { WorkspaceContext } from '../context';
+import { WorkspaceContext } from 'lightning-lsp-common';
 import { AttributeInfo, TagInfo } from '../html-language-service/parser/htmlTags';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
-import { WorkspaceType } from '../shared';
-import * as utils from '../utils';
+import { utils, shared } from 'lightning-lsp-common';
 import decamelize from 'decamelize';
-
+import { join } from 'path';
+const { WorkspaceType } = shared;
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
 export function resetCustomComponents() {
@@ -43,9 +43,16 @@ export function getLwcByTag(tag: string): TagInfo {
     return LWC_TAGS.get(tag);
 }
 
+const LWC_STANDARD: string = 'lwc-standard.json';
+const RESOURCES_DIR = '../resources';
+
+export function getlwcStandardResourcePath() {
+    return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
+}
+
 export function loadStandardComponents(): Promise<void> {
     return new Promise((resolve, reject) => {
-        fs.readFile(utils.getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
+        fs.readFile(getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
                 reject(err);
             } else {

@@ -1,7 +1,7 @@
 import { TextDocument, Location, Range, Position } from 'vscode-languageserver-types';
 import { getLanguageService } from '../htmlLanguageService';
-import { WorkspaceContext } from '../../context';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
+import { WorkspaceContext } from 'lightning-lsp-common';
 
 function assertDefinition(value: string, expectedUri?: string, expectedRange?: Range): void {
     const offset = value.indexOf('|');

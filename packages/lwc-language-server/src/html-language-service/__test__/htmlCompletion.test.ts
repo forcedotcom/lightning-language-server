@@ -1,8 +1,9 @@
 import * as path from 'path';
 import { CompletionItem, Position, TextDocument, TextEdit } from 'vscode-languageserver';
-import { WorkspaceContext } from '../../context';
-import { WorkspaceType } from '../../shared';
 import { getLanguageService } from '../htmlLanguageService';
+import LWCIndexer from '../../indexer';
+import { WorkspaceContext, shared } from 'lightning-lsp-common';
+const { WorkspaceType } = shared;
 
 interface ICompletionMatcher {
     label: string;
@@ -76,7 +77,11 @@ it('completion', async () => {
 
 it('completion in sfdx workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     expect(context.type).toBe(WorkspaceType.SFDX);
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
@@ -128,7 +133,11 @@ it('completion in sfdx workspace', async () => {
 
 it('completion in core workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(10);
@@ -152,7 +161,11 @@ it('completion in core workspace', async () => {
 
 it('completion in standard workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
     res = testCompletion('<template><lightning-');
     expect(res.length).toBeGreaterThan(3);

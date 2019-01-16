@@ -16,11 +16,10 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import { WorkspaceContext } from './context';
-
+import LWCIndexer from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
-import * as utils from './utils';
+import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
@@ -28,9 +27,7 @@ import { updateCustomComponentIndex, addCustomTagFromResults } from './metadata-
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
 
-import { WorkspaceType } from './shared';
-export * from './shared';
-
+const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 const connection: IConnection = createConnection();
@@ -57,8 +54,11 @@ connection.onInitialize(
             console.info(`Starting language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
             context = new WorkspaceContext(workspaceRoot);
+            context.configureProject();
             // wait for indexing to finish before returning from onInitialize()
-            await context.configureAndIndex();
+            const lwcIndexer = new LWCIndexer(context);
+            await lwcIndexer.configureAndIndex();
+            context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
             htmlLS = getLanguageService();
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
             // Return the language server capabilities
@@ -146,12 +146,12 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     const changes = change.changes;
     try {
         if (utils.isLWCRootDirectoryChange(changes)) {
-            await context.configureAndIndex();
+            await context.getIndexingProvider('lwc').configureAndIndex();
         }
         if (utils.includesWatchedDirectory(changes)) {
             // re-index everything on directory deletions as no events are reported for contents of deleted directories
             const startTime = process.hrtime();
-            await context.configureAndIndex();
+            await context.getIndexingProvider('lwc').configureAndIndex();
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
         } else {
             await Promise.all([

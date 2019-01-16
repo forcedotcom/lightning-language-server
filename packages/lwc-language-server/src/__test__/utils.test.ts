@@ -1,4 +1,4 @@
-import * as utils from '../utils';
+import { utils } from 'lightning-lsp-common';
 import * as tmp from 'tmp';
 import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';

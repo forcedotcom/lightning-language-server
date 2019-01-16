@@ -7,7 +7,7 @@ import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
-import * as utils from '../utils';
+import { utils } from 'lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 

@@ -5,7 +5,7 @@ import { compile } from '@lwc/compiler';
 import { transform } from '@lwc/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
-import * as utils from '../../utils';
+import { utils } from 'lightning-lsp-common';
 import {
     compileDocument,
     compileFile,

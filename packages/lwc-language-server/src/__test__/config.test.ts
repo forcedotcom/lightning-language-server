@@ -1,12 +1,15 @@
-import * as utils from '../utils';
+import { utils, WorkspaceContext } from 'lightning-lsp-common';
+import LWCIndexer from '../indexer';
 import * as config from '../config';
 import * as path from 'path';
-import { WorkspaceContext } from '../context';
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 
 it('lifecycle', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    await context.configureAndIndex();
+    context.configureProject();
+    const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.configureAndIndex();
+    context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
 
     // verify jsconfig.json after indexing
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';

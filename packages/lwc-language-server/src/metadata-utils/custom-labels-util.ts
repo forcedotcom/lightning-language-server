@@ -3,8 +3,7 @@ import { readFile } from 'fs';
 import { join } from 'path';
 import { parseString } from 'xml2js';
 import { FileEvent, FileChangeType, Files } from 'vscode-languageserver';
-import { WorkspaceContext } from '../context';
-import * as utils from '../utils';
+import { WorkspaceContext, utils } from 'lightning-lsp-common';
 
 interface ICustomLabelsResult {
     CustomLabels: ICustomLabels;

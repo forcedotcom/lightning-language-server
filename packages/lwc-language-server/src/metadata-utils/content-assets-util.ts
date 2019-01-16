@@ -2,8 +2,7 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext } from '../context';
-import * as utils from '../utils';
+import { WorkspaceContext, utils } from 'lightning-lsp-common';
 
 const CONTENT_ASSET_DECLARATION_FILE = '.sfdx/typings/lwc/contentassets.d.ts';
 const CONTENT_ASSETS: Set<string> = new Set();

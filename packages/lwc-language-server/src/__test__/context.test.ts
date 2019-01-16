@@ -1,9 +1,8 @@
 import * as fs from 'fs-extra';
 import { join } from 'path';
-import { WorkspaceContext } from '../context';
-import { WorkspaceType } from '../shared';
-import * as utils from '../utils';
+import { utils, WorkspaceContext, shared } from 'lightning-lsp-common';
 import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument, REGISTERED_EMPTY_FOLDER_ROOT } from './test-utils';
+const { WorkspaceType } = shared;
 
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');

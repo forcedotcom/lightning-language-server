@@ -1,8 +1,8 @@
-import { WorkspaceContext } from './context';
 import { moduleFromFile } from './metadata-utils/custom-components-util';
-import { WorkspaceType } from './shared';
-import * as utils from './utils';
 import * as path from 'path';
+import { WorkspaceContext, shared, utils } from 'lightning-lsp-common';
+
+const { WorkspaceType } = shared;
 
 // file ==> add to jsconfig.json "paths" {tag, [relativePath]}, see http://www.typescriptlang.org/docs/handbook/module-resolution.html
 
