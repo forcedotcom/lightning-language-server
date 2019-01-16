@@ -3,19 +3,8 @@
   "version": "1.0.3",
   "description": "Common Indexer for Lightning LSPs",
   "main": "lib/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/forcedotcom/lightning-lsp-common.git"
-  },
-  "author": "",
+  "typings": "lib/shared.d.ts",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/forcedotcom/lightning-lsp-common/issues"
-  },
-  "publishConfig": {
-    "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
-  },
-  "homepage": "https://github.com/forcedotcom/lightning-lsp-common#readme",
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && cp -r src/resources lib/",
@@ -54,6 +43,9 @@
     "ts-jest": "^23.10.5",
     "tslint": "^5.12.1",
     "typescript": "^3.2.2"
+  },
+  "publishConfig": {
+    "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
   },
   "jest": {
     "transform": {
