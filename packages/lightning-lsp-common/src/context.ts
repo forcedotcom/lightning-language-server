@@ -4,7 +4,7 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { join } from 'path';
 import { lt } from 'semver';
-import { TextDocument } from 'vscode-languageserver'
+import { TextDocument } from 'vscode-languageserver';
 // @ts-ignore
 import * as templateSettings from 'lodash.templatesettings';
 // @ts-ignore
@@ -186,7 +186,7 @@ export class WorkspaceContext {
     private writeJsconfig(file: string, jsconfig: {}) {
         utils.writeFileSync(file, JSON.stringify(jsconfig, null, 4));
     }
-    
+
     private updateCoreSettings() {
         const configBlt = this.readConfigBlt();
         const variableMap = {
