@@ -2,7 +2,7 @@
   "name": "lightning-lsp-common",
   "version": "1.0.2",
   "description": "Common Indexer for Lightning LSPs",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
