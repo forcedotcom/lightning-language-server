@@ -2,8 +2,8 @@ import { mockFileUtil } from './mock-file-util';
 import { indexStaticResources } from '../static-resources-util';
 import { validate } from './util';
 
-jest.mock('../../utils', () => {
-    return mockFileUtil();
+jest.mock('lightning-lsp-common', () => {
+    return { utils: mockFileUtil() };
 });
 
 it('indexStaticResources', async done => {

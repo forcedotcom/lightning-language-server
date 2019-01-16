@@ -2,8 +2,8 @@ import { mockFileUtil } from './mock-file-util';
 import { indexCustomLabels } from '../custom-labels-util';
 import { validate } from './util';
 
-jest.mock('../../utils', () => {
-    return mockFileUtil();
+jest.mock('lightning-lsp-common', () => {
+    return { utils: mockFileUtil() };
 });
 
 it('indexCustomLabels', async done => {
