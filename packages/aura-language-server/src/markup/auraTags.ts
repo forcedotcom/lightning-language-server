@@ -1,5 +1,6 @@
 import { IHTMLTagProvider } from '../html-language-service/parser/htmlTags';
 import { utils } from 'lightning-lsp-common';
+import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TagInfo } from '../tagInfo';
@@ -9,7 +10,7 @@ const AURA_TAGS: Map<string, TagInfo> = new Map();
 
 export function loadStandardComponents(): Promise<void> {
     return new Promise((resolve, reject) => {
-        fs.readFile(utils.getAuraStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
+        fs.readFile(auraUtils.getAuraStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -41,7 +42,7 @@ export function loadStandardComponents(): Promise<void> {
 
 export function loadSystemTags(): Promise<void> {
     return new Promise((resolve, reject) => {
-        fs.readFile(utils.getAuraSystemResourcePath(), { encoding: 'utf8' }, (err, data) => {
+        fs.readFile(auraUtils.getAuraSystemResourcePath(), { encoding: 'utf8' }, (err, data) => {
             if (err) {
                 reject(err);
             } else {

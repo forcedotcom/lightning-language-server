@@ -25,6 +25,7 @@ import {
 } from 'vscode-languageserver';
 
 import { utils } from 'lightning-lsp-common';
+import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import { WorkspaceType } from './shared';
@@ -174,7 +175,7 @@ documents.onDidClose((close: TextDocumentChangeEvent) => {
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
         const document = documents.get(completionParams.textDocument.uri);
-        if (utils.isAuraMarkup(document)) {
+        if (auraUtils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
             return htmlLS.doComplete(document, completionParams.position, htmlDocument);
         }
@@ -227,7 +228,7 @@ connection.onCompletionResolve(
 connection.onHover(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (utils.isAuraMarkup(document)) {
+        if (auraUtils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
             return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
         }
