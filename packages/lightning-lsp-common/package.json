@@ -1,11 +1,8 @@
 {
   "name": "lightning-lsp-common",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Common Indexer for Lightning LSPs",
-  "main": "src/index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/forcedotcom/lightning-lsp-common.git"
@@ -15,7 +12,21 @@
   "bugs": {
     "url": "https://github.com/forcedotcom/lightning-lsp-common/issues"
   },
+  "publishConfig": {
+    "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
+  },
   "homepage": "https://github.com/forcedotcom/lightning-lsp-common#readme",
+  "scripts": {
+    "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
+    "build": "tsc -p . && cp -r src/resources lib/",
+    "prepare": "npm run clean && npm run build",
+    "test": "jest --runInBand src",
+    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
+    "lint": "tslint 'src/**/*.ts'",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "precommit": "lint-staged",
+    "prepush": "npm run prepare && npm run lint && npm run test"
+  },
   "dependencies": {
     "@types/deep-equal": "^1.0.1",
     "@types/lodash.template": "^4.4.4",
@@ -33,6 +44,32 @@
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
     "@types/lodash": "^4.14.119",
-    "@types/semver": "^5.5.0"
+    "@types/semver": "^5.5.0",
+    "husky": "^1.3.1",
+    "jest": "^23.6.0",
+    "lint-staged": "^8.1.0",
+    "prettier": "^1.15.3",
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.2"
+  },
+  "jest": {
+    "transform": {
+      ".ts": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts",
+    "testURL": "http://localhost"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "yarn format",
+      "git add"
+    ]
   }
 }

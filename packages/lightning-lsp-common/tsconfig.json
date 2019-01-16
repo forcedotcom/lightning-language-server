@@ -28,6 +28,7 @@
     "exclude": [
         "node_modules",
         "src/resources/**/*",
-        "**/__test__/fixtures/*.js"
+        "**/__test__/fixtures/*.js",
+        "**/__test__/**/*"
     ]
 }
