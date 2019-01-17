@@ -14,6 +14,7 @@ const shouldFilter = false;
 
 /* this is necessary to inform the parameter types of the controller when
     the helper method is deleted */
+// @ts-ignore
 const ForAllProps_Purgeable = infer.constraint({
     construct: function(c) {
         this.c = c;
@@ -44,9 +45,12 @@ async function readFile(filename) {
 }
 
 function getFilename(filename) {
+    // @ts-ignore
     if (server.options.projectDir.endsWith('/')) {
+        // @ts-ignore
         return server.options.projectDir + filename;
     }
+    // @ts-ignore
     return server.options.projectDir + '/' + filename;
 }
 
@@ -85,6 +89,7 @@ function trimExt(path) {
 }
 
 function initScope(scope) {
+    // @ts-ignore
     var module = new infer.Obj();
     module.propagate(scope.defProp('module'));
     var exports = new infer.Obj(true);
@@ -92,6 +97,7 @@ function initScope(scope) {
     module.originNode = exports.originNode = scope.originNode;
     exports.propagate(scope.defProp('exports'));
     var moduleExports = (scope.exports = module.defProp('exports'));
+    // @ts-ignore
     exports.propagate(moduleExports, WG_DEFAULT_EXPORT);
 }
 async function getLibraryIncludes(file, library) {
@@ -99,6 +105,7 @@ async function getLibraryIncludes(file, library) {
     var inc = await getLibIncludes(getFilename(libFile));
     var includes = [];
     var bn = dirName(libFile);
+    // @ts-ignore
     inc.forEach(function(name) {
         var fname = bn + name + '.js';
         if (!isBlacklisted(fname)) {
@@ -109,6 +116,7 @@ async function getLibraryIncludes(file, library) {
 }
 async function newObj() {
     return new Promise((resolve, reject) => {
+        // @ts-ignore
         infer.withContext(server.cx, function() {
             resolve(new infer.Obj(true));
         });
@@ -116,6 +124,7 @@ async function newObj() {
 }
 async function processIfLibrary(file, modules) {
     let lib = await getLibraryForJS(file.name);
+    // @ts-ignore
     let libs = lib ? [lib] : [];
 
     if (libs.length > 0) {
@@ -140,12 +149,14 @@ async function processIfLibrary(file, modules) {
             //console.log("Found main entry for library: "+l.getType() + " "+l.getType().name + " " + l.getType().origin);
             outObj = l.getType();
         }
+        // @ts-ignore
         if (imps) {
             _debug('Process imported libs of: ' + file.name);
             // get fn decl
             var fn = file.ast.body[0];
             var state = fn.scope;
             // bind included imports to library function....
+            // @ts-ignore
             var imports = imps.split(',');
 
             var libfilesResolved = [];
@@ -161,13 +172,18 @@ async function processIfLibrary(file, modules) {
                     var splits = importedModule.split(':');
                     var qn = splits[0] + ':' + splits[1];
                     var libfile = await getLibFile(file.name, qn);
+                    // @ts-ignore
                     if (!libfile) continue;
 
                     lib = modules.resolveModule('mod:' + qn);
+                    // @ts-ignore
                     if (!lib.getType()) {
                         var zz = await newObj();
+                        // @ts-ignore
                         zz.origin = libfile;
+                        // @ts-ignore
                         zz.name = baseName(libfile);
+                        // @ts-ignore
                         lib.addType(zz);
                     }
                     libfilesResolved.push(modules.resolveModule('mod:' + qn));
@@ -179,6 +195,7 @@ async function processIfLibrary(file, modules) {
                 importedModules.push(importedModule);
             }
             // re-establsh context after awaits
+            // @ts-ignore
             infer.withContext(server.cx, function() {
                 for (var i = 0; i < libfilesResolved.length; i++) {
                     let imf = imfs[i];
@@ -217,6 +234,7 @@ async function processIfLibrary(file, modules) {
             });
         }
         // re-establsh context after awaits
+        // @ts-ignore
         infer.withContext(server.cx, function() {
             _debug('Process exported libs of: ' + file.name);
             walk.simple(
@@ -224,8 +242,11 @@ async function processIfLibrary(file, modules) {
                 {
                     ReturnStatement: function(node, state) {
                         try {
+                            // @ts-ignore
                             var parent = infer.parentNode(node, file.ast);
+                            // @ts-ignore
                             var grand = infer.parentNode(parent, file.ast);
+                            // @ts-ignore
                             var great = infer.parentNode(grand, file.ast);
                             if (great && great['type'] === 'Program') {
                                 if (node.argument) {
@@ -249,6 +270,7 @@ async function processIfLibrary(file, modules) {
                         }
                     },
                 },
+                // @ts-ignore
                 infer.searchVisitor,
             );
         });
@@ -259,12 +281,14 @@ async function processIfComponent(file, modules) {
     //        console.log("cmp " + jsToCmp[file.name]);
 
     let cmp = await getComponentForJS(file.name);
+    // @ts-ignore
     let cmps = cmp ? [cmp] : [];
 
     if (cmps.length > 0) {
         _debug('Discover libs of: ' + cmps[0]);
         let ins = await getCmpImports(getFilename(cmps[0]));
         let libs = [];
+        // @ts-ignore
         for (let i = 0; i < ins.length; i++) {
             let an_import = ins[i];
             let library = an_import.library;
@@ -285,7 +309,9 @@ async function processIfComponent(file, modules) {
             if (!lib.getType()) {
                 // console.log("no type")
                 let zz = await newObj();
+                // @ts-ignore
                 zz.origin = libfile;
+                // @ts-ignore
                 zz.name = baseName(libfile);
                 if (!lib.getType()) {
                     // recheck, after awaits
@@ -293,7 +319,9 @@ async function processIfComponent(file, modules) {
                 }
                 let inc = await getLibraryIncludes(file.name, library);
                 for (let j = 0; j < inc.length; j++) {
+                    // @ts-ignore
                     if (!server.findFile(inc[j])) {
+                        // @ts-ignore
                         server.addFile(inc[j]);
                         // console.log("Added lib dep: "+inc[i]);
                     } else {
@@ -304,6 +332,7 @@ async function processIfComponent(file, modules) {
         }
 
         // reestablish-context after awaits
+        // @ts-ignore
         infer.withContext(server.cx, function() {
             for (let m = 0; m < libs.length; m++) {
                 let library = ins[m].library;
@@ -324,6 +353,7 @@ async function processIfComponent(file, modules) {
                                 }
                             },
                         },
+                        // @ts-ignore
                         infer.searchVisitor,
                     );
                 } catch (ignore) {
@@ -342,7 +372,9 @@ async function connectModule(file, out) {
         return;
     }
 
+    // @ts-ignore
     server.startAsyncAction();
+    // @ts-ignore
     var modules = infer.cx().parent.mod.modules;
     var cx = infer.cx();
     _debug('Starting... ' + file.name);
@@ -350,6 +382,7 @@ async function connectModule(file, out) {
     await processIfComponent(file, modules);
     if (/Helper.js$/.test(file.name)) {
         // need to reestablish server context after awaits
+        // @ts-ignore
         infer.withContext(server.cx, function() {
             _debug('Process helper exports ' + file.name);
             var outObj;
@@ -368,7 +401,9 @@ async function connectModule(file, out) {
                     file.ast,
                     {
                         ObjectExpression: function(node, state) {
+                            // @ts-ignore
                             var parent = infer.parentNode(node, file.ast);
+                            // @ts-ignore
                             var grand = infer.parentNode(parent, file.ast);
                             if (grand.type == 'Program') {
                                 // add some jsdoc
@@ -399,6 +434,7 @@ async function connectModule(file, out) {
                             }
                         },
                     },
+                    // @ts-ignore
                     infer.searchVisitor,
                 );
             } catch (stop) {
@@ -412,30 +448,38 @@ async function connectModule(file, out) {
         var controller = getController(file.name);
         try {
             var text = await readFile(controller);
+            // @ts-ignore
             var sfile = server.findFile(controller);
             if (!sfile || sfile.text !== text) {
+                // @ts-ignore
                 server.addFile(controller, text);
             }
         } catch (ignore) {}
         var renderer = getRenderer(file.name);
         try {
             var text = await readFile(renderer);
+            // @ts-ignore
             var sfile = server.findFile(renderer);
             if (!sfile || sfile.text !== text) {
+                // @ts-ignore
                 server.addFile(renderer, text);
             }
         } catch (ignore) {}
     }
     // reestablish scope after awaits
+    // @ts-ignore
     infer.withContext(server.cx, function() {
         _debug('Fixing scopes...' + file.name);
         walk.simple(file.ast, {
             ObjectExpression: function(node, state) {
+                // @ts-ignore
                 var parent = infer.parentNode(node, file.ast);
+                // @ts-ignore
                 var grand = infer.parentNode(parent, file.ast);
                 if (grand.type == 'Program') {
                     for (var i = 0; i < node.properties.length; ++i) {
                         var prop = node.properties[i],
+                            // @ts-ignore
                             name = infer.propName(prop);
                         if (node.properties[i].value.type == 'FunctionExpression') {
                             var val = node.properties[i].value;
@@ -483,6 +527,7 @@ async function connectModule(file, out) {
         _debug('All done ' + file.name);
     });
 
+    // @ts-ignore
     server.finishAsyncAction();
 }
 
@@ -572,6 +617,7 @@ function resolver(file, parent) {
 }
 
 function unloadDefs() {
+    // @ts-ignore
     server.deleteDefs('Aura');
 }
 
@@ -608,6 +654,7 @@ function escapeRegExp(str) {
 function loadDefs() {
     var defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
     defs = JSON.parse(defs);
+    // @ts-ignore
     server.addDefs(defs);
 }
 
@@ -616,6 +663,7 @@ function safeFunction(fn) {
         try {
             fn.apply(this, arguments);
         } catch (e) {
+            // @ts-ignore
             if (e instanceof infer.TimedOut) throw e;
             console.error(e);
         }
@@ -624,16 +672,23 @@ function safeFunction(fn) {
 
 tern.registerPlugin('aura', function(s, options) {
     server = s;
+    // @ts-ignore
     if (!server.options.async) {
         throw Error('Server must be async');
     }
+    // @ts-ignore
     server.options.getFile = readFileAsync;
 
+    // @ts-ignore
     server.loadPlugin('modules');
+    // @ts-ignore
     server.mod.modules.on('wrapScope', initScope);
+    // @ts-ignore
     server.mod.modules.on('getExports', connectModule);
+    // @ts-ignore
     server.mod.modules.resolvers.push(resolver);
     var currentQuery;
+    // @ts-ignore
     server.on('completion', function(file, query) {
         // don't hijack the request to retrieve the standard completions
         if (currentQuery === query) {
@@ -643,6 +698,7 @@ tern.registerPlugin('aura', function(s, options) {
         // request the standard completions
         var filteredResult;
         query.docFormat = 'full';
+        // @ts-ignore
         server.request(
             {
                 query: query,
@@ -675,6 +731,7 @@ tern.registerPlugin('aura', function(s, options) {
 
     _debug(new Date().toISOString() + ' Done loading!');
 });
+// @ts-ignore
 tern.defineQueryType('ideInit', {
     run: function(server, query) {
         if (query.unloadDefs) {
@@ -682,11 +739,13 @@ tern.defineQueryType('ideInit', {
             _debug('Unloaded default Aura defs');
         }
         if (query.shouldFilter === true || query.shouldFilter === false) {
+            // @ts-ignore
             shouldFilter = query.shouldFilter;
         }
         return 'OK';
     },
 });
+// @ts-ignore
 tern.defineQueryType('cleanup-file', {
     run: function(server, query) {
         var files = query.files;
@@ -713,16 +772,21 @@ tern.defineQueryType('cleanup-file', {
         return 'OK';
     },
 });
+// @ts-ignore
 tern.defineQueryType('guess-types', {
     takesFile: true,
     run: function(server, query, file) {
+        // @ts-ignore
         if (!query.end) throw ternError('missing .query.end field');
+        // @ts-ignore
         if (!query.property) throw ternError('missing .query.property field');
+        // @ts-ignore
         var start = tern.resolvePos(file, query.end);
         var types = [];
 
         function gather(prop, obj, depth) {
             var val = obj.props[prop];
+            // @ts-ignore
             var type = infer.toString(val.getType());
             types.push({
                 property: prop,
@@ -732,12 +796,14 @@ tern.defineQueryType('guess-types', {
                 depth: depth,
             });
         }
+        // @ts-ignore
         infer.forAllLocalsAt(file.ast, start, file.scope, gather);
         return {
             locals: types,
         };
     },
 });
+// @ts-ignore
 tern.defineQueryType('reset', {
     takesFile: false,
     run: function(server, query, file) {
