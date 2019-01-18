@@ -11,7 +11,7 @@
             "port": 6009,
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceRoot}/lib/**"
+                "${workspaceFolder}/lib/**"
             ],
             "protocol": "inspector",
             "timeout": 20000
