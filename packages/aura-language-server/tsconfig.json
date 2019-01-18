@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "lib": [
+            "es2016"
+        ],
+        "outDir": "./lib",
+
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "noUnusedParameters": false,
+        "noUnusedLocals": false,
+
+        "pretty": true,
+        "declaration": true,
+        "esModuleInterop": true,
+    },
+
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.json",
+        "typings/*.d.ts",
+        "jest/*.js"
+    ],
+
+    "exclude": [
+        "node_modules",
+        "src/resources/**/*",
+        "**/__test__/fixtures/*.js"
+    ]
+}

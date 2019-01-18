@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"name": "DX",
+			"path": "../../salesforcedx-vscode"
+		},
+		{
+			"name": "Common",
+			"path": "../"
+		},
+		{
+			"name": "LWC-LSP",
+			"path": "../../lwc-language-server"
+		}
+	],
+	"settings": {
+		"workbench.editor.labelFormat": "medium",
+		"terminal.integrated.env.osx": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		},
+		"terminal.integrated.env.linux": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		},
+		"terminal.integrated.env.windows": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		}
+	},
+	"launch": {
+		"configurations": [],
+		"compounds": [
+			{
+				"name": "Launch DX - LWC",
+				"configurations": [
+				  "Launch Extensions without compile",
+				  "Debug LWC LSP"
+				]
+			}
+		]
+	}
+}

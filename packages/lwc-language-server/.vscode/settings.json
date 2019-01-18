@@ -1,0 +1,18 @@
+{
+    "tslint.exclude": [
+        "**/src/html-language-service/htmlLanguageService.ts",
+        "**/src/html-language-service/parser/htmlParser.ts",
+        "**/src/html-language-service/parser/htmlScanner.ts",
+        "**/src/html-language-service/parser/htmlTags.ts",
+        "**/src/html-language-service/services/htmlCompletion.ts",
+        "**/src/html-language-service/utils/strings.ts",
+        "**/src/html-language-service/utils/paths.ts",
+        "**/src/html-language-service/utils/arrays.ts"
+    ],
+    "search.exclude": {
+        "**/node_modules": true,
+        "lib": true
+    },
+    "html.suggest.angular1": false,
+    "html.suggest.ionic": false
+}

@@ -1,0 +1,16 @@
+version: 2
+jobs:
+   build:
+     docker:
+       - image: circleci/node:8.9.3
+     steps:
+       - checkout
+       - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+       - run: yarn install
+       - run: yarn lint
+       - run: yarn test
+       - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules

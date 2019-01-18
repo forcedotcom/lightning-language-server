@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"name": "Aura-LSP",
+			"path": "../../aura-language-server"
+		},
+		{
+			"name": "DX",
+			"path": "../../salesforcedx-vscode"
+		},
+		{
+			"name": "Common",
+			"path": "../"
+		}
+	],
+	"settings": {
+		"workbench.editor.labelFormat": "medium",
+		"terminal.integrated.env.osx": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		},
+		"terminal.integrated.env.linux": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		},
+		"terminal.integrated.env.windows": {
+			"SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+		}
+	},
+	"launch": {
+		"configurations": [],
+		"compounds": [
+			{
+				"name": "Launch DX - Aura",
+				"configurations": [
+				  "Launch Extensions without compile",
+				  "Debug Aura LSP"
+				]
+			}
+		]
+	}
+}
