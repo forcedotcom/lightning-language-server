@@ -2,19 +2,18 @@
   "name": "lwc-language-server",
   "version": "1.8.3",
   "description": "Language Server Protocol implementation for LWC projects",
-  "main": "lib/shared.js",
-  "typings": "lib/shared.d.ts",
+  "main": "lib/server.js",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/",
-    "prepare": "yarn clean && yarn build",
+    "prepare": "npm run clean && npm run build",
     "test": "jest --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
-    "prepush": "yarn prepare && yarn lint && yarn test"
+    "prepush": "npm run prepare && npm run lint && npm run test"
   },
   "dependencies": {
     "@lwc/babel-plugin-component": "0.33.10",
