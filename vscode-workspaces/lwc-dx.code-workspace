@@ -1,16 +1,12 @@
 {
 	"folders": [
 		{
-			"name": "Aura-LSP",
-			"path": "../../aura-language-server"
-		},
-		{
 			"name": "DX",
 			"path": "../../salesforcedx-vscode"
 		},
 		{
-			"name": "Common",
-			"path": "../"
+			"name": "LWC-LSP",
+			"path": "../packages/lwc-language-server"
 		}
 	],
 	"settings": {
@@ -29,10 +25,10 @@
 		"configurations": [],
 		"compounds": [
 			{
-				"name": "Launch DX - Aura",
+				"name": "Launch DX - LWC",
 				"configurations": [
 				  "Launch Extensions without compile",
-				  "Debug Aura LSP"
+				  "Debug LWC LSP"
 				]
 			}
 		]

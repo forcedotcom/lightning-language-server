@@ -2,7 +2,7 @@
 	"folders": [
 		{
 			"name": "Aura-LSP (aura-language-server)",
-			"path": "../../aura-language-server"
+			"path": "../packages/aura-language-server"
 		},
 		{
 			"name": "DX (salesforcedx-vscode)",
@@ -10,15 +10,15 @@
 		},
 		{
 			"name": "DX LWC (salesforce-vscode-lwc)",
-			"path": "../../salesforcedx-vscode/packages/salesforce-vscode-lwc"
+			"path": "../../salesforcedx-vscode/packages/salesforcedx-vscode-lwc"
 		},
 		{
 			"name": "Common (lightning-lsp-common)",
-			"path": "../"
+			"path": "../packages/lightning-lsp-common"
 		},
 		{
 			"name": "LWC-LSP (lwc-language-server)",
-			"path": "../../lwc-language-server"
+			"path": "../packages/lwc-language-server"
 		}
 	],
 	"settings": {

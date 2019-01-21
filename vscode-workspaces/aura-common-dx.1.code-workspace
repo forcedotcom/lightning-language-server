@@ -2,11 +2,15 @@
 	"folders": [
 		{
 			"name": "Aura-LSP",
-			"path": "../../aura-language-server"
+			"path": "../packages/aura-language-server"
 		},
 		{
 			"name": "DX",
-			"path": "../../salesforcedx-vscode"
+			"path": "../packages/salesforcedx-vscode"
+		},
+		{
+			"name": "Common",
+			"path": "../packages/lightning-lsp-common"
 		}
 	],
 	"settings": {

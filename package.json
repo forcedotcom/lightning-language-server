@@ -1,0 +1,26 @@
+{
+  "scripts": {
+    "postinstall": "lerna bootstrap --force-local",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "prepare": "lerna run clean && lerna run build",
+    "test": "lerna run test",
+    "test_with_coverage": "lerna run test_with_coverage",
+    "lint": "lerna run lint",
+    "format": "lerna run format",
+    "precommit": "lerna run precommit",
+    "prepush": "lerna prepush"
+  },
+  "dependencies": {
+    "lerna": "^3.10.6"
+  },
+  "name": "lightning-language-server",
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "typescript": "^3.2.4"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

@@ -7,13 +7,13 @@
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/",
-    "prepare": "npm run clean && npm run build",
+    "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
-    "prepush": "npm run prepare && npm run lint && npm run test"
+    "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "@lwc/babel-plugin-component": "0.33.10",

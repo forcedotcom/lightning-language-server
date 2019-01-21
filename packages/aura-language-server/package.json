@@ -7,21 +7,22 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "tsc -p . && npm run copy-static-assets",
-    "watch": "tsc -p . && npm run copy-static-assets && tsc -w",
-    "transpile-only": "tsc-transpile-only && npm run copy-static-assets",
+    "build": "tsc -p . && yarn copy-static-assets",
+    "watch": "tsc -p . && yarn copy-static-assets && tsc -w",
+    "transpile-only": "tsc-transpile-only && yarn copy-static-assets",
     "copy-static-assets": "ts-node copy-static-assets.ts",
-    "prepare": "npm run clean && npm run build",
+    "prepare": "yarn clean && yarn build",
     "test": "jest --passWithNoTests --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
-    "prepush": "npm run prepare && npm run lint && npm run test"
+    "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "@types/shelljs": "^0.8.1",
     "@types/tern": "^0.22.1",
+    "acorn-walk": "^6.1.1",
     "camelcase": "5.0.0",
     "comment-parser": "0.5.0",
     "deep-equal": "1.0.1",
@@ -82,7 +83,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "npm run format",
+      "yarn format",
       "git add"
     ]
   }

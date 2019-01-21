@@ -2,15 +2,15 @@
 	"folders": [
 		{
 			"name": "DX",
-			"path": "../../salesforcedx-vscode"
+			"path": "../packages/salesforcedx-vscode"
 		},
 		{
 			"name": "Common",
-			"path": "../"
+			"path": "../packages/lightning-lsp-common"
 		},
 		{
 			"name": "LWC-LSP",
-			"path": "../../lwc-language-server"
+			"path": "../packages/lwc-language-server"
 		}
 	],
 	"settings": {

@@ -1,6 +1,6 @@
 import * as infer from 'tern/lib/infer';
 import * as tern from 'tern/lib/tern';
-import * as walk from 'acorn/dist/walk';
+import * as walk from 'acorn-walk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './tern-indexer';
