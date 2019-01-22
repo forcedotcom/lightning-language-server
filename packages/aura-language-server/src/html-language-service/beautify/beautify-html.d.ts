@@ -99,7 +99,7 @@ export interface IBeautifyHTMLOptions {
      */
     wrap_attributes_indent_size?: number;
 
-    /* 
+    /*
      * end of line character to use
      */
     eol?: string;

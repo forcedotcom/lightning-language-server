@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/",
+    "watch": "tsc -p . && node ./scripts/copy_typings.js && cp -r src/resources lib/ && tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",

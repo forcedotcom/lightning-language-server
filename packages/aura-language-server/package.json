@@ -8,7 +8,7 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "tsc -p . && yarn copy-static-assets",
-    "watch": "tsc -p . && yarn copy-static-assets && tsc -w",
+    "watch": "tsc -p . && yarn copy-static-assets && tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "transpile-only": "tsc-transpile-only && yarn copy-static-assets",
     "copy-static-assets": "ts-node copy-static-assets.ts",
     "prepare": "yarn clean && yarn build",
