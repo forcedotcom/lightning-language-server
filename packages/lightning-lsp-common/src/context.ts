@@ -96,6 +96,7 @@ export class WorkspaceContext {
         this.namespaceRoots = this.findNamespaceRootsUsingType();
         this.writeJsconfigJson();
         this.writeSettings();
+        this.writeTypings();
     }
 
     /**
@@ -124,6 +125,32 @@ export class WorkspaceContext {
                 break;
         }
         return list;
+    }
+
+    private writeTypings() {
+        let typingsDir: string;
+
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
+                break;
+            case WorkspaceType.CORE_SINGLE_PROJECT:
+                typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
+                break;
+            case WorkspaceType.CORE_ALL:
+                typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
+                break;
+        }
+
+        if (typingsDir) {
+            // copy typings to typingsDir
+            const resourceTypingsDir = utils.getSfdxResource('typings');
+            fs.ensureDirSync(typingsDir);
+            fs.copySync(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
+            for (const file of fs.readdirSync(join(resourceTypingsDir, 'copied'))) {
+                fs.copySync(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
+            }
+        }
     }
 
     private writeJsconfigJson() {
