@@ -1,6 +1,7 @@
 {
   "scripts": {
     "postinstall": "lerna bootstrap --force-local",
+    "bootstrap": "lerna bootstrap --force-local",
     "clean": "lerna run clean --stream --parallel",
     "build": "lerna run build --stream",
     "watch": "lerna run watch --stream --parallel",
@@ -10,7 +11,8 @@
     "lint": "lerna run lint --stream --parallel",
     "format": "lerna run format --stream --parallel",
     "precommit": "lerna run precommit --stream",
-    "prepush": "lerna prepush --stream"
+    "prepush": "lerna prepush --stream",
+    "link-lsp": "yarn lerna exec yarn unlink && yarn lerna exec yarn link"
   },
   "dependencies": {
     "lerna": "^3.10.6"
