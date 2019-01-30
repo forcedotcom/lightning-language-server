@@ -104,7 +104,7 @@ connection.onInitialize(
         const { rootUri, rootPath, capabilities } = params;
 
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
-        const theRootPath = workspaceRoot;
+        theRootPath = workspaceRoot;
         try {
             if (!workspaceRoot) {
                 console.warn(`No workspace found`);
@@ -135,7 +135,6 @@ connection.onInitialize(
             // wait for indexing to finish before returning from onInitialize()
             // await context.configureAndIndex();
             htmlLS = getLanguageService();
-            debugger;
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
