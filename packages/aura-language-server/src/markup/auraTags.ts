@@ -59,12 +59,19 @@ function searchAura(node: Node): Node[] {
     return results;
 }
 
+function trimQuotes(string: string) {
+    if (!string) {
+        return '';
+    }
+    return string.replace(/"([^"]+(?="))"/g, '$1');
+}
+
 function getTagInfo(file: string, contents: string, node: Node): TagInfo {
     if (!node) {
         return;
     }
     const attributes = node.attributes || {};
-    const documentation = attributes['description'];
+    const documentation = trimQuotes(attributes.description);
 
     const startColumn = new LineColumnFinder(contents).fromIndex(node.start);
     const endColumn = new LineColumnFinder(contents).fromIndex(node.end - 1);
@@ -100,9 +107,9 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
         .filter(tag => tag.tag.startsWith('aura:attribute'))
         .map(node => {
             const attributes = node.attributes || {};
-            const documentation = attributes['description'];
-            const jsName = attributes['name'];
-            const type = attributes['type'];
+            const documentation = trimQuotes(attributes.description);
+            const jsName = trimQuotes(attributes.name);
+            const type = trimQuotes(attributes.type);
             const startColumn = new LineColumnFinder(markup).fromIndex(node.start);
             const endColumn = new LineColumnFinder(markup).fromIndex(node.end - 1);
 
