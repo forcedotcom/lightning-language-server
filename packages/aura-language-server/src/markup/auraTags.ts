@@ -13,6 +13,8 @@ import { basename, parse as parsePath } from 'path';
 const readFile = promisify(fs.readFile);
 
 const AURA_TAGS: Map<string, TagInfo> = new Map();
+const AURA_EVENTS: Map<string, TagInfo> = new Map();
+const AURA_NAMESPACES: Set <string> = new Set();
 
 export function loadStandardComponents(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -25,16 +27,26 @@ export function loadStandardComponents(): Promise<void> {
                     for (const tag in auraStandard) {
                         // TODO need to account for LWC tags here
                         if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
+                            const tagObj =  auraStandard[tag];
                             const info = new TagInfo([]);
-                            if (auraStandard[tag].attributes) {
-                                auraStandard[tag].attributes.map((a: any) => {
+                            if (tagObj.attributes) {
+                                tagObj.attributes.map((a: any) => {
                                     // TODO - could we use more in depth doc from component library here?
-                                    info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'AURA standard attribute'));
+                                    info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
                                 });
                             }
-                            info.documentation = auraStandard[tag].description;
+                            info.documentation = tagObj.description;
                             info.name = tag;
-                            AURA_TAGS.set(tag, info);
+                            info.namespace = tagObj.namespace;
+
+                            // Update our in memory maps
+                            // TODO should we move interfaces/apps/etc to a separate map also?
+                            AURA_NAMESPACES.add(tagObj.namespace);
+                            if (tagObj.type === 'event') {
+                                AURA_EVENTS.set(tag, info);
+                            } else {
+                                AURA_TAGS.set(tag, info);
+                            }
                         }
                     }
                     resolve();
@@ -151,6 +163,7 @@ export function loadSystemTags(): Promise<void> {
                             }
                             info.documentation = auraSystem[tag].description;
                             info.name = tag;
+                            info.namespace = auraSystem[tag].namespace;
                             AURA_TAGS.set(tag, info);
                         }
                     }
@@ -163,6 +176,10 @@ export function loadSystemTags(): Promise<void> {
     });
 }
 
+export function isAuraNamespace(namespace: string): boolean {
+    return AURA_NAMESPACES.has(namespace);
+}
+
 export function getAuraTags(): Map<string, TagInfo> {
     return AURA_TAGS;
 }
@@ -172,17 +189,17 @@ export function getAuraByTag(tag: string): TagInfo {
 }
 
 export function getAuraTagProvider(): IHTMLTagProvider {
-    function addTags(collector: (tag: string, label: string) => void) {
+    function addTags(collector: (tag: string, label: string, info: TagInfo) => void) {
         for (const [tag, tagInfo] of getAuraTags()) {
-            collector(tag, tagInfo.documentation);
+            collector(tag, tagInfo.getHover(), tagInfo);
         }
     }
 
-    function addAttributes(tag: string, collector: (attribute: string, type?: string) => void) {
+    function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) {
         const cTag = getAuraByTag(tag);
         if (cTag) {
             cTag.attributes.map(info => {
-                collector(info.name, info.type);
+                collector(info.name, info, info.type);
             });
         }
     }
@@ -207,10 +224,10 @@ export function getAuraTagProvider(): IHTMLTagProvider {
     return {
         getId: () => 'aura',
         isApplicable: languageId => languageId === 'html',
-        collectTags: (collector: (tag: string, label: string) => void) => {
+        collectTags: (collector: (tag: string, label: string, info: TagInfo) => void) => {
             addTags(collector);
         },
-        collectAttributes: (tag: string, collector: (attribute: string, type?: string) => void) => {
+        collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) => {
             // addDirectives(collector);
             if (tag) {
                 addAttributes(tag, collector);

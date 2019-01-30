@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import { TextDocument, Position, CompletionList, CompletionItemKind, Range, TextEdit, InsertTextFormat, CompletionItem } from 'vscode-languageserver-types';
+import { TextDocument, Position, CompletionList, CompletionItemKind, Range, TextEdit, InsertTextFormat, CompletionItem, MarkupKind } from 'vscode-languageserver-types';
 import { HTMLDocument, Node } from '../parser/htmlParser';
 import { createScanner } from '../parser/htmlScanner';
 import { isEmptyElement } from '../parser/htmlTags';
@@ -57,11 +57,12 @@ export class HTMLCompletion {
         function collectOpenTagSuggestions(afterOpenBracket: number, tagNameEnd?: number): CompletionList {
             let range = getReplaceRange(afterOpenBracket, tagNameEnd);
             tagProviders.forEach(provider => {
-                provider.collectTags((tag, label) => {
+                provider.collectTags((tag, label, info) => {
                     result.items.push({
                         label: tag,
                         kind: CompletionItemKind.Property,
-                        documentation: label,
+                        detail: 'Aura Element',
+                        documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
                         textEdit: TextEdit.replace(range, tag),
                         insertTextFormat: InsertTextFormat.PlainText,
                     });
@@ -109,7 +110,7 @@ export class HTMLCompletion {
                         item.textEdit = TextEdit.replace(getReplaceRange(afterOpenBracket - 1 - endIndent.length), insertText);
                         item.filterText = endIndent + '</' + tag + closeTag;
                     }
-                    result.items.push(item);
+                    result.items.push(item);5
                     return result;
                 }
                 curr = curr.parent;
@@ -119,11 +120,12 @@ export class HTMLCompletion {
             }
 
             tagProviders.forEach(provider => {
-                provider.collectTags((tag, label) => {
+                provider.collectTags((tag, label, info) => {
                     result.items.push({
                         label: '/' + tag,
                         kind: CompletionItemKind.Property,
-                        documentation: label,
+                        detail: 'Aura Element',
+                        documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
                         filterText: '/' + tag + closeTag,
                         textEdit: TextEdit.replace(range, '/' + tag + closeTag),
                         insertTextFormat: InsertTextFormat.PlainText,
@@ -167,7 +169,7 @@ export class HTMLCompletion {
             let tag = currentTag.toLowerCase();
             let seenAttributes = Object.create(null);
             tagProviders.forEach(provider => {
-                provider.collectAttributes(tag, (attribute, type?: string) => {
+                provider.collectAttributes(tag, (attribute, info, type?: string) => {
                     if (seenAttributes[attribute]) {
                         return;
                     }
@@ -184,13 +186,19 @@ export class HTMLCompletion {
                             };
                         }
                     }
-                    result.items.push({
+                    
+                    let retVal: CompletionItem = {
                         label: attribute,
                         kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
                         textEdit: TextEdit.replace(range, codeSnippet),
                         insertTextFormat: InsertTextFormat.Snippet,
                         command,
-                    });
+                    };
+                    if(info.documentation){
+                        retVal.documentation = info.documentation;
+                        retVal.detail = info.detail;
+                    }
+                    result.items.push(retVal);
                 });
             });
             collectDataAttributesSuggestions(range, seenAttributes);
