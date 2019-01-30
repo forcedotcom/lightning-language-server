@@ -1,37 +1,44 @@
 # lightning-language-server
 Mono repo for lwc-language-server and aura-language-server
 
-Running
+## Setup
 
-Create a common directory for LSP
+### Create a common directory for LSP
 
-```mkdir ~/git/LSP```
+```
+mkdir ~/git/LSP
+cd ~/git/LSP
+```
 
-Clone vscode fork
+### Clone this repo and DX Plugins 
+(TODO update doc to point at non-fork version of DX when we merge back)
 
-```git clone git@github.com:midzelis/salesforcedx-vscode.git```
+```
+git clone git@git.soma.salesforce.com:lightning-tools/lightning-language-server.git
+git clone git@github.com:midzelis/salesforcedx-vscode.git
+```
 
-Clone this monorepo
+### Setup lightning-language-server
 
-```git clone git@git.soma.salesforce.com:lightning-tools/lightning-language-server.git```
+```
+cd lightning-language-server
+yarn install
+yarn lerna exec link-lsp
+```
 
-```cd lightning-language-server```
+### Setup the DX Plugins
 
-```yarn install```
+```
+cd ../salesforcedx-vscode
+./link-lsp.sh
+npm install
+npm run compile
+```
 
-Link the packages
+### Recompile LSP on changes
+```cd ../lightning-language-server
+   yarn lerna exec watch
+```
 
-```yarn lerna exec yarn link```
-
-Go to vscode
-
-```cd ../salesforcedx-vscode```
-
-The other side of link
-
-```./link-lsp.sh```
-
-Install/build vscode
-
-```npm install```
-
+### Launch VSCode Debug
+Run 'Launch DX - Aura & LWC' from VSCode
