@@ -15,6 +15,9 @@ export class TagInfo {
         this.documentation = documentation;
         this.name = name;
         this.namespace = namespace;
+        if (!this.documentation) {
+            this.documentation = '';
+        }
     }
 
     public getAttributeInfo(attribute: string): AttributeInfo | null {
@@ -29,7 +32,7 @@ export class TagInfo {
 
     public getHover(hideComponentLibraryLink?: boolean): string | null {
         let retVal = this.documentation + '\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
-        if (hideComponentLibraryLink) {
+        if (hideComponentLibraryLink || this.namespace === 'c' || !this.namespace) {
             retVal = this.documentation + '\n### Attributes\n';
         }
         for (const info of this.attributes) {
@@ -45,6 +48,18 @@ export class TagInfo {
     }
 
     public getAttributeMarkdown(attribute: AttributeInfo): string {
-        return '* **' + attribute.name + '**: *' + attribute.type + '* ' + attribute.documentation;
+        if (attribute.name && attribute.type && attribute.documentation) {
+            return '* **' + attribute.name + '**: *' + attribute.type + '* ' + attribute.documentation;
+        }
+
+        if (attribute.name && attribute.type) {
+            return '* **' + attribute.name + '**: *' + attribute.type + '*';
+        }
+
+        if (attribute.name) {
+            return '* **' + attribute.name + '**';
+        }
+
+        return '';
     }
 }
