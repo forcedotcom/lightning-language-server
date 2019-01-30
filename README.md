@@ -36,8 +36,9 @@ npm run compile
 ```
 
 ### Recompile LSP on changes
-```cd ../lightning-language-server
-   yarn lerna exec watch
+```
+cd ../lightning-language-server
+yarn lerna exec watch
 ```
 
 ### Launch VSCode Debug
