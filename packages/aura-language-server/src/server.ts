@@ -38,6 +38,7 @@ import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas 
 import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
 import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
+import { allTagProviders } from './html-language-service/services/tagProviders';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -268,6 +269,31 @@ connection.onHover(
 
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (auraUtils.isAuraMarkup(document)) {
+            const htmlDocument = htmlLS.parseHTMLDocument(document);
+
+            // TODO: refactor into method
+            let offset = document.offsetAt(textDocumentPosition.position);
+            let node = htmlDocument.findNodeAt(offset);
+            if (!node || !node.tag) {
+                return null;
+            }
+            let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
+            let location;
+            for (let provider of tagProviders) {
+                let hover = null;
+                provider.collectTags((t, label, info) => {
+                    if (t === node.tag || t === node.tag.toLowerCase()) {
+                        if (info.location && info.location.uri && info.location.range) {
+                            location = Location.create(info.location.uri, info.location.range);
+                        }
+                    }
+                });
+            }
+
+            return location;
+        }
         await asyncFlush();
         const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
