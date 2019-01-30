@@ -93,7 +93,9 @@ function addCustomTag(tag: string, uri: string, metadata: Metadata) {
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
+    debugger;
     const files = context.findAllModules();
+
     await loadCustomTagsFromFiles(files, context.type === WorkspaceType.SFDX);
     onIndexCustomComponents(context, files);
 }

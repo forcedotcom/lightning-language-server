@@ -9,8 +9,6 @@ it('indexer', async () => {
     await auraIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
 
-
     context.findAllAuraMarkup();
     // verify jsconfig.json after indexing
-
 });

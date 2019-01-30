@@ -3,6 +3,8 @@ import { indexCustomLabels, resetCustomLabels } from './metadata-utils/custom-la
 import { indexStaticResources, resetStaticResources } from './metadata-utils/static-resources-util';
 import { indexContentAssets, resetContentAssets } from './metadata-utils/content-assets-util';
 import { WorkspaceContext, shared, Indexer } from 'lightning-lsp-common';
+import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
+import { getLwcTags } from './metadata-utils/custom-components-util';
 
 const { WorkspaceType } = shared;
 
@@ -36,3 +38,4 @@ export class LWCIndexer implements Indexer {
     }
 }
 
+export { getLanguageService, LanguageService, getLwcTags };

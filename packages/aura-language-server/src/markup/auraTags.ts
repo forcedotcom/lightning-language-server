@@ -9,53 +9,43 @@ import { promisify } from 'util';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import { basename, parse as parsePath } from 'path';
+import { getLwcTags } from 'lwc-language-server';
+import changeCase from 'change-case';
 
 const readFile = promisify(fs.readFile);
 
 const AURA_TAGS: Map<string, TagInfo> = new Map();
 const AURA_EVENTS: Map<string, TagInfo> = new Map();
-const AURA_NAMESPACES: Set <string> = new Set();
+const AURA_NAMESPACES: Set<string> = new Set();
 
-export function loadStandardComponents(): Promise<void> {
-    return new Promise((resolve, reject) => {
-        fs.readFile(auraUtils.getAuraStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                try {
-                    const auraStandard = JSON.parse(data);
-                    for (const tag in auraStandard) {
-                        // TODO need to account for LWC tags here
-                        if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-                            const tagObj =  auraStandard[tag];
-                            const info = new TagInfo([]);
-                            if (tagObj.attributes) {
-                                tagObj.attributes.map((a: any) => {
-                                    // TODO - could we use more in depth doc from component library here?
-                                    info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
-                                });
-                            }
-                            info.documentation = tagObj.description;
-                            info.name = tag;
-                            info.namespace = tagObj.namespace;
-
-                            // Update our in memory maps
-                            // TODO should we move interfaces/apps/etc to a separate map also?
-                            AURA_NAMESPACES.add(tagObj.namespace);
-                            if (tagObj.type === 'event') {
-                                AURA_EVENTS.set(tag, info);
-                            } else {
-                                AURA_TAGS.set(tag, info);
-                            }
-                        }
-                    }
-                    resolve();
-                } catch (e) {
-                    reject(e);
-                }
+export async function loadStandardComponents(): Promise<void> {
+    const data = await readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
+    const auraStandard = JSON.parse(data);
+    for (const tag in auraStandard) {
+        // TODO need to account for LWC tags here
+        if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
+            const tagObj = auraStandard[tag];
+            const info = new TagInfo([]);
+            if (tagObj.attributes) {
+                tagObj.attributes.map((a: any) => {
+                    // TODO - could we use more in depth doc from component library here?
+                    info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
+                });
             }
-        });
-    });
+            info.documentation = tagObj.description;
+            info.name = tag;
+            info.namespace = tagObj.namespace;
+
+            // Update our in memory maps
+            // TODO should we move interfaces/apps/etc to a separate map also?
+            AURA_NAMESPACES.add(tagObj.namespace);
+            if (tagObj.type === 'event') {
+                AURA_EVENTS.set(tag, info);
+            } else {
+                AURA_TAGS.set(tag, info);
+            }
+        }
+    }
 }
 
 function searchAura(node: Node): Node[] {
@@ -92,7 +82,7 @@ function getTagInfo(file: string, contents: string, node: Node): TagInfo {
             },
         },
     };
-    const name = 'c:'+parsePath(basename(file)).name;
+    const name = 'c:' + parsePath(basename(file)).name;
     const info = new TagInfo([], location, documentation, name);
     return info;
 }
@@ -135,45 +125,33 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
     tagInfo.attributes = attributeInfos;
 
     AURA_TAGS.set(tagInfo.name, tagInfo);
-    
+
     console.log(file);
     return tagInfo;
 }
 
-export function loadSystemTags(): Promise<void> {
-    return new Promise((resolve, reject) => {
-        fs.readFile(auraUtils.getAuraSystemResourcePath(), { encoding: 'utf8' }, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                try {
-                    const auraSystem = JSON.parse(data);
-                    for (const tag in auraSystem) {
-                        // TODO need to account for LWC tags here
-                        if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
-                            const info = new TagInfo([]);
-                            if (auraSystem[tag].attributes) {
-                                const temp = auraSystem[tag].attributes;
-                                for (const v in temp) {
-                                    if (temp.hasOwnProperty(v)) {
-                                        const a = temp[v];
-                                        info.attributes.push(new AttributeInfo(a, a.description, a.type, undefined, 'AURA standard attribute'));
-                                    }
-                                }
-                            }
-                            info.documentation = auraSystem[tag].description;
-                            info.name = tag;
-                            info.namespace = auraSystem[tag].namespace;
-                            AURA_TAGS.set(tag, info);
-                        }
+export async function loadSystemTags(): Promise<void> {
+    const data = await readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
+    const auraSystem = JSON.parse(data);
+    for (const tag in auraSystem) {
+        // TODO need to account for LWC tags here
+        if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
+            const info = new TagInfo([]);
+            if (auraSystem[tag].attributes) {
+                const temp = auraSystem[tag].attributes;
+                for (const v in temp) {
+                    if (temp.hasOwnProperty(v)) {
+                        const a = temp[v];
+                        info.attributes.push(new AttributeInfo(a, a.description, a.type, undefined, 'AURA standard attribute'));
                     }
-                    resolve();
-                } catch (e) {
-                    reject(e);
                 }
             }
-        });
-    });
+            info.documentation = auraSystem[tag].description;
+            info.name = tag;
+            info.namespace = auraSystem[tag].namespace;
+            AURA_TAGS.set(tag, info);
+        }
+    }
 }
 
 export function isAuraNamespace(namespace: string): boolean {
@@ -181,7 +159,22 @@ export function isAuraNamespace(namespace: string): boolean {
 }
 
 export function getAuraTags(): Map<string, TagInfo> {
-    return AURA_TAGS;
+    const tags = getLwcTags();
+    const filtered: Map<string, TagInfo> = new Map();
+    for (const [tag, tagInfo] of tags) {
+        // TODO: MAKE THIS LAZY FOR PERFORMANCE
+        if (tag.startsWith('c')) {
+            const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
+            const name = tag
+                .split('-')
+                .slice(1)
+                .join('-');
+            interopTagInfo.name = ['c', changeCase.camelCase(name)].join(':');
+            filtered.set(interopTagInfo.name, interopTagInfo);
+        }
+    }
+    const map = new Map([...AURA_TAGS, ...filtered]);
+    return map;
 }
 
 export function getAuraByTag(tag: string): TagInfo {

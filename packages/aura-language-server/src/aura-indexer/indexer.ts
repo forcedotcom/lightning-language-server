@@ -1,5 +1,5 @@
 import { WorkspaceContext, shared, Indexer } from 'lightning-lsp-common';
-import { parseMarkup,loadStandardComponents, loadSystemTags } from '../markup/auraTags';
+import { parseMarkup, loadStandardComponents, loadSystemTags } from '../markup/auraTags';
 
 const { WorkspaceType } = shared;
 
@@ -17,14 +17,10 @@ export default class AuraIndexer implements Indexer {
         for (const file of markupfiles) {
             try {
                 await parseMarkup(file);
-            } catch(e) {
-                debugger;
+            } catch (e) {
                 console.log(e);
             }
         }
-
     }
-    private resetAllIndexes() {
-        
-    }
+    private resetAllIndexes() {}
 }

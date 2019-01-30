@@ -1342,6 +1342,11 @@
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/@types/jest/-/jest-23.3.13.tgz#c81484b6f4ca007bb09887ed15ecb3286d58f928"
   integrity sha512-ePl4l+7dLLmCucIwgQHAgjiepY++qcI6nb8eAwGNkB6OxmTe3Z9rQU3rSpomqu42PCCnlThZbOoxsf+qylJsLA==
 
+"@types/lazy.js@^0.3.32":
+  version "0.3.32"
+  resolved "http://npm.lwcjs.org/@types/lazy.js/-/lazy.js-0.3.32/193d438a7d1929727ac0066a3744fc16fc46ce26.tgz#193d438a7d1929727ac0066a3744fc16fc46ce26"
+  integrity sha512-IaZfzi3DbG748JiuiasdOHfvSC+57j3VGbWLq2U/WIOi2nUcs3VeCyBiZumXbuZV5RIBnJqEmW9YHEqEgvu2cQ==
+
 "@types/lodash.template@^4.4.4":
   version "4.4.4"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/@types/lodash.template/-/lodash.template-4.4.4.tgz#75fddd12297fb12683f9be42e05c646c359a1ff7"
@@ -2321,6 +2326,14 @@ callsites@^2.0.0:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/callsites/-/callsites-2.0.0.tgz#06eb84f00eea413da86affefacbffb36093b3c50"
   integrity sha1-BuuE8A7qQT2oav/vrL/7Ngk7PFA=
 
+camel-case@^3.0.0:
+  version "3.0.0"
+  resolved "http://npm.lwcjs.org/camel-case/-/camel-case-3.0.0/ca3c3688a4e9cf3a4cda777dc4dcbc713249cf73.tgz#ca3c3688a4e9cf3a4cda777dc4dcbc713249cf73"
+  integrity sha1-yjw2iKTpzzpM2nd9xNy8cTJJz3M=
+  dependencies:
+    no-case "^2.2.0"
+    upper-case "^1.1.1"
+
 camelcase-keys@^2.0.0:
   version "2.1.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/camelcase-keys/-/camelcase-keys-2.1.0.tgz#308beeaffdf28119051efa1d932213c91b8f92e7"
@@ -2399,6 +2412,30 @@ chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0, chalk@^2.3.1, chalk@^2.4.1, chalk@^2.4
     ansi-styles "^3.2.1"
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
+
+change-case@^3.1.0:
+  version "3.1.0"
+  resolved "http://npm.lwcjs.org/change-case/-/change-case-3.1.0/0e611b7edc9952df2e8513b27b42de72647dd17e.tgz#0e611b7edc9952df2e8513b27b42de72647dd17e"
+  integrity sha512-2AZp7uJZbYEzRPsFoa+ijKdvp9zsrnnt6+yFokfwEpeJm0xuJDVoxiRCAaTzyJND8GJkofo2IcKWaUZ/OECVzw==
+  dependencies:
+    camel-case "^3.0.0"
+    constant-case "^2.0.0"
+    dot-case "^2.1.0"
+    header-case "^1.0.0"
+    is-lower-case "^1.1.0"
+    is-upper-case "^1.1.0"
+    lower-case "^1.1.1"
+    lower-case-first "^1.0.0"
+    no-case "^2.3.2"
+    param-case "^2.1.0"
+    pascal-case "^2.0.0"
+    path-case "^2.1.0"
+    sentence-case "^2.1.0"
+    snake-case "^2.1.0"
+    swap-case "^1.1.0"
+    title-case "^2.1.0"
+    upper-case "^1.1.1"
+    upper-case-first "^1.1.0"
 
 chardet@^0.7.0:
   version "0.7.0"
@@ -2628,6 +2665,14 @@ console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
   integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
+
+constant-case@^2.0.0:
+  version "2.0.0"
+  resolved "http://npm.lwcjs.org/constant-case/-/constant-case-2.0.0/4175764d389d3fa9c8ecd29186ed6005243b6a46.tgz#4175764d389d3fa9c8ecd29186ed6005243b6a46"
+  integrity sha1-QXV2TTidP6nI7NKRhu1gBSQ7akY=
+  dependencies:
+    snake-case "^2.1.0"
+    upper-case "^1.1.1"
 
 conventional-changelog-angular@^5.0.2:
   version "5.0.2"
@@ -3102,6 +3147,13 @@ domexception@^1.0.1:
   integrity sha512-raigMkn7CJNNo6Ihro1fzG7wr3fHuYVytzquZKX5n0yizGsTcYgzdIUwj1X9pK0VvjeihV+XiclP+DjwbsSKug==
   dependencies:
     webidl-conversions "^4.0.2"
+
+dot-case@^2.1.0:
+  version "2.1.1"
+  resolved "http://npm.lwcjs.org/dot-case/-/dot-case-2.1.1/34dcf37f50a8e93c2b3bca8bb7fb9155c7da3bee.tgz#34dcf37f50a8e93c2b3bca8bb7fb9155c7da3bee"
+  integrity sha1-NNzzf1Co6TwrO8qLt/uRVcfaO+4=
+  dependencies:
+    no-case "^2.2.0"
 
 dot-prop@^3.0.0:
   version "3.0.0"
@@ -4089,6 +4141,14 @@ he@^1.1.1:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
+header-case@^1.0.0:
+  version "1.0.1"
+  resolved "http://npm.lwcjs.org/header-case/-/header-case-1.0.1/9535973197c144b09613cd65d317ef19963bd02d.tgz#9535973197c144b09613cd65d317ef19963bd02d"
+  integrity sha1-lTWXMZfBRLCWE81l0xfvGZY70C0=
+  dependencies:
+    no-case "^2.2.0"
+    upper-case "^1.1.3"
+
 home-or-tmp@^2.0.0:
   version "2.0.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/home-or-tmp/-/home-or-tmp-2.0.0.tgz#e36c3f2d2cae7d746a857e38d18d5f32a7882db8"
@@ -4520,6 +4580,13 @@ is-glob@^4.0.0:
   dependencies:
     is-extglob "^2.1.1"
 
+is-lower-case@^1.1.0:
+  version "1.1.3"
+  resolved "http://npm.lwcjs.org/is-lower-case/-/is-lower-case-1.1.3/7e147be4768dc466db3bfb21cc60b31e6ad69393.tgz#7e147be4768dc466db3bfb21cc60b31e6ad69393"
+  integrity sha1-fhR75HaNxGbbO/shzGCzHmrWk5M=
+  dependencies:
+    lower-case "^1.1.0"
+
 is-number@^2.1.0:
   version "2.1.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/is-number/-/is-number-2.1.0.tgz#01fcbbb393463a548f2f466cce16dece49db908f"
@@ -4644,6 +4711,13 @@ is-typedarray@~1.0.0:
   version "1.0.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/is-typedarray/-/is-typedarray-1.0.0.tgz#e479c80858df0c1b11ddda6940f96011fcda4a9a"
   integrity sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=
+
+is-upper-case@^1.1.0:
+  version "1.1.2"
+  resolved "http://npm.lwcjs.org/is-upper-case/-/is-upper-case-1.1.2/8d0b1fa7e7933a1e58483600ec7d9661cbaf756f.tgz#8d0b1fa7e7933a1e58483600ec7d9661cbaf756f"
+  integrity sha1-jQsfp+eTOh5YSDYA7H2WYcuvdW8=
+  dependencies:
+    upper-case "^1.1.0"
 
 is-utf8@^0.2.0:
   version "0.2.1"
@@ -5248,6 +5322,11 @@ kleur@^2.0.1:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/kleur/-/kleur-2.0.2.tgz#b704f4944d95e255d038f0cb05fb8a602c55a300"
   integrity sha512-77XF9iTllATmG9lSlIv0qdQ2BQ/h9t0bJllHlbvsQ0zUWfU7Yi0S8L5JXzPZgkefIiajLmBJJ4BsMJmqcf7oxQ==
 
+lazy.js@^0.5.1:
+  version "0.5.1"
+  resolved "http://npm.lwcjs.org/lazy.js/-/lazy.js-0.5.1/9f05c27f42c66ae7f41814c9674d105efcbc432f.tgz#9f05c27f42c66ae7f41814c9674d105efcbc432f"
+  integrity sha512-p9v24vaKrzS2mEx3yuzva/3M6I3+HwvXd0pB1Xf/IvsFIMdhQgmym7JBO0e7c0OZmKTo07sCuiCIm6jazSWFNw==
+
 lcid@^1.0.0:
   version "1.0.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/lcid/-/lcid-1.0.0.tgz#308accafa0bc483a3867b4b6f2b9506251d1b835"
@@ -5656,6 +5735,18 @@ loud-rejection@^1.0.0:
     currently-unhandled "^0.4.1"
     signal-exit "^3.0.0"
 
+lower-case-first@^1.0.0:
+  version "1.0.2"
+  resolved "http://npm.lwcjs.org/lower-case-first/-/lower-case-first-1.0.2/e5da7c26f29a7073be02d52bac9980e5922adfa1.tgz#e5da7c26f29a7073be02d52bac9980e5922adfa1"
+  integrity sha1-5dp8JvKacHO+AtUrrJmA5ZIq36E=
+  dependencies:
+    lower-case "^1.1.2"
+
+lower-case@^1.1.0, lower-case@^1.1.1, lower-case@^1.1.2:
+  version "1.1.4"
+  resolved "http://npm.lwcjs.org/lower-case/-/lower-case-1.1.4/9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac.tgz#9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac"
+  integrity sha1-miyr0bno4K6ZOkv31YdcOcQujqw=
+
 lru-cache@^4.0.1, lru-cache@^4.1.2, lru-cache@^4.1.3:
   version "4.1.5"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/lru-cache/-/lru-cache-4.1.5.tgz#8bbe50ea85bed59bc9e33dcab8235ee9bcf443cd"
@@ -6050,6 +6141,13 @@ nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+
+no-case@^2.2.0, no-case@^2.3.2:
+  version "2.3.2"
+  resolved "http://npm.lwcjs.org/no-case/-/no-case-2.3.2/60b813396be39b3f1288a4c1ed5d1e7d28b464ac.tgz#60b813396be39b3f1288a4c1ed5d1e7d28b464ac"
+  integrity sha512-rmTZ9kz+f3rCvK2TD1Ue/oZlns7OGoIWP4fc3llxxRXlOkHKoWPPWJOfFYpITabSow43QJbRIoHQXtt10VldyQ==
+  dependencies:
+    lower-case "^1.1.1"
 
 node-fetch-npm@^2.0.2:
   version "2.0.2"
@@ -6549,6 +6647,13 @@ parallel-transform@^1.1.0:
     inherits "^2.0.3"
     readable-stream "^2.1.5"
 
+param-case@^2.1.0:
+  version "2.1.1"
+  resolved "http://npm.lwcjs.org/param-case/-/param-case-2.1.1/df94fd8cf6531ecf75e6bef9a0858fbc72be2247.tgz#df94fd8cf6531ecf75e6bef9a0858fbc72be2247"
+  integrity sha1-35T9jPZTHs915r75oIWPvHK+Ikc=
+  dependencies:
+    no-case "^2.2.0"
+
 parse-github-repo-url@^1.3.0:
   version "1.4.1"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/parse-github-repo-url/-/parse-github-repo-url-1.4.1.tgz#9e7d8bb252a6cb6ba42595060b7bf6df3dbc1f50"
@@ -6596,10 +6701,25 @@ parse5@4.0.0:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
   integrity sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==
 
+pascal-case@^2.0.0:
+  version "2.0.1"
+  resolved "http://npm.lwcjs.org/pascal-case/-/pascal-case-2.0.1/2d578d3455f660da65eca18ef95b4e0de912761e.tgz#2d578d3455f660da65eca18ef95b4e0de912761e"
+  integrity sha1-LVeNNFX2YNpl7KGO+VtODekSdh4=
+  dependencies:
+    camel-case "^3.0.0"
+    upper-case-first "^1.1.0"
+
 pascalcase@^0.1.1:
   version "0.1.1"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
   integrity sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=
+
+path-case@^2.1.0:
+  version "2.1.1"
+  resolved "http://npm.lwcjs.org/path-case/-/path-case-2.1.1/94b8037c372d3fe2906e465bb45e25d226e8eea5.tgz#94b8037c372d3fe2906e465bb45e25d226e8eea5"
+  integrity sha1-lLgDfDctP+KQbkZbtF4l0ibo7qU=
+  dependencies:
+    no-case "^2.2.0"
 
 path-dirname@^1.0.0:
   version "1.0.2"
@@ -7639,6 +7759,14 @@ semver@~5.3.0:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
   integrity sha1-myzl094C0XxgEq0yaqa00M9U+U8=
 
+sentence-case@^2.1.0:
+  version "2.1.1"
+  resolved "http://npm.lwcjs.org/sentence-case/-/sentence-case-2.1.1/1f6e2dda39c168bf92d13f86d4a918933f667ed4.tgz#1f6e2dda39c168bf92d13f86d4a918933f667ed4"
+  integrity sha1-H24t2jnBaL+S0T+G1KkYkz9mftQ=
+  dependencies:
+    no-case "^2.2.0"
+    upper-case-first "^1.1.2"
+
 serializerr@^1.0.3:
   version "1.0.3"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/serializerr/-/serializerr-1.0.3.tgz#12d4c5aa1c3ffb8f6d1dc5f395aa9455569c3f91"
@@ -7738,6 +7866,13 @@ smart-buffer@^4.0.1:
   version "4.0.1"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/smart-buffer/-/smart-buffer-4.0.1.tgz#07ea1ca8d4db24eb4cac86537d7d18995221ace3"
   integrity sha512-RFqinRVJVcCAL9Uh1oVqE6FZkqsyLiVOYEZ20TqIOjuX7iFVJ+zsbs4RIghnw/pTs7mZvt8ZHhvm1ZUrR4fykg==
+
+snake-case@^2.1.0:
+  version "2.1.0"
+  resolved "http://npm.lwcjs.org/snake-case/-/snake-case-2.1.0/41bdb1b73f30ec66a04d4e2cad1b76387d4d6d9f.tgz#41bdb1b73f30ec66a04d4e2cad1b76387d4d6d9f"
+  integrity sha1-Qb2xtz8w7GagTU4srRt2OH1NbZ8=
+  dependencies:
+    no-case "^2.2.0"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
@@ -8119,6 +8254,14 @@ svgo@^0.7.0:
     sax "~1.2.1"
     whet.extend "~0.9.9"
 
+swap-case@^1.1.0:
+  version "1.1.2"
+  resolved "http://npm.lwcjs.org/swap-case/-/swap-case-1.1.2/c39203a4587385fad3c850a0bd1bcafa081974e3.tgz#c39203a4587385fad3c850a0bd1bcafa081974e3"
+  integrity sha1-w5IDpFhzhfrTyFCgvRvK+ggZdOM=
+  dependencies:
+    lower-case "^1.1.1"
+    upper-case "^1.1.1"
+
 symbol-observable@^1.1.0:
   version "1.2.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
@@ -8219,6 +8362,14 @@ through@2, "through@>=2.2.7 <3", through@^2.3.4, through@^2.3.6:
   version "2.3.8"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
+
+title-case@^2.1.0:
+  version "2.1.1"
+  resolved "http://npm.lwcjs.org/title-case/-/title-case-2.1.1/3e127216da58d2bc5becf137ab91dae3a7cd8faa.tgz#3e127216da58d2bc5becf137ab91dae3a7cd8faa"
+  integrity sha1-PhJyFtpY0rxb7PE3q5Ha46fNj6o=
+  dependencies:
+    no-case "^2.2.0"
+    upper-case "^1.0.3"
 
 tmp@0.0.33, tmp@^0.0.33:
   version "0.0.33"
@@ -8554,6 +8705,18 @@ unset-value@^1.0.0:
   dependencies:
     has-value "^0.3.1"
     isobject "^3.0.0"
+
+upper-case-first@^1.1.0, upper-case-first@^1.1.2:
+  version "1.1.2"
+  resolved "http://npm.lwcjs.org/upper-case-first/-/upper-case-first-1.1.2/5d79bedcff14419518fd2edb0a0507c9b6859115.tgz#5d79bedcff14419518fd2edb0a0507c9b6859115"
+  integrity sha1-XXm+3P8UQZUY/S7bCgUHybaFkRU=
+  dependencies:
+    upper-case "^1.1.1"
+
+upper-case@^1.0.3, upper-case@^1.1.0, upper-case@^1.1.1, upper-case@^1.1.3:
+  version "1.1.3"
+  resolved "http://npm.lwcjs.org/upper-case/-/upper-case-1.1.3/f6b4501c2ec4cdd26ba78be7222961de77621598.tgz#f6b4501c2ec4cdd26ba78be7222961de77621598"
+  integrity sha1-9rRQHC7EzdJrp4vnIilh3ndiFZg=
 
 uri-js@^4.2.2:
   version "4.2.2"

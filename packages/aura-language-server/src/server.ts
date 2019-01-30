@@ -186,7 +186,9 @@ connection.onCompletion(
         const document = documents.get(completionParams.textDocument.uri);
         if (auraUtils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
-            return htmlLS.doComplete(document, completionParams.position, htmlDocument);
+
+            const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument);
+            return list;
         }
         try {
             await asyncFlush();
@@ -239,7 +241,8 @@ connection.onHover(
         const document = documents.get(textDocumentPosition.textDocument.uri);
         if (auraUtils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
-            return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+            const hover = htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+            return hover;
         }
         try {
             await asyncFlush();
