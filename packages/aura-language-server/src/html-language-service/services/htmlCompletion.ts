@@ -166,7 +166,7 @@ export class HTMLCompletion {
             }
             let range = getReplaceRange(nameStart, replaceEnd);
             let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '="$1"';
-            let tag = currentTag.toLowerCase();
+            let tag = currentTag; // currentTag.toLowerCase();
             let seenAttributes = Object.create(null);
             tagProviders.forEach(provider => {
                 provider.collectAttributes(tag, (attribute, info, type?: string) => {

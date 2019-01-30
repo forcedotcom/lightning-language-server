@@ -171,13 +171,13 @@ export function getAuraTags(): Map<string, TagInfo> {
                 .slice(1)
                 .join('-');
             interopTagInfo.name = ['c', changeCase.camelCase(name)].join(':');
-            
+
             const attrs: AttributeInfo[] = [];
             for (const attribute of interopTagInfo.attributes) {
                 const attrname = changeCase.camelCase(attribute.jsName);
                 attrs.push( new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
             }
-            
+
             const info = new TagInfo(attrs, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, 'c');
 
             filtered.set(interopTagInfo.name, info);
@@ -188,7 +188,7 @@ export function getAuraTags(): Map<string, TagInfo> {
 }
 
 export function getAuraByTag(tag: string): TagInfo {
-    return AURA_TAGS.get(tag);
+    return getAuraTags().get(tag);
 }
 
 export function getAuraTagProvider(): IHTMLTagProvider {
