@@ -462,15 +462,15 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): { lwc: string[]
 
         const subdirs = findSubdirectories(candidate);
         // Is a root if we have a folder called lwc
-        const isLWC = isModuleRoot(subdirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
+        const isLwc = isModuleRoot(subdirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
         const isAura = isAuraRoot(subdirs);
-        if (isLWC) {
+        if (isLwc) {
             roots.lwc.push(path.resolve(candidate));
         }
         if (isAura) {
             roots.aura.push(path.resolve(candidate));
         }
-        if (!isLWC && !isAura) {
+        if (!isLwc && !isAura) {
             for (const subdir of subdirs) {
                 traverse(subdir, depth);
             }
