@@ -1,5 +1,4 @@
 import { utils, WorkspaceContext } from 'lightning-lsp-common';
-import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 import AuraIndexer from '../indexer';
 
 it('indexer', async () => {

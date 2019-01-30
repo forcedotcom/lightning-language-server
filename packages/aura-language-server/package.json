@@ -83,7 +83,6 @@
       "js",
       "json"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts",
     "testURL": "http://localhost"
   },
   "lint-staged": {
