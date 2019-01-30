@@ -18,6 +18,28 @@ const AURA_TAGS: Map<string, TagInfo> = new Map();
 const AURA_EVENTS: Map<string, TagInfo> = new Map();
 const AURA_NAMESPACES: Set<string> = new Set();
 
+export async function loadSystemTags(): Promise<void> {
+    const data = await readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
+    const auraSystem = JSON.parse(data);
+    for (const tag in auraSystem) {
+        // TODO need to account for LWC tags here
+        if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
+            const tagObj = auraSystem[tag];
+            const info = new TagInfo([]);
+            if (tagObj.attributes) {
+                tagObj.attributes.map((a: any) => {
+                    // TODO - could we use more in depth doc from component library here?
+                    info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
+                });
+            }
+            info.documentation = tagObj.description;
+            info.name = tag;
+            info.namespace = tagObj.namespace;
+            AURA_TAGS.set(tag, info);
+        }
+    }
+}
+
 export async function loadStandardComponents(): Promise<void> {
     const data = await readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
     const auraStandard = JSON.parse(data);
@@ -137,29 +159,7 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
     return tagInfo;
 }
 
-export async function loadSystemTags(): Promise<void> {
-    const data = await readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
-    const auraSystem = JSON.parse(data);
-    for (const tag in auraSystem) {
-        // TODO need to account for LWC tags here
-        if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
-            const info = new TagInfo([]);
-            if (auraSystem[tag].attributes) {
-                const temp = auraSystem[tag].attributes;
-                for (const v in temp) {
-                    if (temp.hasOwnProperty(v)) {
-                        const a = temp[v];
-                        info.attributes.push(new AttributeInfo(a, a.description, a.type, undefined, 'AURA standard attribute'));
-                    }
-                }
-            }
-            info.documentation = auraSystem[tag].description;
-            info.name = tag;
-            info.namespace = auraSystem[tag].namespace;
-            AURA_TAGS.set(tag, info);
-        }
-    }
-}
+
 
 export function isAuraNamespace(namespace: string): boolean {
     return AURA_NAMESPACES.has(namespace);
