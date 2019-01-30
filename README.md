@@ -23,7 +23,7 @@ git clone git@github.com:midzelis/salesforcedx-vscode.git
 ```
 cd lightning-language-server
 yarn install
-yarn lerna exec link-lsp
+yarn link-lsp
 ```
 
 ### Setup the DX Plugins
@@ -38,7 +38,7 @@ npm run compile
 ### Recompile LSP on changes
 ```
 cd ../lightning-language-server
-yarn lerna exec watch
+yarn watch
 ```
 
 ### Launch VSCode Debug
