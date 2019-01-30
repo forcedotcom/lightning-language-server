@@ -83,7 +83,7 @@ function getTagInfo(file: string, contents: string, node: Node): TagInfo {
         },
     };
     const name = 'c:' + parsePath(basename(file)).name;
-    const info = new TagInfo([], location, documentation, name);
+    const info = new TagInfo([], location, documentation, name, 'c');
     return info;
 }
 export async function parseMarkup(file: string): Promise<TagInfo> {

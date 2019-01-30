@@ -271,6 +271,9 @@ connection.onDefinition(
         await asyncFlush();
         const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
+            if (file === 'Aura') {
+                return;
+            }
             return tern2lspLocation({ file, start, end });
         }
     },
