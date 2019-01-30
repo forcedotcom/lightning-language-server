@@ -165,12 +165,16 @@ export function getAuraTags(): Map<string, TagInfo> {
         // TODO: MAKE THIS LAZY FOR PERFORMANCE
         if (tag.startsWith('c')) {
             const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
+            
             const name = tag
                 .split('-')
                 .slice(1)
                 .join('-');
             interopTagInfo.name = ['c', changeCase.camelCase(name)].join(':');
-            filtered.set(interopTagInfo.name, interopTagInfo);
+            
+            const info = new TagInfo(interopTagInfo.attributes, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, 'c');
+
+            filtered.set(interopTagInfo.name, info);
         }
     }
     const map = new Map([...AURA_TAGS, ...filtered]);
