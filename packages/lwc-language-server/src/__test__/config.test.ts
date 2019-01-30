@@ -1,5 +1,5 @@
 import { utils, WorkspaceContext } from 'lightning-lsp-common';
-import LWCIndexer from '../indexer';
+import {LWCIndexer} from '../indexer';
 import * as config from '../config';
 import * as path from 'path';
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';

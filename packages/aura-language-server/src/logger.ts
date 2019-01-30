@@ -5,7 +5,7 @@ export function interceptConsoleLogger(connection) {
     }
     function intercept(method) {
         const original = console[method];
-        console[method] = () => {
+        console[method] = function() {
             if (connection) {
                 connection.console[method].apply(connection.console, arguments);
             }

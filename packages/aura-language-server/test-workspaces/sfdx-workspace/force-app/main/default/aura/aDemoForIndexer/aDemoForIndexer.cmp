@@ -1,0 +1,6 @@
+<aura:component description="This is the description field for top level aDemoForIndexer aura component">
+    <aura:attribute name="attribute1" type="boolean" default="false" description="Description of attribute 1"/>
+    <aura:attribute name="attribute2" type="Map" default="{}" description="Description of attribute 2"/>
+    <aura:attribute name="attribute3" type="Aura.ComponentDefRef[]" description="Description of attribute 3"/>
+
+</aura:component>

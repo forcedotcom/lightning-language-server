@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { CompletionItem, Position, TextDocument, TextEdit } from 'vscode-languageserver';
 import { getLanguageService } from '../htmlLanguageService';
-import LWCIndexer from '../../indexer';
+import {LWCIndexer} from '../../indexer';
 import { WorkspaceContext, shared } from 'lightning-lsp-common';
 const { WorkspaceType } = shared;
 

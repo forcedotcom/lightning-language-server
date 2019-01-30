@@ -24,23 +24,20 @@ import {
     ParameterInformation,
 } from 'vscode-languageserver';
 
-import { utils } from 'lightning-lsp-common';
 import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
-import { WorkspaceType } from './shared';
 export * from './shared';
 import { startServer } from './tern-server/tern-server';
 import * as util from 'util';
 import * as tern from 'tern';
 import { interceptConsoleLogger } from './logger';
-import { isNoop } from 'babel-types';
-import * as fs from 'fs';
 import * as infer from 'tern/lib/infer';
 import * as lineColumn from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { css_beautify } from './html-language-service/beautify/beautify-css';
-import * as aura from './markup/auraTags';
+import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
+import { LWCIndexer } from 'lwc-language-server';
+import AuraIndexer from './aura-indexer/indexer';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -100,32 +97,45 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
 }
 
 let htmlLS: LanguageService;
+let context: WorkspaceContext;
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath, capabilities } = params;
-        theRootPath = rootPath;
-        console.log('Starting Aura LSP server');
-        ternServer = await startServer(rootPath);
-        asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
-        asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
-        // Early exit if no workspace is opened
+
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
+        const theRootPath = workspaceRoot;
         try {
             if (!workspaceRoot) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting language server at ${workspaceRoot}`);
+            console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
+            ternServer = await startServer(rootPath);
+
+            context = new WorkspaceContext(workspaceRoot);
+            context.configureProject();
+
+            const lwcIndexer = new LWCIndexer(context);
+            // // wait for indexing to finish before returning from onInitialize()
+            await lwcIndexer.configureAndIndex();
+            context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+
+            const auraIndexer = new AuraIndexer(context);
+            await auraIndexer.configureAndIndex();
+            context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
+
+            asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
+            asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
+            // Early exit if no workspace is opened
 
             // context = new WorkspaceContext(workspaceRoot);
             // wait for indexing to finish before returning from onInitialize()
             // await context.configureAndIndex();
             htmlLS = getLanguageService();
-            await aura.loadStandardComponents();
-            await aura.loadSystemTags();
+            debugger;
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {

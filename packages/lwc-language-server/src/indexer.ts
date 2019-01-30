@@ -6,7 +6,7 @@ import { WorkspaceContext, shared, Indexer } from 'lightning-lsp-common';
 
 const { WorkspaceType } = shared;
 
-export default class LWCIndexer implements Indexer {
+export class LWCIndexer implements Indexer {
     private context: WorkspaceContext;
 
     constructor(context: WorkspaceContext) {
@@ -35,3 +35,4 @@ export default class LWCIndexer implements Indexer {
         resetContentAssets();
     }
 }
+

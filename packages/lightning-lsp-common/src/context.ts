@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import { GlobSync } from 'glob';
+import glob from 'glob';
 import { homedir } from 'os';
 import * as path from 'path';
 import { join } from 'path';
@@ -26,7 +27,7 @@ export class WorkspaceContext {
     // common to all project types
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
-    public namespaceRoots: string[];
+    public namespaceRoots: { lwc: string[]; aura: string[] };
     public indexers: Map<string, Indexer> = new Map();
     public sfdxPackageDirsPattern: string;
 
@@ -60,8 +61,16 @@ export class WorkspaceContext {
      */
     public findAllModules(): string[] {
         const files: string[] = [];
-        this.namespaceRoots.forEach(namespaceRoot => {
+        this.namespaceRoots.lwc.forEach(namespaceRoot => {
             files.push.apply(files, findModulesIn(namespaceRoot));
+        });
+        return files;
+    }
+
+    public findAllAuraMarkup(): string[] {
+        const files: string[] = [];
+        this.namespaceRoots.aura.forEach(namespaceRoot => {
+            files.push.apply(files, findAuraMarkupIn(namespaceRoot));
         });
         return files;
     }
@@ -80,7 +89,7 @@ export class WorkspaceContext {
             throw new Error('document not in workspace: ' + file + '\n' + this.workspaceRoot);
         }
 
-        for (const root of this.namespaceRoots) {
+        for (const root of this.namespaceRoots.lwc) {
             if (utils.pathStartsWith(file, root)) {
                 return true;
             }
@@ -335,16 +344,19 @@ export class WorkspaceContext {
         }
     }
 
-    private findNamespaceRootsUsingType() {
-        const roots: string[] = [];
+    private findNamespaceRootsUsingType(): { lwc: string[]; aura: string[] } {
+        const roots: { lwc: string[]; aura: string[] } = {
+            lwc: [],
+            aura: [],
+        };
         switch (this.type) {
             case WorkspaceType.SFDX:
                 // optimization: search only inside package directories
                 for (const pkg of this.sfdxProjectConfig.packageDirectories) {
                     const pkgDir = join(this.workspaceRoot, pkg.path);
-                    for (const root of findNamespaceRoots(pkgDir)) {
-                        roots.push(root);
-                    }
+                    const subroots = findNamespaceRoots(pkgDir);
+                    roots.lwc.push(...subroots.lwc);
+                    roots.aura.push(...subroots.aura);
                 }
                 return roots;
             case WorkspaceType.CORE_ALL:
@@ -352,9 +364,9 @@ export class WorkspaceContext {
                 for (const project of fs.readdirSync(this.workspaceRoot)) {
                     const modulesDir = join(this.workspaceRoot, project, 'modules');
                     if (fs.existsSync(modulesDir)) {
-                        for (const root of findNamespaceRoots(modulesDir, 2)) {
-                            roots.push(root);
-                        }
+                        const subroots = findNamespaceRoots(modulesDir, 2);
+                        roots.lwc.push(...subroots.lwc);
+                        roots.aura.push(...subroots.aura);
                     }
                 }
                 return roots;
@@ -396,8 +408,11 @@ function getSfdxPackageDirs(sfdxProjectConfig: ISfdxProjectConfig) {
  * @param root directory to start searching from
  * @return module namespaces root folders found inside 'root'
  */
-function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
-    const roots: string[] = [];
+function findNamespaceRoots(root: string, maxDepth: number = 5): { lwc: string[]; aura: string[] } {
+    const roots: { lwc: string[]; aura: string[] } = {
+        lwc: [],
+        aura: [],
+    };
 
     function isModuleRoot(subdirs: string[]): boolean {
         for (const subdir of subdirs) {
@@ -406,6 +421,19 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
             const modulePath = path.join(subdir, basename + '.js');
             if (fs.existsSync(modulePath)) {
                 // TODO: check contents for: from 'lwc'?
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function isAuraRoot(subdirs: string[]): boolean {
+        for (const subdir of subdirs) {
+            // Is a root if any subdir matches a name/name.js with name.js being a module
+            const basename = path.basename(subdir);
+            const componentPath = path.join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
+            const files = glob.sync(componentPath, { cwd: subdir });
+            if (files.length > 0) {
                 return true;
             }
         }
@@ -434,11 +462,15 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): string[] {
 
         const subdirs = findSubdirectories(candidate);
         // Is a root if we have a folder called lwc
-        if (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc') {
-            roots.push(path.resolve(candidate));
-        } else if (isModuleRoot(subdirs)) {
-            roots.push(path.resolve(candidate));
-        } else {
+        const isLWC = isModuleRoot(subdirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
+        const isAura = isAuraRoot(subdirs);
+        if (isLWC) {
+            roots.lwc.push(path.resolve(candidate));
+        }
+        if (isAura) {
+            roots.aura.push(path.resolve(candidate));
+        }
+        if (!isLWC && !isAura) {
             for (const subdir of subdirs) {
                 traverse(subdir, depth);
             }
@@ -462,6 +494,22 @@ function findModulesIn(namespaceRoot: string): string[] {
             // TODO: check contents for: from 'lwc'?
             files.push(modulePath);
         }
+    }
+    return files;
+}
+
+/*
+ * @return list of .js modules inside namespaceRoot folder
+ */
+function findAuraMarkupIn(namespaceRoot: string): string[] {
+    const files: string[] = [];
+    const subdirs = findSubdirectories(namespaceRoot);
+    for (const subdir of subdirs) {
+        const basename = path.basename(subdir);
+
+        const componentPath = join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
+        const results = glob.sync(componentPath, { cwd: subdir });
+        files.push(...results);
     }
     return files;
 }

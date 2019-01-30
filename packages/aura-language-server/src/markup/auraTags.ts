@@ -1,10 +1,16 @@
 import { IHTMLTagProvider } from '../html-language-service/parser/htmlTags';
-import { utils } from 'lightning-lsp-common';
+import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
-import * as path from 'path';
 import { TagInfo } from '../tagInfo';
 import { AttributeInfo } from '../attributeInfo';
+import { parse, Node } from '../html-language-service/parser/htmlParser';
+import { promisify } from 'util';
+import LineColumnFinder from 'line-column';
+import URI from 'vscode-uri';
+import { basename, parse as parsePath } from 'path';
+
+const readFile = promisify(fs.readFile);
 
 const AURA_TAGS: Map<string, TagInfo> = new Map();
 
@@ -38,6 +44,88 @@ export function loadStandardComponents(): Promise<void> {
             }
         });
     });
+}
+
+function searchAura(node: Node): Node[] {
+    const results = [];
+    if (node.tag.indexOf(':') != -1) {
+        results.push(node);
+    }
+    for (const child of node.children) {
+        results.push(...searchAura(child));
+    }
+    return results;
+}
+
+function getTagInfo(file: string, contents: string, node: Node): TagInfo {
+    if (!node) {
+        return;
+    }
+    const attributes = node.attributes || {};
+    const documentation = attributes['description'];
+
+    const startColumn = new LineColumnFinder(contents).fromIndex(node.start);
+    const endColumn = new LineColumnFinder(contents).fromIndex(node.end - 1);
+
+    const location: Location = {
+        uri: URI.file(file).toString(),
+        range: {
+            start: {
+                line: startColumn.line,
+                character: startColumn.col,
+            },
+            end: {
+                line: endColumn.line,
+                character: endColumn.col,
+            },
+        },
+    };
+    const name = 'c:'+parsePath(basename(file)).name;
+    const info = new TagInfo([], location, documentation, name);
+    return info;
+}
+export async function parseMarkup(file: string): Promise<TagInfo> {
+    const markup = await readFile(file, 'utf-8');
+    const result = parse(markup);
+    const tags = [];
+    for (const root of result.roots) {
+        tags.push(...searchAura(root));
+    }
+
+    const tagInfo = getTagInfo(file, markup, result.roots[0]);
+
+    const attributeInfos = tags
+        .filter(tag => tag.tag.startsWith('aura:attribute'))
+        .map(node => {
+            const attributes = node.attributes || {};
+            const documentation = attributes['description'];
+            const jsName = attributes['name'];
+            const type = attributes['type'];
+            const startColumn = new LineColumnFinder(markup).fromIndex(node.start);
+            const endColumn = new LineColumnFinder(markup).fromIndex(node.end - 1);
+
+            const location: Location = {
+                uri: URI.file(file).toString(),
+                range: {
+                    start: {
+                        line: startColumn.line,
+                        character: startColumn.col,
+                    },
+                    end: {
+                        line: endColumn.line,
+                        character: endColumn.col,
+                    },
+                },
+            };
+
+            return new AttributeInfo(jsName, documentation, type, location);
+        });
+    tagInfo.attributes = attributeInfos;
+
+    AURA_TAGS.set(tagInfo.name, tagInfo);
+    
+    console.log(file);
+    return tagInfo;
 }
 
 export function loadSystemTags(): Promise<void> {

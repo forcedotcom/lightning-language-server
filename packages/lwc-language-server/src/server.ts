@@ -16,7 +16,7 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import LWCIndexer from './indexer';
+import {LWCIndexer} from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
@@ -51,7 +51,7 @@ connection.onInitialize(
                 return { capabilities: {} };
             }
 
-            console.info(`Starting language server at ${workspaceRoot}`);
+            console.info(`Starting [[LWC]] language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();

@@ -1,6 +1,6 @@
 import { join } from 'path';
 import URI from 'vscode-uri';
-import LWCIndexer from '../../indexer';
+import {LWCIndexer} from '../../indexer';
 import { FORCE_APP_ROOT, UTILS_ROOT } from '../../__test__/test-utils';
 import { WorkspaceContext, utils } from 'lightning-lsp-common';
 import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
