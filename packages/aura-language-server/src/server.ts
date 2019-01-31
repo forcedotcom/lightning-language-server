@@ -274,15 +274,14 @@ connection.onDefinition(
             const htmlDocument = htmlLS.parseHTMLDocument(document);
 
             // TODO: refactor into method
-            let offset = document.offsetAt(textDocumentPosition.position);
-            let node = htmlDocument.findNodeAt(offset);
+            const offset = document.offsetAt(textDocumentPosition.position);
+            const node = htmlDocument.findNodeAt(offset);
             if (!node || !node.tag) {
                 return null;
             }
-            let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
-            let location;
-            for (let provider of tagProviders) {
-                let hover = null;
+            const tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
+            let location: Location;
+            for (const provider of tagProviders) {
                 provider.collectTags((t, label, info) => {
                     if (t === node.tag || t === node.tag.toLowerCase()) {
                         if (info.location && info.location.uri && info.location.range) {

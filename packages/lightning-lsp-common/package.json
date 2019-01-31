@@ -5,17 +5,16 @@
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
+    "postinstall": "yarn build",
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && scripts/copy_typings.js && cp -r src/resources lib/",
     "watch": "tsc -p . && scripts/copy_typings.js && cp -r src/resources lib/ && tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand src",
-    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
+    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "precommit": "lint-staged",
-    "prepush": "yarn prepare && yarn lint"
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@types/deep-equal": "^1.0.1",
@@ -49,24 +48,5 @@
   },
   "publishConfig": {
     "registry": "https://npm.lwcjs.org"
-  },
-  "jest": {
-    "transform": {
-      ".ts": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts",
-    "testURL": "http://localhost"
-  },
-  "lint-staged": {
-    "src/**/*.ts": [
-      "yarn format",
-      "git add"
-    ]
   }
 }

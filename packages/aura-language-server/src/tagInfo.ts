@@ -31,7 +31,7 @@ export class TagInfo {
     }
 
     public getHover(hideComponentLibraryLink?: boolean): string | null {
-        let retVal = this.documentation + '\n\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
+        let retVal = this.documentation + '\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
         if (hideComponentLibraryLink || this.namespace === 'c' || !this.namespace) {
             retVal = this.documentation + '\n### Attributes\n';
         }

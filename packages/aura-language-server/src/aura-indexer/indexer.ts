@@ -22,5 +22,7 @@ export default class AuraIndexer implements Indexer {
             }
         }
     }
-    private resetAllIndexes() {}
+    private resetAllIndexes() {
+        // ignore
+    }
 }

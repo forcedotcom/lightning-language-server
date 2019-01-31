@@ -10,7 +10,7 @@
     "watch": "tsc -p . && cp -r src/resources lib/ && tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
-    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
+    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",

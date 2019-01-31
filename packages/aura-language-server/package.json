@@ -14,11 +14,9 @@
     "prepare": "yarn clean && yarn build",
     "test": "jest --passWithNoTests --runInBand src",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand src",
-    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__test__/**/* src",
+    "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "precommit": "lint-staged",
-    "prepush": "yarn prepare && yarn lint && yarn test"
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@types/lazy.js": "^0.3.32",
@@ -72,23 +70,5 @@
   },
   "publishConfig": {
     "registry": "https://nexus.soma.salesforce.com/nexus/content/repositories/npmjs-internal/"
-  },
-  "jest": {
-    "transform": {
-      ".ts": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "testURL": "http://localhost"
-  },
-  "lint-staged": {
-    "src/**/*.ts": [
-      "yarn format",
-      "git add"
-    ]
   }
 }

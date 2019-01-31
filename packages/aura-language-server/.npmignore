@@ -1,6 +1,6 @@
 /src
 /test-workspaces
-**/__test__
+**/__tests__
 .vscode
 tsconfig.json
 tslint.json

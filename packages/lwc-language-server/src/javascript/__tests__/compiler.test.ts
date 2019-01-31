@@ -202,7 +202,7 @@ it('linter returns empty diagnostics on correct file', async () => {
 });
 
 it('transform returns javascript metadata', async () => {
-    const filepath = path.join('src', 'javascript', '__test__', 'fixtures', 'metadata.js');
+    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = utils.readFileSync(filepath);
 
     const options: CompilerOptions = {
@@ -239,7 +239,7 @@ it('transform returns javascript metadata', async () => {
 });
 
 it('returns javascript metadata', async () => {
-    const filepath = path.join('src', 'javascript', '__test__', 'fixtures', 'metadata.js');
+    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = utils.readFileSync(filepath);
 
     const compilerResult = await compileSource(content, 'metadata.js');
@@ -285,7 +285,7 @@ it('use compileDocument()', async () => {
 });
 
 it('use compileFile()', async () => {
-    const filepath = path.join('src', 'javascript', '__test__', 'fixtures', 'foo.js');
+    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'foo.js');
     const { metadata } = await compileFile(filepath);
     const publicProperties = getPublicReactiveProperties(metadata);
     expect(publicProperties).toMatchObject([{ name: 'index' }]);

@@ -72,7 +72,7 @@ export async function loadStandardComponents(): Promise<void> {
 
 function searchAura(node: Node): Node[] {
     const results = [];
-    if (node.tag.indexOf(':') != -1) {
+    if (node.tag.indexOf(':') !== -1) {
         results.push(node);
     }
     for (const child of node.children) {
@@ -81,11 +81,11 @@ function searchAura(node: Node): Node[] {
     return results;
 }
 
-function trimQuotes(string: string) {
-    if (!string) {
+function trimQuotes(str: string) {
+    if (!str) {
         return '';
     }
-    return string.replace(/"([^"]+(?="))"/g, '$1');
+    return str.replace(/"([^"]+(?="))"/g, '$1');
 }
 
 function getTagInfo(file: string, contents: string, node: Node): TagInfo {
@@ -158,8 +158,6 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
     console.log(file);
     return tagInfo;
 }
-
-
 
 export function isAuraNamespace(namespace: string): boolean {
     return AURA_NAMESPACES.has(namespace);
