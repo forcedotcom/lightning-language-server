@@ -37,8 +37,8 @@ BEGIN THIRD PARTY
 import * as strings from '../utils/strings';
 import * as arrays from '../utils/arrays';
 import * as nls from 'vscode-nls';
-import { TagInfo } from '../../tagInfo';
-import { AttributeInfo } from '../../attributeInfo';
+import { TagInfo } from 'lightning-lsp-common';
+import { AttributeInfo } from 'lightning-lsp-common';
 let localize = nls.loadMessageBundle();
 
 export const EMPTY_ELEMENTS: string[] = [
@@ -68,7 +68,7 @@ export interface IHTMLTagProvider {
     getId(): string;
     isApplicable(languageId: string): boolean;
     collectTags(collector: (tag: string, label: string, info: TagInfo) => void): void;
-	collectAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void;
+    collectAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void;
     collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
 }
 

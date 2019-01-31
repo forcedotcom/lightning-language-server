@@ -8795,7 +8795,7 @@ vscode-languageserver-protocol@3.13.0:
     vscode-jsonrpc "^4.0.0"
     vscode-languageserver-types "3.13.0"
 
-vscode-languageserver-protocol@3.14.1, vscode-languageserver-protocol@^3.10.0:
+vscode-languageserver-protocol@3.14.1:
   version "3.14.1"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.14.1.tgz#b8aab6afae2849c84a8983d39a1cf742417afe2f"
   integrity sha512-IL66BLb2g20uIKog5Y2dQ0IiigW0XKrvmWiOvc0yXw80z3tMEzEnHjaGAb3ENuU7MnQqgnYJ1Cl2l9RvNgDi4g==
@@ -8813,14 +8813,6 @@ vscode-languageserver-types@3.14.0:
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-languageserver-types/-/vscode-languageserver-types-3.14.0.tgz#d3b5952246d30e5241592b6dde8280e03942e743"
   integrity sha512-lTmS6AlAlMHOvPQemVwo3CezxBp0sNB95KNPkqp3Nxd5VFEnuG1ByM0zlRWos0zjO3ZWtkvhal0COgiV1xIA4A==
 
-vscode-languageserver@4.4.0:
-  version "4.4.0"
-  resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-languageserver/-/vscode-languageserver-4.4.0.tgz#b6e8b37a739ccb629d92f3635f0099d191c856fa"
-  integrity sha512-NO4JQg286YLSdU11Fko6cke19kwSob3O0bhf6xDxIJuDhUbFy0VEPRB5ITc3riVmp13+Ki344xtqJYmqfcmCrg==
-  dependencies:
-    vscode-languageserver-protocol "^3.10.0"
-    vscode-uri "^1.0.3"
-
 vscode-languageserver@5.1.0:
   version "5.1.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-languageserver/-/vscode-languageserver-5.1.0.tgz#012a28f154cc7a848c443d217894942e4c3eeb39"
@@ -8837,22 +8829,12 @@ vscode-languageserver@^5.2.1:
     vscode-languageserver-protocol "3.14.1"
     vscode-uri "^1.0.6"
 
-vscode-nls@3.2.4:
-  version "3.2.4"
-  resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-nls/-/vscode-nls-3.2.4.tgz#2166b4183c8aea884d20727f5449e62be69fd398"
-  integrity sha512-FTjdqa4jDDoBjJqr36O8lmmZf/55kQ2w4ZY/+GL6K92fq765BqO3aYw21atnXUno/P04V5DWagNl4ybDIndJsw==
-
-vscode-nls@4.0.0:
+vscode-nls@4.0.0, vscode-nls@^4.0.0:
   version "4.0.0"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-nls/-/vscode-nls-4.0.0.tgz#4001c8a6caba5cedb23a9c5ce1090395c0e44002"
   integrity sha512-qCfdzcH+0LgQnBpZA53bA32kzp9rpq/f66Som577ObeuDlFIrtbEJ+A/+CCxjIh4G8dpJYNCKIsxpRAHIfsbNw==
 
-vscode-uri@1.0.5:
-  version "1.0.5"
-  resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-uri/-/vscode-uri-1.0.5.tgz#3b899a8ef71c37f3054d79bdbdda31c7bf36f20d"
-  integrity sha1-O4majvccN/MFTXm9vdoxx7828g0=
-
-vscode-uri@1.0.6, vscode-uri@^1.0.3, vscode-uri@^1.0.6:
+vscode-uri@1.0.6, vscode-uri@^1.0.6:
   version "1.0.6"
   resolved "https://nexus.soma.salesforce.com/nexus/content/groups/npm-all/vscode-uri/-/vscode-uri-1.0.6.tgz#6b8f141b0bbc44ad7b07e94f82f168ac7608ad4d"
   integrity sha512-sLI2L0uGov3wKVb9EB+vIQBl9tVP90nqRvxSoJ35vI3NjxE8jfsE5DSOhWgSunHSZmKS4OCi2jrtfxK7uyp2ww==

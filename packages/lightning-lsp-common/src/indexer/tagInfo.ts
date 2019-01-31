@@ -1,6 +1,6 @@
 import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
-import { isAuraNamespace } from './markup/auraTags';
+import { ClassMember } from '@lwc/babel-plugin-component';
 
 export class TagInfo {
     constructor(
@@ -9,6 +9,9 @@ export class TagInfo {
         public documentation?: string,
         public name?: string,
         public namespace?: string, // properties/methods in the associated .js file: // TODO public properties?: ClassMember[], public methods?: ClassMember[],
+        // properties/methods in the associated .js file:
+        public properties?: ClassMember[],
+        public methods?: ClassMember[],
     ) {
         this.attributes = attributes;
         this.location = location;
@@ -18,6 +21,8 @@ export class TagInfo {
         if (!this.documentation) {
             this.documentation = '';
         }
+        this.properties = properties;
+        this.methods = methods;
     }
 
     public getAttributeInfo(attribute: string): AttributeInfo | null {

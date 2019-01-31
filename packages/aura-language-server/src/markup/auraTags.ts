@@ -2,8 +2,8 @@ import { IHTMLTagProvider } from '../html-language-service/parser/htmlTags';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
-import { TagInfo } from '../tagInfo';
-import { AttributeInfo } from '../attributeInfo';
+import { TagInfo } from 'lightning-lsp-common';
+import { AttributeInfo } from 'lightning-lsp-common';
 import { parse, Node } from '../html-language-service/parser/htmlParser';
 import { promisify } from 'util';
 import LineColumnFinder from 'line-column';
@@ -180,7 +180,7 @@ export function getAuraTags(): Map<string, TagInfo> {
             const attrs: AttributeInfo[] = [];
             for (const attribute of interopTagInfo.attributes) {
                 const attrname = changeCase.camelCase(attribute.jsName);
-                attrs.push( new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
+                attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
             }
 
             const info = new TagInfo(attrs, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, 'c');

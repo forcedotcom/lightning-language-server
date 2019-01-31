@@ -3,15 +3,17 @@ import * as path from 'path';
 import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
-import { WorkspaceContext } from 'lightning-lsp-common';
-import { AttributeInfo, TagInfo } from '../html-language-service/parser/htmlTags';
+import { WorkspaceContext, AttributeInfo, TagInfo } from 'lightning-lsp-common';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
 import { utils, shared } from 'lightning-lsp-common';
 import decamelize from 'decamelize';
 import { join } from 'path';
+import { promisify } from 'util';
 const { WorkspaceType } = shared;
 const LWC_TAGS: Map<string, TagInfo> = new Map();
+
+const readFile = promisify(fs.readFile);
 
 export function resetCustomComponents() {
     LWC_TAGS.clear();
@@ -50,33 +52,22 @@ export function getlwcStandardResourcePath() {
     return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
 }
 
-export function loadStandardComponents(): Promise<void> {
-    return new Promise((resolve, reject) => {
-        fs.readFile(getlwcStandardResourcePath(), { encoding: 'utf8' }, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                try {
-                    const lwcStandard = JSON.parse(data);
-                    for (const tag in lwcStandard) {
-                        if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-                            const info = new TagInfo([]);
-                            if (lwcStandard[tag].attributes) {
-                                lwcStandard[tag].attributes.map((a: any) => {
-                                    info.attributes.push(new AttributeInfo(a.name, a.description, undefined, 'LWC standard attribute'));
-                                });
-                            }
-                            info.documentation = lwcStandard[tag].description;
-                            LWC_TAGS.set('lightning-' + tag, info);
-                        }
-                    }
-                    resolve();
-                } catch (e) {
-                    reject(e);
-                }
+export async function loadStandardComponents(): Promise<void> {
+    const data = await readFile(getlwcStandardResourcePath(), 'utf-8');
+    const lwcStandard = JSON.parse(data);
+    for (const tag in lwcStandard) {
+        if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
+            const info = new TagInfo([]);
+            if (lwcStandard[tag].attributes) {
+                lwcStandard[tag].attributes.map((a: any) => {
+                    const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+                    info.attributes.push(new AttributeInfo(name, a.description, a.type, undefined, 'LWC standard attribute'));
+                });
             }
-        });
-    });
+            info.documentation = lwcStandard[tag].description;
+            LWC_TAGS.set('lightning-' + tag, info);
+        }
+    }
 }
 
 function removeCustomTag(tag: string) {
@@ -89,7 +80,7 @@ function addCustomTag(tag: string, uri: string, metadata: Metadata) {
     // declarationLoc may be undefined if live file doesn't extend LightningElement yet
     const range = metadata.declarationLoc ? toVSCodeRange(metadata.declarationLoc) : Range.create(Position.create(0, 0), Position.create(0, 0));
     const location = Location.create(uri, range);
-    LWC_TAGS.set(tag, new TagInfo(attributes, location, doc, getProperties(metadata), getMethods(metadata)));
+    LWC_TAGS.set(tag, new TagInfo(attributes, location, doc, tag, 'c', getProperties(metadata), getMethods(metadata)));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {

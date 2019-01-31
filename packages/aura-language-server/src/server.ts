@@ -31,11 +31,10 @@ export * from './shared';
 import { startServer } from './tern-server/tern-server';
 import * as util from 'util';
 import * as tern from 'tern';
-import { interceptConsoleLogger } from './logger';
 import * as infer from 'tern/lib/infer';
-import * as lineColumn from 'line-column';
+import LineColumnFinder from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
+import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
 import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { allTagProviders } from './html-language-service/services/tagProviders';
@@ -351,7 +350,7 @@ connection.onSignatureHelp(
 
             const contents = file.text;
 
-            const offset = new lineColumn.default(contents, { origin: 0 }).toIndex(position.line, position.character);
+            const offset = new LineColumnFinder(contents, { origin: 0 }).toIndex(position.line, position.character);
 
             const left = findPreviousLeftParan(contents, offset - 1);
             const word = findPreviousWord(contents, left);

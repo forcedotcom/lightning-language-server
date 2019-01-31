@@ -68,24 +68,5 @@
   },
   "publishConfig": {
     "registry": "https://npm.lwcjs.org"
-  },
-  "jest": {
-    "transform": {
-      ".ts": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "setupTestFrameworkScriptFile": "<rootDir>/jest/matchers.ts",
-    "testURL": "http://localhost"
-  },
-  "lint-staged": {
-    "src/**/*.ts": [
-      "yarn format",
-      "git add"
-    ]
   }
 }

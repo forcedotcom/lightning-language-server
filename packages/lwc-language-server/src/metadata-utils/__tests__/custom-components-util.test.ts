@@ -32,7 +32,6 @@ it('indexSfdx', async () => {
         {
             detail: 'LWC custom attribute',
             documentation: 'todo jsdoc',
-            jsName: 'todo',
             name: 'todo',
             location: {
                 range: { start: { line: 14, character: 4 }, end: { line: 17, character: 5 } },
@@ -44,22 +43,20 @@ it('indexSfdx', async () => {
     expect(getLwcByTag('c-todo_util').attributes).toMatchObject([
         {
             detail: 'LWC custom attribute',
-            jsName: 'info',
             name: 'info',
             location: {
                 range: { start: { line: 3, character: 4 }, end: { line: 4, character: 9 } },
             },
         },
-        { detail: 'LWC custom attribute', jsName: 'iconName', name: 'icon-name' },
-        { detail: 'LWC custom attribute', jsName: 'upperCASE', name: 'upper-c-a-s-e' },
+        { detail: 'LWC custom attribute', name: 'icon-name' },
+        { detail: 'LWC custom attribute', name: 'upper-c-a-s-e' },
     ]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     expect(getLwcByTag('lightning-button').documentation).toBe('Represents a button element.');
-    expect(getLwcByTag('lightning-button').attributes[0]).toEqual({
+    expect(getLwcByTag('lightning-button').attributes[0]).toMatchObject({
         detail: 'LWC standard attribute',
         documentation: 'Specifies a shortcut key to activate or focus an element.',
-        jsName: 'accesskey',
         name: 'accesskey',
     });
     // check tag Location
@@ -107,7 +104,7 @@ it('indexCore', async () => {
 
     // check attributes
     expect(getLwcByTag('one-app-nav-bar').attributes).toEqual([]);
-    expect(getLwcByTag('force-input-phone').attributes).toMatchObject([{ detail: 'LWC custom attribute', jsName: 'value', name: 'value' }]);
+    expect(getLwcByTag('force-input-phone').attributes).toMatchObject([{ detail: 'LWC custom attribute', name: 'value' }]);
     // check standard components
     expect(getLwcByTag('lightning-button')).not.toBeUndefined();
     // check tag Location
@@ -129,14 +126,13 @@ it('indexStandard', async () => {
 
     // check attributes
     expect(getLwcByTag('example-line').attributes).toMatchObject([
-        { detail: 'LWC custom attribute', jsName: 'hover', name: 'hover' },
-        { detail: 'LWC custom attribute', jsName: 'text', name: 'text' },
+        { detail: 'LWC custom attribute', name: 'hover' },
+        { detail: 'LWC custom attribute', name: 'text' },
     ]);
     expect(getLwcByTag('lightning-ito').attributes).toMatchObject([
         {
             detail: 'LWC custom attribute',
             documentation: undefined,
-            jsName: 'attr',
             name: 'attr',
             location: { range: { start: { line: 4, character: 4 }, end: { line: 4, character: 14 } } },
         },

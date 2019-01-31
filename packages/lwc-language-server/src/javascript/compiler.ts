@@ -3,11 +3,10 @@ import * as path from 'path';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
-import { AttributeInfo } from '../html-language-service/parser/htmlTags';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
-import { utils } from 'lightning-lsp-common';
+import { AttributeInfo, utils } from 'lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 
@@ -103,7 +102,9 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
 export function extractAttributes(metadata: Metadata, uri: string): AttributeInfo[] {
     return getPublicReactiveProperties(metadata).map(x => {
         const location = Location.create(uri, toVSCodeRange(x.loc));
-        return new AttributeInfo(x.name, x.doc, location, 'LWC custom attribute');
+
+        const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+        return new AttributeInfo(name, x.doc, undefined, location, 'LWC custom attribute');
     });
 }
 

@@ -35,46 +35,12 @@ BEGIN THIRD PARTY
  *--------------------------------------------------------------------------------------------*/
 
 import arrays = require('../utils/arrays');
-import { Location } from 'vscode-languageserver';
-import { ClassMember } from '@lwc/babel-plugin-component';
+import { TagInfo, AttributeInfo } from 'lightning-lsp-common';
 
 export const EMPTY_ELEMENTS: string[] = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 
 export function isEmptyElement(e: string): boolean {
 	return !!e && arrays.binarySearch(EMPTY_ELEMENTS, e.toLowerCase(), (s1: string, s2: string) => s1.localeCompare(s2)) >= 0;
-}
-
-export class AttributeInfo {
-	public name: string;
-	constructor(
-		public jsName: string,
-		public documentation: string,
-		public location?: Location,
-		public detail?: string,
-	) {
-        this.name = jsName.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-	}
-}
-
-export class TagInfo {
-	constructor(
-		public attributes: AttributeInfo[],
-		public location?: Location,
-		public documentation?: string,
-		// properties/methods in the associated .js file:
-		public properties?: ClassMember[],
-		public methods?: ClassMember[],
-	) {
-	}
-	getAttributeInfo(attribute: string): AttributeInfo | null {
-		attribute = attribute.toLowerCase();
-		for (const info of this.attributes) {
-			if (attribute === info.name.toLowerCase()){
-				return info;
-			}
-		}
-		return null;
-	}
 }
 
 export interface IHTMLTagProvider {
