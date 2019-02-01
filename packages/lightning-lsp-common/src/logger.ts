@@ -17,7 +17,7 @@ export function interceptConsoleLogger(connection: IConnection) {
             original.apply(console, arguments);
         };
     };
-    const methods = ['log', 'warn', 'error'];
+    const methods = ['log', 'info', 'warn', 'error'];
     for (const method of methods) {
         intercept(method);
     }

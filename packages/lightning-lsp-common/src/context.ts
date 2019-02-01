@@ -82,20 +82,30 @@ export class WorkspaceContext {
     public isLWCJavascript(document: TextDocument): boolean {
         return document.languageId === 'javascript' && this.isInsideModulesRoots(document);
     }
-
     public isInsideModulesRoots(document: TextDocument): boolean {
         const file = utils.toResolvedPath(document.uri);
         if (!utils.pathStartsWith(file, this.workspaceRoot)) {
             throw new Error('document not in workspace: ' + file + '\n' + this.workspaceRoot);
         }
+        return this.isFileInsideModulesRoots(file);
+    }
 
+    public isFileInsideModulesRoots(file: string): boolean {
         for (const root of this.namespaceRoots.lwc) {
             if (utils.pathStartsWith(file, root)) {
                 return true;
             }
         }
         return false;
-        // TODO: optimize by switching namespaceRoots to moduleRoots
+    }
+
+    public isFileInsideAuraRoots(file: string): boolean {
+        for (const root of this.namespaceRoots.aura) {
+            if (utils.pathStartsWith(file, root)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

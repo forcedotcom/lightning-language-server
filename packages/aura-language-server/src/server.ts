@@ -35,9 +35,11 @@ import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
-import { LWCIndexer } from 'lwc-language-server';
+import { LWCIndexer, handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { allTagProviders } from './html-language-service/services/tagProviders';
+import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
+import { parseMarkup } from './markup/auraTags';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -304,21 +306,27 @@ connection.onDefinition(
 );
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    console.info('onDidChangeWatchedFiles...');
+    console.info('aura onDidChangeWatchedFiles...');
     const changes = change.changes;
-    // try {
-    //     if (utils.includesWatchedDirectory(changes)) {
-    //         // re-index everything on directory deletions as no events are reported for contents of deleted directories
-    //         const startTime = process.hrtime();
-    //         await context.configureAndIndex();
-    //         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
-    //     } else {
-    //         // await Promise.all([updateStaticResourceIndex(changes, context),
-    //           updateLabelsIndex(changes, context), updateCustomComponentIndex(changes, context)]);
-    //     }
-    // } catch (e) {
-    //     connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
-    // }
+
+    try {
+        handleWatchedFiles(context, change);
+        if (utils.isAuraRootDirectoryCreated(context, changes) || utils.includesDeletedAuraWatchedDirectory(context, changes)) {
+            await context.getIndexingProvider('aura').configureAndIndex();
+            // re-index everything on directory deletions as no events are reported for contents of deleted directories
+            const startTime = process.hrtime();
+            console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
+        } else {
+            for (const event of changes) {
+                const file = toResolvedPath(event.uri);
+                if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
+                    await parseMarkup(file);
+                }
+            }
+        }
+    } catch (e) {
+        connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
+    }
 });
 
 connection.onRequest((method: string, ...params: any[]) => {

@@ -2,6 +2,24 @@ import * as utils from '../utils';
 import * as tmp from 'tmp';
 import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
+import { WorkspaceContext } from '../context';
+import { WorkspaceType } from '../shared';
+
+jest.mock('../context', () => {
+    const context: any = jest.genMockFromModule('../context');
+    const real = new context.WorkspaceContext();
+    real.isFileInsideModulesRoots = () => {
+        return true;
+    };
+    real.isLWCRootDirectory = () => {
+        return true;
+    };
+    context.WorkspaceContext.mockImplementation(() => {
+        real.type = WorkspaceType.SFDX;
+        return real;
+    });
+    return context;
+});
 
 it('includesWatchedDirectory', () => {
     const directoryDeletedEvent: FileEvent = {
@@ -16,9 +34,10 @@ it('includesWatchedDirectory', () => {
         type: FileChangeType.Deleted,
         uri: 'file:///Users/user/test/dir/file.html',
     };
-    expect(utils.includesWatchedDirectory([jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
-    expect(utils.includesWatchedDirectory([jsFileDeletedEvent])).toBeFalsy();
-    expect(utils.includesWatchedDirectory([htmlFileDeletedEvent])).toBeFalsy();
+    const ctxt = new WorkspaceContext('');
+    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
+    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent])).toBeFalsy();
+    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [htmlFileDeletedEvent])).toBeFalsy();
 });
 
 it('isLWCRootDirectoryChange', () => {
@@ -38,10 +57,11 @@ it('isLWCRootDirectoryChange', () => {
         type: FileChangeType.Deleted,
         uri: 'file:///Users/user/test/dir/lwc',
     };
-    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
-    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated])).toBeFalsy();
-    expect(utils.isLWCRootDirectoryChange([noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();
-    expect(utils.isLWCRootDirectoryChange([lwcFolderCreated, lwcFolderDeleted])).toBeTruthy();
+    const ctxt = new WorkspaceContext('');
+    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
+    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated])).toBeFalsy();
+    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();
+    expect(utils.isLWCRootDirectoryCreated(ctxt, [lwcFolderCreated, lwcFolderDeleted])).toBeTruthy();
 });
 
 it('getExtension()', () => {

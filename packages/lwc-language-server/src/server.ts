@@ -16,21 +16,20 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import { LWCIndexer } from './indexer';
+import { LWCIndexer, handleWatchedFiles } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
-import { WorkspaceContext, utils, shared } from 'lightning-lsp-common';
-import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
-import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
-import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { updateCustomComponentIndex, addCustomTagFromResults } from './metadata-utils/custom-components-util';
+import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
+import { addCustomTagFromResults } from './metadata-utils/custom-components-util';
 
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
+
 const connection: IConnection = createConnection();
+interceptConsoleLogger(connection);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -142,25 +141,8 @@ connection.onDefinition(
 connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    console.info('onDidChangeWatchedFiles...');
-    const changes = change.changes;
     try {
-        if (utils.isLWCRootDirectoryChange(changes)) {
-            await context.getIndexingProvider('lwc').configureAndIndex();
-        }
-        if (utils.includesWatchedDirectory(changes)) {
-            // re-index everything on directory deletions as no events are reported for contents of deleted directories
-            const startTime = process.hrtime();
-            await context.getIndexingProvider('lwc').configureAndIndex();
-            console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
-        } else {
-            await Promise.all([
-                updateStaticResourceIndex(changes, context),
-                updateContentAssetIndex(changes, context),
-                updateLabelsIndex(changes, context),
-                updateCustomComponentIndex(changes, context),
-            ]);
-        }
+        return handleWatchedFiles(context, change);
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }

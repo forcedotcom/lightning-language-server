@@ -18,6 +18,12 @@ const AURA_TAGS: Map<string, TagInfo> = new Map();
 const AURA_EVENTS: Map<string, TagInfo> = new Map();
 const AURA_NAMESPACES: Set<string> = new Set();
 
+export async function resetIndexes() {
+    AURA_TAGS.clear();
+    AURA_EVENTS.clear();
+    AURA_NAMESPACES.clear();
+}
+
 export async function loadSystemTags(): Promise<void> {
     const data = await readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
     const auraSystem = JSON.parse(data);
@@ -111,11 +117,25 @@ function getTagInfo(file: string, contents: string, node: Node): TagInfo {
             },
         },
     };
-    const name = 'c:' + parsePath(basename(file)).name;
+    const name = getTagName(file);
     const info = new TagInfo([], location, documentation, name, 'c');
     return info;
 }
-export async function parseMarkup(file: string): Promise<TagInfo> {
+function getTagName(file: string): string {
+    const name = 'c:' + parsePath(basename(file)).name;
+    return name;
+}
+function clearTagsforFile(file: string) {
+    const name = getTagName(file);
+    AURA_TAGS.delete(name);
+}
+export async function parseMarkup(file: string): Promise<TagInfo | undefined> {
+    console.log(file);
+
+    if (!fs.existsSync(file)) {
+        clearTagsforFile(file);
+        return;
+    }
     const markup = await readFile(file, 'utf-8');
     const result = parse(markup);
     const tags = [];
@@ -124,7 +144,10 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
     }
 
     const tagInfo = getTagInfo(file, markup, result.roots[0]);
-
+    if (!tagInfo) {
+        clearTagsforFile(file);
+        return;
+    }
     const attributeInfos = tags
         .filter(tag => tag.tag.startsWith('aura:attribute'))
         .map(node => {
@@ -152,10 +175,7 @@ export async function parseMarkup(file: string): Promise<TagInfo> {
             return new AttributeInfo(jsName, documentation, type, location);
         });
     tagInfo.attributes = attributeInfos;
-
     AURA_TAGS.set(tagInfo.name, tagInfo);
-
-    console.log(file);
     return tagInfo;
 }
 

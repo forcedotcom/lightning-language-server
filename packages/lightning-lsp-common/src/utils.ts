@@ -3,38 +3,73 @@ import { dirname, extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import equal from 'deep-equal';
+import { WorkspaceContext } from './context';
+import { WorkspaceType } from './shared';
 
 const RESOURCES_DIR = 'resources';
 
 /**
  * @return true if changes include a directory delete
  */
-export function includesWatchedDirectory(changes: FileEvent[]): boolean {
+export function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
-        if (event.type === FileChangeType.Deleted && isWatchedDirectory(event.uri)) {
+        if (event.type === FileChangeType.Deleted && isLWCWatchedDirectory(context, event.uri)) {
+            return true;
+        }
+    }
+    return false;
+}
+export function includesDeletedAuraWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Deleted && isAuraWatchedDirectory(context, event.uri)) {
             return true;
         }
     }
     return false;
 }
 
-export function isLWCRootDirectoryChange(changes: FileEvent[]) {
+export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]) {
     for (const event of changes) {
-        if (event.type === FileChangeType.Created && isLwcDirectory(event.uri)) {
+        if (event.type === FileChangeType.Created && isLWCRootDirectory(context, event.uri)) {
             return true;
         }
     }
     return false;
 }
 
-function isLwcDirectory(uri: string) {
-    return uri.endsWith('lwc');
+export function isAuraRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]) {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Created && isAuraDirectory(context, event.uri)) {
+            return true;
+        }
+    }
+    return false;
 }
 
-function isWatchedDirectory(uri: string) {
-    // use heuristics: directory if doesn't have suffix
-    // (we can't use fs.stat because the directory has already been deleted)
-    return uri.indexOf('.') === -1;
+function isLWCRootDirectory(context: WorkspaceContext, uri: string) {
+    if (context.type === WorkspaceType.SFDX) {
+        const file = toResolvedPath(uri);
+        return file.endsWith('lwc');
+    }
+    return false;
+}
+
+function isAuraDirectory(context: WorkspaceContext, uri: string) {
+    if (context.type === WorkspaceType.SFDX) {
+        const file = toResolvedPath(uri);
+        return file.endsWith('aura');
+    }
+    return false;
+}
+
+function isLWCWatchedDirectory(context: WorkspaceContext, uri: string) {
+    const file = toResolvedPath(uri);
+    return file.indexOf('.') === -1 && context.isFileInsideModulesRoots(file);
+}
+
+function isAuraWatchedDirectory(context: WorkspaceContext, uri: string) {
+    const file = toResolvedPath(uri);
+    return file.indexOf('.') === -1 && context.isFileInsideAuraRoots(file);
 }
 
 export function relativePath(from: string, to: string): string {
