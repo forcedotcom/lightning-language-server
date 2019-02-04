@@ -1,0 +1,9 @@
+{
+    "search.exclude": {
+        "**/node_modules": true,
+        "lib": true
+    },
+    "eslint.packageManager": "yarn",
+    "tslint.packageManager": "yarn",
+    "npm.packageManager": "yarn"
+}

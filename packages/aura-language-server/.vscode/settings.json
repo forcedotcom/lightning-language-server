@@ -14,8 +14,6 @@
         "**/node_modules": true,
         "lib": true
     },
-    "html.suggest.angular1": false,
-    "html.suggest.ionic": false,
     "terminal.integrated.env.osx": {
         "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
     },
@@ -24,5 +22,8 @@
     },
     "terminal.integrated.env.windows": {
         "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
-    }
+    },
+    "eslint.packageManager": "yarn",
+    "npm.packageManager": "yarn",
+    "tslint.packageManager": "yarn"
 }

@@ -13,6 +13,7 @@
         "**/node_modules": true,
         "lib": true
     },
-    "html.suggest.angular1": false,
-    "html.suggest.ionic": false
+    "eslint.packageManager": "yarn",
+    "npm.packageManager": "yarn",
+    "tslint.packageManager": "yarn"
 }
