@@ -17,6 +17,10 @@ export function moduleFromFile(file: string, sfdxProject: boolean) {
     return nameFromFile(file, sfdxProject, moduleName);
 }
 
+export function componentFromFile(file: string, sfdxProject: boolean) {
+    return nameFromFile(file, sfdxProject, componentName);
+}
+
 function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
     const filePath = path.parse(file);
     const fileName = filePath.name;
@@ -53,4 +57,8 @@ function tagName(namespace: string, tag: string) {
 function moduleName(namespace: string, tag: string) {
     // convert camel-case to hyphen-case/kebab-case
     return namespace + '/' + decamelize(tag, '-');
+}
+
+function componentName(namespace: string, tag: string) {
+    return namespace + ':' + tag;
 }

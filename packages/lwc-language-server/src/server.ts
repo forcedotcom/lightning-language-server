@@ -22,7 +22,7 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
 import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
 import URI from 'vscode-uri';
-import { addCustomTagFromResults } from './metadata-utils/custom-components-util';
+import { addCustomTagFromResults, getLwcTags } from './metadata-utils/custom-components-util';
 
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
@@ -146,4 +146,9 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }
+});
+
+connection.onRequest('salesforce/listComponents', () => {
+    const tags = getLwcTags();
+    return JSON.stringify([...tags]);
 });

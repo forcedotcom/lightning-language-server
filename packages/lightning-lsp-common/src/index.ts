@@ -4,5 +4,6 @@ import * as shared from './shared';
 import { TagInfo } from './indexer/tagInfo';
 import { AttributeInfo } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
+import * as componentUtil from './component-util';
 
-export { WorkspaceContext, Indexer, utils, shared, TagInfo, AttributeInfo, interceptConsoleLogger };
+export { WorkspaceContext, Indexer, utils, componentUtil, shared, TagInfo, AttributeInfo, interceptConsoleLogger};

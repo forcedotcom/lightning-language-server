@@ -15,7 +15,7 @@ import { parse } from 'properties';
 
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
 import * as utils from './utils';
-import { isJSComponent } from './custom-components-util';
+import { componentUtil } from './index';
 
 export interface Indexer {
     configureAndIndex(): Promise<void>;
@@ -376,13 +376,19 @@ export class WorkspaceContext {
                     if (fs.existsSync(modulesDir)) {
                         const subroots = findNamespaceRoots(modulesDir, 2);
                         roots.lwc.push(...subroots.lwc);
+                    }
+                    const auraDir = join(this.workspaceRoot, project, 'components');
+                    if (fs.existsSync(auraDir)) {
+                        const subroots = findNamespaceRoots(auraDir, 2);
                         roots.aura.push(...subroots.aura);
                     }
                 }
                 return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
-                return findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                roots.lwc.push(...findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2).lwc);
+                roots.aura.push(...findNamespaceRoots(join(this.workspaceRoot, 'components'), 2).aura);
+                return roots;
             case WorkspaceType.STANDARD_LWC:
             case WorkspaceType.UNKNOWN:
                 return findNamespaceRoots(this.workspaceRoot);
@@ -462,8 +468,8 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): { lwc: string[]
             filename === 'bin' ||
             filename === 'target' ||
             filename === 'jest-modules' ||
-            filename === 'components' ||
-            filename === 'repository'
+            filename === 'repository' ||
+            filename === 'git'
         ) {
             return;
         }
@@ -500,7 +506,7 @@ function findModulesIn(namespaceRoot: string): string[] {
     for (const subdir of subdirs) {
         const basename = path.basename(subdir);
         const modulePath = path.join(subdir, basename + '.js');
-        if (fs.existsSync(modulePath) && isJSComponent(modulePath)) {
+        if (fs.existsSync(modulePath) && componentUtil.isJSComponent(modulePath)) {
             // TODO: check contents for: from 'lwc'?
             files.push(modulePath);
         }

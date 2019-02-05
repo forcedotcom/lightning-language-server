@@ -6,8 +6,7 @@ import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomCompon
 import { WorkspaceContext, AttributeInfo, TagInfo } from 'lightning-lsp-common';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
-import { utils, shared } from 'lightning-lsp-common';
-import decamelize from 'decamelize';
+import { utils, shared, componentUtil } from 'lightning-lsp-common';
 import { join } from 'path';
 import { promisify } from 'util';
 const { WorkspaceType } = shared;
@@ -24,7 +23,7 @@ export async function updateCustomComponentIndex(updatedFiles: FileEvent[], cont
     updatedFiles.forEach(f => {
         if (f.uri.match(`.*${path.sep}lwc${path.sep}.*.js`)) {
             const file = URI.parse(f.uri).fsPath;
-            if (isJSComponent(file)) {
+            if (componentUtil.isJSComponent(file)) {
                 if (f.type === FileChangeType.Created) {
                     addCustomTagFromFile(file, isSfdxProject);
                     onCreatedCustomComponent(context, file);
@@ -57,7 +56,7 @@ export async function loadStandardComponents(): Promise<void> {
     const lwcStandard = JSON.parse(data);
     for (const tag in lwcStandard) {
         if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-            const info = new TagInfo([]);
+            const info = new TagInfo(true, []);
             if (lwcStandard[tag].attributes) {
                 lwcStandard[tag].attributes.map((a: any) => {
                     const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
@@ -80,7 +79,8 @@ function addCustomTag(tag: string, uri: string, metadata: Metadata) {
     // declarationLoc may be undefined if live file doesn't extend LightningElement yet
     const range = metadata.declarationLoc ? toVSCodeRange(metadata.declarationLoc) : Range.create(Position.create(0, 0), Position.create(0, 0));
     const location = Location.create(uri, range);
-    LWC_TAGS.set(tag, new TagInfo(attributes, location, doc, tag, 'c', getProperties(metadata), getMethods(metadata)));
+    const namespace = tag.split('-')[0];
+    LWC_TAGS.set(tag, new TagInfo(true, attributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata)));
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
@@ -99,7 +99,7 @@ async function loadCustomTagsFromFiles(filePaths: string[], sfdxProject: boolean
 }
 
 export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
-    const tag = tagFromFile(file, sfdxProject);
+    const tag = componentUtil.tagFromFile(file, sfdxProject);
     if (tag) {
         // get attributes from compiler metadata
         try {
@@ -118,69 +118,15 @@ export async function addCustomTagFromFile(file: string, sfdxProject: boolean) {
 }
 
 export function addCustomTagFromResults(uri: string, metadata: Metadata, sfdxProject: boolean) {
-    const tag = tagFromFile(URI.parse(uri).fsPath, sfdxProject);
+    const tag = componentUtil.tagFromFile(URI.parse(uri).fsPath, sfdxProject);
     if (tag) {
         addCustomTag(tag, uri, metadata);
     }
 }
 
 function removeCustomTagFromFile(file: string, sfdxProject: boolean) {
-    const tag = tagFromFile(file, sfdxProject);
+    const tag = componentUtil.tagFromFile(file, sfdxProject);
     if (tag) {
         removeCustomTag(tag);
     }
-}
-
-/**
- * @param file path to main .js/.html for component, i.e. card/card.js or card/card.html
- * @return tag name, i.e. c-card or namespace-card, or null if not the .js/.html file for a component
- */
-export function tagFromFile(file: string, sfdxProject: boolean) {
-    return nameFromFile(file, sfdxProject, tagName);
-}
-
-/**
- * @param file path to main .js/.html for component, i.e. card/card.js or card/card.html
- * @return module name, i.e. c/card or namespace/card, or null if not the .js/.html file for a component
- */
-export function moduleFromFile(file: string, sfdxProject: boolean) {
-    return nameFromFile(file, sfdxProject, moduleName);
-}
-
-function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
-    const filePath = path.parse(file);
-    const fileName = filePath.name;
-    const pathElements = filePath.dir.split(path.sep);
-    const parentDirName = pathElements.pop();
-    if (fileName === parentDirName) {
-        const namespace = sfdxProject ? 'c' : pathElements.pop();
-        return converter(namespace, parentDirName);
-    }
-    return null;
-}
-
-/**
- * @return true if file is the main .js file for a component
- */
-export function isJSComponent(file: string): boolean {
-    if (!file.toLowerCase().endsWith('.js')) {
-        return false;
-    }
-    return tagFromFile(file, true) != null;
-}
-
-function tagName(namespace: string, tag: string) {
-    if (namespace === 'interop') {
-        // treat interop as lightning, i.e. needed when using extension with lightning-global
-        // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
-        namespace = 'lightning';
-    }
-
-    // convert camel-case to hyphen-case/kebab-case
-    return namespace + '-' + decamelize(tag, '-');
-}
-
-function moduleName(namespace: string, tag: string) {
-    // convert camel-case to hyphen-case/kebab-case
-    return namespace + '/' + decamelize(tag, '-');
 }

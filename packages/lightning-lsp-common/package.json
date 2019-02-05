@@ -3,7 +3,11 @@
   "version": "1.0.4",
   "description": "Common Indexer for Lightning LSPs",
   "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "license": "MIT",
+  "engines": {
+    "vscode": "^1.26.0"
+  },
   "scripts": {
     "postinstall": "yarn build",
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
@@ -27,7 +31,8 @@
     "lodash.templatesettings": "^4.1.0",
     "properties": "^1.2.1",
     "semver": "^5.6.0",
-    "vscode-languageserver": "^5.2.1"
+    "vscode-languageserver": "^5.2.1",
+    "vscode-languageclient": "^3.5.1"
   },
   "devDependencies": {
     "@types/decamelize": "^1.2.0",

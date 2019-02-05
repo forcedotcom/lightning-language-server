@@ -11,7 +11,7 @@ import { isEmptyElement } from '../parser/htmlTags';
 import { allTagProviders } from './tagProviders';
 import { CompletionConfiguration } from '../htmlLanguageService';
 import URI from 'vscode-uri';
-import { tagFromFile } from '../../metadata-utils/custom-components-util';
+import { componentUtil } from 'lightning-lsp-common';
 
 export function doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, sfdxWorkspace: boolean, settings?: CompletionConfiguration): CompletionList {
 
@@ -181,7 +181,7 @@ export function doComplete(document: TextDocument, position: Position, htmlDocum
 			const expressionEnd = offset - 1;
 			for(let i = expressionEnd; i >= valueStart; i--) {
 				if(text[i] === '{') {
-					const templateTag = tagFromFile(URI.parse(document.uri).fsPath, sfdxWorkspace);
+					const templateTag = componentUtil.tagFromFile(URI.parse(document.uri).fsPath, sfdxWorkspace);
 					if (templateTag) {
 						const range = getReplaceRange(i + 1, offset);
 						tagProviders.forEach(provider => {

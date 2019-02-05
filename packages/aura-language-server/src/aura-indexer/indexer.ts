@@ -16,7 +16,7 @@ export default class AuraIndexer implements Indexer {
         const markupfiles = this.context.findAllAuraMarkup();
         for (const file of markupfiles) {
             try {
-                await parseMarkup(file);
+                await parseMarkup(file, this.context.type === WorkspaceType.SFDX);
             } catch (e) {
                 console.log(`Error parsing markup from ${file}: + ${e}`);
             }

@@ -26,6 +26,7 @@
     ],
 
     "exclude": [
+        "lib",
         "node_modules",
         "src/resources/**/*",
         "**/__tests__/fixtures/*.js",

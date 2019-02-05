@@ -39,7 +39,8 @@ import { LWCIndexer, handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { allTagProviders } from './html-language-service/services/tagProviders';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { parseMarkup } from './markup/auraTags';
+import { parseMarkup, getAuraTags} from './markup/auraTags';
+import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -320,7 +321,7 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             for (const event of changes) {
                 const file = toResolvedPath(event.uri);
                 if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
-                    await parseMarkup(file);
+                    await parseMarkup(file, context.type === WorkspaceType.SFDX);
                 }
             }
         }
@@ -407,3 +408,8 @@ connection.onSignatureHelp(
 );
 // Listen on the connection
 connection.listen();
+
+connection.onRequest('salesforce/listComponents', () => {
+    const tags = getAuraTags();
+    return JSON.stringify([...tags]);
+});

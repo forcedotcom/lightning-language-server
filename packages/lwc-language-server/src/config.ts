@@ -1,6 +1,5 @@
-import { moduleFromFile } from './metadata-utils/custom-components-util';
 import * as path from 'path';
-import { WorkspaceContext, shared, utils } from 'lightning-lsp-common';
+import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
 
 const { WorkspaceType } = shared;
 
@@ -23,7 +22,7 @@ export function onIndexCustomComponents(context: WorkspaceContext, files: string
 
         const paths: IPaths = {};
         for (const file of files) {
-            const tag = moduleFromFile(file, context.type === WorkspaceType.SFDX);
+            const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
             // path must be relative to location of jsconfig.json
             const relativeFilePath = utils.relativePath(modulesDir, file);
             paths[tag] = [relativeFilePath];
@@ -52,7 +51,7 @@ export function onIndexCustomComponents(context: WorkspaceContext, files: string
 
 export function onCreatedCustomComponent(context: WorkspaceContext, file: string) {
     // add tag/path to component to all the project's jsconfig.json "paths"
-    const tag = moduleFromFile(file, context.type === WorkspaceType.SFDX);
+    const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
     context.getRelativeModulesDirs().forEach(relativeModulesDir => {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
@@ -77,7 +76,7 @@ export function onCreatedCustomComponent(context: WorkspaceContext, file: string
 
 export function onDeletedCustomComponent(context: WorkspaceContext, file: string) {
     // delete tag from all the project's jsconfig.json "paths"
-    const tag = moduleFromFile(file, context.type === WorkspaceType.SFDX);
+    const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
     context.getRelativeModulesDirs().forEach(relativeModulesDir => {
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);

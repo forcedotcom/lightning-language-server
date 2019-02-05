@@ -3,7 +3,7 @@ import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
 import { TagInfo } from 'lightning-lsp-common';
-import { AttributeInfo } from 'lightning-lsp-common';
+import { AttributeInfo, componentUtil } from 'lightning-lsp-common';
 import { parse, Node } from '../html-language-service/parser/htmlParser';
 import { promisify } from 'util';
 import LineColumnFinder from 'line-column';
@@ -31,7 +31,7 @@ export async function loadSystemTags(): Promise<void> {
         // TODO need to account for LWC tags here
         if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
             const tagObj = auraSystem[tag];
-            const info = new TagInfo([]);
+            const info = new TagInfo(false, []);
             if (tagObj.attributes) {
                 tagObj.attributes.map((a: any) => {
                     // TODO - could we use more in depth doc from component library here?
@@ -53,7 +53,7 @@ export async function loadStandardComponents(): Promise<void> {
         // TODO need to account for LWC tags here
         if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
             const tagObj = auraStandard[tag];
-            const info = new TagInfo([]);
+            const info = new TagInfo(false, []);
             if (tagObj.attributes) {
                 tagObj.attributes.map((a: any) => {
                     // TODO - could we use more in depth doc from component library here?
@@ -94,7 +94,7 @@ function trimQuotes(str: string) {
     return str.replace(/"([^"]+(?="))"/g, '$1');
 }
 
-function getTagInfo(file: string, contents: string, node: Node): TagInfo {
+function getTagInfo(file: string, sfdxProject: boolean, contents: string, node: Node): TagInfo {
     if (!node) {
         return;
     }
@@ -117,23 +117,22 @@ function getTagInfo(file: string, contents: string, node: Node): TagInfo {
             },
         },
     };
-    const name = getTagName(file);
-    const info = new TagInfo([], location, documentation, name, 'c');
+    const name = getTagName(file, sfdxProject);
+    const info = new TagInfo(false, [], location, documentation, name, 'c');
     return info;
 }
-function getTagName(file: string): string {
-    const name = 'c:' + parsePath(basename(file)).name;
-    return name;
+function getTagName(file: string, sfdxProject: boolean): string {
+    return componentUtil.componentFromFile(file, sfdxProject);
 }
-function clearTagsforFile(file: string) {
-    const name = getTagName(file);
+function clearTagsforFile(file: string, sfdxProject: boolean) {
+    const name = getTagName(file, sfdxProject);
     AURA_TAGS.delete(name);
 }
-export async function parseMarkup(file: string): Promise<TagInfo | undefined> {
-    console.log(file);
+export async function parseMarkup(file: string, sfdxProject: boolean): Promise<TagInfo | undefined> {
+    // console.log(file);
 
     if (!fs.existsSync(file)) {
-        clearTagsforFile(file);
+        clearTagsforFile(file, sfdxProject);
         return;
     }
     const markup = await readFile(file, 'utf-8');
@@ -143,9 +142,9 @@ export async function parseMarkup(file: string): Promise<TagInfo | undefined> {
         tags.push(...searchAura(root));
     }
 
-    const tagInfo = getTagInfo(file, markup, result.roots[0]);
+    const tagInfo = getTagInfo(file, sfdxProject, markup, result.roots[0]);
     if (!tagInfo) {
-        clearTagsforFile(file);
+        clearTagsforFile(file, sfdxProject);
         return;
     }
     const attributeInfos = tags
@@ -188,22 +187,23 @@ export function getAuraTags(): Map<string, TagInfo> {
     const filtered: Map<string, TagInfo> = new Map();
     for (const [tag, tagInfo] of tags) {
         // TODO: MAKE THIS LAZY FOR PERFORMANCE
-        if (tag.startsWith('c')) {
+        if (!tag.startsWith('lightning')) {
             const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
 
+            const namespace = tag.split('-')[0];
             const name = tag
                 .split('-')
                 .slice(1)
                 .join('-');
-            interopTagInfo.name = ['c', changeCase.camelCase(name)].join(':');
+            interopTagInfo.name = [namespace, changeCase.camelCase(name)].join(':');
 
             const attrs: AttributeInfo[] = [];
             for (const attribute of interopTagInfo.attributes) {
-                const attrname = changeCase.camelCase(attribute.jsName);
+                const attrname = changeCase.camelCase(attribute.jsName || attribute.name);
                 attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
             }
 
-            const info = new TagInfo(attrs, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, 'c');
+            const info = new TagInfo(true, attrs, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, namespace);
 
             filtered.set(interopTagInfo.name, info);
         }
