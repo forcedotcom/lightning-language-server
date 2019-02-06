@@ -5,20 +5,19 @@ import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 
-jest.mock('../context', () => {
-    const context: any = jest.genMockFromModule('../context');
-    const real = new context.WorkspaceContext();
-    real.isFileInsideModulesRoots = () => {
-        return true;
-    };
-    real.isLWCRootDirectory = () => {
-        return true;
-    };
-    context.WorkspaceContext.mockImplementation(() => {
-        real.type = WorkspaceType.SFDX;
-        return real;
-    });
-    return context;
+jest.mock('../context');
+const real = jest.requireActual('../context');
+real.WorkspaceContext.prototype.isFileInsideModulesRoots = () => {
+    return true;
+};
+real.WorkspaceContext.prototype.isLWC = () => {
+    return true;
+};
+const realWS = new real.WorkspaceContext('');
+realWS.type = WorkspaceType.SFDX;
+// @ts-ignore
+WorkspaceContext.mockImplementation(() => {
+    return realWS;
 });
 
 it('includesWatchedDirectory', () => {

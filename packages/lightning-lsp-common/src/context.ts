@@ -493,7 +493,9 @@ function findNamespaceRoots(root: string, maxDepth: number = 5): { lwc: string[]
         }
     }
 
-    traverse(root, maxDepth);
+    if (fs.existsSync(root)) {
+        traverse(root, maxDepth);
+    }
     return roots;
 }
 
