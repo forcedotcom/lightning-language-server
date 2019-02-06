@@ -23,4 +23,3 @@ for (const key of tagkeys) {
 }
 const out = JSON.stringify(tags, null, 3);
 fs.writeFileSync('aura-system.json',out, 'utf-8');
-debugger;

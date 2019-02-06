@@ -14,7 +14,7 @@
                 "${workspaceFolder}/lib/**"
             ],
             "protocol": "inspector",
-            "timeout": 20000
+            "timeout": 90000
         },
         {
             "name": "Launch All Tests",
