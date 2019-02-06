@@ -43,7 +43,7 @@ export class WorkspaceContext {
             this.initSfdxProject();
         }
         if (!isLWC(this.type)) {
-            console.error('not a LWC workspace:', workspaceRoot);
+            console.error('not a LWC workspace:', this.workspaceRoot);
         }
         this.namespaceRoots = this.findNamespaceRootsUsingType();
     }
