@@ -9,7 +9,7 @@ import { getLwcTags } from './metadata-utils/custom-components-util';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { updateCustomComponentIndex } from './metadata-utils/custom-components-util';
+import { updateCustomComponentIndex, tagEvents } from './metadata-utils/custom-components-util';
 import { utils } from 'lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 
@@ -21,13 +21,12 @@ export class LWCIndexer implements Indexer {
     constructor(context: WorkspaceContext) {
         this.context = context;
     }
-    public async configureAndIndex() {
-        this.resetAllIndexes();
 
+    public async configureAndIndex() {
         // indexing:
         const indexingTasks: Array<Promise<void>> = [];
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
-            indexingTasks.push(loadStandardComponents());
+            indexingTasks.push(loadStandardComponents(this.context));
         }
         indexingTasks.push(indexCustomComponents(this.context));
         if (this.context.type === WorkspaceType.SFDX) {
@@ -37,7 +36,7 @@ export class LWCIndexer implements Indexer {
         }
         await Promise.all(indexingTasks);
     }
-    private resetAllIndexes() {
+    public resetIndex() {
         resetCustomComponents();
         resetCustomLabels();
         resetStaticResources();
@@ -48,8 +47,7 @@ export class LWCIndexer implements Indexer {
 export async function handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
     const changes = change.changes;
 
-    if (utils.isLWCRootDirectoryCreated(workspaceContext, changes) || utils.includesDeletedLwcWatchedDirectory(workspaceContext, changes)) {
-        // re-index everything on directory deletions as no events are reported for contents of deleted directories
+    if (utils.isLWCRootDirectoryCreated(workspaceContext, changes)) {
         const startTime = process.hrtime();
         await workspaceContext.getIndexingProvider('lwc').configureAndIndex();
         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime), changes);
@@ -63,4 +61,4 @@ export async function handleWatchedFiles(workspaceContext: WorkspaceContext, cha
     }
 }
 
-export { getLanguageService, LanguageService, getLwcTags };
+export { getLanguageService, LanguageService, getLwcTags, tagEvents };

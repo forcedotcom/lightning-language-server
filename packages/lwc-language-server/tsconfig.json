@@ -17,12 +17,14 @@
         "pretty": true,
         "declaration": true,
         "esModuleInterop": true,
+        "rootDir": "./src",
+        "sourceRoot": "./src"
     },
 
     "include": [
         "src/**/*.ts",
         "typings/*.d.ts",
-        "jest/*.js"
+        // "jest/*.js"
     ],
 
     "exclude": [

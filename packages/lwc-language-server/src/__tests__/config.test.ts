@@ -1,4 +1,4 @@
-import { utils, WorkspaceContext } from 'lightning-lsp-common';
+import { utils, WorkspaceContext, componentUtil } from 'lightning-lsp-common';
 import { LWCIndexer } from '../indexer';
 import * as config from '../config';
 import * as path from 'path';
@@ -36,9 +36,11 @@ it('lifecycle', async () => {
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
 
     // onDeleteCustomComponent:
-    config.onDeletedCustomComponent(context, newCompPath);
+    const moduleTag = componentUtil.moduleFromFile(newCompPath, true);
+    config.onDeletedCustomComponent(moduleTag, context);
     jsconfigForceApp = JSON.parse(utils.readFileSync(jsconfigPathForceApp));
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
     // no error deleting non-existing:
-    config.onDeletedCustomComponent(context, newCompPath);
+
+    config.onDeletedCustomComponent(moduleTag, context);
 });

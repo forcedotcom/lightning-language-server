@@ -29,7 +29,7 @@ it('UC: goto definition for custom tags and attributes', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // standard tags
-    await loadStandardComponents();
+    await loadStandardComponents(context);
     assertDefinition('|<lightning-button></lightning-button>');
     assertDefinition('<lightning-bu|tton></lightning-button>');
     assertDefinition('<lightning-button cl|ass="one"></lightning-button>');

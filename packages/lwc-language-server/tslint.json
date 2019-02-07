@@ -20,7 +20,8 @@
             "src/html-language-service/services/htmlHover.ts",
             "src/html-language-service/utils/strings.ts",
             "src/html-language-service/utils/paths.ts",
-            "src/html-language-service/utils/arrays.ts"
+            "src/html-language-service/utils/arrays.ts",
+            "typings/**"
         ]
     }
 }

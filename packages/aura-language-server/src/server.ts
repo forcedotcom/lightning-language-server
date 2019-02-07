@@ -22,6 +22,7 @@ import {
     SignatureHelp,
     SignatureInformation,
     ParameterInformation,
+    FileChangeType,
 } from 'vscode-languageserver';
 
 import * as auraUtils from './aura-utils';
@@ -35,11 +36,11 @@ import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
-import { LWCIndexer, handleWatchedFiles } from 'lwc-language-server';
+import { handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { allTagProviders } from './html-language-service/services/tagProviders';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { parseMarkup, getAuraTags} from './markup/auraTags';
+import { parseMarkup, getAuraTags, getAuraNamespaces, clearTagsforDirectory } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 
 // Create a standard connection and let the caller decide the strategy
@@ -121,14 +122,8 @@ connection.onInitialize(
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
 
-            const lwcIndexer = new LWCIndexer(context);
-            // // wait for indexing to finish before returning from onInitialize()
-            await lwcIndexer.configureAndIndex();
-            context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
-
-            const auraIndexer = new AuraIndexer(context);
+            const auraIndexer = new AuraIndexer(context, connection);
             await auraIndexer.configureAndIndex();
-            context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
 
             asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
             asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
@@ -312,16 +307,23 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
 
     try {
         handleWatchedFiles(context, change);
-        if (utils.isAuraRootDirectoryCreated(context, changes) || utils.includesDeletedAuraWatchedDirectory(context, changes)) {
+        if (utils.isAuraRootDirectoryCreated(context, changes)) {
+            await context.getIndexingProvider('aura').resetIndex();
             await context.getIndexingProvider('aura').configureAndIndex();
             // re-index everything on directory deletions as no events are reported for contents of deleted directories
             const startTime = process.hrtime();
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
+            return;
         } else {
             for (const event of changes) {
-                const file = toResolvedPath(event.uri);
-                if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
-                    await parseMarkup(file, context.type === WorkspaceType.SFDX);
+                if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(context, event.uri)) {
+                    const dir = toResolvedPath(event.uri);
+                    clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
+                } else {
+                    const file = toResolvedPath(event.uri);
+                    if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
+                        await parseMarkup(file, context.type === WorkspaceType.SFDX);
+                    }
                 }
             }
         }
@@ -412,4 +414,9 @@ connection.listen();
 connection.onRequest('salesforce/listComponents', () => {
     const tags = getAuraTags();
     return JSON.stringify([...tags]);
+});
+
+connection.onRequest('salesforce/listNamespaces', () => {
+    const tags = getAuraNamespaces();
+    return JSON.stringify(tags);
 });

@@ -37,7 +37,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // standard tags
-    await loadStandardComponents();
+    await loadStandardComponents(context);
 
     assertNoHover('|<lightning-button></lightning-button>');
     assertHover(

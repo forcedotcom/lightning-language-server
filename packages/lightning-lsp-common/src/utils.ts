@@ -62,12 +62,12 @@ function isAuraDirectory(context: WorkspaceContext, uri: string) {
     return false;
 }
 
-function isLWCWatchedDirectory(context: WorkspaceContext, uri: string) {
+export function isLWCWatchedDirectory(context: WorkspaceContext, uri: string) {
     const file = toResolvedPath(uri);
     return file.indexOf('.') === -1 && context.isFileInsideModulesRoots(file);
 }
 
-function isAuraWatchedDirectory(context: WorkspaceContext, uri: string) {
+export function isAuraWatchedDirectory(context: WorkspaceContext, uri: string) {
     const file = toResolvedPath(uri);
     return file.indexOf('.') === -1 && context.isFileInsideAuraRoots(file);
 }

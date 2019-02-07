@@ -17,7 +17,7 @@ export interface IJsconfig {
 
 export function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
-    context.getRelativeModulesDirs().forEach(relativeModulesDir => {
+    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         const paths: IPaths = {};
@@ -46,13 +46,17 @@ export function onIndexCustomComponents(context: WorkspaceContext, files: string
             jsconfig.compilerOptions.paths = paths;
             writeJsconfig(jsconfigFile, jsconfig);
         }
-    });
+    }
 }
 
 export function onCreatedCustomComponent(context: WorkspaceContext, file: string) {
+    if (!file) {
+        // could be a non-local tag, like LGC, etc
+        return;
+    }
     // add tag/path to component to all the project's jsconfig.json "paths"
-    const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-    context.getRelativeModulesDirs().forEach(relativeModulesDir => {
+    const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
+    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         // path must be relative to location of jsconfig.json
@@ -69,25 +73,24 @@ export function onCreatedCustomComponent(context: WorkspaceContext, file: string
         if (!jsconfig.compilerOptions.paths) {
             jsconfig.compilerOptions.paths = {};
         }
-        jsconfig.compilerOptions.paths[tag] = [relativeFilePath];
+        jsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
         writeJsconfig(jsconfigFile, jsconfig);
-    });
+    }
 }
 
-export function onDeletedCustomComponent(context: WorkspaceContext, file: string) {
+export function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext) {
     // delete tag from all the project's jsconfig.json "paths"
-    const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-    context.getRelativeModulesDirs().forEach(relativeModulesDir => {
+    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         const jsconfig: IJsconfig = JSON.parse(utils.readFileSync(jsconfigFile));
         if (jsconfig.compilerOptions) {
             if (jsconfig.compilerOptions.paths) {
-                delete jsconfig.compilerOptions.paths[tag];
+                delete jsconfig.compilerOptions.paths[moduleTag];
                 writeJsconfig(jsconfigFile, jsconfig);
             }
         }
-    });
+    }
 }
 
 export function writeJsconfig(file: string, jsconfig: {}) {

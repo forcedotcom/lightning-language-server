@@ -4,6 +4,7 @@ import { ClassMember } from '@lwc/babel-plugin-component';
 
 export class TagInfo {
     constructor(
+        public file: string,
         public lwc: boolean,
         public attributes: AttributeInfo[],
         public location?: Location,

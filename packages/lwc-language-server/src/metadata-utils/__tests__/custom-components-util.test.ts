@@ -6,12 +6,13 @@ import { WorkspaceContext, utils } from 'lightning-lsp-common';
 import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
 
 it('addCustomTagFromFile(): adds custom tag attributes and documentation', async () => {
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     // custom tag is not indexed initially
     let tagInfo = getLwcByTag('c-todo_item');
     expect(tagInfo).toBeUndefined();
 
     // index todo_item.js ==> custom tag and attributes are added to the index
-    await addCustomTagFromFile(join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default', 'lwc', 'todo_item', 'todo_item.js'), true);
+    await addCustomTagFromFile(context, join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default', 'lwc', 'todo_item', 'todo_item.js'), true);
     tagInfo = getLwcByTag('c-todo_item');
     expect(tagInfo).toMatchObject({ attributes: [{ name: 'todo' }, { name: 'same-line' }, { name: 'next-line' }], documentation: 'TodoItem doc' });
     const location = tagInfo.location;
@@ -121,6 +122,7 @@ it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
     context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
+    await lwcIndexer.resetIndex();
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
 
