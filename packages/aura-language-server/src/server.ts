@@ -34,7 +34,7 @@ import * as util from 'util';
 import * as tern from 'tern';
 import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
-import { findWord, findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
+import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
 import { handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
@@ -42,6 +42,7 @@ import { allTagProviders } from './html-language-service/services/tagProviders';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { parseMarkup, getAuraTags, getAuraNamespaces, clearTagsforDirectory } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
+import { readFileSync, readdirSync, statSync } from 'fs';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -103,6 +104,20 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
+function *walkSync(dir: string) {
+    const files = readdirSync(dir);
+
+    for (const file of files) {
+        const pathToFile = path.join(dir, file);
+        const isDirectory = statSync(pathToFile).isDirectory();
+        if (isDirectory) {
+            yield *walkSync(pathToFile);
+        } else {
+            yield pathToFile;
+        }
+    }
+}
+
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath, capabilities } = params;
@@ -127,6 +142,22 @@ connection.onInitialize(
 
             asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
             asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
+
+            const result = await asyncTernRequest({
+                query: {
+                    type: 'ideInit',
+                    unloadDefs: true,
+                },
+            });
+            const resources = path.join(__dirname, '../resources/aura');
+            const found = [...walkSync(resources)];
+            for (const file of found) {
+                if (file.endsWith('.js')) {
+                    const data = readFileSync(file, 'utf-8');
+                    ternServer.addFile(file, data);
+                }
+            }
+            await asyncFlush();
             // Early exit if no workspace is opened
 
             // context = new WorkspaceContext(workspaceRoot);
@@ -201,8 +232,8 @@ connection.onCompletion(
                 caseInsensitive: true,
             });
             const items: CompletionItem[] = completions.map(completion => {
-                let kind = 10;
-                if (completion.type.startsWith('fn')) {
+                let kind = 18;
+                if (completion.type && completion.type.startsWith('fn')) {
                     kind = 3;
                 }
                 return {
@@ -295,6 +326,13 @@ connection.onDefinition(
         if (file) {
             if (file === 'Aura') {
                 return;
+            } else if (file.indexOf('/resources/aura/') >= 0 ) {
+                const slice = file.slice( file.indexOf('/resources/aura/'));
+                const real = path.join(__dirname, '..', slice);
+                return {
+                    uri: URI.file(real).toString(),
+                    range: tern2lspRange({ start, end }),
+                };
             }
             return tern2lspLocation({ file, start, end });
         }

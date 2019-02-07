@@ -86,7 +86,7 @@ export class WorkspaceContext {
     public isInsideModulesRoots(document: TextDocument): boolean {
         const file = utils.toResolvedPath(document.uri);
         if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-            throw new Error('document not in workspace: ' + file + '\n' + this.workspaceRoot);
+            return false;
         }
         return this.isFileInsideModulesRoots(file);
     }
