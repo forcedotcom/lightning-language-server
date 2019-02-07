@@ -77,6 +77,7 @@ it('completion', async () => {
 
 it('completion in sfdx workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+
     context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();

@@ -9,8 +9,10 @@ import { promisify } from 'util';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import { basename, parse as parsePath } from 'path';
-import { getLwcTags } from 'lwc-language-server';
+import { tagEvents as lwcTagEvents } from 'lwc-language-server';
 import changeCase from 'change-case';
+
+import EventsEmitter from 'events';
 
 const readFile = promisify(fs.readFile);
 
@@ -18,10 +20,63 @@ const AURA_TAGS: Map<string, TagInfo> = new Map();
 const AURA_EVENTS: Map<string, TagInfo> = new Map();
 const AURA_NAMESPACES: Set<string> = new Set();
 
+export const tagEvents = new EventsEmitter();
+lwcTagEvents.on('clear', () => {
+    // don't propogate this one
+});
+lwcTagEvents.on('delete', (tag: string) => {
+    const transformedName = transformLwcTagName(tag);
+    const auraName = [transformedName.namespace, transformedName.name].join(':');
+
+    deleteCustomTag(auraName);
+});
+lwcTagEvents.on('set', (tagInfo: TagInfo) => {
+    const tag = tagInfo.name;
+    if (!tag.startsWith('lightning')) {
+        const interopTagInfo = transformLwcTagToAura(tag, tagInfo);
+        setCustomTag(interopTagInfo);
+    }
+});
 export async function resetIndexes() {
     AURA_TAGS.clear();
     AURA_EVENTS.clear();
-    AURA_NAMESPACES.clear();
+
+    tagEvents.emit('clear');
+}
+
+export function clearTagsforDirectory(directory: string, sfdxProject: boolean) {
+    const name = componentUtil.componentFromDirectory(directory, sfdxProject);
+    deleteCustomTag(name);
+}
+
+function clearTagsforFile(file: string, sfdxProject: boolean) {
+    const name = componentUtil.componentFromFile(file, sfdxProject);
+    deleteCustomTag(name);
+}
+
+function deleteCustomTag(tag: string) {
+    AURA_TAGS.delete(tag);
+    AURA_EVENTS.delete(tag);
+
+    tagEvents.emit('delete', tag);
+}
+function setAuraNamespaceTag(namespace: string) {
+    if (!AURA_NAMESPACES.has(namespace)) {
+        AURA_NAMESPACES.add(namespace);
+        tagEvents.emit('set-namespace', namespace);
+    }
+}
+
+function setCustomEventTag(info: TagInfo) {
+    setAuraNamespaceTag(info.namespace);
+    AURA_EVENTS.set(info.name, info);
+    tagEvents.emit('set', info);
+}
+
+function setCustomTag(info: TagInfo) {
+    setAuraNamespaceTag(info.namespace);
+    AURA_TAGS.set(info.name, info);
+    tagEvents.emit('set', info);
 }
 
 export async function loadSystemTags(): Promise<void> {
@@ -31,7 +86,7 @@ export async function loadSystemTags(): Promise<void> {
         // TODO need to account for LWC tags here
         if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
             const tagObj = auraSystem[tag];
-            const info = new TagInfo(false, []);
+            const info = new TagInfo(null, false, []);
             if (tagObj.attributes) {
                 tagObj.attributes.map((a: any) => {
                     // TODO - could we use more in depth doc from component library here?
@@ -41,7 +96,8 @@ export async function loadSystemTags(): Promise<void> {
             info.documentation = tagObj.description;
             info.name = tag;
             info.namespace = tagObj.namespace;
-            AURA_TAGS.set(tag, info);
+
+            setCustomTag(info);
         }
     }
 }
@@ -53,7 +109,7 @@ export async function loadStandardComponents(): Promise<void> {
         // TODO need to account for LWC tags here
         if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
             const tagObj = auraStandard[tag];
-            const info = new TagInfo(false, []);
+            const info = new TagInfo(null, false, []);
             if (tagObj.attributes) {
                 tagObj.attributes.map((a: any) => {
                     // TODO - could we use more in depth doc from component library here?
@@ -66,11 +122,10 @@ export async function loadStandardComponents(): Promise<void> {
 
             // Update our in memory maps
             // TODO should we move interfaces/apps/etc to a separate map also?
-            AURA_NAMESPACES.add(tagObj.namespace);
             if (tagObj.type === 'event') {
-                AURA_EVENTS.set(tag, info);
+                setCustomEventTag(info);
             } else {
-                AURA_TAGS.set(tag, info);
+                setCustomTag(info);
             }
         }
     }
@@ -117,17 +172,11 @@ function getTagInfo(file: string, sfdxProject: boolean, contents: string, node: 
             },
         },
     };
-    const name = getTagName(file, sfdxProject);
-    const info = new TagInfo(false, [], location, documentation, name, 'c');
+    const name = componentUtil.componentFromFile(file, sfdxProject);
+    const info = new TagInfo(file, false, [], location, documentation, name, 'c');
     return info;
 }
-function getTagName(file: string, sfdxProject: boolean): string {
-    return componentUtil.componentFromFile(file, sfdxProject);
-}
-function clearTagsforFile(file: string, sfdxProject: boolean) {
-    const name = getTagName(file, sfdxProject);
-    AURA_TAGS.delete(name);
-}
+
 export async function parseMarkup(file: string, sfdxProject: boolean): Promise<TagInfo | undefined> {
     // console.log(file);
 
@@ -174,7 +223,7 @@ export async function parseMarkup(file: string, sfdxProject: boolean): Promise<T
             return new AttributeInfo(jsName, documentation, type, location);
         });
     tagInfo.attributes = attributeInfos;
-    AURA_TAGS.set(tagInfo.name, tagInfo);
+    setCustomTag(tagInfo);
     return tagInfo;
 }
 
@@ -182,34 +231,47 @@ export function isAuraNamespace(namespace: string): boolean {
     return AURA_NAMESPACES.has(namespace);
 }
 
-export function getAuraTags(): Map<string, TagInfo> {
-    const tags = getLwcTags();
-    const filtered: Map<string, TagInfo> = new Map();
-    for (const [tag, tagInfo] of tags) {
-        // TODO: MAKE THIS LAZY FOR PERFORMANCE
-        if (!tag.startsWith('lightning')) {
-            const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
+function transformLwcTagName(tag: string) {
+    const namespace = tag.split('-')[0];
+    const name = tag
+        .split('-')
+        .slice(1)
+        .join('-');
+    return {
+        namespace,
+        name: changeCase.camelCase(name),
+    };
+}
+function transformLwcTagToAura(tag: string, tagInfo: any): TagInfo {
+    const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
 
-            const namespace = tag.split('-')[0];
-            const name = tag
-                .split('-')
-                .slice(1)
-                .join('-');
-            interopTagInfo.name = [namespace, changeCase.camelCase(name)].join(':');
+    const transformedName = transformLwcTagName(tag);
+    interopTagInfo.name = [transformedName.namespace, transformedName.name].join(':');
 
-            const attrs: AttributeInfo[] = [];
-            for (const attribute of interopTagInfo.attributes) {
-                const attrname = changeCase.camelCase(attribute.jsName || attribute.name);
-                attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
-            }
-
-            const info = new TagInfo(true, attrs, interopTagInfo.location, interopTagInfo.documentation, interopTagInfo.name, namespace);
-
-            filtered.set(interopTagInfo.name, info);
-        }
+    const attrs: AttributeInfo[] = [];
+    for (const attribute of interopTagInfo.attributes) {
+        const attrname = changeCase.camelCase(attribute.jsName || attribute.name);
+        attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
     }
-    const map = new Map([...AURA_TAGS, ...filtered]);
-    return map;
+
+    const info = new TagInfo(
+        interopTagInfo.file,
+        true,
+        attrs,
+        interopTagInfo.location,
+        interopTagInfo.documentation,
+        interopTagInfo.name,
+        transformedName.namespace,
+    );
+    return info;
+}
+
+export function getAuraTags(): Map<string, TagInfo> {
+    return AURA_TAGS;
+}
+
+export function getAuraNamespaces(): string[] {
+    return [...AURA_NAMESPACES];
 }
 
 export function getAuraByTag(tag: string): TagInfo {

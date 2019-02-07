@@ -19,6 +19,7 @@ import { componentUtil } from './index';
 
 export interface Indexer {
     configureAndIndex(): Promise<void>;
+    resetIndex(): void;
 }
 /**
  * Holds information and utility methods for a LWC workspace

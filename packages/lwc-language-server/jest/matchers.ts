@@ -6,8 +6,7 @@ expect.extend({
         const pass = fs.existsSync(path);
         if (pass) {
             return {
-                message: () =>
-                    `expected ${path} not to exist`,
+                message: () => `expected ${path} not to exist`,
                 pass: true,
             };
         } else {
@@ -21,8 +20,7 @@ expect.extend({
         const pass = isAbsolute(path);
         if (pass) {
             return {
-                message: () =>
-                    `expected ${path} not to be absolute`,
+                message: () => `expected ${path} not to be absolute`,
                 pass: true,
             };
         } else {
@@ -36,8 +34,7 @@ expect.extend({
         const pass = str.endsWith(suffix);
         if (pass) {
             return {
-                message: () =>
-                    `expected ${str} not to end with ${suffix}`,
+                message: () => `expected ${str} not to end with ${suffix}`,
                 pass: true,
             };
         } else {

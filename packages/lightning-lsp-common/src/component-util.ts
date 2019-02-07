@@ -8,6 +8,9 @@ import decamelize from 'decamelize';
 export function tagFromFile(file: string, sfdxProject: boolean) {
     return nameFromFile(file, sfdxProject, tagName);
 }
+export function tagFromDirectory(file: string, sfdxProject: boolean) {
+    return nameFromDirectory(file, sfdxProject, tagName);
+}
 
 /**
  * @param file path to main .js/.html for component, i.e. card/card.js or card/card.html
@@ -16,12 +19,19 @@ export function tagFromFile(file: string, sfdxProject: boolean) {
 export function moduleFromFile(file: string, sfdxProject: boolean) {
     return nameFromFile(file, sfdxProject, moduleName);
 }
+export function moduleFromDirectory(file: string, sfdxProject: boolean) {
+    return nameFromDirectory(file, sfdxProject, moduleName);
+}
 
 export function componentFromFile(file: string, sfdxProject: boolean) {
     return nameFromFile(file, sfdxProject, componentName);
 }
+export function componentFromDirectory(file: string, sfdxProject: boolean) {
+    return nameFromDirectory(file, sfdxProject, componentName);
+}
 
 function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
+
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = filePath.dir.split(path.sep);
@@ -31,6 +41,16 @@ function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string,
         return converter(namespace, parentDirName);
     }
     return null;
+}
+function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
+
+    const filePath = path.parse(file);
+    if (sfdxProject) {
+        return converter('c', filePath.name);
+    } else {
+        // TODO verify
+        return converter(filePath.dir.split(path.sep).pop() , filePath.name);
+    }
 }
 
 /**
