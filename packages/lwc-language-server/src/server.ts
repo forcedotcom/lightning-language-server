@@ -59,7 +59,7 @@ connection.onInitialize(
             await lwcIndexer.configureAndIndex();
             context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
             htmlLS = getLanguageService();
-            console.info('     ... language server started in ' + utils.elapsedMillis(startTime), context);
+            console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
                 capabilities: {
