@@ -42,5 +42,10 @@ cd ../lightning-language-server
 yarn watch
 ```
 
+### Open VSCode Workspace
+```
+code ~/git/LSP/lightning-language-server/vscode-workspaces/lsp-all.code-workspace
+```
+
 ### Launch VSCode Debug
 Run 'Launch DX - Aura & LWC' from VSCode
