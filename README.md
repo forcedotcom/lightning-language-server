@@ -25,12 +25,13 @@ cd lightning-language-server
 yarn install
 yarn link-lsp
 ```
+(Note: if link-lsp fails because it can't find the common plugin just run 'lerna exec yarn link')
 
 ### Setup the DX Plugins
 
 ```
 cd ../salesforcedx-vscode
-./link-lsp.sh
+npm run link-lsp
 npm install
 npm run compile
 ```
