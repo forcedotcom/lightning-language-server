@@ -53,3 +53,6 @@ code ./vscode-workspaces/lsp-all.code-workspace
 
 ### Launch VSCode Debug
 Run 'Launch DX - Aura & LWC' from VSCode
+
+### Debugging Language Server when it doesn't startup
+TODO
