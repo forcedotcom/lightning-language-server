@@ -147,16 +147,25 @@ connection.onInitialize(
                 query: {
                     type: 'ideInit',
                     unloadDefs: true,
+                    // shouldFilter: true,
                 },
             });
             const resources = path.join(__dirname, '../resources/aura');
             const found = [...walkSync(resources)];
+            let [lastFile, lastText] = [undefined, undefined];
             for (const file of found) {
                 if (file.endsWith('.js')) {
                     const data = readFileSync(file, 'utf-8');
-                    ternServer.addFile(file, data);
+                    // HACK HACK HACK - glue it all together baby!
+                    if (file.endsWith('AuraInstance.js')) {
+                        lastFile = file;
+                        lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
+                    } else {
+                        ternServer.addFile(file, data);
+                    }
                 }
             }
+            ternServer.addFile(lastFile, lastText);
             await asyncFlush();
             // Early exit if no workspace is opened
 

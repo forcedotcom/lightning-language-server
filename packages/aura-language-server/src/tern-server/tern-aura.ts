@@ -9,7 +9,7 @@ const WG_IMPORT_DEFAULT_FALLBACK = 80;
 const WG_DEFAULT_EXPORT = 95;
 let server = {};
 
-const shouldFilter = false;
+let shouldFilter = false;
 /* tslint:disable */
 
 /* this is necessary to inform the parameter types of the controller when
@@ -738,6 +738,7 @@ tern.defineQueryType('ideInit', {
             unloadDefs();
             _debug('Unloaded default Aura defs');
         }
+
         if (query.shouldFilter === true || query.shouldFilter === false) {
             // @ts-ignore
             shouldFilter = query.shouldFilter;
