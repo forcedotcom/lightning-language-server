@@ -3,6 +3,10 @@ Mono repo for lwc-language-server and aura-language-server
 
 ## Setup
 
+### Pre-requisites
+Follow the pre-requisites here:
+https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/docs/developing.md
+
 ### Create a common directory for LSP
 
 ```
@@ -44,7 +48,7 @@ yarn watch
 
 ### Open VSCode Workspace
 ```
-code ~/git/LSP/lightning-language-server/vscode-workspaces/lsp-all.code-workspace
+code ./vscode-workspaces/lsp-all.code-workspace
 ```
 
 ### Launch VSCode Debug
