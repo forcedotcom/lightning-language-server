@@ -5,6 +5,16 @@ import URI from 'vscode-uri';
 import equal from 'deep-equal';
 import { WorkspaceContext } from './context';
 import { WorkspaceType } from './shared';
+import { promisify } from 'util';
+import { Glob } from 'glob';
+
+export const readdir: (arg1: string | Buffer) => Promise<string[]> = promisify(fs.readdir);
+export const writeFile: (arg1: string | number | Buffer, data: any) => Promise<void> = promisify(fs.writeFile);
+export const readFile: (arg1: string | number | Buffer) => Promise<string> = promisify(fs.readFile);
+export const pathExists: (path: string) => Promise<boolean> = promisify(fs.pathExists);
+export const stat: (arg1: string | Buffer) => Promise<fs.Stats> = promisify(fs.stat);
+
+export const glob = promisify(Glob);
 
 const RESOURCES_DIR = 'resources';
 
@@ -182,3 +192,14 @@ export function elapsedMillis(start: [number, number]): string {
     const elapsed = process.hrtime(start);
     return (elapsed[0] * 1000 + elapsed[1] / 1e6).toFixed(2) + ' ms';
 }
+
+export const memoize = (fn: any) => {
+    let cache: any;
+    return () => {
+        if (cache) {
+            return cache;
+        }
+        cache = fn.apply(this);
+        return cache;
+    };
+};

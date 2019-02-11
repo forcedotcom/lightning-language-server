@@ -89,10 +89,10 @@ export async function loadSystemTags(): Promise<void> {
             const tagObj = auraSystem[tag];
             const info = new TagInfo(null, false, []);
             if (tagObj.attributes) {
-                tagObj.attributes.map((a: any) => {
+                for (const a of tagObj.attributes) {
                     // TODO - could we use more in depth doc from component library here?
                     info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
-                });
+                }
             }
             info.documentation = tagObj.description;
             info.name = tag;
@@ -112,10 +112,10 @@ export async function loadStandardComponents(): Promise<void> {
             const tagObj = auraStandard[tag];
             const info = new TagInfo(null, false, []);
             if (tagObj.attributes) {
-                tagObj.attributes.map((a: any) => {
+                for (const a of tagObj.attributes) {
                     // TODO - could we use more in depth doc from component library here?
                     info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
-                });
+                }
             }
             info.documentation = tagObj.description;
             info.name = tag;

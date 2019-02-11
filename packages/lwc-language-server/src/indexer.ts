@@ -18,12 +18,15 @@ const { WorkspaceType } = shared;
 export class LWCIndexer implements Indexer {
     private context: WorkspaceContext;
 
+    private indexingTasks: Promise<void>;
+
     constructor(context: WorkspaceContext) {
         this.context = context;
     }
 
     public async configureAndIndex() {
         // indexing:
+        debugger;
         const indexingTasks: Array<Promise<void>> = [];
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
             indexingTasks.push(loadStandardComponents(this.context));
@@ -34,8 +37,13 @@ export class LWCIndexer implements Indexer {
             indexingTasks.push(indexContentAssets(this.context.workspaceRoot, this.context.sfdxPackageDirsPattern));
             indexingTasks.push(indexCustomLabels(this.context.workspaceRoot, this.context.sfdxPackageDirsPattern));
         }
-        await Promise.all(indexingTasks);
+        this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
     }
+
+    public async waitOnIndex() {
+        return this.indexingTasks;
+    }
+
     public resetIndex() {
         resetCustomComponents();
         resetCustomLabels();

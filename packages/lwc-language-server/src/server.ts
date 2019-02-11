@@ -55,9 +55,10 @@ connection.onInitialize(
             const startTime = process.hrtime();
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
-            // wait for indexing to finish before returning from onInitialize()
             const lwcIndexer = new LWCIndexer(context);
-            await lwcIndexer.configureAndIndex();
+
+            lwcIndexer.configureAndIndex();
+
             context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getLwcTagProvider());

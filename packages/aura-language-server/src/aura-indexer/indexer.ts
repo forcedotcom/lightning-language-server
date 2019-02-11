@@ -16,15 +16,14 @@ const tagsCleared: NotificationType<void, void> = new NotificationType<void, voi
 export default class AuraIndexer implements Indexer {
     private context: WorkspaceContext;
     private connection?: IConnection;
+    private indexingTasks: Promise<void>;
 
     constructor(context: WorkspaceContext, connection?: IConnection) {
         this.context = context;
         this.connection = connection;
         this.context.addIndexingProvider({ name: 'aura', indexer: this });
-    }
-
-    public async configureAndIndex() {
         if (this.connection) {
+            // TODO: get tag events from the LWC indexer
             tagEvents.on('set', (tag: TagInfo) => {
                 this.connection.sendNotification(tagAdded, { taginfo: tag });
             });
@@ -35,15 +34,34 @@ export default class AuraIndexer implements Indexer {
                 this.connection.sendNotification(tagsCleared, undefined);
             });
         }
+    }
+
+    public async configureAndIndex() {
+        const indexingTasks: Array<Promise<void>> = [];
 
         const lwcIndexer = new LWCIndexer(this.context);
-        // // wait for indexing to finish before returning from onInitialize()
-        await lwcIndexer.configureAndIndex();
         this.context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
 
-        await loadStandardComponents();
-        await loadSystemTags();
-        const markupfiles = this.context.findAllAuraMarkup();
+        indexingTasks.push( lwcIndexer.configureAndIndex() ); 
+        indexingTasks.push(loadStandardComponents());
+        indexingTasks.push(loadSystemTags());
+        indexingTasks.push(this.indexCustomComponents());
+
+        this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
+        return this.indexingTasks;
+    }
+
+    public async waitForIndexing() {
+        return this.indexingTasks;
+    }
+
+    public resetIndex() {
+        this.context.getIndexingProvider('lwc').resetIndex();
+        resetIndexes();
+    }
+
+    private async indexCustomComponents() {
+        const markupfiles = await this.context.findAllAuraMarkup();
         for (const file of markupfiles) {
             try {
                 await parseMarkup(file, this.context.type === WorkspaceType.SFDX);
@@ -51,10 +69,5 @@ export default class AuraIndexer implements Indexer {
                 console.log(`Error parsing markup from ${file}: + ${e}`);
             }
         }
-    }
-
-    public resetIndex() {
-        this.context.getIndexingProvider('lwc').resetIndex();
-        resetIndexes();
     }
 }

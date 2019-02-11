@@ -15,9 +15,9 @@ export interface IJsconfig {
     };
 }
 
-export function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
+export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         const paths: IPaths = {};
@@ -49,14 +49,14 @@ export function onIndexCustomComponents(context: WorkspaceContext, files: string
     }
 }
 
-export function onCreatedCustomComponent(context: WorkspaceContext, file: string) {
+export async function onCreatedCustomComponent(context: WorkspaceContext, file: string): Promise<void> {
     if (!file) {
         // could be a non-local tag, like LGC, etc
         return;
     }
     // add tag/path to component to all the project's jsconfig.json "paths"
     const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         // path must be relative to location of jsconfig.json
@@ -78,9 +78,9 @@ export function onCreatedCustomComponent(context: WorkspaceContext, file: string
     }
 }
 
-export function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext) {
+export async function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext): Promise<void> {
     // delete tag from all the project's jsconfig.json "paths"
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         const jsconfig: IJsconfig = JSON.parse(utils.readFileSync(jsconfigFile));

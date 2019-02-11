@@ -111,7 +111,7 @@ function addCustomTag(context: WorkspaceContext, tag: string, uri: string, metad
 }
 
 export async function indexCustomComponents(context: WorkspaceContext): Promise<void> {
-    const files = context.findAllModules();
+    const files = await context.findAllModules();
 
     await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX);
     onIndexCustomComponents(context, files);
@@ -133,12 +133,14 @@ export async function addCustomTagFromResults(context: WorkspaceContext, uri: st
 }
 
 export async function addCustomTagFromFile(context: WorkspaceContext, file: string, sfdxProject: boolean) {
+    debugger;
     const tag = componentUtil.tagFromFile(file, sfdxProject);
     if (tag) {
         // get attributes from compiler metadata
         try {
             const { metadata, diagnostics } = await compileFile(file);
             if (diagnostics.length > 0) {
+                debugger;
                 console.log('error compiling ' + file + ': ', diagnostics);
             }
             if (metadata) {
