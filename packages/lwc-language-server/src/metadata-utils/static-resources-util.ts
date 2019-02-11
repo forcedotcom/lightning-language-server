@@ -1,7 +1,11 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { utils, WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from 'lightning-lsp-common';
+import { promisify } from 'util';
+import * as fs from 'fs-extra';
+
+const glob = promisify(Glob);
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
 const STATIC_RESOURCES: Set<string> = new Set();
@@ -15,9 +19,9 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext) {
+export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
-    updatedFiles.forEach(f => {
+    for (const f of updatedFiles) {
         if (f.uri.endsWith('.resource-meta.xml')) {
             if (f.type === FileChangeType.Created) {
                 didChange = true;
@@ -27,36 +31,32 @@ export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { wor
                 didChange = true;
             }
         }
-    });
+    }
     if (didChange) {
-        processStaticResources(workspaceRoot);
+        return processStaticResources(workspaceRoot, writeConfigs);
     }
 }
 
-function processStaticResources(workspace: string) {
-    if (STATIC_RESOURCES.size > 0) {
-        utils.writeFileSync(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
+async function processStaticResources(workspace: string, writeConfigs: boolean): Promise<void> {
+    if (STATIC_RESOURCES.size > 0 && writeConfigs) {
+        fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
     }
 }
 
-export function indexStaticResources(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
+export async function indexStaticResources(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
+    const { workspaceRoot } = context;
+    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
-    return new Promise((resolve, reject) => {
-        /* tslint:disable */
-        new Glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
-            if (err) {
-                console.log(`Error queuing up indexing of static resources. Error details: ${err}`);
-                reject(err);
-            } else {
-                files.map((file: string) => {
-                    STATIC_RESOURCES.add(getResourceName(file));
-                });
-                processStaticResources(workspacePath);
-                resolve();
-            }
-        });
-        /* tslint:enable */
-    });
+    try {
+        const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoot });
+        for (const file of files) {
+            STATIC_RESOURCES.add(getResourceName(file));
+        }
+        processStaticResources(workspaceRoot, writeConfigs);
+    } catch (err) {
+        console.log(`Error queuing up indexing of static resources. Error details:`, err);
+        throw err;
+    }
 }
 
 function generateResourceTypeDeclarations(): string {

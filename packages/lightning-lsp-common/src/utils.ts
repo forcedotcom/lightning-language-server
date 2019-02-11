@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import { dirname, extname, join, relative, resolve } from 'path';
+import { extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import equal from 'deep-equal';
@@ -7,12 +7,6 @@ import { WorkspaceContext } from './context';
 import { WorkspaceType } from './shared';
 import { promisify } from 'util';
 import { Glob } from 'glob';
-
-export const readdir: (arg1: string | Buffer) => Promise<string[]> = promisify(fs.readdir);
-export const writeFile: (arg1: string | number | Buffer, data: any) => Promise<void> = promisify(fs.writeFile);
-export const readFile: (arg1: string | number | Buffer) => Promise<string> = promisify(fs.readFile);
-export const pathExists: (path: string) => Promise<boolean> = promisify(fs.pathExists);
-export const stat: (arg1: string | Buffer) => Promise<fs.Stats> = promisify(fs.stat);
 
 export const glob = promisify(Glob);
 
@@ -90,15 +84,6 @@ export function unixify(filePath: string): string {
     return filePath.replace(/\\/g, '/');
 }
 
-export function readFileSync(file: string): string {
-    return fs.readFileSync(file, { encoding: 'utf8' });
-}
-
-export function writeFileSync(file: string, contents: string) {
-    fs.ensureDirSync(dirname(file));
-    fs.writeFileSync(file, contents);
-}
-
 export function pathStartsWith(path: string, root: string) {
     if (process.platform === 'win32') {
         return path.toLowerCase().startsWith(root.toLowerCase());
@@ -127,17 +112,17 @@ export function getCoreResource(resourceName: string) {
     return join(__dirname, RESOURCES_DIR, 'core', resourceName);
 }
 
-export function appendLineIfMissing(file: string, line: string) {
-    if (!fs.existsSync(file)) {
-        writeFileSync(file, line + '\n');
-    } else if (!fileContainsLine(file, line)) {
-        fs.appendFileSync(file, '\n' + line + '\n');
+export async function appendLineIfMissing(file: string, line: string): Promise<void> {
+    if (!await fs.pathExists(file)) {
+        return fs.writeFile(file, line + '\n');
+    } else if (!await fileContainsLine(file, line)) {
+        return fs.appendFile(file, '\n' + line + '\n');
     }
 }
 
-function fileContainsLine(file: string, expectLine: string) {
+async function fileContainsLine(file: string, expectLine: string): Promise<boolean> {
     const trimmed = expectLine.trim();
-    for (const line of readFileSync(file).split('\n')) {
+    for (const line of (await fs.readFile(file, 'utf8')).split('\n')) {
         if (line.trim() === trimmed) {
             return true;
         }

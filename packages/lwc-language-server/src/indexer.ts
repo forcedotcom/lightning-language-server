@@ -17,25 +17,25 @@ const { WorkspaceType } = shared;
 
 export class LWCIndexer implements Indexer {
     private context: WorkspaceContext;
-
+    private writeConfigs: boolean;
     private indexingTasks: Promise<void>;
 
-    constructor(context: WorkspaceContext) {
+    constructor(context: WorkspaceContext, writeConfigs: boolean = true) {
         this.context = context;
+        this.writeConfigs = writeConfigs;
     }
 
     public async configureAndIndex() {
         // indexing:
-        debugger;
         const indexingTasks: Array<Promise<void>> = [];
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
-            indexingTasks.push(loadStandardComponents(this.context));
+            indexingTasks.push(loadStandardComponents(this.context, this.writeConfigs));
         }
-        indexingTasks.push(indexCustomComponents(this.context));
+        indexingTasks.push(indexCustomComponents(this.context, this.writeConfigs));
         if (this.context.type === WorkspaceType.SFDX) {
-            indexingTasks.push(indexStaticResources(this.context.workspaceRoot, this.context.sfdxPackageDirsPattern));
-            indexingTasks.push(indexContentAssets(this.context.workspaceRoot, this.context.sfdxPackageDirsPattern));
-            indexingTasks.push(indexCustomLabels(this.context.workspaceRoot, this.context.sfdxPackageDirsPattern));
+            indexingTasks.push(indexStaticResources(this.context, this.writeConfigs));
+            indexingTasks.push(indexContentAssets(this.context, this.writeConfigs));
+            indexingTasks.push(indexCustomLabels(this.context, this.writeConfigs));
         }
         this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
     }
@@ -61,10 +61,10 @@ export async function handleWatchedFiles(workspaceContext: WorkspaceContext, cha
         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime), changes);
     } else {
         await Promise.all([
-            updateStaticResourceIndex(changes, workspaceContext),
-            updateContentAssetIndex(changes, workspaceContext),
-            updateLabelsIndex(changes, workspaceContext),
-            updateCustomComponentIndex(changes, workspaceContext),
+            updateStaticResourceIndex(changes, workspaceContext, this.writeConfigs),
+            updateContentAssetIndex(changes, workspaceContext, this.writeConfigs),
+            updateLabelsIndex(changes, workspaceContext, this.writeConfigs),
+            updateCustomComponentIndex(changes, workspaceContext, this.writeConfigs),
         ]);
     }
 }

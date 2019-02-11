@@ -42,7 +42,7 @@ export default class AuraIndexer implements Indexer {
         const lwcIndexer = new LWCIndexer(this.context);
         this.context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
 
-        indexingTasks.push( lwcIndexer.configureAndIndex() ); 
+        indexingTasks.push(lwcIndexer.configureAndIndex());
         indexingTasks.push(loadStandardComponents());
         indexingTasks.push(loadSystemTags());
         indexingTasks.push(this.indexCustomComponents());

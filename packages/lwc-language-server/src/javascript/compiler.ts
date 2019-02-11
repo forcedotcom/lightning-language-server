@@ -1,12 +1,13 @@
 import { SourceLocation } from 'babel-types';
 import * as path from 'path';
+import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
-import { AttributeInfo, utils } from 'lightning-lsp-common';
+import { AttributeInfo } from 'lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 
@@ -79,7 +80,7 @@ export async function compileDocument(document: TextDocument): Promise<ICompiler
 export async function compileFile(file: string): Promise<ICompilerResult> {
     const filePath = path.parse(file);
     const fileName = filePath.base;
-    return compileSource(utils.readFileSync(file), fileName);
+    return compileSource(await fs.readFile(file, 'utf-8'), fileName);
 }
 
 export async function compileSource(source: string, fileName: string = 'foo.js'): Promise<ICompilerResult> {

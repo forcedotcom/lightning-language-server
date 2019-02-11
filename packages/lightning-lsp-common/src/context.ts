@@ -16,6 +16,15 @@ import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from '.
 import * as utils from './utils';
 import { componentUtil } from './index';
 
+export interface ISfdxPackageDirectoryConfig {
+    path: string;
+}
+
+export interface ISfdxProjectConfig {
+    packageDirectories: ISfdxPackageDirectoryConfig[];
+    sfdxPackageDirsPattern: string;
+}
+
 export interface Indexer {
     configureAndIndex(): Promise<void>;
     resetIndex(): void;
@@ -28,11 +37,10 @@ export class WorkspaceContext {
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
     public indexers: Map<string, Indexer> = new Map();
-    public sfdxPackageDirsPattern: string;
 
     // for sfdx projectsÍ
-    private sfdxProjectConfig: ISfdxProjectConfig;
-    private findNamespaceRootsUsingTypeCache: any;
+    private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
+    private initSfdxProjectConfigCache: () => Promise<ISfdxProjectConfig>;
 
     /**
      * @return WorkspaceContext representing the workspace at workspaceRoot
@@ -40,13 +48,22 @@ export class WorkspaceContext {
     public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
         this.type = detectWorkspaceType(workspaceRoot);
-        if (this.type === WorkspaceType.SFDX) {
-            this.initSfdxProject();
-        }
         if (!isLWC(this.type)) {
             console.error('not a LWC workspace:', this.workspaceRoot);
         }
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
+        this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
+        if (this.type === WorkspaceType.SFDX) {
+            this.initSfdxProjectConfigCache();
+        }
+    }
+
+    public async getNamespaceRoots(): Promise<{ lwc: string[]; aura: string[] }> {
+        return this.findNamespaceRootsUsingTypeCache();
+    }
+
+    public async getSfdxProjectConfig(): Promise<ISfdxProjectConfig> {
+        return this.initSfdxProjectConfigCache();
     }
 
     public addIndexingProvider(provider: { name: string; indexer: Indexer }): void {
@@ -64,7 +81,7 @@ export class WorkspaceContext {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
         for (const namespaceRoot of namespaceRoots.lwc) {
-            files.push.apply(files, findModulesIn(namespaceRoot));
+            files.push( ...(await findModulesIn(namespaceRoot)) );
         }
         return files;
     }
@@ -73,17 +90,17 @@ export class WorkspaceContext {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
         for (const namespaceRoot of namespaceRoots.aura) {
-            files.push.apply(files, findAuraMarkupIn(namespaceRoot));
+            files.push( ...(await findAuraMarkupIn(namespaceRoot)) );
         }
         return files;
     }
 
     public async isLWCTemplate(document: TextDocument): Promise<boolean> {
-        return document.languageId === 'html' && utils.getExtension(document) === '.html' && await this.isInsideModulesRoots(document);
+        return document.languageId === 'html' && utils.getExtension(document) === '.html' && (await this.isInsideModulesRoots(document));
     }
 
     public async isLWCJavascript(document: TextDocument): Promise<boolean> {
-        return document.languageId === 'javascript' && await this.isInsideModulesRoots(document);
+        return document.languageId === 'javascript' && (await this.isInsideModulesRoots(document));
     }
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
@@ -130,14 +147,15 @@ export class WorkspaceContext {
         const list: string[] = [];
         switch (this.type) {
             case WorkspaceType.SFDX:
-                const wsdirs = await utils.glob(`${this.sfdxPackageDirsPattern}/**/lwc/`, { cwd: this.workspaceRoot });
+                const { sfdxPackageDirsPattern } = await this.getSfdxProjectConfig();
+                const wsdirs = await utils.glob(`${sfdxPackageDirsPattern}/**/lwc/`, { cwd: this.workspaceRoot });
                 list.push(...wsdirs);
                 break;
             case WorkspaceType.CORE_ALL:
-                const dirs = await utils.readdir(this.workspaceRoot);
+                const dirs = await fs.readdir(this.workspaceRoot);
                 for (const project of dirs) {
                     const modulesDir = join(project, 'modules');
-                    if (await utils.pathExists(join(this.workspaceRoot, modulesDir))) {
+                    if (await fs.pathExists(join(this.workspaceRoot, modulesDir))) {
                         list.push(modulesDir);
                     }
                 }
@@ -147,6 +165,19 @@ export class WorkspaceContext {
                 break;
         }
         return list;
+    }
+
+    private async initSfdxProject() {
+        const sfdxProjectConfig = await readSfdxProjectConfig(this.workspaceRoot);
+
+        // initializing the packageDirs glob pattern prefix
+        const packageDirs = getSfdxPackageDirs(sfdxProjectConfig);
+        sfdxProjectConfig.sfdxPackageDirsPattern = packageDirs.join();
+        if (packageDirs.length > 1) {
+            // {} brackets are only needed if there are multiple paths
+            sfdxProjectConfig.sfdxPackageDirsPattern = `{${sfdxProjectConfig.sfdxPackageDirsPattern}}`;
+        }
+        return sfdxProjectConfig;
     }
 
     private async writeTypings() {
@@ -173,7 +204,7 @@ export class WorkspaceContext {
             } catch (ignore) {
                 // ignore
             }
-            const dirs = await utils.readdir(join(resourceTypingsDir, 'copied'));
+            const dirs = await fs.readdir(join(resourceTypingsDir, 'copied'));
             for (const file of dirs) {
                 try {
                     await fs.copy(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
@@ -191,8 +222,8 @@ export class WorkspaceContext {
 
         switch (this.type) {
             case WorkspaceType.SFDX:
-                jsConfigTemplate = await utils.readFile(utils.getSfdxResource('jsconfig-sfdx.json'));
-                const eslintrcTemplate = await utils.readFile(utils.getSfdxResource('eslintrc-sfdx.json'));
+                jsConfigTemplate = await fs.readFile(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
+                const eslintrcTemplate = await fs.readFile(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
                 const forceignore = join(this.workspaceRoot, '.forceignore');
                 for (const relativeModulesDir of relativeModulesDirs) {
                     // write/update jsconfig.json
@@ -204,12 +235,12 @@ export class WorkspaceContext {
                     // write/update .eslintrc.json
                     const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
                     this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
-                    this.updateForceIgnoreFile(forceignore);
+                    await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
 
             case WorkspaceType.CORE_ALL:
-                jsConfigTemplate = await utils.readFile(utils.getCoreResource('jsconfig-core.json'));
+                jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
@@ -218,7 +249,7 @@ export class WorkspaceContext {
                 break;
 
             case WorkspaceType.CORE_SINGLE_PROJECT:
-                jsConfigTemplate = await utils.readFile(utils.getCoreResource('jsconfig-core.json'));
+                jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
@@ -252,8 +283,8 @@ export class WorkspaceContext {
         }
     }
 
-    private async writeJsconfig(file: string, jsconfig: {}) {
-        await utils.writeFile(file, JSON.stringify(jsconfig, null, 4));
+    private async writeJsconfig(file: string, jsconfig: {}): Promise<void> {
+        return fs.writeFile(file, JSON.stringify(jsconfig, null, 4));
     }
 
     private async updateCoreSettings() {
@@ -264,7 +295,7 @@ export class WorkspaceContext {
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
         };
-        const templateString = await utils.readFile(utils.getCoreResource('settings-core.json'));
+        const templateString = await fs.readFile(utils.getCoreResource('settings-core.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
         await fs.ensureDir(join(this.workspaceRoot, '.vscode'));
         this.updateConfigFile(join('.vscode', 'settings.json'), templateContent);
@@ -280,7 +311,7 @@ export class WorkspaceContext {
             java_home: configBlt['eclipse.default.jdk'],
             workspace_root: utils.unixify(this.workspaceRoot),
         };
-        const templateString = await utils.readFile(utils.getCoreResource('core.code-workspace.json'));
+        const templateString = await fs.readFile(utils.getCoreResource('core.code-workspace.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
         this.updateConfigFile('core.code-workspace', templateContent);
     }
@@ -291,12 +322,12 @@ export class WorkspaceContext {
         if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
             relativeBltDir = join(relativeBltDir, '..');
         }
-        const configBltContent = await utils.readFile(join(this.workspaceRoot, relativeBltDir, 'config.blt'));
+        const configBltContent = await fs.readFile(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
         return parse(configBltContent);
     }
 
     private async updateCoreLaunch() {
-        const launchContent = await utils.readFile(utils.getCoreResource('launch-core.json'));
+        const launchContent = await fs.readFile(utils.getCoreResource('launch-core.json'), 'utf8');
         await fs.ensureDir(join(this.workspaceRoot, '.vscode'));
         const relativeLaunchPath = join('.vscode', 'launch.json');
         this.updateConfigFile(relativeLaunchPath, launchContent);
@@ -307,7 +338,7 @@ export class WorkspaceContext {
      * See src/resources/common/settings.json
      */
     private async updateWorkspaceSettings() {
-        const settingsContent = utils.readFileSync(utils.getResourcePath(join('common', 'settings.json')));
+        const settingsContent = await fs.readFile(utils.getResourcePath(join('common', 'settings.json')), 'utf8');
         await fs.ensureDir(join(this.workspaceRoot, '.vscode'));
         const relativeSettingsPath = join('.vscode', 'settings.json');
         this.updateConfigFile(relativeSettingsPath, settingsContent);
@@ -336,11 +367,11 @@ export class WorkspaceContext {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         try {
             const configJson = JSON.parse(config);
-            if (!(await utils.pathExists(configFile))) {
+            if (!(await fs.pathExists(configFile))) {
                 await this.writeJsconfig(configFile, configJson);
             } else {
                 try {
-                    const fileConfig = JSON.parse(await utils.readFile(configFile));
+                    const fileConfig = JSON.parse(await fs.readFile(configFile, 'utf8'));
                     if (utils.deepMerge(fileConfig, configJson)) {
                         await this.writeJsconfig(configFile, fileConfig);
                     }
@@ -354,21 +385,9 @@ export class WorkspaceContext {
         }
     }
 
-    private updateForceIgnoreFile(ignoreFile: string) {
-        utils.appendLineIfMissing(ignoreFile, '**/jsconfig.json');
-        utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
-    }
-
-    private async initSfdxProject() {
-        this.sfdxProjectConfig = await readSfdxProjectConfig(this.workspaceRoot);
-
-        // initializing the packageDirs glob pattern prefix
-        const packageDirs = getSfdxPackageDirs(this.sfdxProjectConfig);
-        this.sfdxPackageDirsPattern = packageDirs.join();
-        if (packageDirs.length > 1) {
-            // {} brackets are only needed if there are multiple paths
-            this.sfdxPackageDirsPattern = `{${this.sfdxPackageDirsPattern}}`;
-        }
+    private async updateForceIgnoreFile(ignoreFile: string) {
+        await utils.appendLineIfMissing(ignoreFile, '**/jsconfig.json');
+        await utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
     }
 
     private async findNamespaceRootsUsingType(): Promise<{ lwc: string[]; aura: string[] }> {
@@ -379,7 +398,8 @@ export class WorkspaceContext {
         switch (this.type) {
             case WorkspaceType.SFDX:
                 // optimization: search only inside package directories
-                for (const pkg of this.sfdxProjectConfig.packageDirectories) {
+                const { packageDirectories } = await this.getSfdxProjectConfig();
+                for (const pkg of packageDirectories) {
                     const pkgDir = join(this.workspaceRoot, pkg.path);
                     const subroots = await findNamespaceRoots(pkgDir);
                     roots.lwc.push(...subroots.lwc);
@@ -388,7 +408,7 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
-                for (const project of await utils.readdir(this.workspaceRoot)) {
+                for (const project of await fs.readdir(this.workspaceRoot)) {
                     const modulesDir = join(this.workspaceRoot, project, 'modules');
                     if (await fs.pathExists(modulesDir)) {
                         const subroots = await findNamespaceRoots(modulesDir, 2);
@@ -413,17 +433,9 @@ export class WorkspaceContext {
     }
 }
 
-interface ISfdxPackageDirectoryConfig {
-    path: string;
-}
-
-interface ISfdxProjectConfig {
-    packageDirectories: ISfdxPackageDirectoryConfig[];
-}
-
 async function readSfdxProjectConfig(workspaceRoot: string): Promise<ISfdxProjectConfig> {
     try {
-        return JSON.parse(await utils.readFile(getSfdxProjectFile(workspaceRoot)));
+        return JSON.parse(await fs.readFile(getSfdxProjectFile(workspaceRoot), 'utf8'));
     } catch (e) {
         throw new Error(`Sfdx project file seems invalid. Unable to parse ${getSfdxProjectFile(workspaceRoot)}. ${e.message}`);
     }
@@ -521,7 +533,7 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
     for (const subdir of subdirs) {
         const basename = path.basename(subdir);
         const modulePath = path.join(subdir, basename + '.js');
-        if (await fs.pathExists(modulePath) && componentUtil.isJSComponent(modulePath)) {
+        if ((await fs.pathExists(modulePath)) && componentUtil.isJSComponent(modulePath)) {
             // TODO: check contents for: from 'lwc'?
             files.push(modulePath);
         }
@@ -547,7 +559,7 @@ async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
 
 async function findSubdirectories(dir: string): Promise<string[]> {
     const subdirs: string[] = [];
-    const dirs = await utils.readdir(dir);
+    const dirs = await fs.readdir(dir);
     for (const file of dirs) {
         const subdir = path.join(dir, file);
         if (fs.statSync(subdir).isDirectory()) {
@@ -560,15 +572,15 @@ async function findSubdirectories(dir: string): Promise<string[]> {
 async function findCoreESLint(): Promise<string> {
     // use highest version in ~/tools/eslint-tool/{version}
     const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
-    if (!(await utils.pathExists(eslintToolDir))) {
+    if (!(await fs.pathExists(eslintToolDir))) {
         console.warn('core eslint-tool not installed: ' + eslintToolDir);
         return '/core/eslint-tool/not-installed/run/mvn/tools/eslint-lwc';
     }
     let highestVersion;
-    const dirs = await utils.readdir(eslintToolDir);
+    const dirs = await fs.readdir(eslintToolDir);
     for (const file of dirs) {
         const subdir = path.join(eslintToolDir, file);
-        if ((await utils.stat(subdir)).isDirectory()) {
+        if ((await fs.stat(subdir)).isDirectory()) {
             if (!highestVersion || lt(highestVersion, file)) {
                 highestVersion = file;
             }

@@ -12,6 +12,7 @@ it('indexContentAssets', async done => {
     export default logo;
 }
 `;
+
     await validate(indexContentAssets, 'sfdx-workspace', 'force-app', 'contentassets.d.ts', expectedDTS);
     done();
 });

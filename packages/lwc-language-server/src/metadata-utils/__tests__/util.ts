@@ -1,8 +1,10 @@
 import { mockFileUtilHooks } from './mock-file-util';
 import { join } from 'path';
+import { WorkspaceContext } from 'lightning-lsp-common';
+import { ISfdxProjectConfig } from 'lightning-lsp-common/lib/context';
 
 export async function validate(
-    indexer: (path: string, sfdxPackageDirsPattern: string) => Promise<void>,
+    indexer: (context: WorkspaceContext, writeConfigs: boolean) => Promise<void>,
     testWorkspace: string,
     sfdxPackageDirsPattern: string,
     expectedTypeDeclarationFileName: string,
@@ -13,5 +15,15 @@ export async function validate(
         expect(path).toContain(expectedTypeDeclarationFileName);
         return Promise.resolve();
     };
-    await indexer(join(process.cwd(), 'test-workspaces', testWorkspace), sfdxPackageDirsPattern);
+
+    const context = new class TestContext extends WorkspaceContext {
+        public getSfdxProjectConfig(): Promise<ISfdxProjectConfig> {
+            return Promise.resolve({
+                packageDirectories: [],
+                sfdxPackageDirsPattern,
+            });
+        }
+    }(join(process.cwd(), 'test-workspaces', testWorkspace));
+
+    await indexer(context, true);
 }

@@ -1,7 +1,7 @@
 import { extname, join, resolve } from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import * as utils from '../utils';
+import * as fs from 'fs-extra';
 
 export const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
 export const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'meta');
@@ -12,7 +12,7 @@ export const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src
 
 export function readAsTextDocument(path: string): TextDocument {
     const uri = URI.file(resolve(path)).toString();
-    const content = utils.readFileSync(path);
+    const content = fs.readFileSync(path, 'utf-8');
     return TextDocument.create(uri, languageId(path), 0, content);
 }
 
