@@ -19,7 +19,11 @@ export interface IJsconfig {
 
 async function readJsonWithRetry(file: string): Promise<any> {
     return retry(async () => {
-        return fs.readJSON(file);
+        const exists = await fs.pathExists(file);
+        if (exists) {
+            return fs.readJSON(file);
+        }
+        return {};
     }, {});
 }
 

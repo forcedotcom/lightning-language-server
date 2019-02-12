@@ -5,6 +5,28 @@ import { LWCIndexer } from '../../indexer';
 import { WorkspaceContext, shared } from 'lightning-lsp-common';
 const { WorkspaceType } = shared;
 
+import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
+import * as fs from 'fs-extra';
+
+beforeEach(() => {
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
+    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
+    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
+    fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
+});
+
 interface ICompletionMatcher {
     label: string;
     result: string;
@@ -77,8 +99,7 @@ it('completion', async () => {
 
 it('completion in sfdx workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -134,7 +155,7 @@ it('completion in sfdx workspace', async () => {
 
 it('completion in core workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -162,7 +183,7 @@ it('completion in core workspace', async () => {
 
 it('completion in standard workspace', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });

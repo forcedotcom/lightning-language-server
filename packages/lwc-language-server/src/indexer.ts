@@ -12,10 +12,13 @@ import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
 import { updateCustomComponentIndex, tagEvents } from './metadata-utils/custom-components-util';
 import { utils } from 'lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
+import { EventEmitter } from 'events';
 
 const { WorkspaceType } = shared;
 
 export class LWCIndexer implements Indexer {
+    public readonly tagEvents = new EventEmitter();
+
     private context: WorkspaceContext;
     private writeConfigs: boolean;
     private indexingTasks: Promise<void>;
@@ -23,10 +26,10 @@ export class LWCIndexer implements Indexer {
     constructor(context: WorkspaceContext, writeConfigs: boolean = true) {
         this.context = context;
         this.writeConfigs = writeConfigs;
+        this.tagEvents = tagEvents;
     }
 
     public async configureAndIndex() {
-        // indexing:
         const indexingTasks: Array<Promise<void>> = [];
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
             indexingTasks.push(loadStandardComponents(this.context, this.writeConfigs));
@@ -58,6 +61,7 @@ export async function handleWatchedFiles(workspaceContext: WorkspaceContext, cha
 
     if (utils.isLWCRootDirectoryCreated(workspaceContext, changes)) {
         const startTime = process.hrtime();
+        workspaceContext.getIndexingProvider('lwc').resetIndex();
         await workspaceContext.getIndexingProvider('lwc').configureAndIndex();
         console.info('reindexed workspace in ' + utils.elapsedMillis(startTime), changes);
     } else {

@@ -12,6 +12,10 @@ import EventsEmitter from 'events';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 
 const { WorkspaceType } = shared;
+
+const LWC_STANDARD: string = 'lwc-standard.json';
+const RESOURCES_DIR = '../resources';
+
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
 export const tagEvents = new EventsEmitter();
@@ -74,9 +78,6 @@ export function getLwcByTag(tag: string): TagInfo {
     return LWC_TAGS.get(tag);
 }
 
-const LWC_STANDARD: string = 'lwc-standard.json';
-const RESOURCES_DIR = '../resources';
-
 export function getlwcStandardResourcePath() {
     return join(__dirname, RESOURCES_DIR, LWC_STANDARD);
 }
@@ -116,7 +117,7 @@ export async function indexCustomComponents(context: WorkspaceContext, writeConf
     const files = await context.findAllModules();
 
     await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, writeConfigs);
-    onIndexCustomComponents(context, files);
+    await onIndexCustomComponents(context, files);
 }
 
 async function loadCustomTagsFromFiles(context: WorkspaceContext, filePaths: string[], sfdxProject: boolean, writeConfigs: boolean) {

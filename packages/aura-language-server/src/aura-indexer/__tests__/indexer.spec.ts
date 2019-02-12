@@ -11,4 +11,3 @@ it('indexer', async () => {
     await context.findAllAuraMarkup();
     // verify jsconfig.json after indexing
 });
-

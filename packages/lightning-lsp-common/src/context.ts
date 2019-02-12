@@ -81,7 +81,7 @@ export class WorkspaceContext {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
         for (const namespaceRoot of namespaceRoots.lwc) {
-            files.push( ...(await findModulesIn(namespaceRoot)) );
+            files.push(...(await findModulesIn(namespaceRoot)));
         }
         return files;
     }
@@ -90,7 +90,7 @@ export class WorkspaceContext {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
         for (const namespaceRoot of namespaceRoots.aura) {
-            files.push( ...(await findAuraMarkupIn(namespaceRoot)) );
+            files.push(...(await findAuraMarkupIn(namespaceRoot)));
         }
         return files;
     }
@@ -231,10 +231,10 @@ export class WorkspaceContext {
                     const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoot);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                     // write/update .eslintrc.json
                     const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
-                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
+                    await this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
                     await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
@@ -244,7 +244,7 @@ export class WorkspaceContext {
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
                 break;
 
@@ -253,7 +253,7 @@ export class WorkspaceContext {
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
                 break;
         }
@@ -283,8 +283,8 @@ export class WorkspaceContext {
         }
     }
 
-    private async writeJsconfig(file: string, jsconfig: {}): Promise<void> {
-        return fs.writeFile(file, JSON.stringify(jsconfig, null, 4));
+    private writeJsconfig(file: string, jsconfig: {}): void {
+        return fs.writeFileSync(file, JSON.stringify(jsconfig, null, 4));
     }
 
     private async updateCoreSettings() {
@@ -363,21 +363,23 @@ export class WorkspaceContext {
      * Adds to the config file in 'relativeConfigPath' any missing properties in 'config'
      * (existing properties are not updated)
      */
-    private async updateConfigFile(relativeConfigPath: string, config: string) {
+    private updateConfigFile(relativeConfigPath: string, config: string) {
+        // note: we don't want to use async file i/o here, because we don't want another task
+        // to interleve with reading/writing this file
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         try {
             const configJson = JSON.parse(config);
-            if (!(await fs.pathExists(configFile))) {
-                await this.writeJsconfig(configFile, configJson);
+            if (!fs.pathExists(configFile)) {
+                this.writeJsconfig(configFile, configJson);
             } else {
                 try {
-                    const fileConfig = JSON.parse(await fs.readFile(configFile, 'utf8'));
+                    const fileConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
                     if (utils.deepMerge(fileConfig, configJson)) {
-                        await this.writeJsconfig(configFile, fileConfig);
+                        this.writeJsconfig(configFile, fileConfig);
                     }
                 } catch (e) {
                     // misformed file, write out fresh one
-                    await this.writeJsconfig(configFile, configJson);
+                    this.writeJsconfig(configFile, configJson);
                 }
             }
         } catch (error) {
@@ -545,16 +547,18 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    const files: string[] = [];
-    const subdirs = await findSubdirectories(namespaceRoot);
-    for (const subdir of subdirs) {
-        const basename = path.basename(subdir);
-
-        const componentPath = join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
-        const results = await utils.glob(componentPath, { cwd: subdir });
-        files.push(...results);
-    }
+    // const files: string[] = [];
+    const files = await utils.glob(join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
     return files;
+    // const subdirs = await findSubdirectories(namespaceRoot);
+    // for (const subdir of subdirs) {
+    //     const basename = path.basename(subdir);
+
+    //     const componentPath = join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
+    //     const results = await utils.glob(componentPath, { cwd: subdir });
+    //     files.push(...results);
+    // }
+    // return files;
 }
 
 async function findSubdirectories(dir: string): Promise<string[]> {

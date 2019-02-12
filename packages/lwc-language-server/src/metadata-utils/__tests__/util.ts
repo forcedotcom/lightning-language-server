@@ -16,11 +16,6 @@ export async function validate(
         return Promise.resolve();
     };
 
-    // const context = new WorkspaceContext(join(process.cwd(), 'test-workspaces', testWorkspace), {
-    //     sfdxPackageDirsPattern,
-    //     packageDirectories: [],
-    // });
-
     const context = new class TestContext extends WorkspaceContext {
         public getSfdxProjectConfig(): Promise<ISfdxProjectConfig> {
             return Promise.resolve({
@@ -29,6 +24,7 @@ export async function validate(
             });
         }
     }(join(process.cwd(), 'test-workspaces', testWorkspace));
+    await context.configureProject();
 
     await indexer(context, true);
 }

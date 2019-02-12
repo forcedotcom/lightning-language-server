@@ -2,6 +2,27 @@ import { TextDocument, Location, Range, Position } from 'vscode-languageserver-t
 import { getLanguageService } from 'lightning-lsp-common';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { WorkspaceContext } from 'lightning-lsp-common';
+import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
+import * as fs from 'fs-extra';
+
+beforeEach(() => {
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
+    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
+    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
+    fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
+});
 
 function assertDefinition(value: string, expectedUri?: string, expectedRange?: Range): void {
     const offset = value.indexOf('|');

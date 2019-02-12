@@ -147,7 +147,7 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigPathUtils).toExist();
     expect(eslintrcPathUtils).toExist();
     await context.configureProject();
-debugger;
+
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     expect(sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
 

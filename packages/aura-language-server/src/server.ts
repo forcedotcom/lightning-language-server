@@ -23,6 +23,7 @@ import {
     SignatureInformation,
     ParameterInformation,
     FileChangeType,
+    NotificationType,
 } from 'vscode-languageserver';
 
 import * as auraUtils from './aura-utils';
@@ -35,14 +36,22 @@ import * as tern from 'tern';
 import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
+import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
 import { handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { parseMarkup, getAuraTags, getAuraNamespaces, clearTagsforDirectory } from './markup/auraTags';
+import { setIndexer } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { getAuraTagProvider } from './markup/auraTags';
+
+interface ITagParams {
+    taginfo: TagInfo;
+}
+
+const tagAdded: NotificationType<ITagParams, void> = new NotificationType<ITagParams, void>('salesforce/tagAdded');
+const tagDeleted: NotificationType<string, void> = new NotificationType<string, void>('salesforce/tagDeleted');
+const tagsCleared: NotificationType<void, void> = new NotificationType<void, void>('salesforce/tagsCleared');
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -164,7 +173,19 @@ connection.onInitialize(
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
 
-            const auraIndexer = new AuraIndexer(context, connection);
+            const auraIndexer = new AuraIndexer(context);
+            setIndexer(auraIndexer);
+
+            auraIndexer.tagEvents.on('set', (tag: TagInfo) => {
+                connection.sendNotification(tagAdded, { taginfo: tag });
+            });
+            auraIndexer.tagEvents.on('delete', (tag: string) => {
+                connection.sendNotification(tagDeleted, tag);
+            });
+            auraIndexer.tagEvents.on('clear', () => {
+                connection.sendNotification(tagsCleared, undefined);
+            });
+
             auraIndexer.configureAndIndex();
 
             asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
@@ -370,14 +391,19 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
             return;
         } else {
+            let files = 0;
             for (const event of changes) {
                 if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(context, event.uri)) {
                     const dir = toResolvedPath(event.uri);
-                    clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
+                    const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+                    indexer.clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
+                    files++;
                 } else {
                     const file = toResolvedPath(event.uri);
                     if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
-                        await parseMarkup(file, context.type === WorkspaceType.SFDX);
+                        const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+                        await indexer.indexFile(file, context.type === WorkspaceType.SFDX);
+                        files++;
                     }
                 }
             }
@@ -469,11 +495,17 @@ connection.onSignatureHelp(
 connection.listen();
 
 connection.onRequest('salesforce/listComponents', () => {
-    const tags = getAuraTags();
-    return JSON.stringify([...tags]);
+    debugger;
+    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const tags = indexer.getAuraTags();
+    const result = JSON.stringify([...tags]);
+    return result;
 });
 
 connection.onRequest('salesforce/listNamespaces', () => {
-    const tags = getAuraNamespaces();
-    return JSON.stringify(tags);
+    debugger;
+    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const tags = indexer.getAuraNamespaces();
+    const result = JSON.stringify(tags);
+    return result;
 });
