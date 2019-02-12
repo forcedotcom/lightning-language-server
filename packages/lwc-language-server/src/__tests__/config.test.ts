@@ -7,7 +7,7 @@ import * as fs from 'fs-extra';
 
 it('lifecycle', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -32,13 +32,13 @@ it('lifecycle', async () => {
     const newCompTag = 'c/new_comp';
     const newCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
-    config.onCreatedCustomComponent(context, newCompPath);
+    await config.onCreatedCustomComponent(context, newCompPath);
     jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
 
     // onDeleteCustomComponent:
     const moduleTag = componentUtil.moduleFromFile(newCompPath, true);
-    config.onDeletedCustomComponent(moduleTag, context);
+    await config.onDeletedCustomComponent(moduleTag, context);
     jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
     // no error deleting non-existing:

@@ -16,6 +16,11 @@ export async function validate(
         return Promise.resolve();
     };
 
+    // const context = new WorkspaceContext(join(process.cwd(), 'test-workspaces', testWorkspace), {
+    //     sfdxPackageDirsPattern,
+    //     packageDirectories: [],
+    // });
+
     const context = new class TestContext extends WorkspaceContext {
         public getSfdxProjectConfig(): Promise<ISfdxProjectConfig> {
             return Promise.resolve({

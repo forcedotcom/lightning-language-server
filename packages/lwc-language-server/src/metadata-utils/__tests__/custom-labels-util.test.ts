@@ -3,7 +3,8 @@ import { indexCustomLabels } from '../custom-labels-util';
 import { validate } from './util';
 
 jest.mock('lightning-lsp-common', () => {
-    return { utils: mockFileUtil() };
+    const real = jest.requireActual('lightning-lsp-common');
+    return { utils: mockFileUtil(), WorkspaceContext: real.WorkspaceContext };
 });
 
 it('indexCustomLabels', async done => {

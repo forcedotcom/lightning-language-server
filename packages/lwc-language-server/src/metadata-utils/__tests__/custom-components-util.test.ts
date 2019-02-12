@@ -24,7 +24,7 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
 
 it('indexSfdx', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -99,7 +99,7 @@ it('indexSfdx', async () => {
 it('indexCore', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -121,7 +121,7 @@ it('indexCore', async () => {
 
 it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.resetIndex();
     await lwcIndexer.configureAndIndex();

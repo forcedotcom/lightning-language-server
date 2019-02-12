@@ -38,6 +38,7 @@ export class LWCIndexer implements Indexer {
             indexingTasks.push(indexCustomLabels(this.context, this.writeConfigs));
         }
         this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
+        return this.indexingTasks;
     }
 
     public async waitOnIndex() {
