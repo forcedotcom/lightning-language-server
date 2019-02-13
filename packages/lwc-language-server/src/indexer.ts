@@ -54,23 +54,23 @@ export class LWCIndexer implements Indexer {
         resetStaticResources();
         resetContentAssets();
     }
-}
 
-export async function handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
-    const changes = change.changes;
+    public async handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
+        const changes = change.changes;
 
-    if (utils.isLWCRootDirectoryCreated(workspaceContext, changes)) {
-        const startTime = process.hrtime();
-        workspaceContext.getIndexingProvider('lwc').resetIndex();
-        await workspaceContext.getIndexingProvider('lwc').configureAndIndex();
-        console.info('reindexed workspace in ' + utils.elapsedMillis(startTime), changes);
-    } else {
-        await Promise.all([
-            updateStaticResourceIndex(changes, workspaceContext, this.writeConfigs),
-            updateContentAssetIndex(changes, workspaceContext, this.writeConfigs),
-            updateLabelsIndex(changes, workspaceContext, this.writeConfigs),
-            updateCustomComponentIndex(changes, workspaceContext, this.writeConfigs),
-        ]);
+        if (utils.isLWCRootDirectoryCreated(workspaceContext, changes)) {
+            const startTime = process.hrtime();
+            workspaceContext.getIndexingProvider('lwc').resetIndex();
+            await workspaceContext.getIndexingProvider('lwc').configureAndIndex();
+            console.info('reindexed workspace in ' + utils.elapsedMillis(startTime), changes);
+        } else {
+            await Promise.all([
+                updateStaticResourceIndex(changes, workspaceContext, this.writeConfigs),
+                updateContentAssetIndex(changes, workspaceContext, this.writeConfigs),
+                updateLabelsIndex(changes, workspaceContext, this.writeConfigs),
+                updateCustomComponentIndex(changes, workspaceContext, this.writeConfigs),
+            ]);
+        }
     }
 }
 

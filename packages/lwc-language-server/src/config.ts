@@ -1,7 +1,6 @@
 import * as path from 'path';
 import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
-import * as fs from 'fs-extra';
-import retry from 'async-retry';
+import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
 
 const { WorkspaceType } = shared;
 
@@ -15,16 +14,6 @@ export interface IJsconfig {
         baseUrl?: string;
         paths?: IPaths;
     };
-}
-
-async function readJsonWithRetry(file: string): Promise<any> {
-    return retry(async () => {
-        const exists = await fs.pathExists(file);
-        if (exists) {
-            return fs.readJSON(file);
-        }
-        return {};
-    }, {});
 }
 
 export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
@@ -44,7 +33,8 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         try {
-            const jsconfig: IJsconfig = await readJsonWithRetry(jsconfigFile);
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
             if (
                 !jsconfig.compilerOptions ||
                 !jsconfig.compilerOptions.hasOwnProperty('baseUrl') ||
@@ -57,10 +47,10 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
                 }
                 jsconfig.compilerOptions.baseUrl = '.';
                 jsconfig.compilerOptions.paths = paths;
-                await writeJsconfig(jsconfigFile, jsconfig);
+                writeJsonSync(jsconfigFile, jsconfig);
             }
         } catch (err) {
-            console.log(`Error reading jsconfig ${jsconfigFile}`, err);
+            console.log(`onIndexCustomComponents(LOTS): Error reading jsconfig ${jsconfigFile}`, err);
         }
     }
 }
@@ -82,7 +72,8 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         try {
-            const jsconfig: IJsconfig = await readJsonWithRetry(jsconfigFile);
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
             if (!jsconfig.compilerOptions) {
                 jsconfig.compilerOptions = {};
             }
@@ -91,9 +82,9 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
                 jsconfig.compilerOptions.paths = {};
             }
             jsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
-            await writeJsconfig(jsconfigFile, jsconfig);
+            writeJsonSync(jsconfigFile, jsconfig);
         } catch (err) {
-            console.log(`Error reading jsconfig ${jsconfigFile}`, err);
+            console.log(`onCreatedCustomComponent(${file}): Error reading jsconfig ${jsconfigFile}`, err);
         }
     }
 }
@@ -104,19 +95,16 @@ export async function onDeletedCustomComponent(moduleTag: string, context: Works
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         try {
-            const jsconfig: IJsconfig = await readJsonWithRetry(jsconfigFile);
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
             if (jsconfig.compilerOptions) {
                 if (jsconfig.compilerOptions.paths) {
                     delete jsconfig.compilerOptions.paths[moduleTag];
-                    await writeJsconfig(jsconfigFile, jsconfig);
+                    writeJsonSync(jsconfigFile, jsconfig);
                 }
             }
         } catch (err) {
-            console.log(`Error reading jsconfig ${jsconfigFile}`, err);
+            console.log(`onDeletedCustomComponent${moduleTag}: Error reading jsconfig ${jsconfigFile}`, err);
         }
     }
-}
-
-export async function writeJsconfig(file: string, jsconfig: {}): Promise<void> {
-    return fs.writeFile(file, JSON.stringify(jsconfig, null, 4));
 }

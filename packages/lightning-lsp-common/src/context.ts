@@ -283,9 +283,6 @@ export class WorkspaceContext {
         }
     }
 
-    private writeJsconfig(file: string, jsconfig: {}): void {
-        return fs.writeFileSync(file, JSON.stringify(jsconfig, null, 4));
-    }
 
     private async updateCoreSettings() {
         const configBlt = await this.readConfigBlt();
@@ -370,16 +367,16 @@ export class WorkspaceContext {
         try {
             const configJson = JSON.parse(config);
             if (!fs.pathExists(configFile)) {
-                this.writeJsconfig(configFile, configJson);
+                utils.writeJsonSync(configFile, configJson);
             } else {
                 try {
-                    const fileConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+                    const fileConfig = utils.readJsonSync(configFile);
                     if (utils.deepMerge(fileConfig, configJson)) {
-                        this.writeJsconfig(configFile, fileConfig);
+                        utils.writeJsonSync(configFile, fileConfig);
                     }
                 } catch (e) {
                     // misformed file, write out fresh one
-                    this.writeJsconfig(configFile, configJson);
+                    utils.writeJsonSync(configFile, configJson);
                 }
             }
         } catch (error) {

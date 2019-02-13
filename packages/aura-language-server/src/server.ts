@@ -37,7 +37,7 @@ import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
-import { handleWatchedFiles } from 'lwc-language-server';
+import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { setIndexer } from './markup/auraTags';
@@ -177,7 +177,7 @@ connection.onInitialize(
             setIndexer(auraIndexer);
 
             auraIndexer.tagEvents.on('set', (tag: TagInfo) => {
-                connection.sendNotification(tagAdded, { taginfo: tag });
+                 connection.sendNotification(tagAdded, { taginfo: tag });
             });
             auraIndexer.tagEvents.on('delete', (tag: string) => {
                 connection.sendNotification(tagDeleted, tag);
@@ -186,7 +186,7 @@ connection.onInitialize(
                 connection.sendNotification(tagsCleared, undefined);
             });
 
-            auraIndexer.configureAndIndex();
+            startIndexing();
 
             asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
             asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
@@ -216,6 +216,15 @@ connection.onInitialize(
         }
     },
 );
+
+function startIndexing() {
+    setTimeout( async () => {
+        const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+        connection.sendNotification('salesforce/indexingStarted');
+        await indexer.configureAndIndex();
+        connection.sendNotification('salesforce/indexingEnded');
+    }, 0);
+}
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -382,7 +391,8 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     const changes = change.changes;
 
     try {
-        handleWatchedFiles(context, change);
+        const lwcIndexer =  context.getIndexingProvider('lwc') as LWCIndexer;
+        lwcIndexer.handleWatchedFiles(context, change);
         if (utils.isAuraRootDirectoryCreated(context, changes)) {
             await context.getIndexingProvider('aura').resetIndex();
             await context.getIndexingProvider('aura').configureAndIndex();
@@ -495,7 +505,6 @@ connection.onSignatureHelp(
 connection.listen();
 
 connection.onRequest('salesforce/listComponents', () => {
-    debugger;
     const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
     const tags = indexer.getAuraTags();
     const result = JSON.stringify([...tags]);
@@ -503,7 +512,6 @@ connection.onRequest('salesforce/listComponents', () => {
 });
 
 connection.onRequest('salesforce/listNamespaces', () => {
-    debugger;
     const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
     const tags = indexer.getAuraNamespaces();
     const result = JSON.stringify(tags);

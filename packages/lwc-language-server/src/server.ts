@@ -145,7 +145,8 @@ connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     try {
-        return handleWatchedFiles(context, change);
+        const indexer: LWCIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
+        return indexer.handleWatchedFiles(context, change);
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }

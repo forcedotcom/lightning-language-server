@@ -33,7 +33,7 @@ export default class AuraIndexer implements Indexer {
     public async configureAndIndex() {
         const indexingTasks: Array<Promise<void>> = [];
 
-        this.lwcIndexer = new LWCIndexer(this.context);
+        this.lwcIndexer = new LWCIndexer(this.context, false);
         this.context.addIndexingProvider({ name: 'lwc', indexer: this.lwcIndexer });
 
         this.addListener('delete', (tag: string) => {
@@ -92,8 +92,6 @@ export default class AuraIndexer implements Indexer {
     }
 
     public async indexFile(file: string, sfdxProject: boolean): Promise<TagInfo | undefined> {
-        // console.log(file);
-
         if (!fs.existsSync(file)) {
             this.clearTagsforFile(file, sfdxProject);
             return;
@@ -108,6 +106,10 @@ export default class AuraIndexer implements Indexer {
         const tagInfo = this.getTagInfo(file, sfdxProject, markup, result.roots[0]);
         if (!tagInfo) {
             this.clearTagsforFile(file, sfdxProject);
+            return;
+        }
+        if (!tagInfo.name) {
+            console.warn(`File ${file} has malformed tagname, ignoring`);
             return;
         }
         const attributeInfos = tags
@@ -191,6 +193,9 @@ export default class AuraIndexer implements Indexer {
     }
 
     private setCustomTag(info: TagInfo) {
+        if (!info.name) {
+debugger;
+        }
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_TAGS.set(info.name, info);
         this.tagEvents.emit('set', info);

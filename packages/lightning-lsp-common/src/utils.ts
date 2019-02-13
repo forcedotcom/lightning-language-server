@@ -188,3 +188,18 @@ export const memoize = (fn: any) => {
         return cache;
     };
 };
+
+export function readJsonSync(file: string): any {
+    const exists =  fs.pathExistsSync(file);
+    try {
+        return exists ? fs.readJsonSync(file) : {};
+    } catch (err) {
+        console.log(`onIndexCustomComponents(LOTS): Error reading jsconfig ${file}`, err);
+    }
+}
+
+export function writeJsonSync(file: string, json: any): any {
+    fs.writeJSONSync(file, json, {
+        spaces: 4,
+    });
+}

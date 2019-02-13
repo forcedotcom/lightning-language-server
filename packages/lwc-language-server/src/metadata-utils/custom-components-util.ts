@@ -25,21 +25,21 @@ export function resetCustomComponents() {
     tagEvents.emit('clear');
 }
 
-function removeCustomTag(context: WorkspaceContext, tagName: string, moduleTag: string, writeConfigs: boolean) {
+async function removeCustomTag(context: WorkspaceContext, tagName: string, moduleTag: string, writeConfigs: boolean) {
     LWC_TAGS.delete(tagName);
 
     if (writeConfigs) {
-        onDeletedCustomComponent(moduleTag, context);
+        await onDeletedCustomComponent(moduleTag, context);
     }
 
     tagEvents.emit('delete', tagName);
 }
 
-function setCustomTag(context: WorkspaceContext, info: TagInfo, writeConfigs: boolean) {
+async function setCustomTag(context: WorkspaceContext, info: TagInfo, writeConfigs: boolean) {
     LWC_TAGS.set(info.name, info);
 
     if (writeConfigs) {
-        onCreatedCustomComponent(context, info.file);
+        await onCreatedCustomComponent(context, info.file);
     }
 
     tagEvents.emit('set', info);
@@ -51,18 +51,18 @@ export async function updateCustomComponentIndex(updatedFiles: FileEvent[], cont
         if (f.type === FileChangeType.Deleted && utils.isLWCWatchedDirectory(context, f.uri)) {
             const tagName = componentUtil.tagFromDirectory(f.uri, isSfdxProject);
             const moduleTag = componentUtil.moduleFromDirectory(f.uri, isSfdxProject);
-            removeCustomTag(context, tagName, moduleTag, writeConfigs);
+            await removeCustomTag(context, tagName, moduleTag, writeConfigs);
         } else {
             const dir = URI.file(path.dirname(toResolvedPath(f.uri))).toString();
             if (utils.isLWCWatchedDirectory(context, dir)) {
                 const file = URI.parse(f.uri).fsPath;
                 if (componentUtil.isJSComponent(file)) {
                     if (f.type === FileChangeType.Created) {
-                        addCustomTagFromFile(context, file, isSfdxProject, writeConfigs);
+                        await addCustomTagFromFile(context, file, isSfdxProject, writeConfigs);
                     } else if (f.type === FileChangeType.Deleted) {
                         const tagName = componentUtil.tagFromFile(file, context.type === WorkspaceType.SFDX);
                         const moduleName = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-                        removeCustomTag(context, tagName, moduleName, writeConfigs);
+                        await removeCustomTag(context, tagName, moduleName, writeConfigs);
                     }
                 }
             }
@@ -96,12 +96,12 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
             }
             info.documentation = lwcStandard[tag].description;
             info.name = 'lightning-' + tag;
-            setCustomTag(context, info, writeConfigs);
+            await setCustomTag(context, info, writeConfigs);
         }
     }
 }
 
-function addCustomTag(context: WorkspaceContext, tag: string, uri: string, metadata: Metadata, writeConfigs: boolean) {
+async function addCustomTag(context: WorkspaceContext, tag: string, uri: string, metadata: Metadata, writeConfigs: boolean) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata, uri);
     // declarationLoc may be undefined if live file doesn't extend LightningElement yet
@@ -110,14 +110,16 @@ function addCustomTag(context: WorkspaceContext, tag: string, uri: string, metad
     const namespace = tag.split('-')[0];
     const file = toResolvedPath(uri);
     const tagInfo = new TagInfo(file, true, attributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata));
-    setCustomTag(context, tagInfo, writeConfigs);
+    await setCustomTag(context, tagInfo, writeConfigs);
 }
 
 export async function indexCustomComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const files = await context.findAllModules();
 
     await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, writeConfigs);
-    await onIndexCustomComponents(context, files);
+    if (writeConfigs) {
+        await onIndexCustomComponents(context, files);
+    }
 }
 
 async function loadCustomTagsFromFiles(context: WorkspaceContext, filePaths: string[], sfdxProject: boolean, writeConfigs: boolean) {
@@ -131,7 +133,7 @@ async function loadCustomTagsFromFiles(context: WorkspaceContext, filePaths: str
 export async function addCustomTagFromResults(context: WorkspaceContext, uri: string, metadata: Metadata, sfdxProject: boolean, writeConfigs: boolean) {
     const tag = componentUtil.tagFromFile(URI.parse(uri).fsPath, sfdxProject);
     if (tag) {
-        addCustomTag(context, tag, uri, metadata, writeConfigs);
+        await addCustomTag(context, tag, uri, metadata, writeConfigs);
     }
 }
 
@@ -146,7 +148,7 @@ export async function addCustomTagFromFile(context: WorkspaceContext, file: stri
             }
             if (metadata) {
                 const uri = URI.file(path.resolve(file)).toString();
-                addCustomTag(context, tag, uri, metadata, writeConfigs);
+                await addCustomTag(context, tag, uri, metadata, writeConfigs);
             }
         } catch (error) {
             console.log('error compiling ' + file, error);
