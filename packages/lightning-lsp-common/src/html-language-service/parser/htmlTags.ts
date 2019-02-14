@@ -37,8 +37,8 @@ BEGIN THIRD PARTY
 import * as strings from '../utils/strings';
 import * as arrays from '../utils/arrays';
 import * as nls from 'vscode-nls';
-import { TagInfo } from 'lightning-lsp-common';
-import { AttributeInfo } from 'lightning-lsp-common';
+import { TagInfo } from '../../indexer/tagInfo';
+import { AttributeInfo } from '../../indexer/attributeInfo';
 let localize = nls.loadMessageBundle();
 
 export const EMPTY_ELEMENTS: string[] = [

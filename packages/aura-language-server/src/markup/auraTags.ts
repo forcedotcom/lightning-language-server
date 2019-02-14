@@ -1,10 +1,11 @@
-import { IHTMLTagProvider } from '../html-language-service/parser/htmlTags';
+import { IHTMLTagProvider } from 'lightning-lsp-common';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
 import { TagInfo } from 'lightning-lsp-common';
 import { AttributeInfo, componentUtil } from 'lightning-lsp-common';
-import { parse, Node } from '../html-language-service/parser/htmlParser';
+// TODO not sure if we want to be exposing these or not
+import { parse, Node } from 'lightning-lsp-common';
 import { promisify } from 'util';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';

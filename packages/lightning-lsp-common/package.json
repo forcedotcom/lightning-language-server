@@ -11,8 +11,9 @@
   "scripts": {
     "postinstall": "yarn build",
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
-    "build": "tsc -p . && scripts/copy_typings.js && cp -r src/resources lib/",
-    "watch": "tsc -p . && scripts/copy_typings.js && cp -r src/resources lib/ && tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
+    "build": "tsc -p . && yarn copy-static-assets && scripts/copy_typings.js && cp -r src/resources lib/",
+    "watch": "tsc -p . && yarn copy-static-assets && scripts/copy_typings.js && cp -r src/resources lib/ && tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
+    "copy-static-assets": "ts-node copy-static-assets.ts",
     "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand src",

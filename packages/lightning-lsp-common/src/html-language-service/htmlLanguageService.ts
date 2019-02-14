@@ -7,6 +7,8 @@
 import { createScanner } from './parser/htmlScanner';
 import { parse } from './parser/htmlParser';
 import { HTMLCompletion } from './services/htmlCompletion';
+import { IHTMLTagProvider } from './parser/htmlTags';
+import { addTagProvider, getTagProviders } from './services/tagProviders';
 import { doHover } from './services/htmlHover';
 import { format } from './services/htmlFormatter';
 import { findDocumentLinks } from './services/htmlLinks';
@@ -31,6 +33,8 @@ export * from './htmlLanguageTypes';
 export * from 'vscode-languageserver-types';
 
 export interface LanguageService {
+    addTagProvider(provider: IHTMLTagProvider): void;
+    getTagProviders(): IHTMLTagProvider[];
     createScanner(input: string, initialOffset?: number): Scanner;
     parseHTMLDocument(document: TextDocument): HTMLDocument;
     findDocumentHighlights(document: TextDocument, position: Position, htmlDocument: HTMLDocument): DocumentHighlight[];
@@ -48,6 +52,8 @@ export function getLanguageService(): LanguageService {
     const htmlCompletion = new HTMLCompletion();
     return {
         createScanner,
+        addTagProvider,
+        getTagProviders,
         parseHTMLDocument: document => parse(document.getText()),
         doComplete: htmlCompletion.doComplete.bind(htmlCompletion),
         setCompletionParticipants: htmlCompletion.setCompletionParticipants.bind(htmlCompletion),
