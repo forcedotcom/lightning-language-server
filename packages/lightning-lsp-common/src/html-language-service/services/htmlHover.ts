@@ -7,7 +7,7 @@
 import { HTMLDocument } from '../parser/htmlParser';
 import { createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, Position, Hover, MarkedString, MarkupKind } from 'vscode-languageserver-types';
-import { allTagProviders } from './tagProviders';
+import { getTagProviders } from './tagProviders';
 import { TokenType } from '../htmlLanguageTypes';
 
 export function doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover | null {
@@ -16,7 +16,7 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     if (!node || !node.tag) {
         return null;
     }
-    let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
+    let tagProviders = getTagProviders().filter(p => p.isApplicable(document.languageId));
     function getTagHover(tag: string, range: Range, open: boolean): Hover | null {
         // **** CHANGES TO HTML LANGUAGE SERVICE HERE **** //
         //tag = tag.toLowerCase();
@@ -27,12 +27,7 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
                     if (info) {
                         const doc = info.getHover();
                         const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                        const markdown = [
-                            '```html',
-                            tagLabel,
-                            '```',
-                            doc
-                        ];
+                        const markdown = ['```html', tagLabel, '```', doc];
                         hover = { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
                     }
                 }

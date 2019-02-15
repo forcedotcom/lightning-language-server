@@ -1,7 +1,7 @@
-import { IHTMLTagProvider } from './htmlTags';
+import { IHTMLTagProvider } from 'lightning-lsp-common';
 import { TagInfo, AttributeInfo } from 'lightning-lsp-common';
-import { getLwcTags, getLwcByTag } from './../../metadata-utils/custom-components-util';
-import { ClassMember } from '@lwc/babel-plugin-component';
+import { getLwcTags, getLwcByTag } from '../metadata-utils/custom-components-util';
+// import { ClassMember } from '@lwc/babel-plugin-component';
 
 const LWC_DIRECTIVE = 'LWC directive';
 
@@ -29,9 +29,9 @@ export function getDirectiveInfo(label: string): AttributeInfo | null {
 }
 
 export function getLwcTagProvider(): IHTMLTagProvider {
-    function addTags(collector: (tag: string, info: TagInfo) => void) {
+    function addTags(collector: (tag: string, label: string, info: TagInfo) => void) {
         for (const [tag, tagInfo] of getLwcTags()) {
-            collector(tag, tagInfo);
+            collector(tag, tagInfo.name, tagInfo);
         }
     }
 
@@ -44,17 +44,17 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         }
     }
 
-    function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
-        const cTag = getLwcByTag(templateTag);
-        if (cTag) {
-            cTag.properties.forEach((metadata: ClassMember) => {
-                collector(metadata.name, null, null);
-            });
-            cTag.methods.forEach((metadata: ClassMember) => {
-                collector(metadata.name, null, null);
-            });
-        }
-    }
+    // function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+    //     const cTag = getLwcByTag(templateTag);
+    //     if (cTag) {
+    //         cTag.properties.forEach((metadata: ClassMember) => {
+    //             collector(metadata.name, null, null);
+    //         });
+    //         cTag.methods.forEach((metadata: ClassMember) => {
+    //             collector(metadata.name, null, null);
+    //         });
+    //     }
+    // }
 
     function addDirectives(collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         LWC_DIRECTIVES.map(info => {
@@ -65,7 +65,7 @@ export function getLwcTagProvider(): IHTMLTagProvider {
     return {
         getId: () => 'lwc',
         isApplicable: languageId => languageId === 'html',
-        collectTags: (collector: (tag: string, info: TagInfo) => void) => {
+        collectTags: (collector: (tag: string, label: string, info: TagInfo) => void) => {
             addTags(collector);
         },
         collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) => {
@@ -77,9 +77,11 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
         },
-        collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
-            addExpressions(templateTag, collector);
-        },
-        getTagInfo: (tag: string) => getLwcByTag(tag),
+        // TODO
+        // collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
+        //     addExpressions(templateTag, collector);
+        // },
+        // TODO don't remember what this did
+        // getTagInfo: (tag: string) => getLwcByTag(tag),
     };
 }

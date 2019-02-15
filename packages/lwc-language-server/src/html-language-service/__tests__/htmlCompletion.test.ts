@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { CompletionItem, Position, TextDocument, TextEdit } from 'vscode-languageserver';
-import { getLanguageService } from '../htmlLanguageService';
+import { getLanguageService } from 'lightning-lsp-common';
 import { LWCIndexer } from '../../indexer';
 import { WorkspaceContext, shared } from 'lightning-lsp-common';
 const { WorkspaceType } = shared;
@@ -26,7 +26,7 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = [], sf
     const position = Position.create(0, before.length);
     const ls = getLanguageService();
     const htmlDocument = ls.parseHTMLDocument(document);
-    const items = ls.doComplete(document, position, htmlDocument, sfdxProject);
+    const items = ls.doComplete(document, position, htmlDocument, { isSfdxProject: sfdxProject });
 
     matchers.forEach(matcher => {
         const item = items.items.find(candidate => matcher.label === candidate.label);

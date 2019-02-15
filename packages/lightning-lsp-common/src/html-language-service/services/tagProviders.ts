@@ -5,13 +5,21 @@
 'use strict';
 
 import { IHTMLTagProvider } from '../parser/htmlTags';
-import { getAuraTagProvider } from '../../markup/auraTags';
+//import { getAuraTagProvider } from '../../markup/auraTags';
 
 // **** CHANGES TO HTML LANGUAGE SERVICE HERE **** //
-export let allTagProviders: IHTMLTagProvider[] = [
-    getAuraTagProvider(),
+let allTagProviders: IHTMLTagProvider[] = [
+    // getAuraTagProvider(),
     // getHTML5TagProvider(),
     // getAngularTagProvider(),
     // getIonicTagProvider(),
     // getRazorTagProvider(),
 ];
+
+export function addTagProvider(provider: IHTMLTagProvider) {
+    allTagProviders.push(provider);
+}
+
+export function getTagProviders() {
+    return allTagProviders;
+}

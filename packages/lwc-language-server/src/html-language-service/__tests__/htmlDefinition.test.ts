@@ -1,5 +1,5 @@
 import { TextDocument, Location, Range, Position } from 'vscode-languageserver-types';
-import { getLanguageService } from '../htmlLanguageService';
+import { getLanguageService } from 'lightning-lsp-common';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
 import { WorkspaceContext } from 'lightning-lsp-common';
 

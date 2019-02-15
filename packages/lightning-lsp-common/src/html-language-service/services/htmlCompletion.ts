@@ -4,11 +4,21 @@
  *--------------------------------------------------------------------------------------------*/
 'use strict';
 
-import { TextDocument, Position, CompletionList, CompletionItemKind, Range, TextEdit, InsertTextFormat, CompletionItem, MarkupKind } from 'vscode-languageserver-types';
+import {
+    TextDocument,
+    Position,
+    CompletionList,
+    CompletionItemKind,
+    Range,
+    TextEdit,
+    InsertTextFormat,
+    CompletionItem,
+    MarkupKind,
+} from 'vscode-languageserver-types';
 import { HTMLDocument, Node } from '../parser/htmlParser';
 import { createScanner } from '../parser/htmlScanner';
 import { isEmptyElement } from '../parser/htmlTags';
-import { allTagProviders } from './tagProviders';
+import { getTagProviders } from './tagProviders';
 import { CompletionConfiguration, ICompletionParticipant, ScannerState, TokenType } from '../htmlLanguageTypes';
 import { entities } from '../parser/htmlEntities';
 
@@ -33,7 +43,7 @@ export class HTMLCompletion {
             items: [],
         };
         let completionParticipants = this.completionParticipants;
-        let tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId) && (!settings || settings[p.getId()] !== false));
+        let tagProviders = getTagProviders().filter(p => p.isApplicable(document.languageId) && (!settings || settings[p.getId()] !== false));
 
         let text = document.getText();
         let offset = document.offsetAt(position);
@@ -110,7 +120,8 @@ export class HTMLCompletion {
                         item.textEdit = TextEdit.replace(getReplaceRange(afterOpenBracket - 1 - endIndent.length), insertText);
                         item.filterText = endIndent + '</' + tag + closeTag;
                     }
-                    result.items.push(item);5
+                    result.items.push(item);
+                    5;
                     return result;
                 }
                 curr = curr.parent;
@@ -186,7 +197,7 @@ export class HTMLCompletion {
                             };
                         }
                     }
-                    
+
                     let retVal: CompletionItem = {
                         label: attribute,
                         kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
@@ -194,7 +205,7 @@ export class HTMLCompletion {
                         insertTextFormat: InsertTextFormat.Snippet,
                         command,
                     };
-                    if(info.documentation){
+                    if (info.documentation) {
                         retVal.documentation = info.documentation;
                         retVal.detail = info.detail;
                     }
@@ -232,6 +243,39 @@ export class HTMLCompletion {
                 }),
             );
         }
+
+        // TODO if(settings.isSfdxProject) - do this during collectattributeValueSuggestions
+        /**
+         * If current offset is inside curly brackets expression, add public properties, private properties, handler
+         * methods etc. to the suggestions list
+         * @param valueStart starting index of the current text token
+         * @returns returns true if expression suggestions are being provided, false otherwise
+         */
+        // function collectExpressionSuggestions(valueStart: number): Boolean {
+        //     if (valueStart >= 0 && offset < text.length && (text[offset] === '}' || text[offset] === '>')) {
+        //         const expressionEnd = offset - 1;
+        //         for (let i = expressionEnd; i >= valueStart; i--) {
+        //             if (text[i] === '{') {
+        //                 const templateTag = componentUtil.tagFromFile(URI.parse(document.uri).fsPath, sfdxWorkspace);
+        //                 if (templateTag) {
+        //                     const range = getReplaceRange(i + 1, offset);
+        //                     tagProviders.forEach(provider => {
+        //                         provider.collectExpressionValues(templateTag, value => {
+        //                             result.items.push({
+        //                                 label: value,
+        //                                 kind: CompletionItemKind.Reference,
+        //                                 textEdit: TextEdit.replace(range, value + (text[offset] === '}' ? '' : '}')),
+        //                                 insertTextFormat: InsertTextFormat.PlainText,
+        //                             });
+        //                         });
+        //                     });
+        //                     return true;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return false;
+        // }
 
         function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
             let range: Range;

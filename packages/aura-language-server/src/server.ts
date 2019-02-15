@@ -27,7 +27,7 @@ import {
 
 import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
-import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
+import { getLanguageService, LanguageService } from 'lightning-lsp-common';
 export * from './shared';
 import { startServer } from './tern-server/tern-server';
 import * as util from 'util';
@@ -38,11 +38,11 @@ import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './
 import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
 import { handleWatchedFiles } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
-import { allTagProviders } from './html-language-service/services/tagProviders';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { parseMarkup, getAuraTags, getAuraNamespaces, clearTagsforDirectory } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 import { readFileSync, readdirSync, statSync } from 'fs';
+import { getAuraTagProvider } from './markup/auraTags';
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -104,14 +104,14 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
-function *walkSync(dir: string) {
+function* walkSync(dir: string) {
     const files = readdirSync(dir);
 
     for (const file of files) {
         const pathToFile = path.join(dir, file);
         const isDirectory = statSync(pathToFile).isDirectory();
         if (isDirectory) {
-            yield *walkSync(pathToFile);
+            yield* walkSync(pathToFile);
         } else {
             yield pathToFile;
         }
@@ -173,6 +173,9 @@ connection.onInitialize(
             // wait for indexing to finish before returning from onInitialize()
             // await context.configureAndIndex();
             htmlLS = getLanguageService();
+
+            // add our tag provider
+            htmlLS.addTagProvider(getAuraTagProvider());
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
@@ -316,7 +319,7 @@ connection.onDefinition(
             if (!node || !node.tag) {
                 return null;
             }
-            const tagProviders = allTagProviders.filter(p => p.isApplicable(document.languageId));
+            const tagProviders = htmlLS.getTagProviders().filter(p => p.isApplicable(document.languageId));
             let location: Location;
             for (const provider of tagProviders) {
                 provider.collectTags((t, label, info) => {
@@ -335,8 +338,8 @@ connection.onDefinition(
         if (file) {
             if (file === 'Aura') {
                 return;
-            } else if (file.indexOf('/resources/aura/') >= 0 ) {
-                const slice = file.slice( file.indexOf('/resources/aura/'));
+            } else if (file.indexOf('/resources/aura/') >= 0) {
+                const slice = file.slice(file.indexOf('/resources/aura/'));
                 const real = path.join(__dirname, '..', slice);
                 return {
                     uri: URI.file(real).toString(),

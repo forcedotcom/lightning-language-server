@@ -25,6 +25,7 @@ export interface HTMLFormatConfiguration {
 export interface CompletionConfiguration {
     [provider: string]: boolean | undefined;
     hideAutoCompleteProposals?: boolean;
+    isSfdxProject: boolean;
 }
 
 export interface Node {
