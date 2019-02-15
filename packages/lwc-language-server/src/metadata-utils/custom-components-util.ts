@@ -19,11 +19,11 @@ const RESOURCES_DIR = '../resources';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
-export const tagEvents = new EventsEmitter();
+export const eventEmitter = new EventsEmitter();
 
 export function resetCustomComponents() {
     LWC_TAGS.clear();
-    tagEvents.emit('clear');
+    eventEmitter.emit('clear');
 }
 
 async function removeCustomTag(context: WorkspaceContext, tagName: string, moduleTag: string, writeConfigs: boolean) {
@@ -33,7 +33,7 @@ async function removeCustomTag(context: WorkspaceContext, tagName: string, modul
         await onDeletedCustomComponent(moduleTag, context);
     }
 
-    tagEvents.emit('delete', tagName);
+    eventEmitter.emit('delete', tagName);
 }
 
 async function setCustomTag(context: WorkspaceContext, info: TagInfo, writeConfigs: boolean) {
@@ -43,7 +43,7 @@ async function setCustomTag(context: WorkspaceContext, info: TagInfo, writeConfi
         await onCreatedCustomComponent(context, info.file);
     }
 
-    tagEvents.emit('set', info);
+    eventEmitter.emit('set', info);
 }
 
 export async function updateCustomComponentIndex(updatedFiles: FileEvent[], context: WorkspaceContext, writeConfigs: boolean = true) {

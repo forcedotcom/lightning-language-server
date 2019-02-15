@@ -13,7 +13,7 @@ import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
 const { WorkspaceType } = shared;
 
 export default class AuraIndexer implements Indexer {
-    public readonly tagEvents = new EventsEmitter();
+    public readonly eventEmitter = new EventsEmitter();
 
     private context: WorkspaceContext;
     private indexingTasks: Promise<void>;
@@ -64,10 +64,10 @@ export default class AuraIndexer implements Indexer {
     }
 
     public resetIndex() {
-        this.tagEvents.emit('clear');
+        this.eventEmitter.emit('clear');
 
         if (this.lwcIndexer) {
-            this.lwcIndexer.tagEvents.removeAllListeners();
+            this.lwcIndexer.eventEmitter.removeAllListeners();
             this.lwcIndexer.resetIndex();
         }
         this.AURA_TAGS.clear();
@@ -145,12 +145,12 @@ export default class AuraIndexer implements Indexer {
 
     private addListener(event: string, listener: any) {
         this.listeners.set(event, listener);
-        this.lwcIndexer.tagEvents.on(event, listener);
+        this.lwcIndexer.eventEmitter.on(event, listener);
     }
 
     private removeListeners() {
         for (const [event, listener] of this.listeners.entries()) {
-            this.lwcIndexer.tagEvents.removeListener(event, listener);
+            this.lwcIndexer.eventEmitter.removeListener(event, listener);
         }
     }
 
@@ -177,25 +177,25 @@ export default class AuraIndexer implements Indexer {
         this.AURA_TAGS.delete(tag);
         this.AURA_EVENTS.delete(tag);
 
-        this.tagEvents.emit('delete', tag);
+        this.eventEmitter.emit('delete', tag);
     }
     private setAuraNamespaceTag(namespace: string) {
         if (!this.AURA_NAMESPACES.has(namespace)) {
             this.AURA_NAMESPACES.add(namespace);
-            this.tagEvents.emit('set-namespace', namespace);
+            this.eventEmitter.emit('set-namespace', namespace);
         }
     }
 
     private setCustomEventTag(info: TagInfo) {
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_EVENTS.set(info.name, info);
-        this.tagEvents.emit('set', info);
+        this.eventEmitter.emit('set', info);
     }
 
     private setCustomTag(info: TagInfo) {
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_TAGS.set(info.name, info);
-        this.tagEvents.emit('set', info);
+        this.eventEmitter.emit('set', info);
     }
 
     private async loadSystemTags(): Promise<void> {

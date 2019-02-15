@@ -43,7 +43,6 @@ import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { setIndexer } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 import { readFileSync, readdirSync, statSync } from 'fs';
-import { getAuraTagProvider } from './markup/auraTags';
 
 interface ITagParams {
     taginfo: TagInfo;
@@ -176,13 +175,13 @@ connection.onInitialize(
             const auraIndexer = new AuraIndexer(context);
             setIndexer(auraIndexer);
 
-            auraIndexer.tagEvents.on('set', (tag: TagInfo) => {
+            auraIndexer.eventEmitter.on('set', (tag: TagInfo) => {
                  connection.sendNotification(tagAdded, { taginfo: tag });
             });
-            auraIndexer.tagEvents.on('delete', (tag: string) => {
+            auraIndexer.eventEmitter.on('delete', (tag: string) => {
                 connection.sendNotification(tagDeleted, tag);
             });
-            auraIndexer.tagEvents.on('clear', () => {
+            auraIndexer.eventEmitter.on('clear', () => {
                 connection.sendNotification(tagsCleared, undefined);
             });
 

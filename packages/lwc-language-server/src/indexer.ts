@@ -9,7 +9,7 @@ import { getLwcTags } from './metadata-utils/custom-components-util';
 import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { updateCustomComponentIndex, tagEvents } from './metadata-utils/custom-components-util';
+import { updateCustomComponentIndex, eventEmitter } from './metadata-utils/custom-components-util';
 import { utils } from 'lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
@@ -17,7 +17,7 @@ import { EventEmitter } from 'events';
 const { WorkspaceType } = shared;
 
 export class LWCIndexer implements Indexer {
-    public readonly tagEvents = new EventEmitter();
+    public readonly eventEmitter = new EventEmitter();
 
     private context: WorkspaceContext;
     private writeConfigs: boolean;
@@ -26,7 +26,7 @@ export class LWCIndexer implements Indexer {
     constructor(context: WorkspaceContext, writeConfigs: boolean = true) {
         this.context = context;
         this.writeConfigs = writeConfigs;
-        this.tagEvents = tagEvents;
+        this.eventEmitter = eventEmitter;
     }
 
     public async configureAndIndex() {
@@ -74,4 +74,4 @@ export class LWCIndexer implements Indexer {
     }
 }
 
-export { getLanguageService, LanguageService, getLwcTags, tagEvents };
+export { getLanguageService, LanguageService, getLwcTags, eventEmitter };
