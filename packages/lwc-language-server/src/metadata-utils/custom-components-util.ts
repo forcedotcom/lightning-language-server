@@ -10,6 +10,7 @@ import { utils, shared, componentUtil } from 'lightning-lsp-common';
 import { join } from 'path';
 import EventsEmitter from 'events';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
+import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 
@@ -87,7 +88,7 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
     const lwcStandard = JSON.parse(data);
     for (const tag in lwcStandard) {
         if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-            const info = new TagInfo(null, true, []);
+            const info = new TagInfo(null, TagType.STANDARD, true, []);
             if (lwcStandard[tag].attributes) {
                 lwcStandard[tag].attributes.map((a: any) => {
                     const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
@@ -109,7 +110,7 @@ async function addCustomTag(context: WorkspaceContext, tag: string, uri: string,
     const location = Location.create(uri, range);
     const namespace = tag.split('-')[0];
     const file = toResolvedPath(uri);
-    const tagInfo = new TagInfo(file, true, attributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata));
+    const tagInfo = new TagInfo(file, TagType.CUSTOM, true, attributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata));
     await setCustomTag(context, tagInfo, writeConfigs);
 }
 

@@ -8,6 +8,7 @@ import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import changeCase from 'change-case';
 import EventsEmitter from 'events';
+import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 
@@ -43,7 +44,7 @@ export default class AuraIndexer implements Indexer {
         });
         this.addListener('set', (tagInfo: TagInfo) => {
             const tag = tagInfo.name;
-            if (!tag.startsWith('lightning')) {
+            if (tagInfo.type === TagType.CUSTOM) {
                 const interopTagInfo = this.transformLwcTagToAura(tag, tagInfo);
                 this.setCustomTag(interopTagInfo);
             }
@@ -204,7 +205,7 @@ export default class AuraIndexer implements Indexer {
             // TODO need to account for LWC tags here
             if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraSystem[tag];
-                const info = new TagInfo(null, false, []);
+                const info = new TagInfo(null, TagType.SYSTEM, false, []);
                 if (tagObj.attributes) {
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
@@ -227,7 +228,7 @@ export default class AuraIndexer implements Indexer {
             // TODO need to account for LWC tags here
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraStandard[tag];
-                const info = new TagInfo(null, false, []);
+                const info = new TagInfo(null, TagType.STANDARD, false, []);
                 if (tagObj.attributes) {
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
@@ -291,7 +292,7 @@ export default class AuraIndexer implements Indexer {
             },
         };
         const name = componentUtil.componentFromFile(file, sfdxProject);
-        const info = new TagInfo(file, false, [], location, documentation, name, 'c');
+        const info = new TagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
         return info;
     }
 
@@ -324,6 +325,8 @@ export default class AuraIndexer implements Indexer {
 
         const info = new TagInfo(
             interopTagInfo.file,
+            // TagType[interopTagInfo.type as string],
+            interopTagInfo.type,
             true,
             attrs,
             interopTagInfo.location,

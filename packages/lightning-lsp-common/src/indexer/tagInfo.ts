@@ -2,9 +2,15 @@ import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '@lwc/babel-plugin-component';
 
+export enum TagType {
+    STANDARD,
+    SYSTEM,
+    CUSTOM,
+}
 export class TagInfo {
     constructor(
         public file: string,
+        public type: TagType,
         public lwc: boolean,
         public attributes: AttributeInfo[],
         public location?: Location,
