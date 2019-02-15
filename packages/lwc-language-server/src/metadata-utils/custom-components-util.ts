@@ -131,7 +131,7 @@ async function loadCustomTagsFromFiles(context: WorkspaceContext, filePaths: str
     console.log('loadCustomTagsFromFiles: processed ' + filePaths.length + ' files in ' + utils.elapsedMillis(startTime));
 }
 
-export async function addCustomTagFromResults(context: WorkspaceContext, uri: string, metadata: Metadata, sfdxProject: boolean, writeConfigs: boolean) {
+export async function addCustomTagFromResults(context: WorkspaceContext, uri: string, metadata: Metadata, sfdxProject: boolean, writeConfigs: boolean = true) {
     const tag = componentUtil.tagFromFile(URI.parse(uri).fsPath, sfdxProject);
     if (tag) {
         await addCustomTag(context, tag, uri, metadata, writeConfigs);

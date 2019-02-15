@@ -96,7 +96,7 @@ documents.onDidChangeContent(async change => {
         const { metadata, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (metadata) {
-            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, true);
+            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
         }
     }
 });
