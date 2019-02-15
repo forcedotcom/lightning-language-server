@@ -20,9 +20,10 @@ import { LWCIndexer, handleWatchedFiles } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
-import { getLanguageService, LanguageService } from './html-language-service/htmlLanguageService';
+import { getLanguageService, LanguageService } from 'lightning-lsp-common';
 import URI from 'vscode-uri';
 import { addCustomTagFromResults, getLwcTags } from './metadata-utils/custom-components-util';
+import { getLwcTagProvider } from './markup/lwcTags';
 
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
@@ -59,6 +60,7 @@ connection.onInitialize(
             await lwcIndexer.configureAndIndex();
             context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
             htmlLS = getLanguageService();
+            htmlLS.addTagProvider(getLwcTagProvider());
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             // Return the language server capabilities
             return {
@@ -105,7 +107,7 @@ connection.onCompletion(
             return { isIncomplete: false, items: [] };
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, context.type === WorkspaceType.SFDX);
+        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument); // , context.type === WorkspaceType.SFDX);
     },
 );
 

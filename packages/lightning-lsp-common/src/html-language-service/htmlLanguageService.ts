@@ -14,6 +14,7 @@ import { format } from './services/htmlFormatter';
 import { findDocumentLinks } from './services/htmlLinks';
 import { findDocumentHighlights } from './services/htmlHighlighting';
 import { findDocumentSymbols } from './services/htmlSymbolsProvider';
+import { findDefinition } from './services/htmlDefinition';
 import {
     TextDocument,
     Position,
@@ -28,6 +29,7 @@ import {
 } from 'vscode-languageserver-types';
 import { Scanner, HTMLDocument, CompletionConfiguration, ICompletionParticipant, HTMLFormatConfiguration, DocumentContext } from './htmlLanguageTypes';
 import { getFoldingRanges } from './services/htmlFolding';
+import { Location } from 'vscode-languageserver-types';
 
 export * from './htmlLanguageTypes';
 export * from 'vscode-languageserver-types';
@@ -46,6 +48,8 @@ export interface LanguageService {
     findDocumentSymbols(document: TextDocument, htmlDocument: HTMLDocument): SymbolInformation[];
     doTagComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null;
     getFoldingRanges(document: TextDocument, context?: { rangeLimit?: number }): FoldingRange[];
+    // TODO HACK - adding findDefinition here to make LWC work for now
+    findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
 }
 
 export function getLanguageService(): LanguageService {
@@ -64,5 +68,6 @@ export function getLanguageService(): LanguageService {
         findDocumentSymbols,
         getFoldingRanges,
         doTagComplete: htmlCompletion.doTagComplete.bind(htmlCompletion),
+        findDefinition,
     };
 }
