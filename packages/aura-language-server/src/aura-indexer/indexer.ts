@@ -3,8 +3,7 @@ import { LWCIndexer } from 'lwc-language-server/lib/indexer';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs-extra';
-import { AttributeInfo, componentUtil } from 'lightning-lsp-common';
-import { parse, Node } from '../html-language-service/parser/htmlParser';
+import { AttributeInfo, componentUtil, parse, Node } from 'lightning-lsp-common';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import changeCase from 'change-case';
@@ -157,7 +156,7 @@ export default class AuraIndexer implements Indexer {
     private async indexCustomComponents() {
         const startTime = process.hrtime();
         const markupfiles = await this.context.findAllAuraMarkup();
-       
+
         for (const file of markupfiles) {
             try {
                 await this.indexFile(file, this.context.type === WorkspaceType.SFDX);
@@ -193,9 +192,6 @@ export default class AuraIndexer implements Indexer {
     }
 
     private setCustomTag(info: TagInfo) {
-        if (!info.name) {
-debugger;
-        }
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_TAGS.set(info.name, info);
         this.tagEvents.emit('set', info);

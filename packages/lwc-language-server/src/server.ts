@@ -16,7 +16,7 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import { LWCIndexer, handleWatchedFiles } from './indexer';
+import { LWCIndexer } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
