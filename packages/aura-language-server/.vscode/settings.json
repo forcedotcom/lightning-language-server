@@ -12,7 +12,8 @@
     ],
     "search.exclude": {
         "**/node_modules": true,
-        "lib": true
+        "lib": true,
+        "resources": true
     },
     "terminal.integrated.env.osx": {
         "SFDX_SET_CLIENT_IDS": "sfdx-vscode"

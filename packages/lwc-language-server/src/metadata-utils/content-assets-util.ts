@@ -2,7 +2,11 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext, utils } from 'lightning-lsp-common';
+import { WorkspaceContext } from 'lightning-lsp-common';
+import { promisify } from 'util';
+import * as fs from 'fs-extra';
+
+const glob = promisify(Glob);
 
 const CONTENT_ASSET_DECLARATION_FILE = '.sfdx/typings/lwc/contentassets.d.ts';
 const CONTENT_ASSETS: Set<string> = new Set();
@@ -16,9 +20,9 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateContentAssetIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext) {
+export async function updateContentAssetIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
-    updatedFiles.forEach(f => {
+    for (const f of updatedFiles) {
         if (f.uri.endsWith('.asset-meta.xml')) {
             if (f.type === FileChangeType.Created) {
                 didChange = true;
@@ -28,36 +32,33 @@ export async function updateContentAssetIndex(updatedFiles: FileEvent[], { works
                 didChange = true;
             }
         }
-    });
+    }
     if (didChange) {
-        processContentAssets(workspaceRoot);
+        return processContentAssets(workspaceRoot, writeConfigs);
     }
 }
 
-function processContentAssets(workspace: string) {
-    if (CONTENT_ASSETS.size > 0) {
-        utils.writeFileSync(join(workspace, CONTENT_ASSET_DECLARATION_FILE), generateTypeDeclarations());
+function processContentAssets(workspace: string, writeConfig: boolean): Promise<void> {
+    if (CONTENT_ASSETS.size > 0 && writeConfig) {
+        return fs.writeFile(join(workspace, CONTENT_ASSET_DECLARATION_FILE), generateTypeDeclarations());
     }
 }
 
-export function indexContentAssets(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
+export async function indexContentAssets(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
+    const { workspaceRoot } = context;
+    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
-    return new Promise((resolve, reject) => {
-        /* tslint:disable */
-        new Glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspacePath }, async (err: Error, files: string[]) => {
-            if (err) {
-                console.log(`Error queueing up indexing of content assets. Error details: ${err}`);
-                reject(err);
-            } else {
-                files.map((file: string) => {
-                    CONTENT_ASSETS.add(getResourceName(file));
-                });
-                processContentAssets(workspacePath);
-                resolve();
-            }
-        });
-        /* tslint:enable */
-    });
+
+    try {
+        const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoot });
+        for (const file of files) {
+            CONTENT_ASSETS.add(getResourceName(file));
+        }
+        return processContentAssets(workspaceRoot, writeConfigs);
+    } catch (err) {
+        console.log(`Error queuing up indexing of content resources. Error details:`, err);
+        throw err;
+    }
 }
 
 function generateTypeDeclarations(): string {

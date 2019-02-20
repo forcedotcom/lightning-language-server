@@ -1,9 +1,29 @@
 import { join } from 'path';
+import * as fs from 'fs-extra';
 import URI from 'vscode-uri';
 import { LWCIndexer } from '../../indexer';
 import { FORCE_APP_ROOT, UTILS_ROOT } from '../../__tests__/test-utils';
-import { WorkspaceContext, utils } from 'lightning-lsp-common';
+import { WorkspaceContext } from 'lightning-lsp-common';
 import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
+
+beforeEach(() => {
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
+    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
+    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
+    fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
+});
 
 it('addCustomTagFromFile(): adds custom tag attributes and documentation', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
@@ -23,7 +43,7 @@ it('addCustomTagFromFile(): adds custom tag attributes and documentation', async
 
 it('indexSfdx', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -80,14 +100,14 @@ it('indexSfdx', async () => {
 
     // verify modifycations in jsconfig.json when indexing
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
-    const jsconfigForceApp = JSON.parse(utils.readFileSync(jsconfigPathForceApp));
+    const jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigForceApp.compilerOptions.paths).toMatchObject({
         'c/hello_world': ['hello_world/hello_world.js'],
         'c/todo_utils': ['../../../../utils/meta/lwc/todo_utils/todo_utils.js'],
     });
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const jsconfigUtils = JSON.parse(utils.readFileSync(jsconfigPathUtils));
+    const jsconfigUtils = JSON.parse(fs.readFileSync(jsconfigPathUtils, 'utf8'));
     expect(jsconfigUtils.compilerOptions.baseUrl).toBe('.');
     expect(jsconfigUtils.compilerOptions.paths).toMatchObject({
         'c/hello_world': ['../../../force-app/main/default/lwc/hello_world/hello_world.js'],
@@ -98,7 +118,7 @@ it('indexSfdx', async () => {
 it('indexCore', async () => {
     // test indexing of core-like workspace
     const context = new WorkspaceContext('test-workspaces/core-like-workspace/app/main/core');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
@@ -120,7 +140,7 @@ it('indexCore', async () => {
 
 it('indexStandard', async () => {
     const context = new WorkspaceContext('test-workspaces/standard-workspace');
-    context.configureProject();
+    await context.configureProject();
     const lwcIndexer = new LWCIndexer(context);
     await lwcIndexer.resetIndex();
     await lwcIndexer.configureAndIndex();

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
+import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
 
 const { WorkspaceType } = shared;
 
@@ -15,9 +16,9 @@ export interface IJsconfig {
     };
 }
 
-export function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
+export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         const paths: IPaths = {};
@@ -31,32 +32,37 @@ export function onIndexCustomComponents(context: WorkspaceContext, files: string
         // set "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
-        const jsconfig: IJsconfig = JSON.parse(utils.readFileSync(jsconfigFile));
-        if (
-            !jsconfig.compilerOptions ||
-            !jsconfig.compilerOptions.hasOwnProperty('baseUrl') ||
-            jsconfig.compilerOptions.baseUrl !== '.' ||
-            !jsconfig.compilerOptions.hasOwnProperty('paths') ||
-            JSON.stringify(jsconfig.compilerOptions.paths) !== JSON.stringify(paths)
-        ) {
-            if (!jsconfig.compilerOptions) {
-                jsconfig.compilerOptions = {};
+        try {
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
+            if (
+                !jsconfig.compilerOptions ||
+                !jsconfig.compilerOptions.hasOwnProperty('baseUrl') ||
+                jsconfig.compilerOptions.baseUrl !== '.' ||
+                !jsconfig.compilerOptions.hasOwnProperty('paths') ||
+                JSON.stringify(jsconfig.compilerOptions.paths) !== JSON.stringify(paths)
+            ) {
+                if (!jsconfig.compilerOptions) {
+                    jsconfig.compilerOptions = {};
+                }
+                jsconfig.compilerOptions.baseUrl = '.';
+                jsconfig.compilerOptions.paths = paths;
+                writeJsonSync(jsconfigFile, jsconfig);
             }
-            jsconfig.compilerOptions.baseUrl = '.';
-            jsconfig.compilerOptions.paths = paths;
-            writeJsconfig(jsconfigFile, jsconfig);
+        } catch (err) {
+            console.log(`onIndexCustomComponents(LOTS): Error reading jsconfig ${jsconfigFile}`, err);
         }
     }
 }
 
-export function onCreatedCustomComponent(context: WorkspaceContext, file: string) {
+export async function onCreatedCustomComponent(context: WorkspaceContext, file: string): Promise<void> {
     if (!file) {
         // could be a non-local tag, like LGC, etc
         return;
     }
     // add tag/path to component to all the project's jsconfig.json "paths"
     const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         // path must be relative to location of jsconfig.json
@@ -65,34 +71,40 @@ export function onCreatedCustomComponent(context: WorkspaceContext, file: string
         // update "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
-        const jsconfig: IJsconfig = JSON.parse(utils.readFileSync(jsconfigFile));
-        if (!jsconfig.compilerOptions) {
-            jsconfig.compilerOptions = {};
+        try {
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
+            if (!jsconfig.compilerOptions) {
+                jsconfig.compilerOptions = {};
+            }
+            jsconfig.compilerOptions.baseUrl = '.';
+            if (!jsconfig.compilerOptions.paths) {
+                jsconfig.compilerOptions.paths = {};
+            }
+            jsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
+            writeJsonSync(jsconfigFile, jsconfig);
+        } catch (err) {
+            console.log(`onCreatedCustomComponent(${file}): Error reading jsconfig ${jsconfigFile}`, err);
         }
-        jsconfig.compilerOptions.baseUrl = '.';
-        if (!jsconfig.compilerOptions.paths) {
-            jsconfig.compilerOptions.paths = {};
-        }
-        jsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
-        writeJsconfig(jsconfigFile, jsconfig);
     }
 }
 
-export function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext) {
+export async function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext): Promise<void> {
     // delete tag from all the project's jsconfig.json "paths"
-    for (const relativeModulesDir of context.getRelativeModulesDirs()) {
+    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
-        const jsconfig: IJsconfig = JSON.parse(utils.readFileSync(jsconfigFile));
-        if (jsconfig.compilerOptions) {
-            if (jsconfig.compilerOptions.paths) {
-                delete jsconfig.compilerOptions.paths[moduleTag];
-                writeJsconfig(jsconfigFile, jsconfig);
+        try {
+            // note, this read/write file must be synchronous, so it is atomic
+            const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
+            if (jsconfig.compilerOptions) {
+                if (jsconfig.compilerOptions.paths) {
+                    delete jsconfig.compilerOptions.paths[moduleTag];
+                    writeJsonSync(jsconfigFile, jsconfig);
+                }
             }
+        } catch (err) {
+            console.log(`onDeletedCustomComponent${moduleTag}: Error reading jsconfig ${jsconfigFile}`, err);
         }
     }
-}
-
-export function writeJsconfig(file: string, jsconfig: {}) {
-    utils.writeFileSync(file, JSON.stringify(jsconfig, null, 4));
 }

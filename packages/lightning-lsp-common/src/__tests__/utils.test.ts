@@ -4,6 +4,7 @@ import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
+import * as fs from 'fs-extra';
 
 jest.mock('../context');
 const real = jest.requireActual('../context');
@@ -73,22 +74,22 @@ it('test canonicalizing in nodejs', () => {
     expect(canonical.endsWith(join('tmp', 'a'))).toBe(true);
 });
 
-it('appendLineIfMissing()', () => {
+it('appendLineIfMissing()', async () => {
     const file = tmp.tmpNameSync();
     tmp.setGracefulCleanup();
 
     // creates with line if file doesn't exist
     expect(file).not.toExist();
-    utils.appendLineIfMissing(file, 'line 1');
-    expect(utils.readFileSync(file)).toBe('line 1\n');
+    await utils.appendLineIfMissing(file, 'line 1');
+    expect(fs.readFileSync(file, 'utf8')).toBe('line 1\n');
 
     // add second line
-    utils.appendLineIfMissing(file, 'line 2');
-    expect(utils.readFileSync(file)).toBe('line 1\n\nline 2\n');
+    await utils.appendLineIfMissing(file, 'line 2');
+    expect(fs.readFileSync(file, 'utf8')).toBe('line 1\n\nline 2\n');
 
     // doesn't add line if already there
-    utils.appendLineIfMissing(file, 'line 1');
-    expect(utils.readFileSync(file)).toBe('line 1\n\nline 2\n');
+    await utils.appendLineIfMissing(file, 'line 1');
+    expect(fs.readFileSync(file, 'utf8')).toBe('line 1\n\nline 2\n');
 });
 
 it('deepMerge()', () => {

@@ -9,120 +9,120 @@ it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoot).toBeAbsolutePath();
-    let roots = context.namespaceRoots;
+    let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
     expect(roots.lwc[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
     expect(roots.lwc[1]).toEndWith(join(UTILS_ROOT, 'lwc'));
     expect(roots.lwc[2]).toEndWith(join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
     expect(roots.lwc.length).toBe(3);
-    let modules = context.findAllModules();
+    let modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
-    expect(context.getRelativeModulesDirs().length).toBe(3);
+    expect((await context.getRelativeModulesDirs()).length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
-    roots = context.namespaceRoots;
+    roots = await context.getNamespaceRoots();
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
     expect(roots.lwc[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
     expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
     expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
     expect(roots.lwc.length).toBe(3);
-    modules = context.findAllModules();
+    modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
     expect(modules[1]).toEndWith(join(STANDARDS_ROOT, 'example', 'line', 'line.js'));
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
-    expect(context.getRelativeModulesDirs()).toEqual([]);
+    expect(await context.getRelativeModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
-    roots = context.namespaceRoots;
+    roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/clients'));
     expect(roots.lwc[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
     expect(roots.lwc[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
     expect(roots.lwc.length).toBe(3);
-    modules = context.findAllModules();
+    modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    expect(context.getRelativeModulesDirs().length).toBe(2);
+    expect((await context.getRelativeModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
-    roots = context.namespaceRoots;
+    roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.lwc.length).toBe(1);
-    modules = context.findAllModules();
+    modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
-    expect(context.getRelativeModulesDirs()).toEqual(['modules']);
+    expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
 });
 
-it('isInsideModulesRoots()', () => {
+it('isInsideModulesRoots()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
-    expect(context.isInsideModulesRoots(document)).toBeTruthy();
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
-    expect(context.isInsideModulesRoots(document)).toBeFalsy();
+    expect(await context.isInsideModulesRoots(document)).toBeFalsy();
 
     document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
-    expect(context.isInsideModulesRoots(document)).toBeTruthy();
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 });
 
-it('isLWCTemplate()', () => {
+it('isLWCTemplate()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // .js is not a template
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
-    expect(context.isLWCTemplate(document)).toBeFalsy();
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // .html is a template
     document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
-    expect(context.isLWCTemplate(document)).toBeTruthy();
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
 
     // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
-    expect(context.isLWCTemplate(document)).toBeFalsy();
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // html outside namespace roots is not a template
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
-    expect(context.isLWCTemplate(document)).toBeFalsy();
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // .html in utils folder is a template
     document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.html');
-    expect(context.isLWCTemplate(document)).toBeTruthy();
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
 });
 
-it('isLWCJavascript()', () => {
+it('isLWCJavascript()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
     // lwc .js
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
-    expect(context.isLWCJavascript(document)).toBeTruthy();
+    expect(await (context.isLWCJavascript(document))).toBeTruthy();
 
     // lwc .htm
     document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
-    expect(context.isLWCJavascript(document)).toBeFalsy();
+    expect(await (context.isLWCJavascript(document))).toBeFalsy();
 
     // aura cmps
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
-    expect(context.isLWCJavascript(document)).toBeFalsy();
+    expect(await (context.isLWCJavascript(document))).toBeFalsy();
 
     // .js outside namespace roots
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
-    expect(context.isLWCJavascript(document)).toBeFalsy();
+    expect(await (context.isLWCJavascript(document))).toBeFalsy();
 
     // lwc .js in utils
     document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
-    expect(context.isLWCJavascript(document)).toBeTruthy();
+    expect(await (context.isLWCJavascript(document))).toBeTruthy();
 });
 
-it('configureSfdxProject()', () => {
+it('configureSfdxProject()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
@@ -146,13 +146,13 @@ it('configureSfdxProject()', () => {
 
     expect(jsconfigPathUtils).toExist();
     expect(eslintrcPathUtils).toExist();
-    context.configureProject();
+    await context.configureProject();
 
-    // tslint:disable-next-line no-string-literal
-    expect(context['sfdxPackageDirsPattern']).toBe('{force-app,utils,registered-empty-folder}');
+    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
+    expect(sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
 
     // verify newly created jsconfig.json
-    const jsconfigForceAppContent = utils.readFileSync(jsconfigPathForceApp);
+    const jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');
     expect(jsconfigForceAppContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
     expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
@@ -160,7 +160,7 @@ it('configureSfdxProject()', () => {
     expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
     // verify updated jsconfig.json
-    const jsconfigUtilsContent = utils.readFileSync(jsconfigPathUtils);
+    const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
     expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfigUtils = JSON.parse(jsconfigUtilsContent);
     expect(jsconfigUtils.compilerOptions.target).toBe('es2017');
@@ -170,19 +170,19 @@ it('configureSfdxProject()', () => {
     expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
 
     // verify newly created .eslintrc.json
-    const eslintrcForceAppContent = utils.readFileSync(eslintrcPathForceApp);
+    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
     expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
     const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
     expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     // verify updated .eslintrc.json
-    const eslintrcUtilsContent = utils.readFileSync(eslintrcPathUtils);
+    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
     expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
     const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
     expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
-    const forceignoreContent = utils.readFileSync(forceignorePath);
+    const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
     expect(forceignoreContent).toContain('**/jsconfig.json');
     expect(forceignoreContent).toContain('**/.eslintrc.json');
 
@@ -190,15 +190,15 @@ it('configureSfdxProject()', () => {
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
     expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
     expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
-    const schemaContents = utils.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'));
+    const schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
     expect(schemaContents).toContain('declare module "@salesforce/schema" {');
-    const apexContents = utils.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'));
+    const apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
     expect(apexContents).not.toContain('declare type');
 
     verifyWorkspaceSettings(settingsPath);
 });
 
-it('configureCoreProject()', () => {
+it('configureCoreProject()', async () => {
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
     const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
@@ -209,17 +209,17 @@ it('configureCoreProject()', () => {
     fs.removeSync(typingsPath);
 
     // configure and verify typings/jsconfig after configuration:
-    context.configureProject();
+    await context.configureProject();
 
     verifyJsconfigCore(jsconfigPath);
     verifyTypingsCore();
 
-    const settings = JSON.parse(utils.readFileSync(settingsPath));
+    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     verifyCoreSettings(settings);
     verifyWorkspaceSettings(settingsPath);
 });
 
-it('configureCoreAll()', () => {
+it('configureCoreAll()', async () => {
     const context = new WorkspaceContext(CORE_ALL_ROOT);
     const jsconfigPathGlobal = CORE_ALL_ROOT + '/ui-global-components/modules/jsconfig.json';
     const jsconfigPathForce = CORE_ALL_ROOT + '/ui-force-components/modules/jsconfig.json';
@@ -233,7 +233,7 @@ it('configureCoreAll()', () => {
     fs.removeSync(launchPath);
 
     // configure and verify typings/jsconfig after configuration:
-    context.configureProject();
+    await context.configureProject();
 
     // verify newly created jsconfig.json
     verifyJsconfigCore(jsconfigPathGlobal);
@@ -244,12 +244,12 @@ it('configureCoreAll()', () => {
     verifyCodeWorkspaceSettings(codeWorkspacePath);
 
     // launch.json
-    const launchContent = utils.readFileSync(launchPath);
+    const launchContent = fs.readFileSync(launchPath, 'utf8');
     expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {
-    const jsconfigContent = utils.readFileSync(jsconfigPath);
+    const jsconfigContent = fs.readFileSync(jsconfigPath, 'utf8');
     expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfig = JSON.parse(jsconfigContent);
     expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
@@ -266,7 +266,7 @@ function verifyTypingsCore() {
 }
 
 function verifyCodeWorkspace(path: string) {
-    const content = utils.readFileSync(path);
+    const content = fs.readFileSync(path, 'utf8');
     const workspace = JSON.parse(content);
     const folders = workspace.folders;
     expect(folders.length).toBe(1);
@@ -288,7 +288,7 @@ function verifyCoreSettings(settings: any) {
 }
 
 function verifyCodeWorkspaceSettings(path: string) {
-    const content = utils.readFileSync(path);
+    const content = fs.readFileSync(path, 'utf8');
     const workspace = JSON.parse(content);
     const settings = workspace.settings;
     expect(settings['html.suggest.angular1']).toBe(false);
@@ -296,7 +296,7 @@ function verifyCodeWorkspaceSettings(path: string) {
 }
 
 function verifyWorkspaceSettings(settingsPath: string) {
-    const settingsContent = utils.readFileSync(settingsPath);
+    const settingsContent = fs.readFileSync(settingsPath, 'utf8');
     const settings = JSON.parse(settingsContent);
     expect(settings['html.suggest.angular1']).toBe(false);
     expect(settings['html.suggest.ionic']).toBe(false);

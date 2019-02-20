@@ -1,9 +1,13 @@
-import { Glob, IOptions } from 'glob';
-import { readFile } from 'fs';
+import { Glob } from 'glob';
+import * as fs from 'fs-extra';
 import { join } from 'path';
-import { parseString } from 'xml2js';
+import { parseString as parseStringSync, OptionsV2, convertableToString } from 'xml2js';
 import { FileEvent, FileChangeType, Files } from 'vscode-languageserver';
-import { WorkspaceContext, utils } from 'lightning-lsp-common';
+import { WorkspaceContext } from 'lightning-lsp-common';
+import { promisify } from 'util';
+import { readFile } from 'fs-extra';
+
+const glob = promisify(Glob);
 
 interface ICustomLabelsResult {
     CustomLabels: ICustomLabels;
@@ -19,43 +23,50 @@ const CUSTOM_LABELS: Set<string> = new Set();
 const CUSTOM_LABEL_FILES: Set<string> = new Set();
 const CUSTOM_LABELS_DECLARATION_FILE = '.sfdx/typings/lwc/customlabels.d.ts';
 
+function parseString(xml: convertableToString, options?: OptionsV2): Promise<any> {
+    return new Promise((resolve, reject) => {
+        if (options) {
+            parseStringSync(xml, options, (err, results) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(results);
+            });
+        } else {
+            parseStringSync(xml, (err, results) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(results);
+            });
+        }
+    });
+}
+
 export function resetCustomLabels() {
     CUSTOM_LABELS.clear();
     CUSTOM_LABEL_FILES.clear();
 }
 
-function getGlob(globPattern: string, workspace: string, callBack: (err: Error, files: string[]) => void) {
-    const options: IOptions = {};
-    options.cwd = workspace;
-
-    return new Glob(globPattern, options, callBack);
-}
-
-export function indexCustomLabels(workspacePath: string, sfdxPackageDirsPattern: string): Promise<void> {
+export async function indexCustomLabels(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
+    const { workspaceRoot } = context;
+    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
-    return new Promise((resolve, reject) => {
-        getGlob(CUSTOM_LABEL_GLOB_PATTERN, workspacePath, async (err: Error, files: string[]) => {
-            if (err) {
-                console.log(`Error queing up indexing of labels. Error detatils: ${err}`);
-                reject(err);
-            } else {
-                try {
-                    files.forEach(file => {
-                        CUSTOM_LABEL_FILES.add(join(workspacePath, file));
-                    });
-                    await processLabels(workspacePath);
-                    resolve();
-                } catch (e) {
-                    reject(e);
-                }
-            }
-        });
-    });
+    try {
+        const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoot });
+        for (const file of files) {
+            CUSTOM_LABEL_FILES.add(join(workspaceRoot, file));
+        }
+        return processLabels(workspaceRoot, writeConfigs);
+    } catch (err) {
+        console.log(`Error queuing up indexing of labels. Error details:`, err);
+        throw err;
+    }
 }
 
-export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext) {
+export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
-    updatedFiles.forEach(f => {
+    for (const f of updatedFiles) {
         if (f.uri.endsWith('CustomLabels.labels-meta.xml')) {
             didChange = true;
             if (f.type === FileChangeType.Created) {
@@ -64,59 +75,48 @@ export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRo
                 CUSTOM_LABEL_FILES.delete(Files.uriToFilePath(f.uri));
             }
         }
-    });
+    }
     if (didChange) {
-        await processLabels(workspaceRoot);
+        await processLabels(workspaceRoot, writeConfigs);
     }
 }
 
-async function processLabels(workspacePath: string) {
+async function processLabels(workspacePath: string, writeConfigs: boolean): Promise<void> {
     CUSTOM_LABELS.clear();
-    const labelReadPromises: Array<Promise<void>> = [];
+    if (writeConfigs) {
+        const labelReadPromises: Array<Promise<void>> = [];
 
-    CUSTOM_LABEL_FILES.forEach(filePath => {
-        labelReadPromises.push(readLabelFile(filePath));
-    });
+        for (const filePath of CUSTOM_LABEL_FILES) {
+            labelReadPromises.push(readLabelFile(filePath));
+        }
 
-    await Promise.all(labelReadPromises);
-    if (CUSTOM_LABELS.size > 0) {
-        utils.writeFileSync(join(workspacePath, CUSTOM_LABELS_DECLARATION_FILE), generateLabelTypeDeclarations());
+        await Promise.all(labelReadPromises);
+        if (CUSTOM_LABELS.size > 0) {
+            return fs.writeFile(join(workspacePath, CUSTOM_LABELS_DECLARATION_FILE), generateLabelTypeDeclarations());
+        }
     }
 }
 
-function readLabelFile(filePath: string) {
-    return new Promise<void>(resolve => {
-        readFile(filePath, (err: NodeJS.ErrnoException, data: Buffer) => {
-            if (err) {
-                console.log(`Error reading label file at ${filePath}. Error detatils: ${err}`);
-                // if we can't read the file, let's just proceed without it.
-                resolve();
-            } else {
-                parseString(data, (parseErr: any, result: ICustomLabelsResult) => {
-                    if (parseErr) {
-                        // if we can't parse the file, let's just proceed without it.
-                        console.log(`Error parsing the contents of label file at ${filePath}. Error detatils: ${parseErr}`);
-                        resolve();
-                    } else {
-                        result.CustomLabels.labels.map(l => {
-                            if (l.fullName.length > 0) {
-                                CUSTOM_LABELS.add(l.fullName[0]);
-                            }
-                        });
-                        resolve();
-                    }
-                });
+async function readLabelFile(filePath: string) {
+    try {
+        const data = await readFile(filePath, 'utf-8');
+        const result: ICustomLabelsResult = await parseString(data);
+        for (const l of result.CustomLabels.labels) {
+            if (l.fullName.length > 0) {
+                CUSTOM_LABELS.add(l.fullName[0]);
             }
-        });
-    });
+        }
+    } catch (err) {
+        console.log(`Error reading/parsing label file at ${filePath}. Error detatils:`, err);
+    }
 }
 
 function generateLabelTypeDeclarations(): string {
     let resTypeDecs = '';
     const sortedCustomLabels = Array.from(CUSTOM_LABELS).sort();
-    sortedCustomLabels.forEach(res => {
+    for (const res of sortedCustomLabels) {
         resTypeDecs += generateLabelTypeDeclaration(res);
-    });
+    }
     return resTypeDecs;
 }
 

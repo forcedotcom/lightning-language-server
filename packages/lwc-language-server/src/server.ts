@@ -16,7 +16,7 @@ import {
     MessageType,
 } from 'vscode-languageserver';
 
-import { LWCIndexer, handleWatchedFiles } from './indexer';
+import { LWCIndexer } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
@@ -55,9 +55,10 @@ connection.onInitialize(
             const startTime = process.hrtime();
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
-            // wait for indexing to finish before returning from onInitialize()
             const lwcIndexer = new LWCIndexer(context);
-            await lwcIndexer.configureAndIndex();
+
+            lwcIndexer.configureAndIndex();
+
             context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getLwcTagProvider());
@@ -144,7 +145,8 @@ connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     try {
-        return handleWatchedFiles(context, change);
+        const indexer: LWCIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
+        return indexer.handleWatchedFiles(context, change);
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }

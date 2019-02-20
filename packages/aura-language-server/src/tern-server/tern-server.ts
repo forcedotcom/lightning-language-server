@@ -81,19 +81,19 @@ async function loadLocal(plugin, rootPath) {
     return true;
 }
 
-async function loadBuiltIn(plugin, rootPath) {
+async function loadBuiltIn(plugin: string, rootPath: string) {
     const ternlibpath = require.resolve('tern');
     const ternbasedir = path.join(ternlibpath, '../..');
 
     const def = path.join(ternbasedir, 'plugin', plugin);
 
-    let found;
+    let found: string;
     try {
         // local resolution only here
         found = require.resolve(def);
     } catch (e) {
         process.stderr.write('Failed to find plugin ' + plugin + '.\n');
-        return;
+        return false;
     }
 
     const mod = await import(found);
@@ -103,7 +103,7 @@ async function loadBuiltIn(plugin, rootPath) {
     return true;
 }
 
-export async function startServer(rootPath) {
+export async function startServer(rootPath: string) {
     const defs = findDefs(defaultLibs);
     const plugins = await loadPlugins(defaultPlugins, rootPath);
 

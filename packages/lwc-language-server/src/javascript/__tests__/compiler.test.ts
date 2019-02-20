@@ -5,7 +5,8 @@ import { compile } from '@lwc/compiler';
 import { transform } from '@lwc/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
-import { utils } from 'lightning-lsp-common';
+import * as fs from 'fs-extra';
+
 import {
     compileDocument,
     compileFile,
@@ -203,7 +204,7 @@ it('linter returns empty diagnostics on correct file', async () => {
 
 it('transform returns javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
-    const content = utils.readFileSync(filepath);
+    const content = fs.readFileSync(filepath, 'utf8');
 
     const options: CompilerOptions = {
         name: 'metadata',
@@ -240,7 +241,7 @@ it('transform returns javascript metadata', async () => {
 
 it('returns javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
-    const content = utils.readFileSync(filepath);
+    const content = fs.readFileSync(filepath, 'utf8');
 
     const compilerResult = await compileSource(content, 'metadata.js');
     const metadata = compilerResult.metadata;

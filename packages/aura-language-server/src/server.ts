@@ -23,6 +23,7 @@ import {
     SignatureInformation,
     ParameterInformation,
     FileChangeType,
+    NotificationType,
 } from 'vscode-languageserver';
 
 import * as auraUtils from './aura-utils';
@@ -35,14 +36,21 @@ import * as tern from 'tern';
 import * as infer from 'tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { WorkspaceContext, utils, interceptConsoleLogger } from 'lightning-lsp-common';
-import { handleWatchedFiles } from 'lwc-language-server';
+import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
+import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { parseMarkup, getAuraTags, getAuraNamespaces, clearTagsforDirectory } from './markup/auraTags';
+import { setIndexer } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 import { readFileSync, readdirSync, statSync } from 'fs';
-import { getAuraTagProvider } from './markup/auraTags';
+
+interface ITagParams {
+    taginfo: TagInfo;
+}
+
+const tagAdded: NotificationType<ITagParams, void> = new NotificationType<ITagParams, void>('salesforce/tagAdded');
+const tagDeleted: NotificationType<string, void> = new NotificationType<string, void>('salesforce/tagDeleted');
+const tagsCleared: NotificationType<void, void> = new NotificationType<void, void>('salesforce/tagsCleared');
 
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -117,6 +125,33 @@ function* walkSync(dir: string) {
         }
     }
 }
+async function ternInit() {
+    await asyncTernRequest({
+        query: {
+            type: 'ideInit',
+            unloadDefs: true,
+            // shouldFilter: true,
+        },
+    });
+    const resources = path.join(__dirname, '../resources/aura');
+    const found = [...walkSync(resources)];
+    let [lastFile, lastText] = [undefined, undefined];
+    for (const file of found) {
+        if (file.endsWith('.js')) {
+            const data = readFileSync(file, 'utf-8');
+            // HACK HACK HACK - glue it all together baby!
+            if (file.endsWith('AuraInstance.js')) {
+                lastFile = file;
+                lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
+            } else {
+                ternServer.addFile(file, data);
+            }
+        }
+    }
+    ternServer.addFile(lastFile, lastText);
+}
+
+const init = utils.memoize(ternInit.bind(this));
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
@@ -137,47 +172,29 @@ connection.onInitialize(
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
 
-            const auraIndexer = new AuraIndexer(context, connection);
-            await auraIndexer.configureAndIndex();
+            const auraIndexer = new AuraIndexer(context);
+            setIndexer(auraIndexer);
+
+            auraIndexer.eventEmitter.on('set', (tag: TagInfo) => {
+                 connection.sendNotification(tagAdded, { taginfo: tag });
+            });
+            auraIndexer.eventEmitter.on('delete', (tag: string) => {
+                connection.sendNotification(tagDeleted, tag);
+            });
+            auraIndexer.eventEmitter.on('clear', () => {
+                connection.sendNotification(tagsCleared, undefined);
+            });
+
+            startIndexing();
 
             asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
             asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
 
-            const result = await asyncTernRequest({
-                query: {
-                    type: 'ideInit',
-                    unloadDefs: true,
-                    // shouldFilter: true,
-                },
-            });
-            const resources = path.join(__dirname, '../resources/aura');
-            const found = [...walkSync(resources)];
-            let [lastFile, lastText] = [undefined, undefined];
-            for (const file of found) {
-                if (file.endsWith('.js')) {
-                    const data = readFileSync(file, 'utf-8');
-                    // HACK HACK HACK - glue it all together baby!
-                    if (file.endsWith('AuraInstance.js')) {
-                        lastFile = file;
-                        lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
-                    } else {
-                        ternServer.addFile(file, data);
-                    }
-                }
-            }
-            ternServer.addFile(lastFile, lastText);
-            await asyncFlush();
-            // Early exit if no workspace is opened
+            init();
 
-            // context = new WorkspaceContext(workspaceRoot);
-            // wait for indexing to finish before returning from onInitialize()
-            // await context.configureAndIndex();
             htmlLS = getLanguageService();
+            console.info('... language server started in ' + utils.elapsedMillis(startTime));
 
-            // add our tag provider
-            htmlLS.addTagProvider(getAuraTagProvider());
-            console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
-            // Return the language server capabilities
             return {
                 capabilities: {
                     textDocumentSync: documents.syncKind,
@@ -198,6 +215,15 @@ connection.onInitialize(
         }
     },
 );
+
+function startIndexing() {
+    setTimeout( async () => {
+        const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+        connection.sendNotification('salesforce/indexingStarted');
+        await indexer.configureAndIndex();
+        connection.sendNotification('salesforce/indexingEnded');
+    }, 0);
+}
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -232,6 +258,7 @@ connection.onCompletion(
             return list;
         }
         try {
+            await init();
             await asyncFlush();
             const { completions } = await ternRequest(completionParams, 'completions', {
                 types: true,
@@ -286,6 +313,7 @@ connection.onHover(
             return hover;
         }
         try {
+            await init();
             await asyncFlush();
             const info = await ternRequest(textDocumentPosition, 'type');
 
@@ -330,23 +358,29 @@ connection.onDefinition(
                     }
                 });
             }
-
             return location;
         }
-        await asyncFlush();
-        const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
-        if (file) {
-            if (file === 'Aura') {
-                return;
-            } else if (file.indexOf('/resources/aura/') >= 0) {
-                const slice = file.slice(file.indexOf('/resources/aura/'));
-                const real = path.join(__dirname, '..', slice);
-                return {
-                    uri: URI.file(real).toString(),
-                    range: tern2lspRange({ start, end }),
-                };
+        try {
+            await init();
+            await asyncFlush();
+            const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
+            if (file) {
+                if (file === 'Aura') {
+                    return;
+                } else if (file.indexOf('/resources/aura/') >= 0) {
+                    const slice = file.slice(file.indexOf('/resources/aura/'));
+                    const real = path.join(__dirname, '..', slice);
+                    return {
+                        uri: URI.file(real).toString(),
+                        range: tern2lspRange({ start, end }),
+                    };
+                }
+                return tern2lspLocation({ file, start, end });
             }
-            return tern2lspLocation({ file, start, end });
+        } catch (e) {
+            if (e.message && e.message.startsWith('No type found')) {
+                return;
+            }
         }
     },
 );
@@ -356,7 +390,8 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     const changes = change.changes;
 
     try {
-        handleWatchedFiles(context, change);
+        const lwcIndexer =  context.getIndexingProvider('lwc') as LWCIndexer;
+        lwcIndexer.handleWatchedFiles(context, change);
         if (utils.isAuraRootDirectoryCreated(context, changes)) {
             await context.getIndexingProvider('aura').resetIndex();
             await context.getIndexingProvider('aura').configureAndIndex();
@@ -365,14 +400,19 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
             return;
         } else {
+            let files = 0;
             for (const event of changes) {
                 if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(context, event.uri)) {
                     const dir = toResolvedPath(event.uri);
-                    clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
+                    const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+                    indexer.clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
+                    files++;
                 } else {
                     const file = toResolvedPath(event.uri);
                     if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
-                        await parseMarkup(file, context.type === WorkspaceType.SFDX);
+                        const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+                        await indexer.indexFile(file, context.type === WorkspaceType.SFDX);
+                        files++;
                     }
                 }
             }
@@ -388,6 +428,7 @@ connection.onRequest((method: string, ...params: any[]) => {
 
 connection.onReferences(
     async (reference: ReferenceParams): Promise<Location[]> => {
+        await init();
         await asyncFlush();
         const { refs } = await ternRequest(reference, 'refs');
         if (refs && refs.length > 0) {
@@ -403,6 +444,7 @@ connection.onSignatureHelp(
             textDocument: { uri },
         } = signatureParams;
         try {
+            await init();
             await asyncFlush();
             const sp = signatureParams;
             const files = ternServer.files;
@@ -462,11 +504,15 @@ connection.onSignatureHelp(
 connection.listen();
 
 connection.onRequest('salesforce/listComponents', () => {
-    const tags = getAuraTags();
-    return JSON.stringify([...tags]);
+    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const tags = indexer.getAuraTags();
+    const result = JSON.stringify([...tags]);
+    return result;
 });
 
 connection.onRequest('salesforce/listNamespaces', () => {
-    const tags = getAuraNamespaces();
-    return JSON.stringify(tags);
+    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const tags = indexer.getAuraNamespaces();
+    const result = JSON.stringify(tags);
+    return result;
 });
