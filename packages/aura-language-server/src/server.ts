@@ -40,7 +40,7 @@ import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightn
 import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { setIndexer } from './markup/auraTags';
+import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
 import { readFileSync, readdirSync, statSync } from 'fs';
 
@@ -176,7 +176,7 @@ connection.onInitialize(
             setIndexer(auraIndexer);
 
             auraIndexer.eventEmitter.on('set', (tag: TagInfo) => {
-                 connection.sendNotification(tagAdded, { taginfo: tag });
+                connection.sendNotification(tagAdded, { taginfo: tag });
             });
             auraIndexer.eventEmitter.on('delete', (tag: string) => {
                 connection.sendNotification(tagDeleted, tag);
@@ -193,6 +193,7 @@ connection.onInitialize(
             init();
 
             htmlLS = getLanguageService();
+            htmlLS.addTagProvider(getAuraTagProvider());
             console.info('... language server started in ' + utils.elapsedMillis(startTime));
 
             return {
@@ -217,8 +218,8 @@ connection.onInitialize(
 );
 
 function startIndexing() {
-    setTimeout( async () => {
-        const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    setTimeout(async () => {
+        const indexer = context.getIndexingProvider('aura') as AuraIndexer;
         connection.sendNotification('salesforce/indexingStarted');
         await indexer.configureAndIndex();
         connection.sendNotification('salesforce/indexingEnded');
@@ -390,7 +391,7 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     const changes = change.changes;
 
     try {
-        const lwcIndexer =  context.getIndexingProvider('lwc') as LWCIndexer;
+        const lwcIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
         lwcIndexer.handleWatchedFiles(context, change);
         if (utils.isAuraRootDirectoryCreated(context, changes)) {
             await context.getIndexingProvider('aura').resetIndex();
@@ -504,14 +505,14 @@ connection.onSignatureHelp(
 connection.listen();
 
 connection.onRequest('salesforce/listComponents', () => {
-    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const indexer = context.getIndexingProvider('aura') as AuraIndexer;
     const tags = indexer.getAuraTags();
     const result = JSON.stringify([...tags]);
     return result;
 });
 
 connection.onRequest('salesforce/listNamespaces', () => {
-    const indexer =  context.getIndexingProvider('aura') as AuraIndexer;
+    const indexer = context.getIndexingProvider('aura') as AuraIndexer;
     const tags = indexer.getAuraNamespaces();
     const result = JSON.stringify(tags);
     return result;
