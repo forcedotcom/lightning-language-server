@@ -30,7 +30,11 @@
 		},
 		"npm.packageManager": "yarn",
 		"eslint.packageManager": "yarn",
-		"tslint.packageManager": "yarn"
+		"tslint.packageManager": "yarn",
+		"search.exclude": {
+			"**/node_modules": true,
+			"lib": true
+		},
 	},
 	"launch": {
 		"configurations": [],
