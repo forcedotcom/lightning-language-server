@@ -89,10 +89,10 @@ documents.onDidChangeContent(async change => {
     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
     const { document } = change;
     const { uri } = document;
-    if (context.isLWCTemplate(document)) {
+    if (await context.isLWCTemplate(document)) {
         const diagnostics = templateLinter(document);
         connection.sendDiagnostics({ uri, diagnostics });
-    } else if (context.isLWCJavascript(document)) {
+    } else if (await context.isLWCJavascript(document)) {
         const { metadata, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (metadata) {
@@ -102,9 +102,9 @@ documents.onDidChangeContent(async change => {
 });
 
 connection.onCompletion(
-    (textDocumentPosition: TextDocumentPositionParams): CompletionList => {
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
+        if (!(await context.isLWCTemplate(document))) {
             return { isIncomplete: false, items: [] };
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
@@ -119,9 +119,9 @@ connection.onCompletionResolve(
 );
 
 connection.onHover(
-    (textDocumentPosition: TextDocumentPositionParams): Hover => {
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
+        if (!(await context.isLWCTemplate(document))) {
             return null;
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
@@ -130,9 +130,9 @@ connection.onHover(
 );
 
 connection.onDefinition(
-    (textDocumentPosition: TextDocumentPositionParams): Location => {
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!context.isLWCTemplate(document)) {
+        if (!(await context.isLWCTemplate(document))) {
             return null;
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
