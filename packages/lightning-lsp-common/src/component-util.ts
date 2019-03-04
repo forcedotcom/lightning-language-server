@@ -76,7 +76,9 @@ function tagName(namespace: string, tag: string) {
 
 function moduleName(namespace: string, tag: string) {
     // convert camel-case to hyphen-case/kebab-case
-    return namespace + '/' + decamelize(tag, '-');
+    return namespace + '/' + tag;
+    // TODO confirm we shouldn't be doing this anymore
+    // + decamelize(tag, '-');
 }
 
 function componentName(namespace: string, tag: string) {
