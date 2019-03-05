@@ -29,20 +29,14 @@ import {
 import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from 'lightning-lsp-common';
-export * from './shared';
-import { startServer } from './tern-server/tern-server';
-import * as util from 'util';
-import * as tern from 'tern';
-import * as infer from 'tern/lib/infer';
-import LineColumnFinder from 'line-column';
-import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
+import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
 import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
-import { readFileSync, readdirSync, statSync } from 'fs';
+export * from './shared';
 
 interface ITagParams {
     taginfo: TagInfo;
@@ -61,104 +55,23 @@ interceptConsoleLogger(connection);
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
-let ternServer;
-let asyncTernRequest;
-let asyncFlush;
-let theRootPath;
-
-function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
-    return { line, ch: character };
-}
-
-function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
-    return { line, character: ch };
-}
-
-function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
-    return {
-        uri: fileToUri(file),
-        range: tern2lspRange({ start, end }),
-    };
-}
-
-function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
-    return {
-        start: tern2lspPos(start),
-        end: tern2lspPos(end),
-    };
-}
-
-function uriToFile(uri: string): string {
-    return URI.parse(uri).fsPath;
-}
-
-function fileToUri(file: string): string {
-    // internally, tern will strip the project root, so we have to add it back
-    return URI.file(path.join(theRootPath, file)).toString();
-}
-
-async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
-    return await asyncTernRequest({
-        query: {
-            type,
-            file: uriToFile(event.textDocument.uri),
-            end: lsp2ternPos(event.position),
-            lineCharPositions: true,
-            ...options,
-        },
-    });
-}
-
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
-function* walkSync(dir: string) {
-    const files = readdirSync(dir);
-
-    for (const file of files) {
-        const pathToFile = path.join(dir, file);
-        const isDirectory = statSync(pathToFile).isDirectory();
-        if (isDirectory) {
-            yield* walkSync(pathToFile);
-        } else {
-            yield pathToFile;
-        }
-    }
+function startIndexing() {
+    setTimeout(async () => {
+        const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+        connection.sendNotification('salesforce/indexingStarted');
+        await indexer.configureAndIndex();
+        connection.sendNotification('salesforce/indexingEnded');
+    }, 0);
 }
-async function ternInit() {
-    await asyncTernRequest({
-        query: {
-            type: 'ideInit',
-            unloadDefs: true,
-            // shouldFilter: true,
-        },
-    });
-    const resources = path.join(__dirname, '../resources/aura');
-    const found = [...walkSync(resources)];
-    let [lastFile, lastText] = [undefined, undefined];
-    for (const file of found) {
-        if (file.endsWith('.js')) {
-            const data = readFileSync(file, 'utf-8');
-            // HACK HACK HACK - glue it all together baby!
-            if (file.endsWith('AuraInstance.js')) {
-                lastFile = file;
-                lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
-            } else {
-                ternServer.addFile(file, data);
-            }
-        }
-    }
-    ternServer.addFile(lastFile, lastText);
-}
-
-const init = utils.memoize(ternInit.bind(this));
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath, capabilities } = params;
 
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
-        theRootPath = workspaceRoot;
         try {
             if (!workspaceRoot) {
                 console.warn(`No workspace found`);
@@ -167,7 +80,7 @@ connection.onInitialize(
 
             console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
-            ternServer = await startServer(rootPath);
+            await startServer(rootPath, workspaceRoot);
 
             context = new WorkspaceContext(workspaceRoot);
             context.configureProject();
@@ -186,11 +99,6 @@ connection.onInitialize(
             });
 
             startIndexing();
-
-            asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
-            asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
-
-            init();
 
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getAuraTagProvider());
@@ -217,36 +125,9 @@ connection.onInitialize(
     },
 );
 
-function startIndexing() {
-    setTimeout(async () => {
-        const indexer = context.getIndexingProvider('aura') as AuraIndexer;
-        connection.sendNotification('salesforce/indexingStarted');
-        await indexer.configureAndIndex();
-        connection.sendNotification('salesforce/indexingEnded');
-    }, 0);
-}
-
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
-});
-
-const addFile = (event: TextDocumentChangeEvent) => {
-    const { document } = event;
-    ternServer.addFile(uriToFile(document.uri), document.getText());
-};
-
-documents.onDidOpen(async (open: TextDocumentChangeEvent) => {
-    addFile(open);
-});
-
-documents.onDidChangeContent(async (change: TextDocumentChangeEvent) => {
-    addFile(change);
-});
-
-documents.onDidClose((close: TextDocumentChangeEvent) => {
-    const { document } = close;
-    ternServer.delFile(uriToFile(document.uri));
 });
 
 connection.onCompletion(
@@ -258,44 +139,7 @@ connection.onCompletion(
             const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument);
             return list;
         }
-        try {
-            await init();
-            await asyncFlush();
-            const { completions } = await ternRequest(completionParams, 'completions', {
-                types: true,
-                docs: true,
-                depths: true,
-                guess: true,
-                origins: true,
-                urls: true,
-                expandWordForward: true,
-                caseInsensitive: true,
-            });
-            const items: CompletionItem[] = completions.map(completion => {
-                let kind = 18;
-                if (completion.type && completion.type.startsWith('fn')) {
-                    kind = 3;
-                }
-                return {
-                    documentation: completion.doc,
-                    detail: completion.type,
-                    label: completion.name,
-                    kind,
-                };
-            });
-            return {
-                isIncomplete: true,
-                items,
-            };
-        } catch (e) {
-            if (e.message && e.message.startsWith('No type found')) {
-                return;
-            }
-            return {
-                isIncomplete: true,
-                items: [],
-            };
-        }
+        return onCompletion(completionParams);
     },
 );
 
@@ -313,26 +157,7 @@ connection.onHover(
             const hover = htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
             return hover;
         }
-        try {
-            await init();
-            await asyncFlush();
-            const info = await ternRequest(textDocumentPosition, 'type');
-
-            const out = [];
-            out.push(`${info.exprName || info.name}: ${info.type}`);
-            if (info.doc) {
-                out.push(info.doc);
-            }
-            if (info.url) {
-                out.push(info.url);
-            }
-
-            return { contents: out };
-        } catch (e) {
-            if (e.message && e.message.startsWith('No type found')) {
-                return;
-            }
-        }
+        return onHover(textDocumentPosition);
     },
 );
 
@@ -361,28 +186,7 @@ connection.onDefinition(
             }
             return location;
         }
-        try {
-            await init();
-            await asyncFlush();
-            const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
-            if (file) {
-                if (file === 'Aura') {
-                    return;
-                } else if (file.indexOf('/resources/aura/') >= 0) {
-                    const slice = file.slice(file.indexOf('/resources/aura/'));
-                    const real = path.join(__dirname, '..', slice);
-                    return {
-                        uri: URI.file(real).toString(),
-                        range: tern2lspRange({ start, end }),
-                    };
-                }
-                return tern2lspLocation({ file, start, end });
-            }
-        } catch (e) {
-            if (e.message && e.message.startsWith('No type found')) {
-                return;
-            }
-        }
+        return onDefinition(textDocumentPosition);
     },
 );
 
@@ -423,87 +227,6 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     }
 });
 
-connection.onRequest((method: string, ...params: any[]) => {
-    // debugger
-});
-
-connection.onReferences(
-    async (reference: ReferenceParams): Promise<Location[]> => {
-        await init();
-        await asyncFlush();
-        const { refs } = await ternRequest(reference, 'refs');
-        if (refs && refs.length > 0) {
-            return refs.map(ref => tern2lspLocation(ref));
-        }
-    },
-);
-
-connection.onSignatureHelp(
-    async (signatureParams: TextDocumentPositionParams): Promise<SignatureHelp> => {
-        const {
-            position,
-            textDocument: { uri },
-        } = signatureParams;
-        try {
-            await init();
-            await asyncFlush();
-            const sp = signatureParams;
-            const files = ternServer.files;
-            const fileName = ternServer.normalizeFilename(uriToFile(uri));
-            const file = files.find(f => f.name === fileName);
-
-            const contents = file.text;
-
-            const offset = new LineColumnFinder(contents, { origin: 0 }).toIndex(position.line, position.character);
-
-            const left = findPreviousLeftParan(contents, offset - 1);
-            const word = findPreviousWord(contents, left);
-
-            const info = await asyncTernRequest({
-                query: {
-                    type: 'type',
-                    file: file.name,
-                    end: word.start,
-                    docs: true,
-                },
-            });
-
-            const commas = countPreviousCommas(contents, offset - 1);
-            const cx = ternServer.cx;
-            let parsed;
-            infer.withContext(cx, () => {
-                // @ts-ignore
-                const parser = new infer.def.TypeParser(info.type);
-                parsed = parser.parseType(true);
-            });
-
-            const params = parsed.args.map((arg, index) => {
-                const type = arg.getType();
-                return {
-                    label: parsed.argNames[index],
-                    documentation: type.toString() + '\n' + (type.doc || ''),
-                };
-            });
-
-            const sig: SignatureInformation = {
-                label: parsed.argNames[commas] || 'unknown param',
-                documentation: `${info.exprName || info.name}: ${info.doc}`,
-                parameters: params,
-            };
-            const sigs: SignatureHelp = {
-                signatures: [sig],
-                activeSignature: 0,
-                activeParameter: commas,
-            };
-            return sigs;
-        } catch (e) {
-            // ignore
-        }
-    },
-);
-// Listen on the connection
-connection.listen();
-
 connection.onRequest('salesforce/listComponents', () => {
     const indexer = context.getIndexingProvider('aura') as AuraIndexer;
     const tags = indexer.getAuraTags();
@@ -517,3 +240,16 @@ connection.onRequest('salesforce/listNamespaces', () => {
     const result = JSON.stringify(tags);
     return result;
 });
+
+// connection.onRequest((method: string, ...params: any[]) => {
+//     // debugger
+// });
+
+documents.onDidOpen(addFile);
+documents.onDidChangeContent(addFile);
+documents.onDidClose(delFile);
+connection.onReferences(onReferences);
+connection.onSignatureHelp(onSignatureHelp);
+
+// Listen on the connection
+connection.listen();

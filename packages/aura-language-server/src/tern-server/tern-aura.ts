@@ -560,6 +560,7 @@ function findAndBindComponent(type, server, cx, infer) {
 
 function findAndBindHelper(type, server, modules, file) {
     var helperFile = getHelper(file.name);
+    
     var bn = trimExt(baseName(helperFile));
     var r = server.findFile(helperFile);
     if (!r) server.addFile(helperFile);
