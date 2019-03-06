@@ -2,12 +2,12 @@
 
 exports[`aura indexer 1`] = `
 Array [
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/indexApp/indexApp.app",
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app",
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
-  "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
+  "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
+  "force-app/main/default/aura/indexApp/indexApp.app",
+  "force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
+  "force-app/main/default/aura/todoApp/todoApp.app",
+  "force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
+  "force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
 ]
 `;
 
@@ -12348,7 +12348,7 @@ Map {
   "c:helloWorldApp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
+    "file": "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12360,7 +12360,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
+      "uri": "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
     },
     "lwc": false,
     "methods": undefined,
@@ -12372,7 +12372,7 @@ Map {
   "c:indexApp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/indexApp/indexApp.app",
+    "file": "force-app/main/default/aura/indexApp/indexApp.app",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12384,7 +12384,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/indexApp/indexApp.app",
+      "uri": "force-app/main/default/aura/indexApp/indexApp.app",
     },
     "lwc": false,
     "methods": undefined,
@@ -12396,7 +12396,7 @@ Map {
   "c:lightningExamplesApp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
+    "file": "force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12408,7 +12408,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
+      "uri": "force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
     },
     "lwc": false,
     "methods": undefined,
@@ -12420,7 +12420,7 @@ Map {
   "c:todoApp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app",
+    "file": "force-app/main/default/aura/todoApp/todoApp.app",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12432,7 +12432,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app",
+      "uri": "force-app/main/default/aura/todoApp/todoApp.app",
     },
     "lwc": false,
     "methods": undefined,
@@ -12444,7 +12444,7 @@ Map {
   "c:helloWorld" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js",
+    "file": "force-app/main/default/lwc/hello_world/hello_world.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12456,7 +12456,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js",
+      "uri": "force-app/main/default/lwc/hello_world/hello_world.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12468,7 +12468,7 @@ Map {
   "c:wireLdsApp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
+    "file": "force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12480,7 +12480,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
+      "uri": "force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
     },
     "lwc": false,
     "methods": undefined,
@@ -12492,7 +12492,7 @@ Map {
   "c:importRelative" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/import_relative/import_relative.js",
+    "file": "force-app/main/default/lwc/import_relative/import_relative.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12504,7 +12504,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/import_relative/import_relative.js",
+      "uri": "force-app/main/default/lwc/import_relative/import_relative.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12516,7 +12516,7 @@ Map {
   "c:wireLdsCmp" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
+    "file": "force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12528,7 +12528,7 @@ Map {
           "line": 1,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
+      "uri": "force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
     },
     "lwc": false,
     "methods": undefined,
@@ -12540,7 +12540,7 @@ Map {
   "c:index" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/index/index.js",
+    "file": "force-app/main/default/lwc/index/index.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12552,7 +12552,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/index/index.js",
+      "uri": "force-app/main/default/lwc/index/index.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12564,7 +12564,7 @@ Map {
   "c:lightningDatatableExample" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example.js",
+    "file": "force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12576,7 +12576,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example.js",
+      "uri": "force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12588,7 +12588,7 @@ Map {
   "c:lightningTreeExample" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.js",
+    "file": "force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12600,7 +12600,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.js",
+      "uri": "force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12612,7 +12612,7 @@ Map {
   "c:todo" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.js",
+    "file": "force-app/main/default/lwc/todo/todo.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12624,7 +12624,7 @@ Map {
           "line": 16,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.js",
+      "uri": "force-app/main/default/lwc/todo/todo.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12658,7 +12658,7 @@ Map {
       },
     ],
     "documentation": "TodoItem doc",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js",
+    "file": "force-app/main/default/lwc/todo_item/todo_item.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12670,7 +12670,7 @@ Map {
           "line": 6,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo_item/todo_item.js",
+      "uri": "force-app/main/default/lwc/todo_item/todo_item.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12682,7 +12682,7 @@ Map {
   "c:utils" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/utils/utils.js",
+    "file": "force-app/main/default/lwc/utils/utils.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12694,7 +12694,7 @@ Map {
           "line": 0,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/force-app/main/default/lwc/utils/utils.js",
+      "uri": "force-app/main/default/lwc/utils/utils.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12728,7 +12728,7 @@ Map {
       },
     ],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_util/todo_util.js",
+    "file": "utils/meta/lwc/todo_util/todo_util.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12740,7 +12740,7 @@ Map {
           "line": 2,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_util/todo_util.js",
+      "uri": "utils/meta/lwc/todo_util/todo_util.js",
     },
     "lwc": true,
     "methods": undefined,
@@ -12752,7 +12752,7 @@ Map {
   "c:todoUtils" => TagInfo {
     "attributes": Array [],
     "documentation": "",
-    "file": "/Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_utils/todo_utils.js",
+    "file": "utils/meta/lwc/todo_utils/todo_utils.js",
     "location": Object {
       "range": Object {
         "end": Object {
@@ -12764,7 +12764,7 @@ Map {
           "line": 0,
         },
       },
-      "uri": "file:///Users/midzelis/git/LSP-mono/lightning-language-server/packages/aura-language-server/test-workspaces/sfdx-workspace/utils/meta/lwc/todo_utils/todo_utils.js",
+      "uri": "utils/meta/lwc/todo_utils/todo_utils.js",
     },
     "lwc": true,
     "methods": undefined,
