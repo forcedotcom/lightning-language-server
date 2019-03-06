@@ -108,7 +108,10 @@ connection.onCompletion(
             return { isIncomplete: false, items: [] };
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument); // , context.type === WorkspaceType.SFDX);
+        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, {
+            isSfdxProject: context.type === WorkspaceType.SFDX,
+            useAttributeValueQuotes: false,
+        });
     },
 );
 

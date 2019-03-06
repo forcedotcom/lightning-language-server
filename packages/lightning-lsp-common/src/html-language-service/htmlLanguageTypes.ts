@@ -26,6 +26,7 @@ export interface CompletionConfiguration {
     [provider: string]: boolean | undefined;
     hideAutoCompleteProposals?: boolean;
     isSfdxProject: boolean;
+    useAttributeValueQuotes?: boolean;
 }
 
 export interface Node {

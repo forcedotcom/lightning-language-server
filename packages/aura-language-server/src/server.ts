@@ -136,7 +136,8 @@ connection.onCompletion(
         if (auraUtils.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
 
-            const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument);
+            const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument,
+                {isSfdxProject: context.type === WorkspaceType.SFDX, useAttributeValueQuotes: true });
             return list;
         }
         return onCompletion(completionParams);

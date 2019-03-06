@@ -176,7 +176,11 @@ export class HTMLCompletion {
                 replaceEnd++;
             }
             let range = getReplaceRange(nameStart, replaceEnd);
-            let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '="$1"';
+
+            // LWC doesn't want quotes but aura does
+            const c = settings && settings.useAttributeValueQuotes ? '="$1"' : '=$1';
+
+            let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : c;
             let tag = currentTag; // currentTag.toLowerCase();
             let seenAttributes = Object.create(null);
             tagProviders.forEach(provider => {
