@@ -36,7 +36,8 @@ it('aura indexer', async () => {
             taginfo.location.uri = normalize(full, uriToFile(taginfo.location.uri));
         }
     });
-    expect(tags).toMatchSnapshot();
+    const sortedTags = new Map([...tags.entries()].sort());
+    expect(sortedTags).toMatchSnapshot();
 
     const namespaces = auraIndexer.getAuraNamespaces();
     expect(namespaces).toMatchSnapshot();
