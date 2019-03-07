@@ -23,18 +23,12 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
         //tag = tag.toLowerCase();
         for (let provider of tagProviders) {
             let hover = null;
-            provider.collectTags((t, label, info) => {
-                if (t === tag || t === tag.toLowerCase()) {
-                    if (info) {
-                        const doc = info.getHover();
-                        const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
-                        const markdown = ['```html', tagLabel, '```', doc];
-                        hover = { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
-                    }
-                }
-            });
-            if (hover) {
-                return hover;
+            const tagInfo = provider.getTagInfo(tag);
+            if (tagInfo) {
+                const doc = tagInfo.getHover();
+                const tagLabel = open ? '<' + tag + '>' : '</' + tag + '>';
+                const markdown = ['```html', tagLabel, '```', doc];
+                return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
             }
         }
         return null;

@@ -73,8 +73,11 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     // Attribute Hover
     assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', '**icon-name**\n\nThe Lightning Design System name of the icon');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', '**class**\n\nA CSS class for the outer element, in addition to ');
+
+    // Test Directives Hover
     assertHover('<lightning-button if:tr|ue={e}></lightning-button>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
     assertHover('<template if:tr|ue={e}></template>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
+
     assertNoHover('<ht|ml></html>');
 
     // standard component with multiple -
