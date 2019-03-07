@@ -133,14 +133,19 @@ documents.onDidClose(event => {
 connection.onCompletion(
     async (completionParams: CompletionParams): Promise<CompletionList> => {
         const document = documents.get(completionParams.textDocument.uri);
-        if (auraUtils.isAuraMarkup(document)) {
+        if (await context.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
 
-            const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument,
-                {isSfdxProject: context.type === WorkspaceType.SFDX, useAttributeValueQuotes: true });
+            const list: CompletionList = htmlLS.doComplete(document, completionParams.position, htmlDocument, {
+                isSfdxProject: context.type === WorkspaceType.SFDX,
+                useAttributeValueQuotes: true,
+            });
             return list;
         }
-        return onCompletion(completionParams);
+        if (await context.isAuraJavascript(document)) {
+            return onCompletion(completionParams);
+        }
+        return null;
     },
 );
 
@@ -153,19 +158,22 @@ connection.onCompletionResolve(
 connection.onHover(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (auraUtils.isAuraMarkup(document)) {
+        if (await context.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
             const hover = htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
             return hover;
         }
-        return onHover(textDocumentPosition);
+        if (await context.isAuraJavascript(document)) {
+            return onHover(textDocumentPosition);
+        }
+        return null;
     },
 );
 
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (auraUtils.isAuraMarkup(document)) {
+        if (await context.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
 
             // TODO: refactor into method
@@ -187,7 +195,10 @@ connection.onDefinition(
             }
             return location;
         }
-        return onDefinition(textDocumentPosition);
+        if (await context.isAuraJavascript(document)) {
+            return onDefinition(textDocumentPosition);
+        }
+        return null;
     },
 );
 

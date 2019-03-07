@@ -66,13 +66,17 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     // standard tags
     await loadStandardComponents(context);
 
+    // Tag Hover
     assertNoHover('|<lightning-button></lightning-button>');
     assertHover('<lightning-bu|tton></lightning-button>', '```html\n<lightning-button>\n```\nRepresents a button element.');
+
+    // Attribute Hover
     assertHover('<lightning-button icon-n|ame="the-icon-name"></lightning-button>', '**icon-name**\n\nThe Lightning Design System name of the icon');
     assertHover('<lightning-button cl|ass="one"></lightning-button>', '**class**\n\nA CSS class for the outer element, in addition to ');
     assertHover('<lightning-button if:tr|ue={e}></lightning-button>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
     assertHover('<template if:tr|ue={e}></template>', '**if:true**\n\nRenders the element or template if the expression value is thruthy');
     assertNoHover('<ht|ml></html>');
+
     // standard component with multiple -
     assertHover(
         '<lightning-formatted-num|ber></lightning-formatted-number>',

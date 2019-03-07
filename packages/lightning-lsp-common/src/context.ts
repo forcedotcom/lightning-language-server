@@ -41,6 +41,7 @@ export class WorkspaceContext {
     // for sfdx projectsÍ
     private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
     private initSfdxProjectConfigCache: () => Promise<ISfdxProjectConfig>;
+    private AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
     /**
      * @return WorkspaceContext representing the workspace at workspaceRoot
@@ -95,6 +96,14 @@ export class WorkspaceContext {
         return files;
     }
 
+    public async isAuraMarkup(document: TextDocument): Promise<boolean> {
+        return document.languageId === 'html' && this.AURA_EXTENSIONS.includes(utils.getExtension(document)) && (await this.isInsideAuraRoots(document));
+    }
+
+    public async isAuraJavascript(document: TextDocument): Promise<boolean> {
+        return document.languageId === 'javascript' && (await this.isInsideAuraRoots(document));
+    }
+
     public async isLWCTemplate(document: TextDocument): Promise<boolean> {
         return document.languageId === 'html' && utils.getExtension(document) === '.html' && (await this.isInsideModulesRoots(document));
     }
@@ -102,6 +111,15 @@ export class WorkspaceContext {
     public async isLWCJavascript(document: TextDocument): Promise<boolean> {
         return document.languageId === 'javascript' && (await this.isInsideModulesRoots(document));
     }
+
+    public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
+        const file = utils.toResolvedPath(document.uri);
+        if (!utils.pathStartsWith(file, this.workspaceRoot)) {
+            return false;
+        }
+        return this.isFileInsideAuraRoots(file);
+    }
+
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
         if (!utils.pathStartsWith(file, this.workspaceRoot)) {
@@ -282,7 +300,6 @@ export class WorkspaceContext {
                 break;
         }
     }
-
 
     private async updateCoreSettings() {
         const configBlt = await this.readConfigBlt();
