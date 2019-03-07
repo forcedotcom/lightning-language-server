@@ -21,6 +21,8 @@ import { isEmptyElement } from '../parser/htmlTags';
 import { getTagProviders } from './tagProviders';
 import { CompletionConfiguration, ICompletionParticipant, ScannerState, TokenType } from '../htmlLanguageTypes';
 import { entities } from '../parser/htmlEntities';
+import URI from 'vscode-uri';
+import * as componentUtil from '../../component-util';
 
 import * as nls from 'vscode-nls';
 import { isLetterOrDigit, endsWith, startsWith } from '../utils/strings';
@@ -37,7 +39,7 @@ export class HTMLCompletion {
         this.completionParticipants = registeredCompletionParticipants || [];
     }
 
-    doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings?: CompletionConfiguration): CompletionList {
+    doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings: CompletionConfiguration): CompletionList {
         let result: CompletionList = {
             isIncomplete: false,
             items: [],
@@ -248,42 +250,45 @@ export class HTMLCompletion {
             );
         }
 
-        // TODO if(settings.isSfdxProject) - do this during collectattributeValueSuggestions
         /**
          * If current offset is inside curly brackets expression, add public properties, private properties, handler
          * methods etc. to the suggestions list
          * @param valueStart starting index of the current text token
          * @returns returns true if expression suggestions are being provided, false otherwise
          */
-        // function collectExpressionSuggestions(valueStart: number): Boolean {
-        //     if (valueStart >= 0 && offset < text.length && (text[offset] === '}' || text[offset] === '>')) {
-        //         const expressionEnd = offset - 1;
-        //         for (let i = expressionEnd; i >= valueStart; i--) {
-        //             if (text[i] === '{') {
-        //                 const templateTag = componentUtil.tagFromFile(URI.parse(document.uri).fsPath, sfdxWorkspace);
-        //                 if (templateTag) {
-        //                     const range = getReplaceRange(i + 1, offset);
-        //                     tagProviders.forEach(provider => {
-        //                         provider.collectExpressionValues(templateTag, value => {
-        //                             result.items.push({
-        //                                 label: value,
-        //                                 kind: CompletionItemKind.Reference,
-        //                                 textEdit: TextEdit.replace(range, value + (text[offset] === '}' ? '' : '}')),
-        //                                 insertTextFormat: InsertTextFormat.PlainText,
-        //                             });
-        //                         });
-        //                     });
-        //                     return true;
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return false;
-        // }
+        function collectExpressionSuggestions(valueStart: number): Boolean {
+            if (valueStart >= 0 && offset < text.length && (text[offset] === '}' || text[offset] === '>')) {
+                const expressionEnd = offset - 1;
+                for (let i = expressionEnd; i >= valueStart; i--) {
+                    if (text[i] === '{') {
+                        const templateTag = componentUtil.tagFromFile(URI.parse(document.uri).fsPath, settings.isSfdxProject);
+                        if (templateTag) {
+                            const range = getReplaceRange(i + 1, offset);
+                            tagProviders.forEach(provider => {
+                                provider.collectExpressionValues(templateTag, value => {
+                                    result.items.push({
+                                        label: value,
+                                        kind: CompletionItemKind.Reference,
+                                        textEdit: TextEdit.replace(range, value + (text[offset] === '}' ? '' : '}')),
+                                        insertTextFormat: InsertTextFormat.PlainText,
+                                    });
+                                });
+                            });
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
         function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
             let range: Range;
             let addQuotes: boolean;
+            if(collectExpressionSuggestions(valueStart)){
+                return result;
+            }
+
             let valuePrefix: string;
             if (offset > valueStart && offset <= valueEnd && isQuote(text[valueStart])) {
                 // inside quoted attribute
@@ -461,11 +466,19 @@ export class HTMLCompletion {
                     }
                     break;
                 case TokenType.Content:
+                    // TODO move this to a completion participant
+                    if (collectExpressionSuggestions(scanner.getTokenLength())) {
+                        return result;
+                    }
                     if (offset <= scanner.getTokenEnd()) {
                         return collectInsideContent();
                     }
                     break;
                 default:
+                    if (collectExpressionSuggestions(scanner.getTokenLength())) {
+                        return result;
+                    }
+
                     if (offset <= scanner.getTokenEnd()) {
                         return result;
                     }

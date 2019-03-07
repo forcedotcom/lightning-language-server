@@ -16,8 +16,7 @@ export class TagInfo {
         public location?: Location,
         public documentation?: string,
         public name?: string,
-        public namespace?: string, // properties/methods in the associated .js file: // TODO public properties?: ClassMember[], public methods?: ClassMember[],
-        // properties/methods in the associated .js file:
+        public namespace?: string,
         public properties?: ClassMember[],
         public methods?: ClassMember[],
     ) {

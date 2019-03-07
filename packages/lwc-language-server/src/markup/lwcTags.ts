@@ -44,17 +44,17 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         }
     }
 
-    // function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
-    //     const cTag = getLwcByTag(templateTag);
-    //     if (cTag) {
-    //         cTag.properties.forEach((metadata: ClassMember) => {
-    //             collector(metadata.name, null, null);
-    //         });
-    //         cTag.methods.forEach((metadata: ClassMember) => {
-    //             collector(metadata.name, null, null);
-    //         });
-    //     }
-    // }
+    function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+        const cTag = getLwcByTag(templateTag);
+        if (cTag) {
+            cTag.properties.forEach(metadata => {
+                collector(metadata.name, null, null);
+            });
+            cTag.methods.forEach(metadata => {
+                collector(metadata.name, null, null);
+            });
+        }
+    }
 
     function addDirectives(collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         LWC_DIRECTIVES.map(info => {
@@ -77,11 +77,10 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
         },
-        // TODO
-        // collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
-        //     addExpressions(templateTag, collector);
-        // },
-        // TODO don't remember what this did
-        // getTagInfo: (tag: string) => getLwcByTag(tag),
+
+        // TODO move this to ICompletionParticipant
+        collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
+            addExpressions(templateTag, collector);
+        },
     };
 }

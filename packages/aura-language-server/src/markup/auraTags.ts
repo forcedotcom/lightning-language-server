@@ -38,19 +38,14 @@ export function getAuraTagProvider(): IHTMLTagProvider {
 
     function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         const cTag = getAuraByTag(templateTag);
-        // if (cTag) {
-        //     cTag.properties.forEach(metadata => {
-        //         collector(metadata.name, null, null);
-        //     });
-        //     cTag.methods.forEach(metadata => {
-        //         collector(metadata.name, null, null);
-        //     });
-        // }
-        // TODO
-    }
-
-    function addDirectives(collector: (attribute: string, info: AttributeInfo, type: string) => void) {
-        // TODO
+        if (cTag) {
+            cTag.attributes.forEach(attribute => {
+                collector(attribute.name, null, null);
+            });
+            // cTag.methods.forEach(metadata => {
+            //     collector(metadata.name, null, null);
+            // });
+        }
     }
 
     return {
@@ -60,13 +55,15 @@ export function getAuraTagProvider(): IHTMLTagProvider {
             addTags(collector);
         },
         collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) => {
-            // addDirectives(collector);
             if (tag) {
                 addAttributes(tag, collector);
             }
         },
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
+        },
+        collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
+            addExpressions(templateTag, collector);
         },
     };
 }
