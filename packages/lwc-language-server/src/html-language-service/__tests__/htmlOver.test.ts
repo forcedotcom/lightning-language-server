@@ -6,6 +6,7 @@ import { Hover } from 'vscode-languageserver';
 
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 import * as fs from 'fs-extra';
+import { getLwcTagProvider } from '../../markup/lwcTags';
 
 beforeEach(() => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
@@ -34,6 +35,10 @@ function doHover(src: string) {
 
     const position = document.positionAt(offset);
     const ls = getLanguageService();
+    if (ls.getTagProviders().length === 0) {
+        // Only add the tag provider once
+        ls.addTagProvider(getLwcTagProvider());
+    }
     const htmlDoc = ls.parseHTMLDocument(document);
     const hover: Hover = ls.doHover(document, position, htmlDoc);
 
