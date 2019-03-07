@@ -60,6 +60,7 @@ function assertHover(src: string, expectedMarkdownValue?: string, expectedHoverO
     }
 }
 
+// TODO we should really be using snapshots for this rather than handcoded HTML strings
 it('UC: hover is shown for standard and custom tags/attributes', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
@@ -83,8 +84,7 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
     // standard component with multiple -
     assertHover(
         '<lightning-formatted-num|ber></lightning-formatted-number>',
-        '```html\n<lightning-formatted-number>\n```\nDisplays formatted numbers for decimals, currency, and percentages.\n\n\n' +
-            'https://developer.salesforce.com/docs/component-library/bundle/lightning-formatted-number',
+        '```html\n<lightning-formatted-number>\n```\nDisplays formatted numbers for decimals, currency, and percentages.',
     );
 
     // custom tags
@@ -97,5 +97,5 @@ it('UC: hover is shown for standard and custom tags/attributes', async () => {
 
     // custom tags from utils package
     assertNoHover('|<c-todo_util></c-todo_util>');
-    assertHover('<c-todo_ut|il></c-todo_util>', '```html\n<c-todo_util>\n```\nLWC element');
+    assertHover('<c-todo_ut|il></c-todo_util>', '```html\n<c-todo_util>\n```\n\n### Attributes\n* **info**\n* **icon-name**\n* **upper-c-a-s-e**\n');
 });

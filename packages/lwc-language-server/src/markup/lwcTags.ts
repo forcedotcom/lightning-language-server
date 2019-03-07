@@ -93,5 +93,6 @@ export function getLwcTagProvider(): IHTMLTagProvider {
             addExpressions(templateTag, collector);
         },
         getTagInfo: (tag: string) => getLwcByTag(tag),
+        getGlobalAttributes: () => LWC_DIRECTIVES,
     };
 }

@@ -70,8 +70,10 @@ export interface IHTMLTagProvider {
     collectTags(collector: (tag: string, label: string, info: TagInfo) => void): void;
     collectAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void;
     collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
-    getTagInfo: (tag: string) => TagInfo;
-    //TODO HACK - remove later
+    // TODO these are a bit hacky and not part of the original html tag provider interface
+    // we should see if we can utilize existing htmlLS functions to accomplish the same thing
+    getTagInfo(tag: string): TagInfo;
+    getGlobalAttributes(): AttributeInfo[];
     collectExpressionValues(templateTag: string, collector: (value: string) => void): void;
 }
 

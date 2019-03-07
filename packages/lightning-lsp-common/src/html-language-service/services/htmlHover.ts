@@ -45,17 +45,24 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
                     return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
                 }
             }
+            // If we don't match on tags / attributes, see if we match any directives
+            const directiveInfo = getAttributeInfo(name, provider.getGlobalAttributes());
+            if (directiveInfo) {
+                const markdown = ['**' + name + '**', '', directiveInfo.documentation];
+                return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
+            }
         }
-        // TODO directives
-        // const directiveInfo = getDirectiveInfo(name);
-        // if (directiveInfo) {
-        //     const markdown = [
-        //         '**' + name + '**',
-        //         '',
-        //         directiveInfo.documentation
-        //     ];
-        //     return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
-        // }
+
+        return null;
+    }
+
+    // Ugh, dumb
+    function getAttributeInfo(label: string, globalAttributes: AttributeInfo[]): AttributeInfo | null {
+        for (const info of globalAttributes) {
+            if (label === info.name) {
+                return info;
+            }
+        }
         return null;
     }
 

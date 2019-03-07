@@ -79,5 +79,6 @@ export function getAuraTagProvider(): IHTMLTagProvider {
             addExpressions(templateTag, collector);
         },
         getTagInfo: (tag: string) => getAuraByTag(tag),
+        getGlobalAttributes: () => [],
     };
 }
