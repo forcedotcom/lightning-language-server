@@ -225,11 +225,13 @@ export default class AuraIndexer implements Indexer {
         const data = await fs.readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
         const auraStandard = JSON.parse(data);
         for (const tag in auraStandard) {
-            // TODO need to account for LWC tags here
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraStandard[tag];
                 const info = new TagInfo(null, TagType.STANDARD, false, []);
                 if (tagObj.attributes) {
+                    tagObj.attributes.sort( (a, b) => {
+                        return a.name.localeCompare(b.name);
+                    });
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
                         info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
