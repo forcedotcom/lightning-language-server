@@ -41,7 +41,14 @@ const ForAllProps_Purgeable = infer.constraint({
 });
 
 async function readFile(filename) {
-    return fs.readFileSync(filename, 'utf-8');
+    try {
+        return fs.readFileSync(filename, 'utf-8');
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            return '';
+        }
+        throw e;
+    }
 }
 
 function getFilename(filename) {
@@ -560,7 +567,7 @@ function findAndBindComponent(type, server, cx, infer) {
 
 function findAndBindHelper(type, server, modules, file) {
     var helperFile = getHelper(file.name);
-    
+
     var bn = trimExt(baseName(helperFile));
     var r = server.findFile(helperFile);
     if (!r) server.addFile(helperFile);

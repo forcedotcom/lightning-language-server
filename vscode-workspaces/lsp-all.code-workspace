@@ -15,6 +15,9 @@
 		{
 			"name": "LWC-LSP",
 			"path": "../packages/lwc-language-server"
+		},
+		{
+			"path": "../node_modules"
 		}
 	],
 	"settings": {

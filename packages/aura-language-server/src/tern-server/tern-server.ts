@@ -144,7 +144,6 @@ async function loadBuiltIn(plugin: string, rootPath: string) {
 export async function startServer(rootPath: string, wsroot: string) {
     const defs = findDefs(defaultLibs);
     const plugins = await loadPlugins(defaultPlugins, rootPath);
-
     const config: tern.ConstructorOptions = {
         ...defaultConfig,
         defs,
@@ -152,6 +151,7 @@ export async function startServer(rootPath: string, wsroot: string) {
         // @ts-ignore 2345
         projectDir: rootPath,
         getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
+            // note: this isn't invoked
             fs.readFile(path.resolve(rootPath, filename), 'utf8', callback);
         },
     };
