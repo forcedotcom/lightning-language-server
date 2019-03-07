@@ -9,6 +9,7 @@ import { createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, Position, Hover, MarkedString, MarkupKind } from 'vscode-languageserver-types';
 import { getTagProviders } from './tagProviders';
 import { TokenType } from '../htmlLanguageTypes';
+import { AttributeInfo } from '../../indexer/attributeInfo';
 
 export function doHover(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Hover | null {
     let offset = document.offsetAt(position);
@@ -39,6 +40,31 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
         return null;
     }
 
+    function getAttributeHover(tag: string, name: string, range: Range): Hover | null {
+        tag = tag.toLowerCase();
+        for (const provider of tagProviders) {
+            const tagInfo = provider.getTagInfo(tag);
+            if (tagInfo) {
+                const attrInfo = tagInfo.getAttributeInfo(name);
+                if (attrInfo) {
+                    const markdown = ['**' + name + '**', '', attrInfo.documentation || ''];
+                    return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
+                }
+            }
+        }
+        // TODO directives
+        // const directiveInfo = getDirectiveInfo(name);
+        // if (directiveInfo) {
+        //     const markdown = [
+        //         '**' + name + '**',
+        //         '',
+        //         directiveInfo.documentation
+        //     ];
+        //     return { contents: { kind: MarkupKind.Markdown, value: markdown.join('\n') }, range };
+        // }
+        return null;
+    }
+
     function getTagNameRange(tokenType: TokenType, startOffset: number): Range | null {
         let scanner = createScanner(document.getText(), startOffset);
         let token = scanner.scan();
@@ -63,5 +89,11 @@ export function doHover(document: TextDocument, position: Position, htmlDocument
     if (tagRange) {
         return getTagHover(node.tag, tagRange, true);
     }
+
+    const attributeRange = getTagNameRange(TokenType.AttributeName, node.start);
+    if (attributeRange) {
+        return getAttributeHover(node.tag, document.getText(attributeRange), attributeRange);
+    }
+
     return null;
 }

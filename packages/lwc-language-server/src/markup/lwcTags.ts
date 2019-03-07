@@ -92,5 +92,6 @@ export function getLwcTagProvider(): IHTMLTagProvider {
         collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
             addExpressions(templateTag, collector);
         },
+        getTagInfo: (tag: string) => getLwcByTag(tag),
     };
 }

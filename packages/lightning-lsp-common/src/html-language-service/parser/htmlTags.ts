@@ -70,6 +70,7 @@ export interface IHTMLTagProvider {
     collectTags(collector: (tag: string, label: string, info: TagInfo) => void): void;
     collectAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void;
     collectValues(tag: string, attribute: string, collector: (value: string) => void): void;
+    getTagInfo: (tag: string) => TagInfo;
     //TODO HACK - remove later
     collectExpressionValues(templateTag: string, collector: (value: string) => void): void;
 }
