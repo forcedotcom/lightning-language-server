@@ -96,7 +96,9 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
                 });
             }
             info.documentation = lwcStandard[tag].description;
+            // TODO this needs cleanup for things outside the lightning namespace
             info.name = 'lightning-' + tag;
+            info.namespace = 'lightning';
             await setCustomTag(context, info, writeConfigs);
         }
     }

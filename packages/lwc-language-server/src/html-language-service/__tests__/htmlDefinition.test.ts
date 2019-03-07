@@ -6,6 +6,9 @@ import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 import * as fs from 'fs-extra';
 import { getLwcTagProvider } from '../../markup/lwcTags';
 
+// Need for debugging
+// jest.setTimeout(30000);
+
 beforeEach(() => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';

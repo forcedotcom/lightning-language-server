@@ -73,7 +73,7 @@ export class HTMLCompletion {
                     result.items.push({
                         label: tag,
                         kind: CompletionItemKind.Property,
-                        detail: 'Aura Element',
+                        detail: 'Lightning',
                         documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
                         textEdit: TextEdit.replace(range, tag),
                         insertTextFormat: InsertTextFormat.PlainText,
@@ -137,7 +137,7 @@ export class HTMLCompletion {
                     result.items.push({
                         label: '/' + tag,
                         kind: CompletionItemKind.Property,
-                        detail: 'Aura Element',
+                        detail: 'Lightning',
                         documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
                         filterText: '/' + tag + closeTag,
                         textEdit: TextEdit.replace(range, '/' + tag + closeTag),
