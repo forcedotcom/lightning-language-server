@@ -4,6 +4,7 @@ import { loadStandardComponents, indexCustomComponents } from '../../metadata-ut
 import { WorkspaceContext } from 'lightning-lsp-common';
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 import * as fs from 'fs-extra';
+import { getLwcTagProvider } from '../../markup/lwcTags';
 
 beforeEach(() => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
@@ -32,6 +33,10 @@ function assertDefinition(value: string, expectedUri?: string, expectedRange?: R
 
     const position = document.positionAt(offset);
     const ls = getLanguageService();
+    if (ls.getTagProviders().length === 0) {
+        // Only add the tag provider once
+        ls.addTagProvider(getLwcTagProvider());
+    }
     const htmlDoc = ls.parseHTMLDocument(document);
 
     const location: Location = ls.findDefinition(document, position, htmlDoc);

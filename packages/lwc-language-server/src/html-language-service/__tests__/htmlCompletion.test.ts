@@ -48,7 +48,10 @@ function testCompletion(content: string, matchers: ICompletionMatcher[] = [], sf
     const document = TextDocument.create(docName, 'html', 0, before + after);
     const position = Position.create(0, before.length);
     const ls = getLanguageService();
-    ls.addTagProvider(getLwcTagProvider());
+    if (ls.getTagProviders().length === 0) {
+        // Only add the tag provider once
+        ls.addTagProvider(getLwcTagProvider());
+    }
     const htmlDocument = ls.parseHTMLDocument(document);
     const items = ls.doComplete(document, position, htmlDocument, { isSfdxProject: sfdxProject });
 

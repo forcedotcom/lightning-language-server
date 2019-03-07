@@ -30,10 +30,10 @@ export function getDirectiveInfo(label: string): AttributeInfo | null {
 export function getLwcCompletionParticipant(): ICompletionParticipant {
     return {
         onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
-            const temp = context.document.uri;
+            return;
         },
         onHtmlContent: (context: HtmlContentContext): void => {
-            const temp = context.document.uri;
+            return;
         },
     };
 }

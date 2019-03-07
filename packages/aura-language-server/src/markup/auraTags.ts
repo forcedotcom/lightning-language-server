@@ -23,10 +23,10 @@ export function setIndexer(idx: AuraIndexer) {
 export function getAuraCompletionParticipant(): ICompletionParticipant {
     return {
         onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
-            const temp = context.document.uri;
+            return;
         },
         onHtmlContent: (context: HtmlContentContext): void => {
-            const temp = context.document.uri;
+            return;
         },
     };
 }
