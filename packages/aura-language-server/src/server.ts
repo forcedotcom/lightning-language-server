@@ -145,7 +145,7 @@ connection.onCompletion(
         if (await context.isAuraJavascript(document)) {
             return onCompletion(completionParams);
         }
-        return null;
+        return { isIncomplete: false, items: [] };
     },
 );
 
