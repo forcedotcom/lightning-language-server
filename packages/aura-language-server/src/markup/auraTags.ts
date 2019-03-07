@@ -1,5 +1,5 @@
 import AuraIndexer from '../aura-indexer/indexer';
-import { TagInfo, AttributeInfo, IHTMLTagProvider} from 'lightning-lsp-common';
+import { TagInfo, AttributeInfo, IHTMLTagProvider, ICompletionParticipant, HtmlContentContext, HtmlAttributeValueContext} from 'lightning-lsp-common';
 
 let indexer: AuraIndexer;
 
@@ -20,7 +20,18 @@ export function setIndexer(idx: AuraIndexer) {
     indexer = idx;
 }
 
-export function getAuraTagProvider(): IHTMLTagProvider {
+export function getAuraCompletionParticipant(): ICompletionParticipant {
+    return {
+        onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
+            const temp = context.document.uri;
+        },
+        onHtmlContent: (context: HtmlContentContext): void => {
+            const temp = context.document.uri;
+        },
+    };
+}
+
+export function getAuraTagProvider(): IHTMLTagProvider  {
     function addTags(collector: (tag: string, label: string, info: TagInfo) => void) {
         for (const [tag, tagInfo] of getAuraTags()) {
             collector(tag, tagInfo.getHover(), tagInfo);
@@ -62,6 +73,8 @@ export function getAuraTagProvider(): IHTMLTagProvider {
         collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
             // TODO provide suggestions by consulting shapeService
         },
+
+        // TODO move this to ICompletionParticipant
         collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
             addExpressions(templateTag, collector);
         },

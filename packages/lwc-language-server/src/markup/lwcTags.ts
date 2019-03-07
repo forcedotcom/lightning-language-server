@@ -1,5 +1,4 @@
-import { IHTMLTagProvider } from 'lightning-lsp-common';
-import { TagInfo, AttributeInfo } from 'lightning-lsp-common';
+import { TagInfo, AttributeInfo, IHTMLTagProvider, ICompletionParticipant, HtmlContentContext, HtmlAttributeValueContext } from 'lightning-lsp-common';
 import { getLwcTags, getLwcByTag } from '../metadata-utils/custom-components-util';
 // import { ClassMember } from '@lwc/babel-plugin-component';
 
@@ -26,6 +25,17 @@ export function getDirectiveInfo(label: string): AttributeInfo | null {
         }
     }
     return null;
+}
+
+export function getLwcCompletionParticipant(): ICompletionParticipant {
+    return {
+        onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
+            const temp = context.document.uri;
+        },
+        onHtmlContent: (context: HtmlContentContext): void => {
+            const temp = context.document.uri;
+        },
+    };
 }
 
 export function getLwcTagProvider(): IHTMLTagProvider {
