@@ -15,18 +15,25 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
         return null;
     }
     const tagProviders = getTagProviders().filter(p => p.isApplicable(document.languageId));
+
     function getTagLocation(tag: string): Location | null {
-        tag = tag.toLowerCase();
         for (const provider of tagProviders) {
-            let location = null;
-            provider.collectTags((t, label, info) => {
-                if (t === tag && info.location) {
-                    // TODO validate this works
-                    location = info.location;
+            const info = provider.getTagInfo(tag);
+            if (info && info.location) {
+                return info.location;
+            }
+        }
+        return null;
+    }
+
+    function getAttributeLocation(tag: string, attribute: string): Location | null {
+        for (const provider of tagProviders) {
+            const tagInfo = provider.getTagInfo(tag);
+            if (tagInfo) {
+                const attrInfo = tagInfo.getAttributeInfo(attribute);
+                if (attrInfo && attrInfo.location) {
+                    return attrInfo.location;
                 }
-            });
-            if (location) {
-                return location;
             }
         }
         return null;
@@ -56,5 +63,11 @@ export function findDefinition(document: TextDocument, position: Position, htmlD
     if (tagRange) {
         return getTagLocation(node.tag);
     }
+
+    const attributeRange = getTagNameRange(TokenType.AttributeName, node.start);
+    if (attributeRange) {
+        return getAttributeLocation(node.tag, document.getText(attributeRange));
+    }
+
     return null;
 }
