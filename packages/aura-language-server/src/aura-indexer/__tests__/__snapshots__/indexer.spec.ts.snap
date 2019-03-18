@@ -225,6 +225,13 @@ Map {
       },
       AttributeInfo {
         "detail": "Aura Attribute",
+        "documentation": "The description of this library",
+        "location": undefined,
+        "name": "description",
+        "type": "String",
+      },
+      AttributeInfo {
+        "detail": "Aura Attribute",
         "documentation": "A comma-separated list of modes that use the client library. If no value is set, the library is available for all modes.",
         "location": undefined,
         "name": "modes",
@@ -249,13 +256,6 @@ Map {
         "documentation": "The external URL or path to the file on the server for the library. Examples are: https://jquery.org/latest/jquery.js || /absolute/path/to/file.js || relative/path/to/file.css",
         "location": undefined,
         "name": "url",
-        "type": "String",
-      },
-      AttributeInfo {
-        "detail": "Aura Attribute",
-        "documentation": "The description of this library",
-        "location": undefined,
-        "name": "description",
         "type": "String",
       },
     ],
@@ -1255,9 +1255,9 @@ Map {
     "attributes": Array [
       AttributeInfo {
         "detail": "",
-        "documentation": "todo jsdoc",
+        "documentation": undefined,
         "location": undefined,
-        "name": "todo",
+        "name": "nextLine",
         "type": undefined,
       },
       AttributeInfo {
@@ -1269,9 +1269,9 @@ Map {
       },
       AttributeInfo {
         "detail": "",
-        "documentation": undefined,
+        "documentation": "todo jsdoc",
         "location": undefined,
-        "name": "nextLine",
+        "name": "todo",
         "type": undefined,
       },
     ],
@@ -1303,14 +1303,14 @@ Map {
         "detail": "",
         "documentation": undefined,
         "location": undefined,
-        "name": "info",
+        "name": "iconName",
         "type": undefined,
       },
       AttributeInfo {
         "detail": "",
         "documentation": undefined,
         "location": undefined,
-        "name": "iconName",
+        "name": "info",
         "type": undefined,
       },
       AttributeInfo {
@@ -12779,17 +12779,17 @@ Map {
 exports[`aura indexer 3`] = `
 Array [
   "aura",
-  "lightning",
-  "forceChatter",
-  "ui",
-  "forceCommunity",
-  "wave",
-  "force",
-  "lightningsnapin",
-  "clients",
-  "ltng",
-  "lightningcommunity",
-  "flexipage",
   "c",
+  "clients",
+  "flexipage",
+  "force",
+  "forceChatter",
+  "forceCommunity",
+  "lightning",
+  "lightningcommunity",
+  "lightningsnapin",
+  "ltng",
+  "ui",
+  "wave",
 ]
 `;

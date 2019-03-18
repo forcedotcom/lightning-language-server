@@ -25,6 +25,7 @@ it('aura indexer', async () => {
 
     let markup = await context.findAllAuraMarkup();
     markup = markup.map(p => normalize(full, p));
+    markup = markup.sort();
     expect(markup).toMatchSnapshot();
 
     const tags = auraIndexer.getAuraTags();
@@ -35,10 +36,13 @@ it('aura indexer', async () => {
         if (taginfo.location && taginfo.location.uri) {
             taginfo.location.uri = normalize(full, uriToFile(taginfo.location.uri));
         }
+        if (taginfo.attributes) {
+            taginfo.attributes = taginfo.attributes.sort((a, b) => a.name.localeCompare(b.name));
+        }
     });
     const sortedTags = new Map([...tags.entries()].sort());
     expect(sortedTags).toMatchSnapshot();
 
-    const namespaces = auraIndexer.getAuraNamespaces();
+    const namespaces = auraIndexer.getAuraNamespaces().sort();
     expect(namespaces).toMatchSnapshot();
 });

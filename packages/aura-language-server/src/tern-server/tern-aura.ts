@@ -1,5 +1,5 @@
-import * as infer from 'tern/lib/infer';
-import * as tern from 'tern/lib/tern';
+import * as infer from '../tern/lib/infer';
+import * as tern from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,7 +7,7 @@ import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibIm
 
 const WG_IMPORT_DEFAULT_FALLBACK = 80;
 const WG_DEFAULT_EXPORT = 95;
-let server = {};
+let server: any = {};
 
 let shouldFilter = false;
 /* tslint:disable */
@@ -41,8 +41,17 @@ const ForAllProps_Purgeable = infer.constraint({
 });
 
 async function readFile(filename) {
+    let normalized = filename;
+    if (!normalized.startsWith('/')) {
+        normalized = getFilename(normalized);
+    }
+
+    if (isBlacklisted(normalized)) {
+        return '';
+    }
+
     try {
-        return fs.readFileSync(filename, 'utf-8');
+        return fs.readFileSync(normalized, 'utf-8');
     } catch (e) {
         if (e.code === 'ENOENT') {
             return '';
@@ -636,20 +645,6 @@ function isBlacklisted(filename) {
 }
 
 function readFileAsync(filename, c) {
-    if (isBlacklisted(filename)) {
-        c(null, '');
-        return;
-    }
-    if (!filename.startsWith('/')) {
-        filename = getFilename(filename);
-    }
-
-    if (filename.indexOf('.link') >= 0) {
-        readFile(filename).then(function(contents) {
-            c(null, contents);
-        });
-        return;
-    }
     readFile(filename).then(function(contents) {
         c(null, contents);
     });

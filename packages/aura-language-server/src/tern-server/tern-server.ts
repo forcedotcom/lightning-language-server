@@ -1,8 +1,8 @@
 import fs from 'fs';
-import * as tern from 'tern';
+import * as tern from '../tern/lib/tern';
 import path from 'path';
 import * as util from 'util';
-import * as infer from 'tern/lib/infer';
+import * as infer from '../tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import { readFileSync, readdirSync, statSync } from 'fs';
@@ -29,6 +29,24 @@ interface ITernServer extends tern.Server {
     files: ITernFile[];
     cx: any;
     normalizeFilename(file: string): string;
+    /**
+     * Register a file with the server. Note that files can also be included in requests. When using this
+     * to automatically load a dependency, specify the name of the file (as Tern knows it) as the third
+     * argument. That way, the file is counted towards the dependency budget of the root of its dependency graph.
+     */
+    addFile(name: string, text?: string, parent?: string): void;
+    /** Unregister a file. */
+    delFile(name: string): void;
+    /** Forces all files to be fetched an analyzed, and then calls the callback function. */
+    flush(callback: () => void): void;
+    /**
+     * Perform a request. `doc` is a (parsed) JSON document as described in the protocol documentation.
+     * The `callback` function will be called when the request completes. If an `error` occurred,
+     * it will be passed as a first argument. Otherwise, the `response` (parsed) JSON object will be passed as second argument.
+     *
+     * When the server hasn’t been configured to be asynchronous, the callback will be called before request returns.
+     */
+    request(doc: any, callback: any): void;
 }
 interface ITernFile {
     name: string;
@@ -63,7 +81,7 @@ function readJSON(fileName) {
 }
 
 function findDefs(libs) {
-    const ternlibpath = require.resolve('tern');
+    const ternlibpath = require.resolve('../tern/lib/tern');
     const ternbasedir = path.join(ternlibpath, '../..');
 
     const defs = [];
@@ -120,7 +138,7 @@ async function loadLocal(plugin, rootPath) {
 }
 
 async function loadBuiltIn(plugin: string, rootPath: string) {
-    const ternlibpath = require.resolve('tern');
+    const ternlibpath = require.resolve('../tern/lib/tern');
     const ternbasedir = path.join(ternlibpath, '../..');
 
     const def = path.join(ternbasedir, 'plugin', plugin);
