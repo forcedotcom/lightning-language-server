@@ -15,11 +15,10 @@ cd ~/git/LSP
 ```
 
 ### Clone this repo and DX Plugins 
-(TODO update doc to point at non-fork version of DX when we merge back)
 
 ```
 git clone git@git.soma.salesforce.com:lightning-tools/lightning-language-server.git
-git clone git@github.com:midzelis/salesforcedx-vscode.git
+git clone git@github.com:forcedotcom/salesforcedx-vscode.git
 ```
 
 ### Setup lightning-language-server
@@ -29,14 +28,13 @@ cd lightning-language-server
 yarn install
 yarn link-lsp
 ```
-(Note: if link-lsp fails because it can't find the common plugin just run 'lerna exec yarn link')
 
 ### Setup the DX Plugins
 
 ```
 cd ../salesforcedx-vscode
-npm run link-lsp
 npm install
+npm run link-lsp
 npm run compile
 ```
 
