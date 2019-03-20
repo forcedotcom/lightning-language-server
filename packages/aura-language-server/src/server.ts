@@ -36,7 +36,6 @@ import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
-export * from './shared';
 
 interface ITagParams {
     taginfo: TagInfo;
