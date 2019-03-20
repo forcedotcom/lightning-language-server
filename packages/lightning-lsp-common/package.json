@@ -11,15 +11,13 @@
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && yarn copy-static-assets && scripts/copy_typings.js && cp -r src/resources lib/",
-    "watch": "tsc -p . && yarn copy-static-assets && scripts/copy_typings.js && cp -r src/resources lib/ && tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
-    "postinstall": "yarn build",
+    "watch": "tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "copy-static-assets": "ts-node copy-static-assets.ts",
     "test": "jest --runInBand src",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prepare": "yarn clean && yarn build",
     "precommit": "lint-staged",
     "prepush": "yarn prepare && yarn lint && yarn test"
   },
