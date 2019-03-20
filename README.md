@@ -39,18 +39,36 @@ npm run compile
 ```
 
 ### Recompile LSP on changes
+
 ```
 cd ../lightning-language-server
 yarn watch
 ```
 
+### Testing
+Runs all our tests across every package
+
+```
+yarn test
+```
+
+### Publishing
+Login to the lwcjs npm registry using the 'lwcadmin' credentials. Note: package versions will be updated as part of the lerna publish command, so you don't need to update them yourself.
+
+```
+npm login --registry https://npm.lwcjs.org
+lerna publish
+```
+
 ### Open VSCode Workspace
+This workspace has top level folders for lightning-lsp-common / aura-language-server / lwc-language-server / DX so you can see everything from a single workspace.
+
 ```
 code ./vscode-workspaces/lsp-all.code-workspace
 ```
 
 ### Launch VSCode Debug
-Run 'Launch DX - Aura & LWC' from VSCode
+Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). Note: you need to restart vscode each time you make language server changes (even though the file watcher is compiling them on the fly). Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
 
 ### Debugging Language Server when it doesn't startup
 TODO
