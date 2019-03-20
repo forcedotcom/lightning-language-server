@@ -1,6 +1,6 @@
 {
   "name": "lightning-lsp-common",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Common components for lwc-language-server and aura-language-server",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -34,13 +34,13 @@
     "vscode-languageserver": "^5.2.1"
   },
   "devDependencies": {
-    "@types/deep-equal": "^1.0.1",
-    "@types/lodash.template": "^4.4.4",
     "@types/decamelize": "^1.2.0",
+    "@types/deep-equal": "^1.0.1",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
     "@types/jest": "^23.3.12",
     "@types/lodash": "^4.14.119",
+    "@types/lodash.template": "^4.4.4",
     "@types/semver": "^5.5.0",
     "@types/tmp": "0.0.33",
     "find-node-modules": "^1.0.4",
