@@ -9,14 +9,16 @@
     "clean": "rm -rf lib",
     "build": "tsc -p . && yarn copy-static-assets",
     "watch": "tsc -p . && yarn copy-static-assets && tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
-    "transpile-only": "tsc-transpile-only && yarn copy-static-assets",
+    "postinstall": "yarn build",
     "copy-static-assets": "ts-node copy-static-assets.ts",
-    "prepare": "yarn clean && yarn build",
     "test": "jest --runInBand src",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand src",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand src",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "yarn clean && yarn build",
+    "precommit": "lint-staged",
+    "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
     "@types/lazy.js": "^0.3.32",

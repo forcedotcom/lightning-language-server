@@ -14,6 +14,7 @@
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/* src",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "yarn clean && yarn build",
     "precommit": "lint-staged",
     "prepush": "yarn prepare && yarn lint && yarn test"
   },
