@@ -19,8 +19,6 @@
     "prepush": "yarn prepare && yarn lint && yarn test"
   },
   "dependencies": {
-    "@types/lazy.js": "^0.3.32",
-    "@types/shelljs": "^0.8.1",
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
@@ -41,8 +39,6 @@
     "properties": "1.2.1",
     "resolve-from": "2.0.0",
     "shelljs": "^0.8.3",
-    "tmp": "0.0.33",
-    "ts-node": "^7.0.1",
     "vscode-languageserver": "^5.2.1",
     "vscode-nls": "^4.0.0",
     "vscode-uri": "^1.0.6",
@@ -54,8 +50,9 @@
     "@types/fs-extra": "5.0.4",
     "@types/glob": "5.0.35",
     "@types/jest": "23.3.1",
+    "@types/lazy.js": "^0.3.32",
     "@types/node": "8.10.0",
-    "@types/tmp": "0.0.33",
+    "@types/shelljs": "^0.8.1",
     "@types/xml2js": "0.4.3",
     "babel-types": "6.26.0",
     "husky": "0.14.3",
@@ -64,6 +61,7 @@
     "npm-run": "^5.0.1",
     "prettier": "1.16.4",
     "ts-jest": "23.1.3",
+    "ts-node": "^7.0.1",
     "tsc-transpile-only": "0.0.3",
     "tslint": "5.11.0",
     "typescript": "3.1.6"
