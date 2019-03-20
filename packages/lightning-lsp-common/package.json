@@ -1,6 +1,6 @@
 {
   "name": "lightning-lsp-common",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Common Indexer for Lightning LSPs",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
