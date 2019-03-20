@@ -68,6 +68,5 @@
   },
   "publishConfig": {
     "registry": "https://npm.lwcjs.org"
-  },
-  "gitHead": "d1f09da92c39deae8b6a822d4edd79078e59e7f4"
+  }
 }
