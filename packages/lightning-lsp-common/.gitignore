@@ -3,4 +3,6 @@ lib
 .DS_Store
 .sfdx
 .project
-copied
+coverage/
+src/resources/sfdx/typings/copied/
+yarn-error.log
