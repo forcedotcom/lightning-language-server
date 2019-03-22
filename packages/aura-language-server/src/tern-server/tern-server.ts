@@ -82,7 +82,7 @@ function readJSON(fileName) {
 
 function findDefs(libs) {
     const ternlibpath = require.resolve('../tern/lib/tern');
-    const ternbasedir = path.join(ternlibpath, '../..');
+    const ternbasedir = path.join(ternlibpath, '..', '..');
 
     const defs = [];
     const src = libs.slice();
@@ -139,7 +139,7 @@ async function loadLocal(plugin, rootPath) {
 
 async function loadBuiltIn(plugin: string, rootPath: string) {
     const ternlibpath = require.resolve('../tern/lib/tern');
-    const ternbasedir = path.join(ternlibpath, '../..');
+    const ternbasedir = path.join(ternlibpath, '..', '..');
 
     const def = path.join(ternbasedir, 'plugin', plugin);
 
@@ -247,7 +247,7 @@ async function ternInit() {
             // shouldFilter: true,
         },
     });
-    const resources = path.join(__dirname, '../../resources/aura');
+    const resources = path.join(__dirname, '..', '..', 'resources', 'aura');
     const found = [...walkSync(resources)];
     let [lastFile, lastText] = [undefined, undefined];
     for (const file of found) {
