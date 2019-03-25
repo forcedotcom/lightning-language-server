@@ -31,7 +31,6 @@ export function componentFromDirectory(file: string, sfdxProject: boolean) {
 }
 
 function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
-
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = filePath.dir.split(path.sep);
@@ -43,13 +42,12 @@ function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string,
     return null;
 }
 function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
-
     const filePath = path.parse(file);
     if (sfdxProject) {
         return converter('c', filePath.name);
     } else {
         // TODO verify
-        return converter(filePath.dir.split(path.sep).pop() , filePath.name);
+        return converter(filePath.dir.split(path.sep).pop(), filePath.name);
     }
 }
 
@@ -75,6 +73,12 @@ function tagName(namespace: string, tag: string) {
 }
 
 function moduleName(namespace: string, tag: string) {
+    if (namespace === 'interop') {
+        // treat interop as lightning, i.e. needed when using extension with lightning-global
+        // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
+        namespace = 'lightning';
+    }
+
     // convert camel-case to hyphen-case/kebab-case
     return namespace + '/' + tag;
     // TODO confirm we shouldn't be doing this anymore
