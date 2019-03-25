@@ -103,23 +103,23 @@ it('isLWCJavascript()', async () => {
 
     // lwc .js
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
-    expect(await (context.isLWCJavascript(document))).toBeTruthy();
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
 
     // lwc .htm
     document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
-    expect(await (context.isLWCJavascript(document))).toBeFalsy();
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // aura cmps
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
-    expect(await (context.isLWCJavascript(document))).toBeFalsy();
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // .js outside namespace roots
     document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
-    expect(await (context.isLWCJavascript(document))).toBeFalsy();
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // lwc .js in utils
     document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
-    expect(await (context.isLWCJavascript(document))).toBeTruthy();
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
 });
 
 it('configureSfdxProject()', async () => {
@@ -159,6 +159,7 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigForceApp.include[0]).toBe('**/*');
     expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
     // verify updated jsconfig.json
     const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
     expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
@@ -168,6 +169,7 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigUtils.include[0]).toBe('util/*.js');
     expect(jsconfigUtils.include[1]).toBe('**/*');
     expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
 
     // verify newly created .eslintrc.json
     const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
@@ -255,6 +257,7 @@ function verifyJsconfigCore(jsconfigPath: string) {
     expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfig.include[0]).toBe('**/*');
     expect(jsconfig.include[1]).toBe('../../.vscode/typings/lwc/**/*.d.ts');
+    expect(jsconfig.typeAcquisition).toEqual({ include: ['jest'] });
     fs.removeSync(jsconfigPath);
 }
 
