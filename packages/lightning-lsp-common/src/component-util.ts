@@ -33,7 +33,7 @@ export function componentFromDirectory(file: string, sfdxProject: boolean) {
 function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string) {
     const filePath = path.parse(file);
     const fileName = filePath.name;
-    const pathElements = filePath.dir.split(path.sep);
+    const pathElements = splitPath(filePath);
     const parentDirName = pathElements.pop();
     if (fileName === parentDirName) {
         const namespace = sfdxProject ? 'c' : pathElements.pop();
@@ -47,8 +47,18 @@ function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: st
         return converter('c', filePath.name);
     } else {
         // TODO verify
-        return converter(filePath.dir.split(path.sep).pop(), filePath.name);
+        return converter(splitPath(filePath).pop(), filePath.name);
     }
+}
+
+// TODO investigate more why this happens
+function splitPath(filePath: path.ParsedPath): string[] {
+    let pathElements = filePath.dir.split(path.sep);
+    // Somehow on windows paths are occassionally using forward slash
+    if (path.sep === '\\' && filePath.dir.indexOf('\\') === -1) {
+        pathElements = filePath.dir.split('/');
+    }
+    return pathElements;
 }
 
 /**
