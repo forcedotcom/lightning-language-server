@@ -10,7 +10,7 @@
   },
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
-    "build": "tsc -p . && yarn copy-static-assets && scripts/copy_typings.js && cp -r src/resources lib/",
+    "build": "tsc -p . && yarn copy-static-assets && node ./scripts/copy_typings.js && cp -r src/resources lib/",
     "watch": "tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "copy-static-assets": "ts-node copy-static-assets.ts",
     "test": "jest --runInBand src",
