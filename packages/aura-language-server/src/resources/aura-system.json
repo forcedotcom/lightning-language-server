@@ -20,27 +20,6 @@
          },
          {
             "type": "String",
-            "description": "Addtional app cache urls",
-            "name": "additionalAppCacheURLs",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The server-side controller class for the app. The format is java://<package.class> or serviceComponent://<package.class>.",
-            "name": "controller",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The comma-separated list of flavor names in the component bundle, defined in the <componentName>Flavors.css file.",
-            "name": "defaultFlavor",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
             "description": "A brief description of the app.",
             "name": "description",
             "required": "false",
@@ -62,13 +41,6 @@
          },
          {
             "type": "String",
-            "description": "The external JavaScript helper file to use. If you use an external helper file, the helper methods in your component bundle will not be accessible. The format is js://namespace.component.",
-            "name": "helper",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
             "description": "A comma-separated list of interfaces that the app implements.",
             "name": "implements",
             "required": "false",
@@ -83,14 +55,7 @@
          },
          {
             "type": "String",
-            "description": "The model class used to initialize data for the app. The format is java://<package.class> or serviceComponent://<package.class>..",
-            "name": "model",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "Not sure what this does",
+            "description": "",
             "name": "preload",
             "required": "false",
             "access": "global"
@@ -99,13 +64,6 @@
             "type": "String",
             "description": "Renders the component using client-side or server-side renderers. If not provided, the framework determines any dependencies and whether the application should be rendered client-side or server-side. Valid options are client or server. The default is auto. For example, specify render='client' if you want to inspect the application on the client-side during testing.",
             "name": "render",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "Only use this system attribute if you want to use a custom client-side or server-side renderer. If you don't set a renderer, the framework uses its default rendering, which is sufficient for most use cases. If you don't define this system attribute, your application is autowired to a client-side renderer named <appName>Renderer.js, if it exists in your application bundle.",
-            "name": "renderer",
             "required": "false",
             "access": "global"
          },
@@ -120,13 +78,6 @@
             "type": "Component",
             "description": "The name of the template used to bootstrap the loading of the framework and the app. The default value is aura:template. You can customize the template by creating your own component that extends the default template. For example: <aura:component extends='aura:template' ... >",
             "name": "template",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "Boolean",
-            "description": "Specifies whether to use the application cache. Valid options are true or false. Defaults to false.",
-            "name": "useAppcache",
             "required": "false",
             "access": "global"
          },
@@ -168,7 +119,7 @@
          },
          {
             "type": "String",
-            "description": "Required. The name of the attribute. For example, if you set<aura:attribute name='isTrue' type='Boolean' /> on a component called aura:newCmp, you can set this attribute when you instantiate the component; for example,<aura:newCmp isTrue='false' />.",
+            "description": "Required. The name of the attribute. For example, if you set <aura:attribute name='isTrue' type='Boolean' /> on a component called aura:newCmp, you can set this attribute when you instantiate the component; for example,<aura:newCmp isTrue='false' />.",
             "required": "true",
             "name": "name",
             "access": "global"
@@ -211,7 +162,7 @@
          },
          {
             "type": "String",
-            "description": "The server-side controller class for the component. The format is java://<package.class> or serviceComponent://<package.class>..",
+            "description": "The server-side controller class for the component.",
             "name": "controller",
             "required": "false",
             "access": "global"
@@ -246,50 +197,8 @@
          },
          {
             "type": "String",
-            "description": "The external JavaScript helper file to use. If you use an external helper file, the helper methods in your component bundle will not be accessible. The format is js://namespace.component.",
-            "name": "helper",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
             "description": "A comma-separated list of interfaces that the component implements.",
             "name": "implements",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "Boolean",
-            "description": "Set to true if the component is a template. The default is false.",
-            "name": "isTemplate",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The model class used to initialize data for the component. The format is java://<package.class> or serviceComponent://<package.class>..",
-            "name": "model",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The JavaScript or Java provider, in the format java://<package.class> or js://namespace.component. A provider enables you to use an abstract component in markup. Defining a server-side provider overrides any client-side provider in the component bundle.",
-            "name": "provider",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "Renders the component using client-side or server-side renderers. If not provided, the framework determines any dependencies and whether the component should be rendered client- or server-side. Valid options are client or server. The default is auto. Specify this attribute in the top-level component. For example, specify render='client' if you want to inspect the component on the client-side during testing.",
-            "name": "render",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "Only use this system attribute if you want to use a custom client-side or server-side renderer. If you don't set a renderer, the framework uses its default rendering, which is sufficient for most use cases. If you don't define this system attribute, your component is autowired to a client-side renderer named <appName>Renderer.js, if it exists in your component bundle.",
-            "name": "renderer",
             "required": "false",
             "access": "global"
          },
@@ -297,13 +206,6 @@
             "type": "String",
             "description": "The support level for the component. Valid options are PROTO, DEPRECATED, BETA, or GA.",
             "name": "support",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "Component",
-            "description": "The template for this component. A template bootstraps loading of the framework and app. The default template is aura:template. You can customize the template by creating your own component that extends the default template.",
-            "name": "template",
             "required": "false",
             "access": "global"
          },
@@ -403,35 +305,6 @@
       ],
       "namespace": "aura"
    },
-   "aura:import": {
-      "type": "system",
-      "description": "Import an aura:library to be used within this component.",
-      "url": "http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
-      "attributes": [
-         {
-            "type": "String",
-            "description": "The description of this import",
-            "name": "description",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The library name to import. Example: library='namespace:MyLib'",
-            "required": "true",
-            "name": "library",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The property name this library will be referenced by in your component. For example: property='myLib'. The library can now be accessed at 'helper.myLib'.",
-            "required": "true",
-            "name": "property",
-            "access": "global"
-         }
-      ],
-      "namespace": "aura"
-   },
    "aura:interface": {
       "type": "system",
       "description": "Object-oriented languages, such as Java, support the concept of an interface that defines a set of method signatures. A class that implements the interface must provide the method implementations. An interface in Java can't be instantiated directly, but a class that implements the interface can. Similarly, Aura supports the concept of interfaces that define a component's shape by defining its attributes.",
@@ -460,87 +333,8 @@
          },
          {
             "type": "String",
-            "description": "The provider for the interface.",
-            "name": "provider",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
             "description": "The support level for the interface. Valid options are PROTO, DEPRECATED, BETA, or GA.",
             "name": "support",
-            "required": "false",
-            "access": "global"
-         }
-      ],
-      "namespace": "aura"
-   },
-   "aura:library": {
-      "type": "system",
-      "description": "A collection of javascript functions that can be reused accross components.",
-      "url": "http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
-      "attributes": [
-         {
-            "type": "String",
-            "description": "The description of this library",
-            "name": "description",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The support level for the library. Valid options are PROTO, DEPRECATED, BETA, or GA.",
-            "name": "support",
-            "required": "false",
-            "access": "global"
-         }
-      ],
-      "namespace": "aura"
-   },
-   "aura:clientLibrary": {
-      "type": "system",
-      "description": "The <aura:clientLibrary> tag enables you to specify JavaScript or CSS libraries that you want to use. Use the tag in a .cmp or .app resource. Here is some example markup for including client libraries in a component.",
-      "url": "http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_tag_clientlibrary.htm",
-      "attributes": [
-         {
-            "type": "String",
-            "description": "If set to true, the library is added to resources.js or resources.css. This option is only available for resources that are available on the local server, for example under the aura-resources folder. Combining libraries into one file can improve performance by reducing the number of requests, instead of a separate request for each library.",
-            "name": "combine",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "A comma-separated list of modes that use the client library. If no value is set, the library is available for all modes.",
-            "name": "modes",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The name of a ClientLibraryResolver that provides the URL. The name attribute is useful if the location or URL of the library needs to be dynamically generated. The name attribute is required if the url attribute is not specified; otherwise, it’s ignored. See <a href='http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/ref_tag_clientlibrary.htm#add_resolver_title'>Add a Client Library Resolver</a>",
-            "required": "true",
-            "name": "name",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The type of library. Values are CSS, or JS for JavaScript.",
-            "name": "type",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The external URL or path to the file on the server for the library. Examples are: https://jquery.org/latest/jquery.js || /absolute/path/to/file.js || relative/path/to/file.css",
-            "name": "url",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "The description of this library",
-            "name": "description",
             "required": "false",
             "access": "global"
          }
@@ -657,55 +451,6 @@
             "type": "String",
             "description": "The value to set on this attribute",
             "name": "value",
-            "required": "false",
-            "access": "global"
-         }
-      ],
-      "namespace": "aura"
-   },
-   "aura:theme": {
-      "type": "system",
-      "description": "",
-      "url": "http://aura-oss-dev.herokuapp.com/en-us/main/aura-oss/components_overview.htm",
-      "attributes": [
-         {
-            "type": "String",
-            "description": "",
-            "name": "access",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "",
-            "name": "description",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "Component",
-            "name": "extends",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "",
-            "name": "mapProvider",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "",
-            "name": "provider",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
-            "description": "",
-            "name": "support",
             "required": "false",
             "access": "global"
          }
