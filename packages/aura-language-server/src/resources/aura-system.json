@@ -169,13 +169,6 @@
          },
          {
             "type": "String",
-            "description": "The comma-separated list of flavor names in the component bundle, defined in the <componentName>Flavors.css file.",
-            "name": "defaultFlavor",
-            "required": "false",
-            "access": "global"
-         },
-         {
-            "type": "String",
             "description": "A description of the component.",
             "name": "description",
             "required": "false",
