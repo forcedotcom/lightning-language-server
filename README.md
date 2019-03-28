@@ -71,4 +71,4 @@ code ./vscode-workspaces/lsp-all.code-workspace
 Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). Note: you need to restart vscode each time you make language server changes (even though the file watcher is compiling them on the fly). Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
 
 ### Debugging Language Server when it doesn't startup
-TODO
+
