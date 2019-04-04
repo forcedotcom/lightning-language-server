@@ -5,8 +5,6 @@
         }
     ],
     "settings": {
-        "html.suggest.angular1": false,
-        "html.suggest.ionic": false,
         "files.exclude": {
             "**/.git": true,
             "**/.svn": true,
