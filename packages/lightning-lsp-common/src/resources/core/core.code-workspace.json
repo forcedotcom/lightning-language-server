@@ -57,6 +57,7 @@
         "java.debug.settings.enableHotCodeReplace": true,
         "java.jdt.ls.vmargs": "-noverify -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
         "java.trace.server": "messages",
-        "extensions.ignoreRecommendations": true
+        "extensions.ignoreRecommendations": true,
+        "salesforcedx-vscode-lightning.activationMode": "always"
     }
 }
