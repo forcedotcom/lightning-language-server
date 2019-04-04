@@ -1,4 +1,4 @@
-import { SourceLocation } from 'babel-types';
+import { SourceLocation, Decorator } from 'babel-types';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
@@ -7,7 +7,7 @@ import { DIAGNOSTIC_SOURCE } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
-import { AttributeInfo } from 'lightning-lsp-common';
+import { AttributeInfo, Decorator as DecoratorType, MemberType } from 'lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 
@@ -100,13 +100,29 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
     }
 }
 
-export function extractAttributes(metadata: Metadata, uri: string): AttributeInfo[] {
-    return getPublicReactiveProperties(metadata).map(x => {
-        const location = Location.create(uri, toVSCodeRange(x.loc));
+export function extractAttributes(metadata: Metadata, uri: string): { privateAttributes: AttributeInfo[]; publicAttributes: AttributeInfo[] } {
+    const publicAttributes: AttributeInfo[] = [];
+    const privateAttributes: AttributeInfo[] = [];
+    for (const x of getProperties(metadata)) {
+        if (x.decorator === 'api') {
+            const location = Location.create(uri, toVSCodeRange(x.loc));
 
-        const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-        return new AttributeInfo(name, x.doc, undefined, location, 'LWC custom attribute');
-    });
+            const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+            const memberType = x.type === 'property' ? MemberType.PROPERTY : MemberType.METHOD;
+            publicAttributes.push(new AttributeInfo(name, x.doc, memberType, DecoratorType.API, undefined, location, 'LWC custom attribute'));
+        } else {
+            const location = Location.create(uri, toVSCodeRange(x.loc));
+
+            const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
+            const memberType = x.type === 'property' ? MemberType.PROPERTY : MemberType.METHOD;
+            const decorator = x.decorator === 'track' ? DecoratorType.TRACK : undefined;
+            privateAttributes.push(new AttributeInfo(name, x.doc, memberType, decorator, undefined, location, 'LWC custom attribute'));
+        }
+    }
+    return {
+        publicAttributes,
+        privateAttributes,
+    };
 }
 
 // TODO: proper type for 'err' (i.e. SyntaxError)

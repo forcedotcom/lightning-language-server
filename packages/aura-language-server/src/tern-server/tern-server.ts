@@ -22,6 +22,7 @@ import {
     ReferenceParams,
     SignatureHelp,
     SignatureInformation,
+    Definition,
 } from 'vscode-languageserver';
 
 // tslint:disable-next-line:no-namespace
@@ -210,8 +211,12 @@ function uriToFile(uri: string): string {
 }
 
 function fileToUri(file: string): string {
-    // internally, tern will strip the project root, so we have to add it back
-    return URI.file(path.join(theRootPath, file)).toString();
+    if (path.isAbsolute(file)) {
+        return URI.file(file).toString();
+    } else {
+        // internally, tern will strip the project root, so we have to add it back
+        return URI.file(path.join(theRootPath, file)).toString();
+    }
 }
 
 async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
@@ -268,6 +273,7 @@ async function ternInit() {
 const init = memoize(ternInit);
 
 export const addFile = (event: TextDocumentChangeEvent) => {
+    console.log('%');
     const { document } = event;
     ternServer.addFile(uriToFile(document.uri), document.getText());
 };
@@ -281,6 +287,7 @@ export const onCompletion = async (completionParams: CompletionParams): Promise<
     try {
         await init();
         await asyncFlush();
+
         const { completions } = await ternRequest(completionParams, 'completions', {
             types: true,
             docs: true,
@@ -291,6 +298,7 @@ export const onCompletion = async (completionParams: CompletionParams): Promise<
             expandWordForward: true,
             caseInsensitive: true,
         });
+        console.log(JSON.stringify(completionParams, null, 2) + '=>' + completions.length);
         const items: CompletionItem[] = completions.map(completion => {
             let kind = 18;
             if (completion.type && completion.type.startsWith('fn')) {
@@ -341,12 +349,44 @@ export const onHover = async (textDocumentPosition: TextDocumentPositionParams):
     }
 };
 
+export const onTypeDefinition = async (textDocumentPosition: TextDocumentPositionParams): Promise<Definition> => {
+    const info = await ternRequest(textDocumentPosition, 'type');
+    if (info && info.origin) {
+        const contents = fs.readFileSync(info.origin, 'utf-8');
+        const endCol = new LineColumnFinder(contents, { origin: 0 }).fromIndex(contents.length - 1);
+        return {
+            uri: fileToUri(info.origin),
+            range: {
+                start: {
+                    line: 0,
+                    character: 0,
+                },
+                end: {
+                    line: endCol.line,
+                    character: endCol.col,
+                },
+            },
+        };
+    }
+};
+
 export const onDefinition = async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
     try {
         await init();
         await asyncFlush();
         const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
+            const responseURI = fileToUri(file);
+            // check to see if the request position is inside the response object
+            const requestURI = textDocumentPosition.textDocument.uri;
+            if (
+                responseURI === requestURI &&
+                start.line === textDocumentPosition.position.line &&
+                textDocumentPosition.position.character >= start.ch &&
+                textDocumentPosition.position.character <= end.ch
+            ) {
+                return onTypeDefinition(textDocumentPosition) as any;
+            }
             if (file === 'Aura') {
                 return;
             } else if (file.indexOf('/resources/aura/') >= 0) {

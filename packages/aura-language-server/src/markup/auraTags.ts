@@ -1,5 +1,13 @@
 import AuraIndexer from '../aura-indexer/indexer';
-import { TagInfo, AttributeInfo, IHTMLTagProvider, ICompletionParticipant, HtmlContentContext, HtmlAttributeValueContext } from 'lightning-lsp-common';
+import {
+    TagInfo,
+    AttributeInfo,
+    Decorator,
+    IHTMLTagProvider,
+    ICompletionParticipant,
+    HtmlContentContext,
+    HtmlAttributeValueContext,
+} from 'lightning-lsp-common';
 
 let indexer: AuraIndexer;
 
@@ -41,9 +49,9 @@ export function getAuraTagProvider(): IHTMLTagProvider {
     function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) {
         const cTag = getAuraByTag(tag);
         if (cTag) {
-            cTag.attributes.map(info => {
+            for (const info of cTag.attributes) {
                 collector(info.name, info, info.type);
-            });
+            }
         }
     }
 

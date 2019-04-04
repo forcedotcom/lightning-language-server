@@ -136,7 +136,7 @@ export default class AuraIndexer implements Indexer {
                     },
                 };
 
-                return new AttributeInfo(jsName, documentation, type, location);
+                return new AttributeInfo(jsName, documentation, undefined, undefined, type, location);
             });
         tagInfo.attributes = attributeInfos;
         this.setCustomTag(tagInfo);
@@ -229,7 +229,7 @@ export default class AuraIndexer implements Indexer {
                 const tagObj = auraStandard[tag];
                 const info = new TagInfo(null, TagType.STANDARD, false, []);
                 if (tagObj.attributes) {
-                    tagObj.attributes.sort( (a, b) => {
+                    tagObj.attributes.sort((a, b) => {
                         return a.name.localeCompare(b.name);
                     });
                     for (const a of tagObj.attributes) {

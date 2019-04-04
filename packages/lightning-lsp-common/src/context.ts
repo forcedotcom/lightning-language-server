@@ -421,7 +421,6 @@ export class WorkspaceContext {
                     roots.lwc.push(...subroots.lwc);
                     roots.aura.push(...subroots.aura);
                 }
-                return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
                 for (const project of await fs.readdir(this.workspaceRoot)) {
@@ -436,16 +435,25 @@ export class WorkspaceContext {
                         roots.aura.push(...subroots.aura);
                     }
                 }
-                return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
-                roots.lwc.push(...(await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2)).lwc);
-                roots.aura.push(...(await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2)).aura);
-                return roots;
+                const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                roots.lwc.push(...coreroots.lwc);
+                roots.aura.push(...coreroots.aura);
+            case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
-            case WorkspaceType.UNKNOWN:
-                return await findNamespaceRoots(this.workspaceRoot);
+            case WorkspaceType.MONOREPO:
+            case WorkspaceType.UNKNOWN: {
+                let depth = 6;
+                if (this.type === WorkspaceType.MONOREPO) {
+                    depth += 2;
+                }
+                const unknownroots = await findNamespaceRoots(this.workspaceRoot, depth);
+                roots.lwc.push(...unknownroots.lwc);
+                roots.aura.push(...unknownroots.aura);
+            }
         }
+        return roots;
     }
 }
 
@@ -562,6 +570,7 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
     // const files: string[] = [];
+    debugger;
     const files = await utils.glob(join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
     return files;
     // const subdirs = await findSubdirectories(namespaceRoot);

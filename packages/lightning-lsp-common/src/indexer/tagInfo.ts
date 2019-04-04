@@ -1,5 +1,5 @@
 import { Location } from 'vscode-languageserver';
-import { AttributeInfo } from './attributeInfo';
+import { AttributeInfo, Decorator } from './attributeInfo';
 import { ClassMember } from '@lwc/babel-plugin-component';
 
 export enum TagType {
@@ -47,6 +47,7 @@ export class TagInfo {
         if (hideComponentLibraryLink || this.namespace === 'c' || !this.namespace) {
             retVal = this.documentation + '\n### Attributes\n';
         }
+
         for (const info of this.attributes) {
             retVal += this.getAttributeMarkdown(info);
             retVal += '\n';

@@ -15,6 +15,7 @@ import { findDocumentLinks } from './services/htmlLinks';
 import { findDocumentHighlights } from './services/htmlHighlighting';
 import { findDocumentSymbols } from './services/htmlSymbolsProvider';
 import { findDefinition } from './services/htmlDefinition';
+import { findAttributeDefinition, getAttributeValueProperty } from './services/lwcExtensions';
 import {
     TextDocument,
     Position,
@@ -50,6 +51,8 @@ export interface LanguageService {
     getFoldingRanges(document: TextDocument, context?: { rangeLimit?: number }): FoldingRange[];
     // TODO HACK - adding findDefinition here to make LWC work for now
     findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
+    findAttributeDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
+    getAttributeValueProperty(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null;
 }
 
 export function getLanguageService(): LanguageService {
@@ -69,5 +72,7 @@ export function getLanguageService(): LanguageService {
         getFoldingRanges,
         doTagComplete: htmlCompletion.doTagComplete.bind(htmlCompletion),
         findDefinition,
+        findAttributeDefinition,
+        getAttributeValueProperty
     };
 }

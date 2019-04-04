@@ -24,12 +24,13 @@ import {
     ParameterInformation,
     FileChangeType,
     NotificationType,
+    Definition,
 } from 'vscode-languageserver';
 
 import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from 'lightning-lsp-common';
-import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
+import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
 import { LWCIndexer } from 'lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
@@ -164,6 +165,15 @@ connection.onHover(
         }
         if (await context.isAuraJavascript(document)) {
             return onHover(textDocumentPosition);
+        }
+        return null;
+    },
+);
+connection.onTypeDefinition(
+    async (textDocumentPosition: TextDocumentPositionParams): Promise<Definition> => {
+        const document = documents.get(textDocumentPosition.textDocument.uri);
+        if (await context.isAuraJavascript(document)) {
+            return onTypeDefinition(textDocumentPosition);
         }
         return null;
     },
