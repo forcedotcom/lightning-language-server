@@ -5,5 +5,7 @@
     },
     "eslint.packageManager": "yarn",
     "tslint.packageManager": "yarn",
-    "npm.packageManager": "yarn"
+    "npm.packageManager": "yarn",
+    "html.suggest.angular1": false,
+    "html.suggest.ionic": false
 }

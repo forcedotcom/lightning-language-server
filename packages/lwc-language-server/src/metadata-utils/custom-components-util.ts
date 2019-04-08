@@ -92,7 +92,7 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
             if (lwcStandard[tag].attributes) {
                 lwcStandard[tag].attributes.map((a: any) => {
                     const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    info.attributes.push(new AttributeInfo(name, a.description, a.type, undefined, 'LWC standard attribute'));
+                    info.attributes.push(new AttributeInfo(name, a.description, undefined, undefined, a.type, undefined, 'LWC standard attribute'));
                 });
             }
             info.documentation = lwcStandard[tag].description;

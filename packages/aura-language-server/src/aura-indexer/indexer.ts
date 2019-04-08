@@ -216,7 +216,7 @@ export default class AuraIndexer implements Indexer {
                 if (tagObj.attributes) {
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
-                        info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
+                        info.attributes.push(new AttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
                     }
                 }
                 info.documentation = tagObj.description;
@@ -241,7 +241,7 @@ export default class AuraIndexer implements Indexer {
                     });
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
-                        info.attributes.push(new AttributeInfo(a.name, a.description, a.type, undefined, 'Aura Attribute'));
+                        info.attributes.push(new AttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
                     }
                 }
                 info.documentation = tagObj.description;

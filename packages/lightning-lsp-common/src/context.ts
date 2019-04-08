@@ -418,6 +418,7 @@ export class WorkspaceContext {
                     roots.lwc.push(...subroots.lwc);
                     roots.aura.push(...subroots.aura);
                 }
+                return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
                 for (const project of await fs.readdir(this.workspaceRoot)) {
@@ -432,11 +433,13 @@ export class WorkspaceContext {
                         roots.aura.push(...subroots.aura);
                     }
                 }
+                return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
                 const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
                 roots.lwc.push(...coreroots.lwc);
                 roots.aura.push(...coreroots.aura);
+                return roots;
             case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
             case WorkspaceType.MONOREPO:
@@ -448,6 +451,7 @@ export class WorkspaceContext {
                 const unknownroots = await findNamespaceRoots(this.workspaceRoot, depth);
                 roots.lwc.push(...unknownroots.lwc);
                 roots.aura.push(...unknownroots.aura);
+                return roots;
             }
         }
         return roots;

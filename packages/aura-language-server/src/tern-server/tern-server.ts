@@ -273,7 +273,6 @@ async function ternInit() {
 const init = memoize(ternInit);
 
 export const addFile = (event: TextDocumentChangeEvent) => {
-    console.log('%');
     const { document } = event;
     ternServer.addFile(uriToFile(document.uri), document.getText());
 };
@@ -298,7 +297,6 @@ export const onCompletion = async (completionParams: CompletionParams): Promise<
             expandWordForward: true,
             caseInsensitive: true,
         });
-        console.log(JSON.stringify(completionParams, null, 2) + '=>' + completions.length);
         const items: CompletionItem[] = completions.map(completion => {
             let kind = 18;
             if (completion.type && completion.type.startsWith('fn')) {
