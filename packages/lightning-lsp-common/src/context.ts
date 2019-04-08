@@ -49,9 +49,6 @@ export class WorkspaceContext {
     public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
         this.type = detectWorkspaceType(workspaceRoot);
-        if (!isLWC(this.type)) {
-            console.error('not a LWC workspace:', this.workspaceRoot);
-        }
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
         if (this.type === WorkspaceType.SFDX) {
@@ -570,7 +567,6 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
     // const files: string[] = [];
-    debugger;
     const files = await utils.glob(join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
     return files;
     // const subdirs = await findSubdirectories(namespaceRoot);

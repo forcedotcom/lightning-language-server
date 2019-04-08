@@ -179,30 +179,52 @@ connection.onTypeDefinition(
     },
 );
 
+function findJavascriptProperty(valueProperty: string, textDocumentPosition: TextDocumentPositionParams): Location | null {
+    // couldn't find it within the markup file, try looking for it as a javascript property
+    const fsPath = URI.parse(textDocumentPosition.textDocument.uri).fsPath;
+    const parsedPath = path.parse(fsPath);
+    const componentName = parsedPath.name;
+    const namespace = path.basename(path.dirname(parsedPath.dir));
+    const indexer = context.getIndexingProvider('aura') as AuraIndexer;
+    const tag = indexer.getAuraByTag(namespace + ':' + componentName);
+    if (tag) {
+        // aura tag doesn't contain controller methods yet
+        // but, if its not a v.value, its probably fine to just open the controller file
+        const controllerPath = path.join(parsedPath.dir, componentName + 'Controller.js');
+        return {
+            uri: URI.file(controllerPath).toString(),
+            range: {
+                start: {
+                    character: 0,
+                    line: 1,
+                },
+                end: {
+                    character: 0,
+                    line: 1,
+                },
+            },
+        };
+    }
+    return null;
+}
+
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
         if (await context.isAuraMarkup(document)) {
             const htmlDocument = htmlLS.parseHTMLDocument(document);
 
-            // TODO: refactor into method
-            const offset = document.offsetAt(textDocumentPosition.position);
-            const node = htmlDocument.findNodeAt(offset);
-            if (!node || !node.tag) {
-                return null;
-            }
-            const tagProviders = htmlLS.getTagProviders().filter(p => p.isApplicable(document.languageId));
-            let location: Location;
-            for (const provider of tagProviders) {
-                provider.collectTags((t, label, info) => {
-                    if (t === node.tag || t === node.tag.toLowerCase()) {
-                        if (info.location && info.location.uri && info.location.range) {
-                            location = Location.create(info.location.uri, info.location.range);
-                        }
+            let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+            if (!def) {
+                def = htmlLS.getAuraBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
+                if (!def) {
+                    const valueProperty = htmlLS.getAuraBindingValue(document, textDocumentPosition.position, htmlDocument);
+                    if (valueProperty) {
+                        def = findJavascriptProperty(valueProperty, textDocumentPosition);
                     }
-                });
+                }
             }
-            return location;
+            return def;
         }
         if (await context.isAuraJavascript(document)) {
             return onDefinition(textDocumentPosition);

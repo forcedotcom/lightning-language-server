@@ -15,6 +15,9 @@
 		{
 			"name": "LWC-LSP",
 			"path": "../packages/lwc-language-server"
+		},
+		{
+			"path": "/Users/midzelis/git/LSP-mono/lightning-language-server/node_modules"
 		}
 	],
 	"settings": {

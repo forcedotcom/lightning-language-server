@@ -169,18 +169,14 @@ connection.onDefinition(
         const htmlDocument = htmlLS.parseHTMLDocument(document);
         let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
         if (!def) {
-            def = htmlLS.findAttributeDefinition(document, textDocumentPosition.position, htmlDocument);
+            def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
             if (!def) {
-                let valueProperty = htmlLS.getAttributeValueProperty(document, textDocumentPosition.position, htmlDocument);
-                if (!valueProperty) {
-                    valueProperty = htmlLS.getBodyValueProperty();
-                }
+                const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
                 if (valueProperty) {
                     def = findJavascriptProperty(valueProperty, textDocumentPosition);
                 }
             }
         }
-        console.log(def);
         return def;
     },
 );

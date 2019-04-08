@@ -112,8 +112,15 @@ export default class AuraIndexer implements Indexer {
             console.warn(`File ${file} has malformed tagname, ignoring`);
             return;
         }
+
         const attributeInfos = tags
             .filter(tag => tag.tag.startsWith('aura:attribute'))
+            .filter(
+                node =>
+                    (node.parent && (node.parent.tag === 'aura:application' || node.parent.tag === 'aura:component')) ||
+                    node.parent.tag === 'aura:event' ||
+                    node.parent.tag === 'aura:interface',
+            )
             .map(node => {
                 const attributes = node.attributes || {};
                 const documentation = this.trimQuotes(attributes.description);
@@ -322,7 +329,7 @@ export default class AuraIndexer implements Indexer {
         const attrs: AttributeInfo[] = [];
         for (const attribute of interopTagInfo.attributes) {
             const attrname = changeCase.camelCase(attribute.jsName || attribute.name);
-            attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.type, attribute.Location, ''));
+            attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.memberType, attribute.decorator, attribute.type, attribute.location, ''));
         }
 
         const info = new TagInfo(
@@ -335,6 +342,8 @@ export default class AuraIndexer implements Indexer {
             interopTagInfo.documentation,
             interopTagInfo.name,
             transformedName.namespace,
+            interopTagInfo.properties,
+            interopTagInfo.methods,
         );
         return info;
     }
