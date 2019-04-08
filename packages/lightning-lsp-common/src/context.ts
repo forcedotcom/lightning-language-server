@@ -246,10 +246,10 @@ export class WorkspaceContext {
                     const jsConfigPath = join(this.workspaceRoot, relativeJsConfigPath);
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoot);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
-                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                     // write/update .eslintrc.json
                     const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
-                    await this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
+                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
                     await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
@@ -259,7 +259,7 @@ export class WorkspaceContext {
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
                 break;
 
@@ -268,7 +268,7 @@ export class WorkspaceContext {
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    await this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
                 }
                 break;
         }
@@ -380,7 +380,7 @@ export class WorkspaceContext {
         const configFile = join(this.workspaceRoot, relativeConfigPath);
         try {
             const configJson = JSON.parse(config);
-            if (!fs.pathExists(configFile)) {
+            if (!fs.pathExistsSync(configFile)) {
                 utils.writeJsonSync(configFile, configJson);
             } else {
                 try {

@@ -11,7 +11,8 @@
     "format": "lerna run format --stream --parallel",
     "precommit": "lerna run precommit --stream",
     "prepush": "lerna prepush --stream",
-    "link-lsp": "lerna exec yarn link",
+    "link-lsp": "lerna exec yarn link --no-bail",
+    "unlink-lsp": "lerna exec yarn unlink --no-bail",
     "publish-all": "lerna publish"
   },
   "dependencies": {

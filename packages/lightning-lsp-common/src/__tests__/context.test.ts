@@ -196,8 +196,6 @@ it('configureSfdxProject()', async () => {
     expect(schemaContents).toContain('declare module "@salesforce/schema" {');
     const apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
     expect(apexContents).not.toContain('declare type');
-
-    verifyWorkspaceSettings(settingsPath);
 });
 
 it('configureCoreProject()', async () => {
@@ -218,7 +216,6 @@ it('configureCoreProject()', async () => {
 
     const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     verifyCoreSettings(settings);
-    verifyWorkspaceSettings(settingsPath);
 });
 
 it('configureCoreAll()', async () => {
@@ -243,7 +240,6 @@ it('configureCoreAll()', async () => {
     verifyTypingsCore();
 
     verifyCodeWorkspace(codeWorkspacePath);
-    verifyCodeWorkspaceSettings(codeWorkspacePath);
 
     // launch.json
     const launchContent = fs.readFileSync(launchPath, 'utf8');
@@ -288,19 +284,4 @@ function verifyCoreSettings(settings: any) {
     expect(settings['perforce.client']).toBe('username-localhost-blt');
     expect(settings['perforce.user']).toBe('username');
     expect(settings['perforce.port']).toBe('ssl:host:port');
-}
-
-function verifyCodeWorkspaceSettings(path: string) {
-    const content = fs.readFileSync(path, 'utf8');
-    const workspace = JSON.parse(content);
-    const settings = workspace.settings;
-    expect(settings['html.suggest.angular1']).toBe(false);
-    expect(settings['html.suggest.ionic']).toBe(false);
-}
-
-function verifyWorkspaceSettings(settingsPath: string) {
-    const settingsContent = fs.readFileSync(settingsPath, 'utf8');
-    const settings = JSON.parse(settingsContent);
-    expect(settings['html.suggest.angular1']).toBe(false);
-    expect(settings['html.suggest.ionic']).toBe(false);
 }
