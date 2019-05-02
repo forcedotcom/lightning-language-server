@@ -147,11 +147,11 @@ function findJavascriptProperty(valueProperty: string, textDocumentPosition: Tex
                     range: {
                         start: {
                             character: property.loc.start.column,
-                            line: property.loc.start.line,
+                            line: property.loc.start.line - 1,
                         },
                         end: {
                             character: property.loc.end.column,
-                            line: property.loc.end.line,
+                            line: property.loc.end.line - 1,
                         },
                     },
                 };
