@@ -22,9 +22,9 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
 import { getLanguageService, LanguageService } from 'lightning-lsp-common';
 import URI from 'vscode-uri';
-import { addCustomTagFromResults, getLwcTags } from './metadata-utils/custom-components-util';
+import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
 import { getLwcTagProvider } from './markup/lwcTags';
-
+import decamelize from 'decamelize';
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -132,6 +132,34 @@ connection.onHover(
     },
 );
 
+function findJavascriptProperty(valueProperty: string, textDocumentPosition: TextDocumentPositionParams) {
+    // couldn't find it within the markup file, try looking for it as a javascript property
+    const fsPath = URI.parse(textDocumentPosition.textDocument.uri).fsPath;
+    const parsedPath = path.parse(fsPath);
+    const componentName = decamelize(parsedPath.name, '-');
+    const namespace = path.basename(path.dirname(parsedPath.dir));
+    const tagInfo = getLwcByTag(namespace + '-' + componentName);
+    if (tagInfo) {
+        for (const property of [...tagInfo.properties, ...tagInfo.methods]) {
+            if (property.name === valueProperty) {
+                return {
+                    uri: URI.file(tagInfo.file).toString(),
+                    range: {
+                        start: {
+                            character: property.loc.start.column,
+                            line: property.loc.start.line,
+                        },
+                        end: {
+                            character: property.loc.end.column,
+                            line: property.loc.end.line,
+                        },
+                    },
+                };
+            }
+        }
+    }
+    return null;
+}
 connection.onDefinition(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
         const document = documents.get(textDocumentPosition.textDocument.uri);
@@ -139,7 +167,17 @@ connection.onDefinition(
             return null;
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+        let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+        if (!def) {
+            def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
+            if (!def) {
+                const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
+                if (valueProperty) {
+                    def = findJavascriptProperty(valueProperty, textDocumentPosition);
+                }
+            }
+        }
+        return def;
     },
 );
 

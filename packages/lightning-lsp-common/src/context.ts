@@ -49,9 +49,6 @@ export class WorkspaceContext {
     public constructor(workspaceRoot: string) {
         this.workspaceRoot = path.resolve(workspaceRoot);
         this.type = detectWorkspaceType(workspaceRoot);
-        if (!isLWC(this.type)) {
-            console.error('not a LWC workspace:', this.workspaceRoot);
-        }
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
         if (this.type === WorkspaceType.SFDX) {
@@ -439,13 +436,25 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
-                roots.lwc.push(...(await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2)).lwc);
-                roots.aura.push(...(await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2)).aura);
+                const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                roots.lwc.push(...coreroots.lwc);
+                roots.aura.push(...coreroots.aura);
                 return roots;
+            case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
-            case WorkspaceType.UNKNOWN:
-                return await findNamespaceRoots(this.workspaceRoot);
+            case WorkspaceType.MONOREPO:
+            case WorkspaceType.UNKNOWN: {
+                let depth = 6;
+                if (this.type === WorkspaceType.MONOREPO) {
+                    depth += 2;
+                }
+                const unknownroots = await findNamespaceRoots(this.workspaceRoot, depth);
+                roots.lwc.push(...unknownroots.lwc);
+                roots.aura.push(...unknownroots.aura);
+                return roots;
+            }
         }
+        return roots;
     }
 }
 

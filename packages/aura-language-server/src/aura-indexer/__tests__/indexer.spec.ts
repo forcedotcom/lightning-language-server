@@ -38,6 +38,11 @@ it('aura indexer', async () => {
         }
         if (taginfo.attributes) {
             taginfo.attributes = taginfo.attributes.sort((a, b) => a.name.localeCompare(b.name));
+            for (const attribute of taginfo.attributes) {
+                if (attribute.location && attribute.location.uri) {
+                    attribute.location.uri = normalize(full, uriToFile(attribute.location.uri));
+                }
+            }
         }
     });
     const sortedTags = new Map([...tags.entries()].sort());

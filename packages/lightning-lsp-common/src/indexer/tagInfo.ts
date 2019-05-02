@@ -1,5 +1,5 @@
 import { Location } from 'vscode-languageserver';
-import { AttributeInfo } from './attributeInfo';
+import { AttributeInfo, Decorator } from './attributeInfo';
 import { ClassMember } from '@lwc/babel-plugin-component';
 
 export enum TagType {
@@ -44,12 +44,22 @@ export class TagInfo {
 
     public getHover(hideComponentLibraryLink?: boolean): string | null {
         let retVal = this.documentation + '\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
-        if (hideComponentLibraryLink || this.namespace === 'c' || !this.namespace) {
+        if (hideComponentLibraryLink || this.type === TagType.CUSTOM) {
             retVal = this.documentation + '\n### Attributes\n';
         }
+
         for (const info of this.attributes) {
             retVal += this.getAttributeMarkdown(info);
             retVal += '\n';
+        }
+
+        const methods = (this.methods && this.methods.filter(m => m.decorator === 'api')) || [];
+        if (methods.length > 0) {
+            retVal += this.documentation + '\n### Methods\n';
+            for (const info of methods) {
+                retVal += this.getMethodMarkdown(info);
+                retVal += '\n';
+            }
         }
 
         return retVal;
@@ -70,6 +80,17 @@ export class TagInfo {
 
         if (attribute.name) {
             return '* **' + attribute.name + '**';
+        }
+
+        return '';
+    }
+    public getMethodMarkdown(method: ClassMember): string {
+        if (method.name && method.doc) {
+            return '* **' + method.name + '()**: ' + method.doc;
+        }
+
+        if (method.name) {
+            return '* **' + method.name + '()**';
         }
 
         return '';

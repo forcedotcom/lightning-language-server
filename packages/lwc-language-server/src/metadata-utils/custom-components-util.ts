@@ -92,7 +92,7 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
             if (lwcStandard[tag].attributes) {
                 lwcStandard[tag].attributes.map((a: any) => {
                     const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    info.attributes.push(new AttributeInfo(name, a.description, a.type, undefined, 'LWC standard attribute'));
+                    info.attributes.push(new AttributeInfo(name, a.description, undefined, undefined, a.type, undefined, 'LWC standard attribute'));
                 });
             }
             info.documentation = lwcStandard[tag].description;
@@ -107,12 +107,13 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
 async function addCustomTag(context: WorkspaceContext, tag: string, uri: string, metadata: Metadata, writeConfigs: boolean) {
     const doc = metadata.doc;
     const attributes = extractAttributes(metadata, uri);
+    const publicAttributes = attributes.publicAttributes;
     // declarationLoc may be undefined if live file doesn't extend LightningElement yet
     const range = metadata.declarationLoc ? toVSCodeRange(metadata.declarationLoc) : Range.create(Position.create(0, 0), Position.create(0, 0));
     const location = Location.create(uri, range);
     const namespace = tag.split('-')[0];
     const file = toResolvedPath(uri);
-    const tagInfo = new TagInfo(file, TagType.CUSTOM, true, attributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata));
+    const tagInfo = new TagInfo(file, TagType.CUSTOM, true, publicAttributes, location, doc, tag, namespace, getProperties(metadata), getMethods(metadata));
     await setCustomTag(context, tagInfo, writeConfigs);
 }
 

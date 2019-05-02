@@ -15,6 +15,8 @@ import { findDocumentLinks } from './services/htmlLinks';
 import { findDocumentHighlights } from './services/htmlHighlighting';
 import { findDocumentSymbols } from './services/htmlSymbolsProvider';
 import { findDefinition } from './services/htmlDefinition';
+import { getPropertyBindingTemplateDeclaration, getPropertyBindingValue } from './services/lwcExtensions';
+import { getAuraBindingTemplateDeclaration, getAuraBindingValue } from './services/auraExtensions';
 import {
     TextDocument,
     Position,
@@ -50,6 +52,10 @@ export interface LanguageService {
     getFoldingRanges(document: TextDocument, context?: { rangeLimit?: number }): FoldingRange[];
     // TODO HACK - adding findDefinition here to make LWC work for now
     findDefinition(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
+    getPropertyBindingTemplateDeclaration(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
+    getPropertyBindingValue(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null;
+    getAuraBindingTemplateDeclaration(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null;
+    getAuraBindingValue(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null;
 }
 
 export function getLanguageService(): LanguageService {
@@ -69,5 +75,9 @@ export function getLanguageService(): LanguageService {
         getFoldingRanges,
         doTagComplete: htmlCompletion.doTagComplete.bind(htmlCompletion),
         findDefinition,
+        getPropertyBindingTemplateDeclaration,
+        getPropertyBindingValue,
+        getAuraBindingTemplateDeclaration,
+        getAuraBindingValue,
     };
 }

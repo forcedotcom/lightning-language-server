@@ -1,4 +1,12 @@
-import { TagInfo, AttributeInfo, IHTMLTagProvider, ICompletionParticipant, HtmlContentContext, HtmlAttributeValueContext } from 'lightning-lsp-common';
+import {
+    TagInfo,
+    AttributeInfo,
+    Decorator,
+    IHTMLTagProvider,
+    ICompletionParticipant,
+    HtmlContentContext,
+    HtmlAttributeValueContext,
+} from 'lightning-lsp-common';
 import { getLwcTags, getLwcByTag } from '../metadata-utils/custom-components-util';
 // import { ClassMember } from '@lwc/babel-plugin-component';
 
@@ -8,14 +16,48 @@ const LWC_DIRECTIVES: AttributeInfo[] = [
     new AttributeInfo(
         'for:each',
         'Renders the element or template block multiple times based on the expression value.',
+        undefined,
+        Decorator.API,
         'expression binding',
         undefined,
         LWC_DIRECTIVE,
     ),
-    new AttributeInfo('for:item', 'Bind the current iteration item to an identifier.', 'expression binding', undefined, LWC_DIRECTIVE),
-    new AttributeInfo('for:index', 'Bind the current iteration index to an identifier.', 'expression binding', undefined, LWC_DIRECTIVE),
-    new AttributeInfo('if:true', 'Renders the element or template if the expression value is thruthy.', 'expression binding', undefined, LWC_DIRECTIVE),
-    new AttributeInfo('if:false', 'Renders the element or template if the expression value is falsy.', 'expression binding', undefined, LWC_DIRECTIVE),
+    new AttributeInfo(
+        'for:item',
+        'Bind the current iteration item to an identifier.',
+        undefined,
+        Decorator.API,
+        'expression binding',
+        undefined,
+        LWC_DIRECTIVE,
+    ),
+    new AttributeInfo(
+        'for:index',
+        'Bind the current iteration index to an identifier.',
+        undefined,
+        Decorator.API,
+        'expression binding',
+        undefined,
+        LWC_DIRECTIVE,
+    ),
+    new AttributeInfo(
+        'if:true',
+        'Renders the element or template if the expression value is thruthy.',
+        undefined,
+        Decorator.API,
+        'expression binding',
+        undefined,
+        LWC_DIRECTIVE,
+    ),
+    new AttributeInfo(
+        'if:false',
+        'Renders the element or template if the expression value is falsy.',
+        undefined,
+        Decorator.API,
+        'expression binding',
+        undefined,
+        LWC_DIRECTIVE,
+    ),
 ];
 
 export function getDirectiveInfo(label: string): AttributeInfo | null {
@@ -48,9 +90,9 @@ export function getLwcTagProvider(): IHTMLTagProvider {
     function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
         const cTag = getLwcByTag(tag);
         if (cTag) {
-            cTag.attributes.map((info: AttributeInfo) => {
+            for (const info of cTag.attributes) {
                 collector(info.name, info, '');
-            });
+            }
         }
     }
 

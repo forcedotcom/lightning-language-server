@@ -9,6 +9,10 @@ export enum WorkspaceType {
     STANDARD,
     /** standard workspace with a package.json and lwc dependencies */
     STANDARD_LWC,
+    /** monorepo workspace, using monorepo strucutre */
+    MONOREPO,
+    /** monorepo workspace, using monorepo strucutre, and lwc dependencies */
+    MONOREPO_LWC,
     /** sfdx workspace */
     SFDX,
     /** workspace including all core projects */
@@ -18,7 +22,16 @@ export enum WorkspaceType {
 
     UNKNOWN,
 }
-
+export function isUnknown(type: WorkspaceType) {
+    switch (type) {
+        case WorkspaceType.STANDARD:
+        case WorkspaceType.MONOREPO_LWC:
+        case WorkspaceType.MONOREPO:
+        case WorkspaceType.UNKNOWN:
+            return true;
+    }
+    return false;
+}
 export function isLWC(type: WorkspaceType): boolean {
     return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
 }
@@ -50,6 +63,12 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             if (devDependencies.includes('@lwc/engine')) {
                 return WorkspaceType.STANDARD_LWC;
+            }
+            if (packageInfo.workspaces) {
+                return WorkspaceType.MONOREPO;
+            }
+            if (fs.existsSync(path.join(workspaceRoot, 'lerna.json'))) {
+                return WorkspaceType.MONOREPO;
             }
             return WorkspaceType.STANDARD;
         } catch (e) {
