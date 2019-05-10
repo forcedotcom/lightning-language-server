@@ -17,7 +17,7 @@ cd ~/git/LSP
 ### Clone this repo and DX Plugins 
 
 ```
-git clone git@git.soma.salesforce.com:lightning-tools/lightning-language-server.git
+git clone git@github.com:forcedotcom/lightning-language-server.git
 git clone git@github.com:forcedotcom/salesforcedx-vscode.git
 ```
 
