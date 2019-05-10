@@ -16,9 +16,9 @@ platform: x64
 install:
   - ps: Install-Product node 10.12.18 x64
   - yarn install
-
-build_script:
   - yarn run lint
+
+build: off
 
 test_script:
   - node --version
