@@ -13,12 +13,12 @@ skip_branch_with_pr: true
 # Build on x64 only
 platform: x64
 
-build: off
-
 install:
-  - ps: Install-Product node 10.12.18 x64
-  - yarn install
+  - ps: Install-Product node 10 x64
+  - appveyor-retry yarn install
   - yarn run lint
+
+build: off
 
 test_script:
   - node --version
