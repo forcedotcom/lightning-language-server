@@ -12,6 +12,7 @@
     "copy-static-assets": "ts-node copy-static-assets.ts",
     "test": "jest --runInBand",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
+    "test:debugWindows": "node --inspect-brk ../../node_modules/jest/bin/jest.js --passWithNoTests --runInBand",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/*",
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",

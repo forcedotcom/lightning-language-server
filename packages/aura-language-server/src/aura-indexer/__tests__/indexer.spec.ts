@@ -4,7 +4,16 @@ import * as path from 'path';
 import URI from 'vscode-uri';
 
 function normalize(start: string, p: string) {
-    if (p.startsWith(start)) {
+    // Fix relative paths on windows
+    if (start.indexOf('\\') !== -1) {
+        start = start.replace(/\\/g, '/');
+    }
+    if (p.indexOf('\\') !== -1) {
+        p = p.replace(/\\/g, '/');
+    }
+
+    // Need toLowerCase on windows due to paths differing in case (C:/ and c:/)
+    if (p.toLowerCase().startsWith(start.toLowerCase())) {
         return p.slice(start.length + 1);
     }
     return p;
