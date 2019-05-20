@@ -6,6 +6,7 @@
     "watch": "lerna run watch --stream --parallel",
     "prepare": "lerna run clean && lerna run build --stream",
     "test": "lerna run test --stream --no-bail -- --colors",
+    "test:debug": "lerna run test:debug --stream --no-bail -- --colors",
     "test_with_coverage": "lerna run test_with_coverage --stream",
     "lint": "lerna run lint --stream --parallel",
     "format": "lerna run format --stream --parallel",
