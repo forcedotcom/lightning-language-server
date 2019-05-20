@@ -23,4 +23,5 @@ build: off
 test_script:
   - node --version
   - yarn --version
-  - yarn run test
+  - yarn windowsCopySymlinks
+  - yarn test
