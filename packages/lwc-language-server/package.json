@@ -14,7 +14,8 @@
     "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
-    "prepush": "yarn prepare && yarn lint && yarn test"
+    "prepush": "yarn prepare && yarn lint && yarn test",
+    "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
     "@lwc/babel-plugin-component": "0.34.8",

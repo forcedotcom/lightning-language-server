@@ -13,7 +13,8 @@
     "prepush": "lerna prepush --stream",
     "link-lsp": "lerna exec yarn link --no-bail",
     "unlink-lsp": "lerna exec yarn unlink --no-bail",
-    "publish-all": "lerna publish"
+    "publish-all": "lerna publish",
+    "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail"
   },
   "dependencies": {
   },

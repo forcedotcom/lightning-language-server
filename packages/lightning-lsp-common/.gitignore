@@ -6,3 +6,4 @@ lib
 coverage/
 src/resources/sfdx/typings/copied/
 yarn-error.log
+test-workspaces
