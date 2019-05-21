@@ -1,7 +1,7 @@
 {
   "name": "aura-language-server",
   "version": "2.2.3",
-  "description": "Language server for Aura components",
+  "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
   "license": "MIT",

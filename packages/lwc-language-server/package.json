@@ -1,7 +1,7 @@
 {
   "name": "lwc-language-server",
   "version": "2.2.3",
-  "description": "Language server for Lightning Web Components",
+  "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "MIT",
   "scripts": {
