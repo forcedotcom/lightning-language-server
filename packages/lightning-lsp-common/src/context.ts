@@ -277,23 +277,19 @@ export class WorkspaceContext {
     private async writeSettings() {
         switch (this.type) {
             case WorkspaceType.SFDX:
-                await this.updateWorkspaceSettings();
                 break;
 
             case WorkspaceType.CORE_ALL:
-                await this.updateWorkspaceSettings();
                 // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreCodeWorkspace();
                 await this.updateCoreLaunch();
                 break;
 
             case WorkspaceType.CORE_SINGLE_PROJECT:
-                await this.updateWorkspaceSettings();
                 await this.updateCoreSettings();
                 break;
 
             default:
-                await this.updateWorkspaceSettings();
                 break;
         }
     }
@@ -342,17 +338,6 @@ export class WorkspaceContext {
         await fs.ensureDir(join(this.workspaceRoot, '.vscode'));
         const relativeLaunchPath = join('.vscode', 'launch.json');
         this.updateConfigFile(relativeLaunchPath, launchContent);
-    }
-
-    /**
-     * Updates common workspace settings that apply to any LWC project.
-     * See src/resources/common/settings.json
-     */
-    private async updateWorkspaceSettings() {
-        const settingsContent = await fs.readFile(utils.getResourcePath(join('common', 'settings.json')), 'utf8');
-        await fs.ensureDir(join(this.workspaceRoot, '.vscode'));
-        const relativeSettingsPath = join('.vscode', 'settings.json');
-        this.updateConfigFile(relativeSettingsPath, settingsContent);
     }
 
     private processTemplate(
