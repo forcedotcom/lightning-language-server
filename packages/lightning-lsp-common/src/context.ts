@@ -280,15 +280,12 @@ export class WorkspaceContext {
                 break;
 
             case WorkspaceType.CORE_ALL:
-                // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreCodeWorkspace();
                 await this.updateCoreLaunch();
-                break;
-
             case WorkspaceType.CORE_SINGLE_PROJECT:
+                // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreSettings();
                 break;
-
             default:
                 break;
         }
@@ -315,8 +312,6 @@ export class WorkspaceContext {
             p4_port: configBlt['p4.port'],
             p4_client: configBlt['p4.client'],
             p4_user: configBlt['p4.user'],
-            java_home: configBlt['eclipse.default.jdk'],
-            workspace_root: utils.unixify(this.workspaceRoot),
         };
         const templateString = await fs.readFile(utils.getCoreResource('core.code-workspace.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
@@ -586,7 +581,8 @@ async function findCoreESLint(): Promise<string> {
     const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
     if (!(await fs.pathExists(eslintToolDir))) {
         console.warn('core eslint-tool not installed: ' + eslintToolDir);
-        return '/core/eslint-tool/not-installed/run/mvn/tools/eslint-lwc';
+        // default
+        return '~/tools/eslint-tool/1.0.3/node_modules';
     }
     let highestVersion;
     const dirs = await fs.readdir(eslintToolDir);

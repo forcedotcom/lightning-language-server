@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "path": "${workspace_root}"
+            "path": "."
         }
     ],
     "settings": {
@@ -29,34 +29,16 @@
         "files.useExperimentalFileWatcher": true,
         "eslint.nodePath": "${eslint_node_path}",
         "perforce.maxBuffer": 10485760,
+        "perforce.editOnFileSave": true,
         "perforce.editOnFileModified": true,
         "perforce.addOnFileCreate": true,
         "perforce.deleteOnFileDelete": true,
         "perforce.client": "${p4_client}",
         "perforce.user": "${p4_user}",
         "perforce.port": "${p4_port}",
-        "java.home": "${java_home}",
+        "java.autobuild.enabled": false,
         "java.import.maven.enabled": false,
         "java.import.gradle.enabled": false,
-        "java.completion.favoriteStaticMembers": [],
-        "java.configuration.updateBuildConfiguration": "disabled",
-        "java.errors.incompleteClasspath.severity": "error",
-        "java.import.exclusions": [
-            "**/.git/objects/**",
-            "**/.git/subtree-cache/**",
-            "**/node_modules/**",
-            "**/core/build/repository/**",
-            "**/core/ext/**",
-            "**/.metadata/**",
-            "**/archetype-resources/**",
-            "**/META-INF/maven/**",
-            "**/target/**",
-            "**/bin/**"
-        ],
-        "java.debug.logLevel": "info",
-        "java.debug.settings.enableHotCodeReplace": true,
-        "java.jdt.ls.vmargs": "-noverify -Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication",
-        "java.trace.server": "messages",
         "extensions.ignoreRecommendations": true,
         "salesforcedx-vscode-lightning.activationMode": "always",
         "salesforcedx-vscode-lightning.showLightningExplorer": true
