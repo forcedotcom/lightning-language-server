@@ -239,11 +239,14 @@ it('configureCoreAll()', async () => {
     verifyJsconfigCore(jsconfigPathForce);
     verifyTypingsCore();
 
-    verifyCodeWorkspace(codeWorkspacePath);
+    // Commenting out core-workspace & launch.json tests until we finalize
+    // where these should live or if they should exist at all
+
+    // verifyCodeWorkspace(codeWorkspacePath);
 
     // launch.json
-    const launchContent = fs.readFileSync(launchPath, 'utf8');
-    expect(launchContent).toContain('"name": "SFDC (attach)"');
+    // const launchContent = fs.readFileSync(launchPath, 'utf8');
+    // expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
 
 function verifyJsconfigCore(jsconfigPath: string) {

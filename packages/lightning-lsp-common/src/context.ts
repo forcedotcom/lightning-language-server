@@ -280,8 +280,9 @@ export class WorkspaceContext {
                 break;
 
             case WorkspaceType.CORE_ALL:
-                await this.updateCoreCodeWorkspace();
-                await this.updateCoreLaunch();
+            // Removing these for now
+            // await this.updateCoreCodeWorkspace();
+            // await this.updateCoreLaunch();
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreSettings();
