@@ -14,6 +14,8 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
+    RequestType,
+    RegistrationRequest,
 } from 'vscode-languageserver';
 
 import { LWCIndexer } from './indexer';
@@ -72,6 +74,12 @@ connection.onInitialize(
                     },
                     hoverProvider: true,
                     definitionProvider: true,
+                    workspace: {
+                        workspaceFolders: {
+                            changeNotifications: true,
+                            supported: true,
+                        },
+                    },
                 },
             };
         } catch (e) {
@@ -196,4 +204,13 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
 connection.onRequest('salesforce/listComponents', () => {
     const tags = getLwcTags();
     return JSON.stringify([...tags]);
+});
+
+connection.onRequest((method: string, ...params: any[]) => {
+    // debugger
+    console.log(method);
+});
+
+connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
+    console.log('request');
 });

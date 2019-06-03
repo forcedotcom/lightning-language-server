@@ -284,9 +284,10 @@ connection.onRequest('salesforce/listNamespaces', () => {
     return result;
 });
 
-// connection.onRequest((method: string, ...params: any[]) => {
-//     // debugger
-// });
+connection.onRequest((method: string, ...params: any[]) => {
+    // debugger
+    console.log(method);
+});
 
 documents.onDidOpen(addFile);
 documents.onDidChangeContent(addFile);
