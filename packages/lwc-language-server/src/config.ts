@@ -15,10 +15,11 @@ export interface IJsconfig {
         paths?: IPaths;
     };
 }
-
+// this listens and i have to detect where this file is coming from
 export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
     for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
+        // for core single, this would be workspaceroot/modules
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
 
         const paths: IPaths = {};
@@ -31,6 +32,7 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
 
         // set "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
+        // are there multiple jsonconfigFiles?
         const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
         try {
             // note, this read/write file must be synchronous, so it is atomic

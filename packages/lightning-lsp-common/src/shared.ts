@@ -19,10 +19,12 @@ export enum WorkspaceType {
     CORE_ALL,
     /** workspace including only one single core project (should not be used in java mode) */
     CORE_SINGLE_PROJECT,
+    // CORE_SINGLE
 
     UNKNOWN,
 }
 export function isUnknown(type: WorkspaceType) {
+    // what about core all or core single?
     switch (type) {
         case WorkspaceType.STANDARD:
         case WorkspaceType.MONOREPO_LWC:

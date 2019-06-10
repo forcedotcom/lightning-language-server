@@ -55,6 +55,7 @@ interface ITernFile {
 }
 
 let theRootPath: string;
+// let theRootPaths: string[];
 let ternServer: ITernServer;
 let asyncTernRequest;
 let asyncFlush;
@@ -122,6 +123,26 @@ async function loadPlugins(plugins, rootPath) {
     return options;
 }
 
+// async function loadPlugins(plugins, rootPaths) {
+//     const options = {};
+//     for (const plugin of Object.keys(plugins)) {
+//         const val = plugins[plugin];
+//         if (!val) {
+//             continue;
+//         }
+
+//         if (!(await loadLocal(plugin, rootPaths))) {
+//             if (!(await loadBuiltIn(plugin, rootPaths))) {
+//                 process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+//             }
+//         }
+
+//         options[path.basename(plugin)] = true;
+//     }
+
+//     return options;
+// }
+
 async function loadLocal(plugin, rootPath) {
     let found;
     try {
@@ -137,6 +158,24 @@ async function loadLocal(plugin, rootPath) {
     }
     return true;
 }
+
+// async function loadLocal(plugin, rootPaths) {
+//     let found;
+//     try {
+//         // local resolution only here
+//         found = require.resolve('./tern-' + plugin);
+//     } catch (e) {
+//         return false;
+//     }
+
+//     const mod = await import(found);
+//     if (mod.hasOwnProperty('initialize')) {
+//         for(const rootPath of rootPaths){
+//             mod.initialize(rootPath);
+//         }
+//     }
+//     return true;
+// }
 
 async function loadBuiltIn(plugin: string, rootPath: string) {
     const ternlibpath = require.resolve('../tern/lib/tern');
@@ -160,7 +199,33 @@ async function loadBuiltIn(plugin: string, rootPath: string) {
     return true;
 }
 
+// async function loadBuiltIn(plugin: string, rootPaths: string[]) {
+//     const ternlibpath = require.resolve('../tern/lib/tern');
+//     const ternbasedir = path.join(ternlibpath, '..', '..');
+
+//     const def = path.join(ternbasedir, 'plugin', plugin);
+
+//     let found: string;
+//     try {
+//         // local resolution only here
+//         found = require.resolve(def);
+//     } catch (e) {
+//         process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+//         return false;
+//     }
+
+//     const mod = await import(found);
+//     if (mod.hasOwnProperty('initialize')) {
+//         for(const rootPath of rootPaths){
+//             mod.initialize(rootPath);
+//         }
+//     }
+//     return true;
+// }
+
 export async function startServer(rootPath: string, wsroot: string) {
+    // console.log(rootPath);
+    // console.log(wsroot);
     const defs = findDefs(defaultLibs);
     const plugins = await loadPlugins(defaultPlugins, rootPath);
     const config: tern.ConstructorOptions = {
@@ -183,6 +248,36 @@ export async function startServer(rootPath: string, wsroot: string) {
 
     return ternServer;
 }
+
+// export async function startServer(rootPaths: string[], wsroots: string[]) {
+//     // console.log(rootPath);
+//     // console.log(wsroot);
+//     const defs = findDefs(defaultLibs);
+//     const plugins = await loadPlugins(defaultPlugins, rootPaths);
+//     const config: tern.ConstructorOptions = {
+//         ...defaultConfig,
+//         defs,
+//         plugins,
+//         // @ts-ignore 2345
+//         projectDir: rootPath,
+//         getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
+//             // note: this isn't invoked
+//             for(const rootPath of rootPaths){
+//                 fs.readFile(path.resolve(rootPath, filename), 'utf8', callback);
+//             }
+//         },
+//     };
+//     for(const wsroot of wsroots){
+//         theRootPaths.push(wsroot);
+//     }
+//     ternServer = new tern.Server(config) as ITernServer;
+//     asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
+//     asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
+
+//     init();
+
+//     return ternServer;
+// }
 
 function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
     return { line, ch: character };
@@ -210,6 +305,7 @@ function uriToFile(uri: string): string {
     return URI.parse(uri).fsPath;
 }
 
+// do I need to need to know where this file came from?
 function fileToUri(file: string): string {
     if (path.isAbsolute(file)) {
         return URI.file(file).toString();

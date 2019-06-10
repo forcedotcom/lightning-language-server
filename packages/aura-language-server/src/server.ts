@@ -69,8 +69,13 @@ function startIndexing() {
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath, capabilities } = params;
-
+        // i deleted capabilities as a declaration
+        const { rootUri, rootPath, workspaceFolders } = params;
+        const workspaceRoots: string[] = [];
+        for (const folder of workspaceFolders) {
+            workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
+            console.log(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
+        }
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
             if (!workspaceRoot) {
@@ -81,8 +86,10 @@ connection.onInitialize(
             console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
             await startServer(rootPath, workspaceRoot);
+            // await startServer(rootPath, workspaceRoots);
 
             context = new WorkspaceContext(workspaceRoot);
+            // context = new WorkspaceContext(workspaceRoots);
             context.configureProject();
 
             const auraIndexer = new AuraIndexer(context);
@@ -109,6 +116,11 @@ connection.onInitialize(
                     textDocumentSync: documents.syncKind,
                     completionProvider: {
                         resolveProvider: true,
+                    },
+                    workspace: {
+                        workspaceFolders: {
+                            supported: true,
+                        },
                     },
                     signatureHelpProvider: {
                         triggerCharacters: ['('],

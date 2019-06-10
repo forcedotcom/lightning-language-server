@@ -4,7 +4,7 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { join } from 'path';
 import { lt } from 'semver';
-import { TextDocument } from 'vscode-languageserver';
+import { TextDocument, Files } from 'vscode-languageserver';
 // @ts-ignore
 import templateSettings from 'lodash.templatesettings';
 // @ts-ignore
@@ -36,6 +36,7 @@ export class WorkspaceContext {
     // common to all project types
     public readonly type: WorkspaceType;
     public readonly workspaceRoot: string;
+    public readonly workspaceRoots: string[];
     public indexers: Map<string, Indexer> = new Map();
 
     // for sfdx projectsÍ
@@ -55,6 +56,19 @@ export class WorkspaceContext {
             this.initSfdxProjectConfigCache();
         }
     }
+
+    // public constructor(workspaceRoots: string[]) {
+    //     console.log('in constructor so i can make this workspaceroot now resolved' + path.resolve(workspaceRoot));
+    //     for(const workspaceRoot of workspaceRoots){
+    //         this.workspaceRoots.push(path.resolve(workspaceRoot));
+    //     }
+    //     this.type = detectWorkspaceType(workspaceRoots);
+    //     this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
+    //     this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
+    //     if (this.type === WorkspaceType.SFDX) {
+    //         this.initSfdxProjectConfigCache();
+    //     }
+    // }
 
     public async getNamespaceRoots(): Promise<{ lwc: string[]; aura: string[] }> {
         return this.findNamespaceRootsUsingTypeCache();
@@ -111,6 +125,12 @@ export class WorkspaceContext {
 
     public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
+        // for(const workspaceRoot of this.workspaceRoots){
+        //     if(utils.pathStartsWith(file, workspaceRoot)){
+        //         return this.isFileInsideAuraRoots(file);
+        //     }
+        // }
+        // return false;
         if (!utils.pathStartsWith(file, this.workspaceRoot)) {
             return false;
         }
@@ -119,12 +139,19 @@ export class WorkspaceContext {
 
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
+        // for(const workspaceRoot of this.workspaceRoots){
+        //     if(utils.pathStartsWith(file, workspaceRoot)){
+        //         return this.isFileInsideModulesRoots(file);
+        //     }
+        // }
+        // return false;
         if (!utils.pathStartsWith(file, this.workspaceRoot)) {
             return false;
         }
         return this.isFileInsideModulesRoots(file);
     }
 
+    // do two methods below need changing?
     public async isFileInsideModulesRoots(file: string): Promise<boolean> {
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
         for (const root of namespaceRoots.lwc) {
@@ -417,6 +444,11 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
+                // for(const workspaceRoot of workspaceRoots){
+                //     const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                //     roots.lwc.push(...coreroots.lwc);
+                //     roots.aura.push(...coreroots.aura);
+                // }
                 const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
                 roots.lwc.push(...coreroots.lwc);
                 roots.aura.push(...coreroots.aura);

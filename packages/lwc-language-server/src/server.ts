@@ -43,8 +43,14 @@ let context: WorkspaceContext;
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath } = params;
+        const { rootUri, rootPath, workspaceFolders } = params;
 
+        // const test = workspaceFolders;
+        const workspaceRoots: string[] = [];
+        for (const folder of workspaceFolders) {
+            workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
+            console.log(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
+        }
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
@@ -52,10 +58,18 @@ connection.onInitialize(
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
+            // if(!workspaceRoots){
+            //     console.warn(`No workspace found`);
+            //     return { capabilities: {} };
+            // }
 
+            // keep this? helpful for showing king root basically
             console.info(`Starting [[LWC]] language server at ${workspaceRoot}`);
+
             const startTime = process.hrtime();
-            context = new WorkspaceContext(workspaceRoot);
+            console.log('starting a workspace using ' + workspaceRoot);
+            context = new WorkspaceContext(workspaceRoot); // must fix after doing context.ts
+            // context = new WorkspaceContext(workspaceRoots);
             context.configureProject();
             const lwcIndexer = new LWCIndexer(context);
 
@@ -76,7 +90,6 @@ connection.onInitialize(
                     definitionProvider: true,
                     workspace: {
                         workspaceFolders: {
-                            changeNotifications: true,
                             supported: true,
                         },
                     },
@@ -211,6 +224,6 @@ connection.onRequest((method: string, ...params: any[]) => {
     console.log(method);
 });
 
-connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
-    console.log('request');
-});
+// connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
+//     console.log('request');
+// });
