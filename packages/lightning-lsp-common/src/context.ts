@@ -444,14 +444,11 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
-                // for(const workspaceRoot of workspaceRoots){
-                //     const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
-                //     roots.lwc.push(...coreroots.lwc);
-                //     roots.aura.push(...coreroots.aura);
-                // }
-                const coreroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
-                roots.lwc.push(...coreroots.lwc);
-                roots.aura.push(...coreroots.aura);
+                // make sure core roots path exists before pushing
+                const lwcSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                roots.lwc.push(...lwcSubroots.lwc);
+                const auraSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
+                roots.aura.push(...auraSubroots.aura);
                 return roots;
             case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
