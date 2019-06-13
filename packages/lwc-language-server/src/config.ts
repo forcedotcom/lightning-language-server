@@ -1,6 +1,8 @@
-import * as path from 'path';
+import * as path from 'path'; // is this ok?
+import * as fs from 'fs-extra';
 import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
 import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
+import { FORCE_APP_ROOT } from './html-language-service/__tests__/test-utils';
 
 const { WorkspaceType } = shared;
 
@@ -65,10 +67,24 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
     // add tag/path to component to all the project's jsconfig.json "paths"
     const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
     for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
+        // for (const ws of context.workspaceRoots) {
+        //     const modulesDir = path.join(ws, relativeModulesDir);
+        //     console.log(modulesDir);
+        //     const relativeFilePath = utils.relativePath(modulesDir, file);
+        //     if (await fs.pathExists(relativeFilePath)) {
+
+        //     }
+
+        // }
+
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
+        console.log(modulesDir);
 
         // path must be relative to location of jsconfig.json
+        // MUST SEE IF THIS PATH EXISTS FIRST, SEE AURA MODULE THING
         const relativeFilePath = utils.relativePath(modulesDir, file);
+
+        // await fs.pathExists(modulesDir)
 
         // update "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');

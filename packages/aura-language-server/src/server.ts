@@ -71,11 +71,13 @@ connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         // i deleted capabilities as a declaration
         const { rootUri, rootPath, workspaceFolders } = params;
+
+        // define workspace ROOTS
         const workspaceRoots: string[] = [];
         for (const folder of workspaceFolders) {
             workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
-            console.log(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
         }
+
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
             if (!workspaceRoot) {
@@ -88,8 +90,9 @@ connection.onInitialize(
             await startServer(rootPath, workspaceRoot);
             // await startServer(rootPath, workspaceRoots);
 
-            context = new WorkspaceContext(workspaceRoot);
-            // context = new WorkspaceContext(workspaceRoots);
+            // what is the deal here?
+            context = new WorkspaceContext(workspaceRoot, workspaceRoots);
+            // context = new WorkspaceContext(this.workspaceRoots);
             context.configureProject();
 
             const auraIndexer = new AuraIndexer(context);

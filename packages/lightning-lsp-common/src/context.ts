@@ -47,8 +47,12 @@ export class WorkspaceContext {
     /**
      * @return WorkspaceContext representing the workspace at workspaceRoot
      */
-    public constructor(workspaceRoot: string) {
+    public constructor(workspaceRoot: string, workspaceRoots: string[]) {
         this.workspaceRoot = path.resolve(workspaceRoot);
+        this.workspaceRoots = workspaceRoots;
+        for (const ws of this.workspaceRoots) {
+            console.log(ws);
+        }
         this.type = detectWorkspaceType(workspaceRoot);
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
@@ -56,20 +60,6 @@ export class WorkspaceContext {
             this.initSfdxProjectConfigCache();
         }
     }
-
-    // public constructor(workspaceRoots: string[]) {
-    //     console.log('in constructor so i can make this workspaceroot now resolved' + path.resolve(workspaceRoot));
-    //     for(const workspaceRoot of workspaceRoots){
-    //         this.workspaceRoots.push(path.resolve(workspaceRoot));
-    //     }
-    //     this.type = detectWorkspaceType(workspaceRoots);
-    //     this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
-    //     this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
-    //     if (this.type === WorkspaceType.SFDX) {
-    //         this.initSfdxProjectConfigCache();
-    //     }
-    // }
-
     public async getNamespaceRoots(): Promise<{ lwc: string[]; aura: string[] }> {
         return this.findNamespaceRootsUsingTypeCache();
     }
@@ -125,30 +115,31 @@ export class WorkspaceContext {
 
     public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
-        // for(const workspaceRoot of this.workspaceRoots){
-        //     if(utils.pathStartsWith(file, workspaceRoot)){
-        //         return this.isFileInsideAuraRoots(file);
-        //     }
-        // }
-        // return false;
-        if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-            return false;
+        for (const ws of this.workspaceRoots) {
+            if (utils.pathStartsWith(file, ws)) {
+                console.log('workspace ' + ws + 'starts with ' + file);
+                return this.isFileInsideAuraRoots(file);
+            }
         }
-        return this.isFileInsideAuraRoots(file);
+        return false;
+        // if (!utils.pathStartsWith(file, this.workspaceRoot)) {
+        //     return false;
+        // }
+        // return this.isFileInsideAuraRoots(file);
     }
 
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
-        // for(const workspaceRoot of this.workspaceRoots){
-        //     if(utils.pathStartsWith(file, workspaceRoot)){
-        //         return this.isFileInsideModulesRoots(file);
-        //     }
-        // }
-        // return false;
-        if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-            return false;
+        for (const workspaceRoot of this.workspaceRoots) {
+            if (utils.pathStartsWith(file, workspaceRoot)) {
+                return this.isFileInsideModulesRoots(file);
+            }
         }
-        return this.isFileInsideModulesRoots(file);
+        return false;
+        // if (!utils.pathStartsWith(file, this.workspaceRoot)) {
+        //     return false;
+        // }
+        // return this.isFileInsideModulesRoots(file);
     }
 
     // do two methods below need changing?
@@ -230,6 +221,7 @@ export class WorkspaceContext {
                 typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_SINGLE_PROJECT:
+                // are we ok with writing typings through one root? or should typingsDir be a list?
                 typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_ALL:
@@ -291,11 +283,12 @@ export class WorkspaceContext {
                 break;
 
             case WorkspaceType.CORE_SINGLE_PROJECT:
+                // nothing additional needs to be done here for multi root case
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
-                for (const relativeModulesDir of relativeModulesDirs) {
+                for (const relativeModulesDir of relativeModulesDirs) { // this for loop is unecessary but will leave for time being
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
                 }
                 break;
         }
@@ -385,25 +378,47 @@ export class WorkspaceContext {
     private updateConfigFile(relativeConfigPath: string, config: string) {
         // note: we don't want to use async file i/o here, because we don't want another task
         // to interleve with reading/writing this file
-        const configFile = join(this.workspaceRoot, relativeConfigPath);
-        try {
-            const configJson = JSON.parse(config);
-            if (!fs.pathExistsSync(configFile)) {
-                utils.writeJsonSync(configFile, configJson);
-            } else {
-                try {
-                    const fileConfig = utils.readJsonSync(configFile);
-                    if (utils.deepMerge(fileConfig, configJson)) {
-                        utils.writeJsonSync(configFile, fileConfig);
-                    }
-                } catch (e) {
-                    // misformed file, write out fresh one
+        for (const ws of this.workspaceRoots) {
+            const configFile = join(ws, relativeConfigPath);
+            try {
+                const configJson = JSON.parse(config);
+                if (!fs.pathExistsSync(configFile)) {
                     utils.writeJsonSync(configFile, configJson);
+                } else {
+                    try {
+                        const fileConfig = utils.readJsonSync(configFile);
+                        if (utils.deepMerge(fileConfig, configJson)) {
+                            utils.writeJsonSync(configFile, fileConfig);
+                        }
+                    } catch (e) {
+                        // misinformed file, write out a fresh one
+                        utils.writeJsonSync(configFile, configJson);
+                    }
                 }
+            } catch (error) {
+                console.warn('Error updating ' + configFile, error);
             }
-        } catch (error) {
-            console.warn('Error updating ' + configFile, error);
         }
+    //     const configFile = join(this.workspaceRoot, relativeConfigPath);
+    //     try {
+    //         const configJson = JSON.parse(config);
+    //         if (!fs.pathExistsSync(configFile)) {
+    //             utils.writeJsonSync(configFile, configJson);
+    //         } else {
+    //             try {
+    //                 const fileConfig = utils.readJsonSync(configFile);
+    //                 if (utils.deepMerge(fileConfig, configJson)) {
+    //                     utils.writeJsonSync(configFile, fileConfig);
+    //                 }
+    //             } catch (e) {
+    //                 // misformed file, write out fresh one
+    //                 utils.writeJsonSync(configFile, configJson);
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.warn('Error updating ' + configFile, error);
+    //     }
+    // }
     }
 
     private async updateForceIgnoreFile(ignoreFile: string) {
@@ -445,10 +460,23 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
                 // make sure core roots path exists before pushing
-                const lwcSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
-                roots.lwc.push(...lwcSubroots.lwc);
-                const auraSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
-                roots.aura.push(...auraSubroots.aura);
+                // const lwcSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                // roots.lwc.push(...lwcSubroots.lwc);
+                // const auraSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
+                // roots.aura.push(...auraSubroots.aura);
+                // return roots;
+                for (const ws of this.workspaceRoots) {
+                    const modulesDir = join(ws, 'modules');
+                    if (await fs.pathExists(modulesDir)) {
+                        const subroots = await findNamespaceRoots(join(ws, 'modules'), 2);
+                        roots.lwc.push(...subroots.lwc);
+                    }
+                    const auraDir = join(ws, 'components');
+                    if (await fs.pathExists(auraDir)) {
+                        const subroots = await findNamespaceRoots(join(ws, 'components'), 2);
+                        roots.aura.push(...subroots.aura);
+                    }
+                }
                 return roots;
             case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:

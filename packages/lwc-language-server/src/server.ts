@@ -49,7 +49,6 @@ connection.onInitialize(
         const workspaceRoots: string[] = [];
         for (const folder of workspaceFolders) {
             workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
-            console.log(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
         }
         // Early exit if no workspace is opened
         const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
@@ -58,18 +57,15 @@ connection.onInitialize(
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
-            // if(!workspaceRoots){
-            //     console.warn(`No workspace found`);
-            //     return { capabilities: {} };
-            // }
 
-            // keep this? helpful for showing king root basically
             console.info(`Starting [[LWC]] language server at ${workspaceRoot}`);
 
             const startTime = process.hrtime();
-            console.log('starting a workspace using ' + workspaceRoot);
-            context = new WorkspaceContext(workspaceRoot); // must fix after doing context.ts
+            // context = new WorkspaceContext(workspaceRoots, workspaceRoot); // must fix after doing context.ts
             // context = new WorkspaceContext(workspaceRoots);
+
+            context = new WorkspaceContext(workspaceRoot, workspaceRoots);
+
             context.configureProject();
             const lwcIndexer = new LWCIndexer(context);
 
