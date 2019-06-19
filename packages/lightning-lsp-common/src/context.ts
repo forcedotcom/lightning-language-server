@@ -34,9 +34,9 @@ export interface Indexer {
  */
 export class WorkspaceContext {
     // common to all project types
-    public readonly type: WorkspaceType;
-    public readonly workspaceRoot: string;
-    public readonly workspaceRoots: string[];
+    public type: WorkspaceType;
+    public workspaceRoot: string;
+    public workspaceRoots: string[];
     public indexers: Map<string, Indexer> = new Map();
 
     // for sfdx projectsÍ
@@ -47,12 +47,9 @@ export class WorkspaceContext {
     /**
      * @return WorkspaceContext representing the workspace at workspaceRoot
      */
-    public constructor(workspaceRoot: string, workspaceRoots: string[]) {
+    public constructor(workspaceRoot: string, workspaceRoots?: string[]) {
         this.workspaceRoot = path.resolve(workspaceRoot);
-        this.workspaceRoots = workspaceRoots;
-        for (const ws of this.workspaceRoots) {
-            console.log(ws);
-        }
+        this.workspaceRoots = workspaceRoots || [];
         this.type = detectWorkspaceType(workspaceRoot);
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
@@ -115,6 +112,12 @@ export class WorkspaceContext {
 
     public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
+        if (!this.workspaceRoots.length) {
+            if (!utils.pathStartsWith(file, this.workspaceRoot)) {
+                return false;
+            }
+            return this.isFileInsideAuraRoots(file);
+        }
         for (const ws of this.workspaceRoots) {
             if (utils.pathStartsWith(file, ws)) {
                 console.log('workspace ' + ws + 'starts with ' + file);
@@ -122,24 +125,22 @@ export class WorkspaceContext {
             }
         }
         return false;
-        // if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-        //     return false;
-        // }
-        // return this.isFileInsideAuraRoots(file);
     }
 
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
         const file = utils.toResolvedPath(document.uri);
-        for (const workspaceRoot of this.workspaceRoots) {
-            if (utils.pathStartsWith(file, workspaceRoot)) {
+        if (!this.workspaceRoots.length) {
+            if (!utils.pathStartsWith(file, this.workspaceRoot)) {
+                return false;
+            }
+            return this.isFileInsideModulesRoots(file);
+        }
+        for (const ws of this.workspaceRoots) {
+            if (utils.pathStartsWith(file, ws)) {
                 return this.isFileInsideModulesRoots(file);
             }
         }
         return false;
-        // if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-        //     return false;
-        // }
-        // return this.isFileInsideModulesRoots(file);
     }
 
     // do two methods below need changing?
@@ -377,9 +378,9 @@ export class WorkspaceContext {
      */
     private updateConfigFile(relativeConfigPath: string, config: string) {
         // note: we don't want to use async file i/o here, because we don't want another task
-        // to interleve with reading/writing this file
-        for (const ws of this.workspaceRoots) {
-            const configFile = join(ws, relativeConfigPath);
+        // to interleve with reading/writing this 
+        if (!this.workspaceRoots.length) {
+            const configFile = join(this.workspaceRoot, relativeConfigPath);
             try {
                 const configJson = JSON.parse(config);
                 if (!fs.pathExistsSync(configFile)) {
@@ -391,34 +392,36 @@ export class WorkspaceContext {
                             utils.writeJsonSync(configFile, fileConfig);
                         }
                     } catch (e) {
-                        // misinformed file, write out a fresh one
+                        // misformed file, write out fresh one
                         utils.writeJsonSync(configFile, configJson);
                     }
                 }
             } catch (error) {
                 console.warn('Error updating ' + configFile, error);
             }
+        } else {
+            for (const ws of this.workspaceRoots) {
+                const configFile = join(ws, relativeConfigPath);
+                try {
+                    const configJson = JSON.parse(config);
+                    if (!fs.pathExistsSync(configFile)) {
+                        utils.writeJsonSync(configFile, configJson);
+                    } else {
+                        try {
+                            const fileConfig = utils.readJsonSync(configFile);
+                            if (utils.deepMerge(fileConfig, configJson)) {
+                                utils.writeJsonSync(configFile, fileConfig);
+                            }
+                        } catch (e) {
+                            // misinformed file, write out a fresh one
+                            utils.writeJsonSync(configFile, configJson);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error updating ' + configFile, error);
+                }
+            }
         }
-    //     const configFile = join(this.workspaceRoot, relativeConfigPath);
-    //     try {
-    //         const configJson = JSON.parse(config);
-    //         if (!fs.pathExistsSync(configFile)) {
-    //             utils.writeJsonSync(configFile, configJson);
-    //         } else {
-    //             try {
-    //                 const fileConfig = utils.readJsonSync(configFile);
-    //                 if (utils.deepMerge(fileConfig, configJson)) {
-    //                     utils.writeJsonSync(configFile, fileConfig);
-    //                 }
-    //             } catch (e) {
-    //                 // misformed file, write out fresh one
-    //                 utils.writeJsonSync(configFile, configJson);
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.warn('Error updating ' + configFile, error);
-    //     }
-    // }
     }
 
     private async updateForceIgnoreFile(ignoreFile: string) {
@@ -459,22 +462,29 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 // optimization: search only inside modules/
-                // make sure core roots path exists before pushing
-                // const lwcSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
-                // roots.lwc.push(...lwcSubroots.lwc);
-                // const auraSubroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
-                // roots.aura.push(...auraSubroots.aura);
-                // return roots;
-                for (const ws of this.workspaceRoots) {
-                    const modulesDir = join(ws, 'modules');
+                if (! this.workspaceRoots.length) {
+                    const modulesDir = join(this.workspaceRoot, 'modules');
                     if (await fs.pathExists(modulesDir)) {
-                        const subroots = await findNamespaceRoots(join(ws, 'modules'), 2);
+                        const subroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }
-                    const auraDir = join(ws, 'components');
+                    const auraDir = join(this.workspaceRoot, 'components');
                     if (await fs.pathExists(auraDir)) {
-                        const subroots = await findNamespaceRoots(join(ws, 'components'), 2);
+                        const subroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
                         roots.aura.push(...subroots.aura);
+                    }
+                } else {
+                    for (const ws of this.workspaceRoots) {
+                        const modulesDir = join(ws, 'modules');
+                        if (await fs.pathExists(modulesDir)) {
+                            const subroots = await findNamespaceRoots(join(ws, 'modules'), 2);
+                            roots.lwc.push(...subroots.lwc);
+                        }
+                        const auraDir = join(ws, 'components');
+                        if (await fs.pathExists(auraDir)) {
+                            const subroots = await findNamespaceRoots(join(ws, 'components'), 2);
+                            roots.aura.push(...subroots.aura);
+                        }
                     }
                 }
                 return roots;

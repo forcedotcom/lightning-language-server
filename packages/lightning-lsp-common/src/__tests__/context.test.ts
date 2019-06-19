@@ -6,6 +6,7 @@ import * as utils from '../utils';
 import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument, REGISTERED_EMPTY_FOLDER_ROOT } from './test-utils';
 
 it('WorkspaceContext', async () => {
+    console.log('printing');
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoot).toBeAbsolutePath();

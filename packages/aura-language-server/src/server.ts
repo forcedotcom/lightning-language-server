@@ -87,7 +87,10 @@ connection.onInitialize(
 
             console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
-            await startServer(rootPath, workspaceRoot);
+            // if in a core scenario
+            await startServer('/Users/cmatthiasson/blt/main/app/core', '/Users/cmatthiasson/blt/main/app/core');
+
+            // await startServer(rootPath, workspaceRoot);
             // await startServer(rootPath, workspaceRoots);
 
             // what is the deal here?
