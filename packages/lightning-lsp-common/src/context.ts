@@ -378,7 +378,7 @@ export class WorkspaceContext {
      */
     private updateConfigFile(relativeConfigPath: string, config: string) {
         // note: we don't want to use async file i/o here, because we don't want another task
-        // to interleve with reading/writing this 
+        // to interleve with reading/writing this
         if (!this.workspaceRoots.length) {
             const configFile = join(this.workspaceRoot, relativeConfigPath);
             try {
@@ -473,7 +473,7 @@ export class WorkspaceContext {
                         const subroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
                         roots.aura.push(...subroots.aura);
                     }
-                } else {
+                } else { // core multi root
                     for (const ws of this.workspaceRoots) {
                         const modulesDir = join(ws, 'modules');
                         if (await fs.pathExists(modulesDir)) {
