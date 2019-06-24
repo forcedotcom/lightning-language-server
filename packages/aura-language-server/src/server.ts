@@ -87,13 +87,13 @@ connection.onInitialize(
 
             console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
-            // if in a core scenario
-            // console.log(path.join(workspaceRoot, '/../'));
+
             context = new WorkspaceContext(workspaceRoot, workspaceRoots);
-            if (context.type === WorkspaceType.CORE_SINGLE_PROJECT) {
+            if (context.type === WorkspaceType.CORE_PARTIAL) {
                 await startServer(path.join(workspaceRoot, '..'), path.join(workspaceRoot, '/../'));
+            } else {
+                await startServer(rootPath, workspaceRoot);
             }
-            await startServer(rootPath, workspaceRoot);
             context.configureProject();
 
             const auraIndexer = new AuraIndexer(context);

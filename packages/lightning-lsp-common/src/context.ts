@@ -12,7 +12,7 @@ import template from 'lodash.template';
 // @ts-ignore
 import { parse } from 'properties';
 
-import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
+import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC, detectWorkspaceTypes } from './shared';
 import * as utils from './utils';
 import { componentUtil } from './index';
 
@@ -50,7 +50,10 @@ export class WorkspaceContext {
     public constructor(workspaceRoot: string, workspaceRoots?: string[]) {
         this.workspaceRoot = path.resolve(workspaceRoot);
         this.workspaceRoots = workspaceRoots || [];
-        this.type = detectWorkspaceType(workspaceRoot);
+        const roots = this.workspaceRoots.length ? this.workspaceRoots : [this.workspaceRoot];
+        // this.type = detectWorkspaceType(workspaceRoot);
+        this.type = detectWorkspaceTypes(roots);
+
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
         if (this.type === WorkspaceType.SFDX) {
@@ -111,16 +114,10 @@ export class WorkspaceContext {
     }
 
     public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
+        const workspaceRoots = this.workspaceRoots.length ? this.workspaceRoots : [this.workspaceRoot];
         const file = utils.toResolvedPath(document.uri);
-        if (!this.workspaceRoots.length) {
-            if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-                return false;
-            }
-            return this.isFileInsideAuraRoots(file);
-        }
-        for (const ws of this.workspaceRoots) {
+        for (const ws of workspaceRoots) {
             if (utils.pathStartsWith(file, ws)) {
-                console.log('workspace ' + ws + 'starts with ' + file);
                 return this.isFileInsideAuraRoots(file);
             }
         }
@@ -128,14 +125,9 @@ export class WorkspaceContext {
     }
 
     public async isInsideModulesRoots(document: TextDocument): Promise<boolean> {
+        const workspaceRoots = this.workspaceRoots.length ? this.workspaceRoots : [this.workspaceRoot];
         const file = utils.toResolvedPath(document.uri);
-        if (!this.workspaceRoots.length) {
-            if (!utils.pathStartsWith(file, this.workspaceRoot)) {
-                return false;
-            }
-            return this.isFileInsideModulesRoots(file);
-        }
-        for (const ws of this.workspaceRoots) {
+        for (const ws of workspaceRoots) {
             if (utils.pathStartsWith(file, ws)) {
                 return this.isFileInsideModulesRoots(file);
             }
@@ -194,7 +186,7 @@ export class WorkspaceContext {
                     }
                 }
                 break;
-            case WorkspaceType.CORE_SINGLE_PROJECT:
+            case WorkspaceType.CORE_PARTIAL:
                 list.push('modules');
                 break;
         }
@@ -221,7 +213,7 @@ export class WorkspaceContext {
             case WorkspaceType.SFDX:
                 typingsDir = join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_SINGLE_PROJECT:
+            case WorkspaceType.CORE_PARTIAL:
                 // are we ok with writing typings through one root? or should typingsDir be a list?
                 typingsDir = join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
@@ -283,7 +275,7 @@ export class WorkspaceContext {
                 }
                 break;
 
-            case WorkspaceType.CORE_SINGLE_PROJECT:
+            case WorkspaceType.CORE_PARTIAL:
                 // nothing additional needs to be done here for multi root case
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
@@ -299,12 +291,11 @@ export class WorkspaceContext {
         switch (this.type) {
             case WorkspaceType.SFDX:
                 break;
-
             case WorkspaceType.CORE_ALL:
             // Removing these for now
             // await this.updateCoreCodeWorkspace();
             // await this.updateCoreLaunch();
-            case WorkspaceType.CORE_SINGLE_PROJECT:
+            case WorkspaceType.CORE_PARTIAL:
                 // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreSettings();
                 break;
@@ -343,7 +334,7 @@ export class WorkspaceContext {
     private async readConfigBlt() {
         const isMain = this.workspaceRoot.indexOf(join('main', 'core')) !== -1;
         let relativeBltDir = isMain ? join('..', '..', '..') : join('..', '..', '..', '..');
-        if (this.type === WorkspaceType.CORE_SINGLE_PROJECT) {
+        if (this.type === WorkspaceType.CORE_PARTIAL) {
             relativeBltDir = join(relativeBltDir, '..');
         }
         const configBltContent = await fs.readFile(join(this.workspaceRoot, relativeBltDir, 'config.blt'), 'utf8');
@@ -379,8 +370,9 @@ export class WorkspaceContext {
     private updateConfigFile(relativeConfigPath: string, config: string) {
         // note: we don't want to use async file i/o here, because we don't want another task
         // to interleve with reading/writing this
-        if (!this.workspaceRoots.length) {
-            const configFile = join(this.workspaceRoot, relativeConfigPath);
+        const workspaceRoots = this.workspaceRoots.length ? this.workspaceRoots : [this.workspaceRoot];
+        for (const ws of workspaceRoots) {
+            const configFile = join(ws, relativeConfigPath);
             try {
                 const configJson = JSON.parse(config);
                 if (!fs.pathExistsSync(configFile)) {
@@ -392,34 +384,12 @@ export class WorkspaceContext {
                             utils.writeJsonSync(configFile, fileConfig);
                         }
                     } catch (e) {
-                        // misformed file, write out fresh one
+                        // misinformed file, write out a fresh one
                         utils.writeJsonSync(configFile, configJson);
                     }
                 }
             } catch (error) {
                 console.warn('Error updating ' + configFile, error);
-            }
-        } else {
-            for (const ws of this.workspaceRoots) {
-                const configFile = join(ws, relativeConfigPath);
-                try {
-                    const configJson = JSON.parse(config);
-                    if (!fs.pathExistsSync(configFile)) {
-                        utils.writeJsonSync(configFile, configJson);
-                    } else {
-                        try {
-                            const fileConfig = utils.readJsonSync(configFile);
-                            if (utils.deepMerge(fileConfig, configJson)) {
-                                utils.writeJsonSync(configFile, fileConfig);
-                            }
-                        } catch (e) {
-                            // misinformed file, write out a fresh one
-                            utils.writeJsonSync(configFile, configJson);
-                        }
-                    }
-                } catch (error) {
-                    console.warn('Error updating ' + configFile, error);
-                }
             }
         }
     }
@@ -460,31 +430,19 @@ export class WorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_SINGLE_PROJECT:
+            case WorkspaceType.CORE_PARTIAL:
                 // optimization: search only inside modules/
-                if (! this.workspaceRoots.length) {
-                    const modulesDir = join(this.workspaceRoot, 'modules');
+                const workspaceRoots = this.workspaceRoots.length ? this.workspaceRoots : [this.workspaceRoot];
+                for (const ws of workspaceRoots) {
+                    const modulesDir = join(ws, 'modules');
                     if (await fs.pathExists(modulesDir)) {
-                        const subroots = await findNamespaceRoots(join(this.workspaceRoot, 'modules'), 2);
+                        const subroots = await findNamespaceRoots(join(ws, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }
-                    const auraDir = join(this.workspaceRoot, 'components');
+                    const auraDir = join(ws, 'components');
                     if (await fs.pathExists(auraDir)) {
-                        const subroots = await findNamespaceRoots(join(this.workspaceRoot, 'components'), 2);
+                        const subroots = await findNamespaceRoots(join(ws, 'components'), 2);
                         roots.aura.push(...subroots.aura);
-                    }
-                } else { // core multi root
-                    for (const ws of this.workspaceRoots) {
-                        const modulesDir = join(ws, 'modules');
-                        if (await fs.pathExists(modulesDir)) {
-                            const subroots = await findNamespaceRoots(join(ws, 'modules'), 2);
-                            roots.lwc.push(...subroots.lwc);
-                        }
-                        const auraDir = join(ws, 'components');
-                        if (await fs.pathExists(auraDir)) {
-                            const subroots = await findNamespaceRoots(join(ws, 'components'), 2);
-                            roots.aura.push(...subroots.aura);
-                        }
                     }
                 }
                 return roots;

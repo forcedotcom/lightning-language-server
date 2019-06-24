@@ -18,9 +18,9 @@ export enum WorkspaceType {
     /** workspace including all core projects */
     CORE_ALL,
     /** workspace including only one single core project (should not be used in java mode) */
-    CORE_SINGLE_PROJECT,
+    CORE_PARTIAL,
     // CORE_SINGLE
-
+    // CORE_PARTIAL
     UNKNOWN,
 }
 export function isUnknown(type: WorkspaceType) {
@@ -35,7 +35,7 @@ export function isUnknown(type: WorkspaceType) {
     return false;
 }
 export function isLWC(type: WorkspaceType): boolean {
-    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
+    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
 }
 
 export function getSfdxProjectFile(workspaceRoot: string) {
@@ -50,7 +50,7 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
         return WorkspaceType.CORE_ALL;
     }
     if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
-        return WorkspaceType.CORE_SINGLE_PROJECT;
+        return WorkspaceType.CORE_PARTIAL;
     }
 
     const packageJson = path.join(workspaceRoot, 'package.json');
@@ -81,4 +81,18 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
 
     console.error('unknown workspace type:', workspaceRoot);
     return WorkspaceType.UNKNOWN;
+}
+
+export function detectWorkspaceTypes(workspaceRoots: string[]): WorkspaceType {
+    if (workspaceRoots.length === 1) {
+        return detectWorkspaceType(workspaceRoots[0]);
+    }
+    for (const root of workspaceRoots) {
+        const type = detectWorkspaceType(root);
+        if (type !== WorkspaceType.CORE_PARTIAL) {
+            console.error('unknown workspace type');
+            return WorkspaceType.UNKNOWN;
+        }
+    }
+    return WorkspaceType.CORE_PARTIAL;
 }

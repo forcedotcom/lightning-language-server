@@ -6,7 +6,6 @@ import * as utils from '../utils';
 import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument, REGISTERED_EMPTY_FOLDER_ROOT } from './test-utils';
 
 it('WorkspaceContext', async () => {
-    console.log('printing');
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoot).toBeAbsolutePath();
@@ -52,7 +51,7 @@ it('WorkspaceContext', async () => {
     expect((await context.getRelativeModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
-    expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
+    expect(context.type).toBe(WorkspaceType.CORE_PARTIAL);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.lwc.length).toBe(1);

@@ -78,7 +78,6 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
         // }
 
         const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
-        console.log(modulesDir);
 
         // path must be relative to location of jsconfig.json
         // MUST SEE IF THIS PATH EXISTS FIRST, SEE AURA MODULE THING
