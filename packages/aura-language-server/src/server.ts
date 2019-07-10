@@ -311,5 +311,11 @@ documents.onDidClose(delFile);
 connection.onReferences(onReferences);
 connection.onSignatureHelp(onSignatureHelp);
 
+// vscode.workspace.onDid
+
+// connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
+//     console.log('request');
+// });
+
 // Listen on the connection
 connection.listen();

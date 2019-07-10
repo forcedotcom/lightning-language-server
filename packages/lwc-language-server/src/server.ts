@@ -223,3 +223,5 @@ connection.onRequest((method: string, ...params: any[]) => {
 // connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
 //     console.log('request');
 // });
+
+// connection.workspace.onDidChangeWorkspaceFolders()
