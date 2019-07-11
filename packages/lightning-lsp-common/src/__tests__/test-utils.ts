@@ -8,8 +8,7 @@ export const UTILS_ROOT = join('test-workspaces', 'sfdx-workspace', 'utils', 'me
 export const REGISTERED_EMPTY_FOLDER_ROOT = join('test-workspaces', 'sfdx-workspace', 'registered-empty-folder', 'meta');
 export const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app', 'main', 'core');
 export const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
-const workspaceRoots: string[] = [join(CORE_ALL_ROOT, 'ui-force-components'), join(CORE_ALL_ROOT, 'ui-global-components')];
-export const CORE_MULTI_ROOT = workspaceRoots;
+export const CORE_MULTI_ROOT = [join(CORE_ALL_ROOT, 'ui-force-components'), join(CORE_ALL_ROOT, 'ui-global-components')];
 export const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
 
 export function readAsTextDocument(path: string): TextDocument {

@@ -33,7 +33,6 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
 
         // set "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        // are there multiple jsonconfigFiles?
         const jsconfigFile = path.join(context.workspaceRoots[0], relativeJsConfigPath);
         try {
             // note, this read/write file must be synchronous, so it is atomic
