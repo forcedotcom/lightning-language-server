@@ -17,7 +17,7 @@ import {
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
-    expect(context.workspaceRoot).toBeAbsolutePath();
+    expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
     expect(roots.lwc[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
@@ -70,7 +70,7 @@ it('WorkspaceContext', async () => {
     expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
 
     // so looks the same as core all but is core multi root
-    context = new WorkspaceContext(CORE_MULTI_ROOT[0], CORE_MULTI_ROOT);
+    context = new WorkspaceContext(CORE_MULTI_ROOT);
     expect(context.workspaceRoots.length).toBe(2);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/clients'));
@@ -243,9 +243,9 @@ it('configureCoreProject()', async () => {
 });
 
 it('configureCoreMulti()', async () => {
-    const context = new WorkspaceContext(CORE_MULTI_ROOT[0], CORE_MULTI_ROOT);
+    const context = new WorkspaceContext(CORE_MULTI_ROOT);
 
-    const jsconfigPathForce = context.workspaceRoot + '/modules/jsconfig.json';
+    const jsconfigPathForce = context.workspaceRoots[0] + '/modules/jsconfig.json';
     const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
     const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
     const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';

@@ -45,26 +45,20 @@ connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
         const { rootUri, rootPath, workspaceFolders } = params;
 
-        // const test = workspaceFolders;
         const workspaceRoots: string[] = [];
         for (const folder of workspaceFolders) {
             workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
         }
-        // Early exit if no workspace is opened
-        const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
-            if (!workspaceRoot) {
+            if (!workspaceRoots) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting [[LWC]] language server at ${workspaceRoot}`);
+            console.info(`Starting [[LWC]] language server at ${workspaceRoots[0]}`);
 
             const startTime = process.hrtime();
-            // context = new WorkspaceContext(workspaceRoots, workspaceRoot); // must fix after doing context.ts
-            // context = new WorkspaceContext(workspaceRoots);
-
-            context = new WorkspaceContext(workspaceRoot, workspaceRoots);
+            context = new WorkspaceContext(workspaceRoots);
 
             context.configureProject();
             const lwcIndexer = new LWCIndexer(context);
@@ -75,7 +69,6 @@ connection.onInitialize(
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getLwcTagProvider());
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
-            // Return the language server capabilities
             return {
                 capabilities: {
                     textDocumentSync: documents.syncKind,
@@ -219,9 +212,3 @@ connection.onRequest((method: string, ...params: any[]) => {
     // debugger
     console.log(method);
 });
-
-// connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
-//     console.log('request');
-// });
-
-// connection.workspace.onDidChangeWorkspaceFolders()

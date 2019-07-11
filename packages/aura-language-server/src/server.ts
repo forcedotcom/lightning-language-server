@@ -69,30 +69,25 @@ function startIndexing() {
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        // i deleted capabilities as a declaration
         const { rootUri, rootPath, workspaceFolders } = params;
-
-        // define workspace ROOTS
         const workspaceRoots: string[] = [];
         for (const folder of workspaceFolders) {
             workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
         }
-
-        const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
         try {
-            if (!workspaceRoot) {
+            if (!workspaceRoots) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting *AURA* language server at ${workspaceRoot}`);
+            console.info(`Starting *AURA* language server at ${workspaceRoots[0]}`);
             const startTime = process.hrtime();
 
-            context = new WorkspaceContext(workspaceRoot, workspaceRoots);
+            context = new WorkspaceContext(workspaceRoots);
             if (context.type === WorkspaceType.CORE_PARTIAL) {
-                await startServer(path.join(workspaceRoot, '..'), path.join(workspaceRoot, '/../'));
+                await startServer(path.join(workspaceRoots[0], '..'), path.join(workspaceRoots[0], '/../'));
             } else {
-                await startServer(rootPath, workspaceRoot);
+                await startServer(rootPath, workspaceRoots[0]);
             }
             context.configureProject();
 
@@ -310,12 +305,6 @@ documents.onDidChangeContent(addFile);
 documents.onDidClose(delFile);
 connection.onReferences(onReferences);
 connection.onSignatureHelp(onSignatureHelp);
-
-// vscode.workspace.onDid
-
-// connection.onRequest('workspace/didChangeWorkspaceFolders', args => {
-//     console.log('request');
-// });
 
 // Listen on the connection
 connection.listen();

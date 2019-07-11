@@ -19,8 +19,6 @@ export enum WorkspaceType {
     CORE_ALL,
     /** workspace including only one single core project (should not be used in java mode) */
     CORE_PARTIAL,
-    // CORE_SINGLE
-    // CORE_PARTIAL
     UNKNOWN,
 }
 export function isUnknown(type: WorkspaceType) {
@@ -38,22 +36,22 @@ export function isLWC(type: WorkspaceType): boolean {
     return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
 }
 
-export function getSfdxProjectFile(workspaceRoot: string) {
-    return path.join(workspaceRoot, SFDX_PROJECT);
+export function getSfdxProjectFile(root: string) {
+    return path.join(root, SFDX_PROJECT);
 }
 
-export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
-    if (fs.existsSync(getSfdxProjectFile(workspaceRoot))) {
+export function detectWorkspaceHelper(root: string): WorkspaceType {
+    if (fs.existsSync(getSfdxProjectFile(root))) {
         return WorkspaceType.SFDX;
     }
-    if (fs.existsSync(path.join(workspaceRoot, 'workspace-user.xml'))) {
+    if (fs.existsSync(path.join(root, 'workspace-user.xml'))) {
         return WorkspaceType.CORE_ALL;
     }
-    if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
+    if (fs.existsSync(path.join(root, '..', 'workspace-user.xml'))) {
         return WorkspaceType.CORE_PARTIAL;
     }
 
-    const packageJson = path.join(workspaceRoot, 'package.json');
+    const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
             // Check if package.json contains @lwc/engine
@@ -69,7 +67,7 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
             if (packageInfo.workspaces) {
                 return WorkspaceType.MONOREPO;
             }
-            if (fs.existsSync(path.join(workspaceRoot, 'lerna.json'))) {
+            if (fs.existsSync(path.join(root, 'lerna.json'))) {
                 return WorkspaceType.MONOREPO;
             }
             return WorkspaceType.STANDARD;
@@ -79,16 +77,16 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
         }
     }
 
-    console.error('unknown workspace type:', workspaceRoot);
+    console.error('unknown workspace type:', root);
     return WorkspaceType.UNKNOWN;
 }
 
-export function detectWorkspaceTypes(workspaceRoots: string[]): WorkspaceType {
+export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
     if (workspaceRoots.length === 1) {
-        return detectWorkspaceType(workspaceRoots[0]);
+        return detectWorkspaceHelper(workspaceRoots[0]);
     }
     for (const root of workspaceRoots) {
-        const type = detectWorkspaceType(root);
+        const type = detectWorkspaceHelper(root);
         if (type !== WorkspaceType.CORE_PARTIAL) {
             console.error('unknown workspace type');
             return WorkspaceType.UNKNOWN;

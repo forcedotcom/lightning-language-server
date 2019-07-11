@@ -21,8 +21,7 @@ export interface IJsconfig {
 export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
     for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
-        // for core single, this would be workspaceroot/modules
-        const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
+        const modulesDir = path.join(context.workspaceRoots[0], relativeModulesDir);
 
         const paths: IPaths = {};
         for (const file of files) {
@@ -35,7 +34,7 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
         // set "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
         // are there multiple jsonconfigFiles?
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+        const jsconfigFile = path.join(context.workspaceRoots[0], relativeJsConfigPath);
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
@@ -67,27 +66,15 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
     // add tag/path to component to all the project's jsconfig.json "paths"
     const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
     for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
-        // for (const ws of context.workspaceRoots) {
-        //     const modulesDir = path.join(ws, relativeModulesDir);
-        //     console.log(modulesDir);
-        //     const relativeFilePath = utils.relativePath(modulesDir, file);
-        //     if (await fs.pathExists(relativeFilePath)) {
+        const modulesDir = path.join(context.workspaceRoots[0], relativeModulesDir);
 
-        //     }
-
-        // }
-
-        const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
-
-        // path must be relative to location of jsconfig.json
-        // MUST SEE IF THIS PATH EXISTS FIRST, SEE AURA MODULE THING
         const relativeFilePath = utils.relativePath(modulesDir, file);
 
         // await fs.pathExists(modulesDir)
 
         // update "paths" in jsconfig.json
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+        const jsconfigFile = path.join(context.workspaceRoots[0], relativeJsConfigPath);
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
@@ -110,7 +97,7 @@ export async function onDeletedCustomComponent(moduleTag: string, context: Works
     // delete tag from all the project's jsconfig.json "paths"
     for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
         const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+        const jsconfigFile = path.join(context.workspaceRoots[0], relativeJsConfigPath);
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
