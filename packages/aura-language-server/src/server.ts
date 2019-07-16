@@ -69,10 +69,10 @@ function startIndexing() {
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath, workspaceFolders } = params;
+        const { workspaceFolders } = params;
         const workspaceRoots: string[] = [];
         for (const folder of workspaceFolders) {
-            workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
+            workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
         }
         try {
             if (workspaceRoots.length === 0) {
@@ -87,9 +87,9 @@ connection.onInitialize(
 
             context = new WorkspaceContext(workspaceRoots);
             if (context.type === WorkspaceType.CORE_PARTIAL) {
-                await startServer(path.join(workspaceRoots[0], '..'), path.join(workspaceRoots[0], '/../'));
+                await startServer(path.join(workspaceRoots[0], '..'), path.join(workspaceRoots[0], '..'));
             } else {
-                await startServer(rootPath, workspaceRoots[0]);
+                await startServer(workspaceRoots[0], workspaceRoots[0]);
             }
             context.configureProject();
 

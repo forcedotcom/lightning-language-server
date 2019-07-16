@@ -17,7 +17,7 @@ export enum WorkspaceType {
     SFDX,
     /** workspace including all core projects */
     CORE_ALL,
-    /** workspace including only one single core project (should not be used in java mode) */
+    /** workspace including only one or more core projects */
     CORE_PARTIAL,
     UNKNOWN,
 }
@@ -40,6 +40,28 @@ export function getSfdxProjectFile(root: string) {
     return path.join(root, SFDX_PROJECT);
 }
 
+/**
+ * @param  {string[]} workspaceRoots
+ * @returns WorkspaceType, actively not supporting workspaces of mixed type
+ */
+export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
+    if (workspaceRoots.length === 1) {
+        return detectWorkspaceHelper(workspaceRoots[0]);
+    }
+    for (const root of workspaceRoots) {
+        const type = detectWorkspaceHelper(root);
+        if (type !== WorkspaceType.CORE_PARTIAL) {
+            console.error('unknown workspace type');
+            return WorkspaceType.UNKNOWN;
+        }
+    }
+    return WorkspaceType.CORE_PARTIAL;
+}
+
+/**
+ * @param  {string} root
+ * @returns WorkspaceType for singular root
+ */
 export function detectWorkspaceHelper(root: string): WorkspaceType {
     if (fs.existsSync(getSfdxProjectFile(root))) {
         return WorkspaceType.SFDX;
@@ -79,18 +101,4 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
 
     console.error('unknown workspace type:', root);
     return WorkspaceType.UNKNOWN;
-}
-
-export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
-    if (workspaceRoots.length === 1) {
-        return detectWorkspaceHelper(workspaceRoots[0]);
-    }
-    for (const root of workspaceRoots) {
-        const type = detectWorkspaceHelper(root);
-        if (type !== WorkspaceType.CORE_PARTIAL) {
-            console.error('unknown workspace type');
-            return WorkspaceType.UNKNOWN;
-        }
-    }
-    return WorkspaceType.CORE_PARTIAL;
 }

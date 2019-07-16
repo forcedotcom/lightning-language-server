@@ -55,7 +55,6 @@ interface ITernFile {
 }
 
 let theRootPath: string;
-// let theRootPaths: string[];
 let ternServer: ITernServer;
 let asyncTernRequest;
 let asyncFlush;

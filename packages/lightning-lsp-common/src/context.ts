@@ -37,13 +37,13 @@ export class WorkspaceContext {
     public workspaceRoots: string[];
     public indexers: Map<string, Indexer> = new Map();
 
-    // for sfdx projectsÍ
     private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
     private initSfdxProjectConfigCache: () => Promise<ISfdxProjectConfig>;
     private AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
     /**
-     * @return WorkspaceContext representing the workspace at workspaceRoot
+     * @param  {string[]|string} workspaceRoots
+     * @return WorkspaceContext representing the workspace with workspaceRoots
      */
     public constructor(workspaceRoots: string[] | string) {
         this.workspaceRoots = typeof workspaceRoots === 'string' ? [path.resolve(workspaceRoots)] : workspaceRoots;
@@ -159,14 +159,14 @@ export class WorkspaceContext {
     }
 
     /**
-     * @return list of relative paths to LWC modules directories
+     * Acquires list of absolute modules directories, optimizing for workspace type
+     * @returns Promise
      */
     public async getModulesDirs(): Promise<string[]> {
         const list: string[] = [];
         switch (this.type) {
             case WorkspaceType.SFDX:
                 const { sfdxPackageDirsPattern } = await this.getSfdxProjectConfig();
-                // ** do this for each root **
                 const wsdirs = await utils.glob(`${sfdxPackageDirsPattern}/**/lwc/`, { cwd: this.workspaceRoots[0] });
                 for (const wsdir of wsdirs) {
                     list.push(path.join(this.workspaceRoots[0], wsdir));
@@ -194,7 +194,6 @@ export class WorkspaceContext {
     }
 
     private async initSfdxProject() {
-        // ** need this variable to hold config of all sfdx projects under workspace ** //
         const sfdxProjectConfig = await readSfdxProjectConfig(this.workspaceRoots[0]);
         // initializing the packageDirs glob pattern prefix
         const packageDirs = getSfdxPackageDirs(sfdxProjectConfig);
@@ -241,6 +240,9 @@ export class WorkspaceContext {
         }
     }
 
+    /**
+     * Writes to and updates Jsconfig files and ES Lint files of WorkspaceRoots, optimizing by type
+     */
     private async writeJsconfigJson() {
         let jsConfigTemplate: string;
         let jsConfigContent: string;
@@ -309,8 +311,8 @@ export class WorkspaceContext {
         const templateString = await fs.readFile(utils.getCoreResource('settings-core.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
         for (const ws of this.workspaceRoots) {
-            await fs.ensureDir(join(this.workspaceRoots[0], '.vscode'));
-            this.updateConfigFile(join(this.workspaceRoots[0], '.vscode', 'settings.json'), templateContent);
+            await fs.ensureDir(join(ws, '.vscode'));
+            this.updateConfigFile(join(ws, '.vscode', 'settings.json'), templateContent);
         }
     }
 
@@ -337,13 +339,6 @@ export class WorkspaceContext {
         return parse(configBltContent);
     }
 
-    private async updateCoreLaunch() {
-        const launchContent = await fs.readFile(utils.getCoreResource('launch-core.json'), 'utf8');
-        await fs.ensureDir(join(this.workspaceRoots[0], '.vscode'));
-        const launchPath = join(this.workspaceRoots[0], '.vscode', 'launch.json');
-        this.updateConfigFile(launchPath, launchContent);
-    }
-
     private processTemplate(
         templateString: string,
         variableMap: {
@@ -360,7 +355,7 @@ export class WorkspaceContext {
     }
 
     /**
-     * Adds to the config file in 'relativeConfigPath' any missing properties in 'config'
+     * Adds to the config file in absolute 'configPath' any missing properties in 'config'
      * (existing properties are not updated)
      */
     private updateConfigFile(configPath: string, config: string) {
@@ -391,6 +386,9 @@ export class WorkspaceContext {
         await utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
     }
 
+    /**
+     * @returns string list of all lwc and aura namespace roots
+     */
     private async findNamespaceRootsUsingType(): Promise<{ lwc: string[]; aura: string[] }> {
         const roots: { lwc: string[]; aura: string[] } = {
             lwc: [],

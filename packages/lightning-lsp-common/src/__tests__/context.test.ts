@@ -69,7 +69,6 @@ it('WorkspaceContext', async () => {
     expect(modules.length).toBe(1);
     expect(await context.getModulesDirs()).toEqual([join(context.workspaceRoots[0], 'modules')]);
 
-    // so looks the same as core all but is core multi root
     context = new WorkspaceContext(CORE_MULTI_ROOT);
     expect(context.workspaceRoots.length).toBe(2);
     roots = await context.getNamespaceRoots();
@@ -82,7 +81,10 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    // expect(await context.getModulesDirs()).toEqual(['modules']);
+    const modulesDirs = await context.getModulesDirs();
+    for (let i = 0; i < context.workspaceRoots.length; i = i + 1) {
+        expect(modulesDirs[i]).toMatch(context.workspaceRoots[i]);
+    }
 });
 
 it('isInsideModulesRoots()', async () => {
