@@ -75,12 +75,14 @@ connection.onInitialize(
             workspaceRoots.push(path.resolve(folder.uri ? URI.parse(folder.uri).fsPath : rootPath));
         }
         try {
-            if (!workspaceRoots) {
+            if (workspaceRoots.length === 0) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting *AURA* language server at ${workspaceRoots[0]}`);
+            for (const root of workspaceRoots) {
+                console.info(`Starting *AURA* language server at ${root}`);
+            }
             const startTime = process.hrtime();
 
             context = new WorkspaceContext(workspaceRoots);

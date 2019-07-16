@@ -161,33 +161,41 @@ export class WorkspaceContext {
     /**
      * @return list of relative paths to LWC modules directories
      */
-    public async getRelativeModulesDirs(): Promise<string[]> {
+    public async getModulesDirs(): Promise<string[]> {
         const list: string[] = [];
         switch (this.type) {
             case WorkspaceType.SFDX:
                 const { sfdxPackageDirsPattern } = await this.getSfdxProjectConfig();
+                // ** do this for each root **
                 const wsdirs = await utils.glob(`${sfdxPackageDirsPattern}/**/lwc/`, { cwd: this.workspaceRoots[0] });
-                list.push(...wsdirs);
+                for (const wsdir of wsdirs) {
+                    list.push(path.join(this.workspaceRoots[0], wsdir));
+                }
                 break;
             case WorkspaceType.CORE_ALL:
                 const dirs = await fs.readdir(this.workspaceRoots[0]);
                 for (const project of dirs) {
-                    const modulesDir = join(project, 'modules');
-                    if (await fs.pathExists(join(this.workspaceRoots[0], modulesDir))) {
+                    const modulesDir = join(this.workspaceRoots[0], project, 'modules');
+                    if (await fs.pathExists(modulesDir)) {
                         list.push(modulesDir);
                     }
                 }
                 break;
             case WorkspaceType.CORE_PARTIAL:
-                list.push('modules');
+                for (const ws of this.workspaceRoots) {
+                    const modulesDir = join(ws, 'modules');
+                    if (await fs.pathExists(modulesDir)) {
+                        list.push(modulesDir);
+                    }
+                }
                 break;
         }
         return list;
     }
 
     private async initSfdxProject() {
+        // ** need this variable to hold config of all sfdx projects under workspace ** //
         const sfdxProjectConfig = await readSfdxProjectConfig(this.workspaceRoots[0]);
-
         // initializing the packageDirs glob pattern prefix
         const packageDirs = getSfdxPackageDirs(sfdxProjectConfig);
         sfdxProjectConfig.sfdxPackageDirsPattern = packageDirs.join();
@@ -236,43 +244,38 @@ export class WorkspaceContext {
     private async writeJsconfigJson() {
         let jsConfigTemplate: string;
         let jsConfigContent: string;
-        const relativeModulesDirs = await this.getRelativeModulesDirs();
+        const modulesDirs = await this.getModulesDirs();
 
         switch (this.type) {
             case WorkspaceType.SFDX:
                 jsConfigTemplate = await fs.readFile(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
                 const eslintrcTemplate = await fs.readFile(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
                 const forceignore = join(this.workspaceRoots[0], '.forceignore');
-                for (const relativeModulesDir of relativeModulesDirs) {
-                    // write/update jsconfig.json
-                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    const jsConfigPath = join(this.workspaceRoots[0], relativeJsConfigPath);
+                for (const modulesDir of modulesDirs) {
+                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoots[0]);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                    this.updateConfigFile(jsConfigPath, jsConfigContent);
                     // write/update .eslintrc.json
-                    const relativeEslintrcPath = join(relativeModulesDir, '.eslintrc.json');
-                    this.updateConfigFile(relativeEslintrcPath, eslintrcTemplate);
+                    const eslintrcPath = join(modulesDir, '.eslintrc.json');
+                    this.updateConfigFile(eslintrcPath, eslintrcTemplate);
                     await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
-
             case WorkspaceType.CORE_ALL:
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
-                for (const relativeModulesDir of relativeModulesDirs) {
-                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                for (const modulesDir of modulesDirs) {
+                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
+                    this.updateConfigFile(jsConfigPath, jsConfigContent);
                 }
                 break;
-
             case WorkspaceType.CORE_PARTIAL:
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
-                for (const relativeModulesDir of relativeModulesDirs) {
-                    // this for loop is unecessary but will leave for time being
-                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
+                for (const modulesDir of modulesDirs) {
+                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
+                    this.updateConfigFile(jsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
                 }
                 break;
         }
@@ -305,8 +308,10 @@ export class WorkspaceContext {
         };
         const templateString = await fs.readFile(utils.getCoreResource('settings-core.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
-        await fs.ensureDir(join(this.workspaceRoots[0], '.vscode'));
-        this.updateConfigFile(join('.vscode', 'settings.json'), templateContent);
+        for (const ws of this.workspaceRoots) {
+            await fs.ensureDir(join(this.workspaceRoots[0], '.vscode'));
+            this.updateConfigFile(join(this.workspaceRoots[0], '.vscode', 'settings.json'), templateContent);
+        }
     }
 
     private async updateCoreCodeWorkspace() {
@@ -335,8 +340,8 @@ export class WorkspaceContext {
     private async updateCoreLaunch() {
         const launchContent = await fs.readFile(utils.getCoreResource('launch-core.json'), 'utf8');
         await fs.ensureDir(join(this.workspaceRoots[0], '.vscode'));
-        const relativeLaunchPath = join('.vscode', 'launch.json');
-        this.updateConfigFile(relativeLaunchPath, launchContent);
+        const launchPath = join(this.workspaceRoots[0], '.vscode', 'launch.json');
+        this.updateConfigFile(launchPath, launchContent);
     }
 
     private processTemplate(
@@ -358,29 +363,26 @@ export class WorkspaceContext {
      * Adds to the config file in 'relativeConfigPath' any missing properties in 'config'
      * (existing properties are not updated)
      */
-    private updateConfigFile(relativeConfigPath: string, config: string) {
+    private updateConfigFile(configPath: string, config: string) {
         // note: we don't want to use async file i/o here, because we don't want another task
         // to interleve with reading/writing this
-        for (const ws of this.workspaceRoots) {
-            const configFile = join(ws, relativeConfigPath);
-            try {
-                const configJson = JSON.parse(config);
-                if (!fs.pathExistsSync(configFile)) {
-                    utils.writeJsonSync(configFile, configJson);
-                } else {
-                    try {
-                        const fileConfig = utils.readJsonSync(configFile);
-                        if (utils.deepMerge(fileConfig, configJson)) {
-                            utils.writeJsonSync(configFile, fileConfig);
-                        }
-                    } catch (e) {
-                        // misinformed file, write out a fresh one
-                        utils.writeJsonSync(configFile, configJson);
+        try {
+            const configJson = JSON.parse(config);
+            if (!fs.pathExistsSync(configPath)) {
+                utils.writeJsonSync(configPath, configJson);
+            } else {
+                try {
+                    const fileConfig = utils.readJsonSync(configPath);
+                    if (utils.deepMerge(fileConfig, configJson)) {
+                        utils.writeJsonSync(configPath, fileConfig);
                     }
+                } catch (e) {
+                    // misinformed file, write out a fresh one
+                    utils.writeJsonSync(configPath, configJson);
                 }
-            } catch (error) {
-                console.warn('Error updating ' + configFile, error);
             }
+        } catch (error) {
+            console.warn('Error updating ' + configPath, error);
         }
     }
 

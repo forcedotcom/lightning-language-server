@@ -28,7 +28,7 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
-    expect((await context.getRelativeModulesDirs()).length).toBe(3);
+    expect((await context.getModulesDirs()).length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
@@ -43,7 +43,7 @@ it('WorkspaceContext', async () => {
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
-    expect(await context.getRelativeModulesDirs()).toEqual([]);
+    expect(await context.getModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
@@ -57,7 +57,7 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    expect((await context.getRelativeModulesDirs()).length).toBe(2);
+    expect((await context.getModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_PARTIAL);
@@ -67,7 +67,7 @@ it('WorkspaceContext', async () => {
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
-    expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
+    expect(await context.getModulesDirs()).toEqual([join(context.workspaceRoots[0], 'modules')]);
 
     // so looks the same as core all but is core multi root
     context = new WorkspaceContext(CORE_MULTI_ROOT);
@@ -82,7 +82,7 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
+    // expect(await context.getModulesDirs()).toEqual(['modules']);
 });
 
 it('isInsideModulesRoots()', async () => {

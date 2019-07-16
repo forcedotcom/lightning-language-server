@@ -1,0 +1,47 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "baseUrl": ".",
+        "paths": {
+            "c/hello_world": [
+                "force-app/main/default/lwc/hello_world/hello_world.js"
+            ],
+            "c/import_relative": [
+                "force-app/main/default/lwc/import_relative/import_relative.js"
+            ],
+            "c/index": [
+                "force-app/main/default/lwc/index/index.js"
+            ],
+            "c/lightning_datatable_example": [
+                "force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example.js"
+            ],
+            "c/lightning_tree_example": [
+                "force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.js"
+            ],
+            "c/todo": [
+                "force-app/main/default/lwc/todo/todo.js"
+            ],
+            "c/todo_item": [
+                "force-app/main/default/lwc/todo_item/todo_item.js"
+            ],
+            "c/utils": [
+                "force-app/main/default/lwc/utils/utils.js"
+            ],
+            "c/todo_util": [
+                "utils/meta/lwc/todo_util/todo_util.js"
+            ],
+            "c/todo_utils": [
+                "utils/meta/lwc/todo_utils/todo_utils.js"
+            ]
+        }
+    },
+    "include": [
+        "**/*",
+        "/.sfdx/typings/lwc/**/*.d.ts"
+    ],
+    "typeAcquisition": {
+        "include": [
+            "jest"
+        ]
+    }
+}
