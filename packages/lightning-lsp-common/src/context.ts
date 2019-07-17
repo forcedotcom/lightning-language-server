@@ -20,6 +20,7 @@ export interface ISfdxPackageDirectoryConfig {
     path: string;
 }
 
+// this is a comment i am adding to see if the changes are represented
 export interface ISfdxProjectConfig {
     packageDirectories: ISfdxPackageDirectoryConfig[];
     sfdxPackageDirsPattern: string;
