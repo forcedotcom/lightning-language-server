@@ -1,4 +1,5 @@
-import * as path from 'path';
+import * as path from 'path'; // is this ok?
+import * as fs from 'fs-extra';
 import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
 import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
 
@@ -15,12 +16,9 @@ export interface IJsconfig {
         paths?: IPaths;
     };
 }
-
 export async function onIndexCustomComponents(context: WorkspaceContext, files: string[]) {
     // set paths for all current components in all the projects jsconfig.json files
-    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
-        const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
-
+    for (const modulesDir of await context.getModulesDirs()) {
         const paths: IPaths = {};
         for (const file of files) {
             const tag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
@@ -30,8 +28,7 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
         }
 
         // set "paths" in jsconfig.json
-        const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+        const jsconfigFile = path.join(modulesDir, 'jsconfig.json');
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
@@ -62,15 +59,9 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
     }
     // add tag/path to component to all the project's jsconfig.json "paths"
     const moduleTag = componentUtil.moduleFromFile(file, context.type === WorkspaceType.SFDX);
-    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
-        const modulesDir = path.join(context.workspaceRoot, relativeModulesDir);
-
-        // path must be relative to location of jsconfig.json
+    for (const modulesDir of await context.getModulesDirs()) {
         const relativeFilePath = utils.relativePath(modulesDir, file);
-
-        // update "paths" in jsconfig.json
-        const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+        const jsconfigFile = path.join(modulesDir, 'jsconfig.json');
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
@@ -91,9 +82,8 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
 
 export async function onDeletedCustomComponent(moduleTag: string, context: WorkspaceContext): Promise<void> {
     // delete tag from all the project's jsconfig.json "paths"
-    for (const relativeModulesDir of await context.getRelativeModulesDirs()) {
-        const relativeJsConfigPath = path.join(relativeModulesDir, 'jsconfig.json');
-        const jsconfigFile = path.join(context.workspaceRoot, relativeJsConfigPath);
+    for (const modulesDir of await context.getModulesDirs()) {
+        const jsconfigFile = path.join(modulesDir, 'jsconfig.json');
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);

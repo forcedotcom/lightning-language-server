@@ -3,12 +3,21 @@ import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import * as utils from '../utils';
-import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, STANDARDS_ROOT, UTILS_ROOT, readAsTextDocument, REGISTERED_EMPTY_FOLDER_ROOT } from './test-utils';
+import {
+    CORE_ALL_ROOT,
+    CORE_PROJECT_ROOT,
+    FORCE_APP_ROOT,
+    STANDARDS_ROOT,
+    UTILS_ROOT,
+    readAsTextDocument,
+    REGISTERED_EMPTY_FOLDER_ROOT,
+    CORE_MULTI_ROOT,
+} from './test-utils';
 
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
-    expect(context.workspaceRoot).toBeAbsolutePath();
+    expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
     expect(roots.lwc[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
@@ -19,7 +28,7 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
-    expect((await context.getRelativeModulesDirs()).length).toBe(3);
+    expect((await context.getModulesDirs()).length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
@@ -34,7 +43,7 @@ it('WorkspaceContext', async () => {
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
-    expect(await context.getRelativeModulesDirs()).toEqual([]);
+    expect(await context.getModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
@@ -48,17 +57,34 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    expect((await context.getRelativeModulesDirs()).length).toBe(2);
+    expect((await context.getModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
-    expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
+    expect(context.type).toBe(WorkspaceType.CORE_PARTIAL);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.lwc.length).toBe(1);
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
-    expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
+    expect(await context.getModulesDirs()).toEqual([join(context.workspaceRoots[0], 'modules')]);
+
+    context = new WorkspaceContext(CORE_MULTI_ROOT);
+    expect(context.workspaceRoots.length).toBe(2);
+    roots = await context.getNamespaceRoots();
+    expect(roots.lwc[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/clients'));
+    expect(roots.lwc[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
+    expect(roots.lwc[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
+    expect(roots.lwc.length).toBe(3);
+    modules = await context.findAllModules();
+    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
+    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
+    expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
+    expect(modules.length).toBe(3);
+    const modulesDirs = await context.getModulesDirs();
+    for (let i = 0; i < context.workspaceRoots.length; i = i + 1) {
+        expect(modulesDirs[i]).toMatch(context.workspaceRoots[i]);
+    }
 });
 
 it('isInsideModulesRoots()', async () => {
@@ -216,6 +242,29 @@ it('configureCoreProject()', async () => {
 
     const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     verifyCoreSettings(settings);
+});
+
+it('configureCoreMulti()', async () => {
+    const context = new WorkspaceContext(CORE_MULTI_ROOT);
+
+    const jsconfigPathForce = context.workspaceRoots[0] + '/modules/jsconfig.json';
+    const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
+    const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
+    const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathGlobal);
+    fs.removeSync(jsconfigPathForce);
+    fs.removeSync(codeWorkspacePath);
+    fs.removeSync(launchPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    // verify newly created jsconfig.json
+    verifyJsconfigCore(jsconfigPathGlobal);
+    verifyJsconfigCore(jsconfigPathForce);
+    verifyTypingsCore();
 });
 
 it('configureCoreAll()', async () => {

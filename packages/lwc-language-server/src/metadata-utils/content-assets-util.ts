@@ -20,7 +20,7 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateContentAssetIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateContentAssetIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
     for (const f of updatedFiles) {
         if (f.uri.endsWith('.asset-meta.xml')) {
@@ -34,7 +34,7 @@ export async function updateContentAssetIndex(updatedFiles: FileEvent[], { works
         }
     }
     if (didChange) {
-        return processContentAssets(workspaceRoot, writeConfigs);
+        return processContentAssets(workspaceRoots[0], writeConfigs);
     }
 }
 
@@ -45,16 +45,16 @@ function processContentAssets(workspace: string, writeConfig: boolean): Promise<
 }
 
 export async function indexContentAssets(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
-    const { workspaceRoot } = context;
+    const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
 
     try {
-        const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoot });
+        const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
             CONTENT_ASSETS.add(getResourceName(file));
         }
-        return processContentAssets(workspaceRoot, writeConfigs);
+        return processContentAssets(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of content resources. Error details:`, err);
         throw err;
