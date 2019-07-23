@@ -33,7 +33,10 @@ export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { wor
         }
     }
     if (didChange) {
-        return processStaticResources(workspaceRoots[0], writeConfigs);
+        for (const ws of workspaceRoots) {
+            processStaticResources(ws, writeConfigs);
+        }
+        return;
     }
 }
 
@@ -45,17 +48,22 @@ async function processStaticResources(workspace: string, writeConfigs: boolean):
 
 export async function indexStaticResources(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const { workspaceRoots } = context;
-    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
-    try {
-        const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
-        for (const file of files) {
-            STATIC_RESOURCES.add(getResourceName(file));
+    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
+    // const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
+    for (let i = 0; i < workspaceRoots.length; i = i + 1) {
+        const ws = workspaceRoots[i];
+        const sfdxProjectConfigs = await context.getSfdxProjectConfig();
+        const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxProjectConfigs[i].sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
+        try {
+            const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: ws });
+            for (const file of files) {
+                STATIC_RESOURCES.add(getResourceName(file));
+            }
+            processStaticResources(ws, writeConfigs);
+        } catch (err) {
+            console.log(`Error queuing up indexing of static resources. Error details:`, err);
+            throw err;
         }
-        processStaticResources(workspaceRoots[0], writeConfigs);
-    } catch (err) {
-        console.log(`Error queuing up indexing of static resources. Error details:`, err);
-        throw err;
     }
 }
 

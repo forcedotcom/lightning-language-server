@@ -17,6 +17,9 @@ import {
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
+    // for (const ws of context.workspaceRoots) {
+    //     expect(ws.toBeAbsolutePath());
+    // }
     expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
@@ -174,8 +177,8 @@ it('configureSfdxProject()', async () => {
     expect(eslintrcPathUtils).toExist();
     await context.configureProject();
 
-    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    expect(sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
+    const sfdxProjectConfigs = await context.getSfdxProjectConfig();
+    expect(sfdxProjectConfigs[0].sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
 
     // verify newly created jsconfig.json
     const jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');

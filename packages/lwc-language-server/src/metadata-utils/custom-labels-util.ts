@@ -50,17 +50,22 @@ export function resetCustomLabels() {
 
 export async function indexCustomLabels(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const { workspaceRoots } = context;
-    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
-    try {
-        const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
-        for (const file of files) {
-            CUSTOM_LABEL_FILES.add(join(workspaceRoots[0], file));
+    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
+    // const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
+    for (let i = 0; i < workspaceRoots.length; i = i + 1) {
+        const ws = workspaceRoots[i];
+        const sfdxProjectConfigs = await context.getSfdxProjectConfig();
+        const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxProjectConfigs[i].sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
+        try {
+            const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: ws });
+            for (const file of files) {
+                CUSTOM_LABEL_FILES.add(join(ws, file));
+            }
+            return processLabels(ws, writeConfigs);
+        } catch (err) {
+            console.log(`Error queuing up indexing of labels. Error details:`, err);
+            throw err;
         }
-        return processLabels(workspaceRoots[0], writeConfigs);
-    } catch (err) {
-        console.log(`Error queuing up indexing of labels. Error details:`, err);
-        throw err;
     }
 }
 
@@ -77,7 +82,9 @@ export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRo
         }
     }
     if (didChange) {
-        await processLabels(workspaceRoots[0], writeConfigs);
+        for (const ws of workspaceRoots) {
+            await processLabels(ws, writeConfigs);
+        }
     }
 }
 

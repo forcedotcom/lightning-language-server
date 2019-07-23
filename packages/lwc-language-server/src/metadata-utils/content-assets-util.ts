@@ -34,7 +34,10 @@ export async function updateContentAssetIndex(updatedFiles: FileEvent[], { works
         }
     }
     if (didChange) {
-        return processContentAssets(workspaceRoots[0], writeConfigs);
+        for (const ws of workspaceRoots) {
+            processContentAssets(ws, writeConfigs);
+        }
+        return;
     }
 }
 
@@ -46,18 +49,22 @@ function processContentAssets(workspace: string, writeConfig: boolean): Promise<
 
 export async function indexContentAssets(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
     const { workspaceRoots } = context;
-    const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
-
-    try {
-        const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoots[0] });
-        for (const file of files) {
-            CONTENT_ASSETS.add(getResourceName(file));
+    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
+    // const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
+    for (let i = 0; i < workspaceRoots.length; i = i + 1) {
+        const sfdxProjectConfigs = await context.getSfdxProjectConfig();
+        const CONTENT_ASSET_GLOB_PATTERN = `${sfdxProjectConfigs[i].sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
+        const ws = workspaceRoots[i];
+        try {
+            const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: ws });
+            for (const file of files) {
+                CONTENT_ASSETS.add(getResourceName(file));
+            }
+            return processContentAssets(ws, writeConfigs);
+        } catch (err) {
+            console.log(`Error queuing up indexing of content resources. Error details:`, err);
+            throw err;
         }
-        return processContentAssets(workspaceRoots[0], writeConfigs);
-    } catch (err) {
-        console.log(`Error queuing up indexing of content resources. Error details:`, err);
-        throw err;
     }
 }
 

@@ -45,17 +45,18 @@ export function getSfdxProjectFile(root: string) {
  * @returns WorkspaceType, actively not supporting workspaces of mixed type
  */
 export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
-    if (workspaceRoots.length === 1) {
-        return detectWorkspaceHelper(workspaceRoots[0]);
-    }
-    for (const root of workspaceRoots) {
-        const type = detectWorkspaceHelper(root);
-        if (type !== WorkspaceType.CORE_PARTIAL) {
-            console.error('unknown workspace type');
-            return WorkspaceType.UNKNOWN;
-        }
-    }
-    return WorkspaceType.CORE_PARTIAL;
+    return detectWorkspaceHelper(workspaceRoots[0]);
+    // if (workspaceRoots.length === 1) {
+    //     return detectWorkspaceHelper(workspaceRoots[0]);
+    // }
+    // for (const root of workspaceRoots) {
+    //     const type = detectWorkspaceHelper(root);
+    //     if (type !== WorkspaceType.CORE_PARTIAL) {
+    //         console.error('unknown workspace type');
+    //         return WorkspaceType.UNKNOWN;
+    //     }
+    // }
+    // return WorkspaceType.CORE_PARTIAL;
 }
 
 /**

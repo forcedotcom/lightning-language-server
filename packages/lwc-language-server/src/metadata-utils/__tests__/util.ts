@@ -17,14 +17,23 @@ export async function validate(
     };
 
     const context = new class TestContext extends WorkspaceContext {
-        public getSfdxProjectConfig(): Promise<ISfdxProjectConfig> {
-            return Promise.resolve({
-                packageDirectories: [],
-                sfdxPackageDirsPattern,
-            });
+        public getSfdxProjectConfig(): Promise<ISfdxProjectConfig[]> {
+            return Promise.resolve([
+                {
+                    packageDirectories: [],
+                    sfdxPackageDirsPattern,
+                },
+            ]);
         }
     }(join(process.cwd(), 'test-workspaces', testWorkspace));
     await context.configureProject();
-
     await indexer(context, true);
 }
+// const context = new class TestContext extends WorkspaceContext {
+//     public getSfdxProjectConfig(): Promise<ISfdxProjectConfig[]> {
+//         return Promise.resolve({
+//             sfdxProjectConfig : ISfdxProjectConfig[]
+//         });
+//     }
+// }(join(process.cwd(), 'test-workspaces', testWorkspace));
+// await context.configureProject();
