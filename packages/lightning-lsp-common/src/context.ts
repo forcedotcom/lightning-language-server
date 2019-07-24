@@ -47,7 +47,16 @@ export class WorkspaceContext {
      * @return WorkspaceContext representing the workspace with workspaceRoots
      */
     public constructor(workspaceRoots: string[] | string) {
-        this.workspaceRoots = typeof workspaceRoots === 'string' ? [path.resolve(workspaceRoots)] : workspaceRoots;
+        if (typeof workspaceRoots === 'string') {
+            this.workspaceRoots = [path.resolve(workspaceRoots)];
+        } else {
+            const resolved: string[] = [];
+            for (const ws of workspaceRoots) {
+                resolved.push(path.resolve(ws));
+            }
+            this.workspaceRoots = resolved;
+        }
+        // this.workspaceRoots = typeof workspaceRoots === 'string' ? [path.resolve(workspaceRoots)] : workspaceRoots;
         this.type = detectWorkspaceType(this.workspaceRoots);
 
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));

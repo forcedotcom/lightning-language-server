@@ -19,19 +19,14 @@ import {
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext(SFDX_ROOT);
     expect(context.type).toBe(WorkspaceType.SFDX);
-    // for (const ws of context.workspaceRoots) {
-    //     expect((ws).toBeAbsolutePath());
-    // }
     expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
     expect(roots.lwc[0]).toEndWith(join(SFDX_ROOT, FORCE_APP_ROOT, 'lwc'));
-    console.log('in a singular version sfdx first lwc root is ' + roots.lwc[0]);
     expect(roots.lwc[1]).toEndWith(join(SFDX_ROOT, UTILS_ROOT, 'lwc'));
     expect(roots.lwc[2]).toEndWith(join(SFDX_ROOT, REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
     expect(roots.lwc.length).toBe(3);
     let modules = await context.findAllModules();
-    console.log('this join results in ' + join(SFDX_ROOT, FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[0]).toEndWith(join(SFDX_ROOT, FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(SFDX_ROOT, UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
@@ -41,7 +36,6 @@ it('WorkspaceContext', async () => {
     expect(context.type).toBe(WorkspaceType.SFDX);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
-    console.log('in a multi version sfdx first lwc root is ' + roots.lwc[0]);
     expect(roots.lwc[0]).toEndWith(join(context.workspaceRoots[0], FORCE_APP_ROOT, 'lwc'));
     expect(roots.lwc[1]).toEndWith(join(context.workspaceRoots[0], UTILS_ROOT, 'lwc'));
     expect(roots.lwc[2]).toEndWith(join(context.workspaceRoots[0], REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
@@ -108,7 +102,7 @@ it('WorkspaceContext', async () => {
 });
 
 it('isInsideModulesRoots()', async () => {
-    const context = new WorkspaceContext(SFDX_ROOT);
+    let context = new WorkspaceContext(SFDX_ROOT);
 
     let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
@@ -118,10 +112,31 @@ it('isInsideModulesRoots()', async () => {
 
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
+
+    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
+
+    document = readAsTextDocument(context.workspaceRoots[0] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isInsideModulesRoots(document)).toBeFalsy();
+
+    document = readAsTextDocument(context.workspaceRoots[0] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
+
+    document = readAsTextDocument(context.workspaceRoots[1] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
+
+    document = readAsTextDocument(context.workspaceRoots[1] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isInsideModulesRoots(document)).toBeFalsy();
+
+    document = readAsTextDocument(context.workspaceRoots[1] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 });
 
+// add isInside ModulesRoots
 it('isLWCTemplate()', async () => {
-    const context = new WorkspaceContext(SFDX_ROOT);
+    let context = new WorkspaceContext(SFDX_ROOT);
 
     // .js is not a template
     let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -142,10 +157,52 @@ it('isLWCTemplate()', async () => {
     // .html in utils folder is a template
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.html');
     expect(await context.isLWCTemplate(document)).toBeTruthy();
+
+    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+
+    // .js is not a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // .html is a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
+
+    // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // html outside namespace roots is not a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // .html in utils folder is a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.html');
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
+
+    // .js is not a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // .html is a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
+
+    // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // html outside namespace roots is not a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
+    expect(await context.isLWCTemplate(document)).toBeFalsy();
+
+    // .html in utils folder is a template
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.html');
+    expect(await context.isLWCTemplate(document)).toBeTruthy();
 });
 
 it('isLWCJavascript()', async () => {
-    const context = new WorkspaceContext(SFDX_ROOT);
+    let context = new WorkspaceContext(SFDX_ROOT);
 
     // lwc .js
     let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -166,8 +223,51 @@ it('isLWCJavascript()', async () => {
     // lwc .js in utils
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isLWCJavascript(document)).toBeTruthy();
+
+    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+
+    // lwc .js
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
+
+    // lwc .htm
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // aura cmps
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // .js outside namespace roots
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // lwc .js in utils
+    document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
+
+    // lwc .js
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
+
+    // lwc .htm
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // aura cmps
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // .js outside namespace roots
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
+    expect(await context.isLWCJavascript(document)).toBeFalsy();
+
+    // lwc .js in utils
+    document = readAsTextDocument(SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    expect(await context.isLWCJavascript(document)).toBeTruthy();
 });
 
+// add configureSfdxProject
 it('configureSfdxProject()', async () => {
     const context = new WorkspaceContext(SFDX_ROOT);
     const jsconfigPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
