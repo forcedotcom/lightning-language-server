@@ -12,26 +12,43 @@ import {
     readAsTextDocument,
     REGISTERED_EMPTY_FOLDER_ROOT,
     CORE_MULTI_ROOT,
+    SFDX_ROOT,
+    SFDX_MULTI_ROOT,
 } from './test-utils';
 
 it('WorkspaceContext', async () => {
-    let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    let context = new WorkspaceContext(SFDX_ROOT);
     expect(context.type).toBe(WorkspaceType.SFDX);
     // for (const ws of context.workspaceRoots) {
-    //     expect(ws.toBeAbsolutePath());
+    //     expect((ws).toBeAbsolutePath());
     // }
     expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
-    expect(roots.lwc[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
-    expect(roots.lwc[1]).toEndWith(join(UTILS_ROOT, 'lwc'));
-    expect(roots.lwc[2]).toEndWith(join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
+    expect(roots.lwc[0]).toEndWith(join(SFDX_ROOT, FORCE_APP_ROOT, 'lwc'));
+    console.log('in a singular version sfdx first lwc root is ' + roots.lwc[0]);
+    expect(roots.lwc[1]).toEndWith(join(SFDX_ROOT, UTILS_ROOT, 'lwc'));
+    expect(roots.lwc[2]).toEndWith(join(SFDX_ROOT, REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
     expect(roots.lwc.length).toBe(3);
     let modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
-    expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
+    console.log('this join results in ' + join(SFDX_ROOT, FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
+    expect(modules[0]).toEndWith(join(SFDX_ROOT, FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
+    expect(modules[8]).toEndWith(join(SFDX_ROOT, UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
     expect((await context.getModulesDirs()).length).toBe(3);
+
+    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+    expect(context.type).toBe(WorkspaceType.SFDX);
+    roots = await context.getNamespaceRoots();
+    expect(roots.lwc[0]).toBeAbsolutePath();
+    console.log('in a multi version sfdx first lwc root is ' + roots.lwc[0]);
+    expect(roots.lwc[0]).toEndWith(join(context.workspaceRoots[0], FORCE_APP_ROOT, 'lwc'));
+    expect(roots.lwc[1]).toEndWith(join(context.workspaceRoots[0], UTILS_ROOT, 'lwc'));
+    expect(roots.lwc[2]).toEndWith(join(context.workspaceRoots[0], REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
+    expect(roots.lwc[3]).toEndWith(join(context.workspaceRoots[1], FORCE_APP_ROOT, 'lwc'));
+    expect(roots.lwc[4]).toEndWith(join(context.workspaceRoots[1], UTILS_ROOT, 'lwc'));
+    expect(roots.lwc[5]).toEndWith(join(context.workspaceRoots[1], REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
+    expect(roots.lwc.length).toBe(6);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
@@ -91,74 +108,74 @@ it('WorkspaceContext', async () => {
 });
 
 it('isInsideModulesRoots()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_ROOT);
 
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 
-    document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(await context.isInsideModulesRoots(document)).toBeFalsy();
 
-    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 });
 
 it('isLWCTemplate()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_ROOT);
 
     // .js is not a template
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // .html is a template
-    document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
     expect(await context.isLWCTemplate(document)).toBeTruthy();
 
     // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
-    document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // html outside namespace roots is not a template
-    document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
     expect(await context.isLWCTemplate(document)).toBeFalsy();
 
     // .html in utils folder is a template
-    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.html');
+    document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.html');
     expect(await context.isLWCTemplate(document)).toBeTruthy();
 });
 
 it('isLWCJavascript()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_ROOT);
 
     // lwc .js
-    let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+    let document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isLWCJavascript(document)).toBeTruthy();
 
     // lwc .htm
-    document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
     expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // aura cmps
-    document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
     expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // .js outside namespace roots
-    document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
+    document = readAsTextDocument(SFDX_ROOT + '/' + FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
     expect(await context.isLWCJavascript(document)).toBeFalsy();
 
     // lwc .js in utils
-    document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+    document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isLWCJavascript(document)).toBeTruthy();
 });
 
 it('configureSfdxProject()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
-    const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
-    const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
+    const context = new WorkspaceContext(SFDX_ROOT);
+    const jsconfigPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const jsconfigPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    const jsconfigPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig.json';
+    const eslintrcPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    const eslintrcPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    const eslintrcPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
     const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
