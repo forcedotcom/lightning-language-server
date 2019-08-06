@@ -56,9 +56,7 @@ export class WorkspaceContext {
             }
             this.workspaceRoots = resolved;
         }
-        // this.workspaceRoots = typeof workspaceRoots === 'string' ? [path.resolve(workspaceRoots)] : workspaceRoots;
         this.type = detectWorkspaceType(this.workspaceRoots);
-
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
         if (this.type === WorkspaceType.SFDX) {
