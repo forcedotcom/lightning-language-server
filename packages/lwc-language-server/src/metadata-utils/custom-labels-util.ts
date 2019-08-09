@@ -50,8 +50,6 @@ export function resetCustomLabels() {
 
 export async function indexCustomLabels(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const { workspaceRoots } = context;
-    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    // const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
     for (let i = 0; i < workspaceRoots.length; i = i + 1) {
         const ws = workspaceRoots[i];
         const sfdxProjectConfigs = await context.getSfdxProjectConfig();

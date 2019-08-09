@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import * as path from 'path';
 import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
@@ -16,6 +17,11 @@ import {
     SFDX_MULTI_ROOT,
 } from './test-utils';
 
+const SFDX_MULTI_ROOT_ABS: string[] = [];
+for (const ws of SFDX_MULTI_ROOT) {
+    SFDX_MULTI_ROOT_ABS.push(path.resolve(ws));
+}
+
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext(SFDX_ROOT);
     expect(context.type).toBe(WorkspaceType.SFDX);
@@ -32,7 +38,8 @@ it('WorkspaceContext', async () => {
     expect(modules.length).toBe(10);
     expect((await context.getModulesDirs()).length).toBe(3);
 
-    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+    // resolve roots before creating context
+    context = new WorkspaceContext(SFDX_MULTI_ROOT_ABS);
     expect(context.type).toBe(WorkspaceType.SFDX);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
@@ -113,7 +120,7 @@ it('isInsideModulesRoots()', async () => {
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 
-    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+    context = new WorkspaceContext(SFDX_MULTI_ROOT_ABS);
 
     document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
@@ -158,7 +165,7 @@ it('isLWCTemplate()', async () => {
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.html');
     expect(await context.isLWCTemplate(document)).toBeTruthy();
 
-    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+    context = new WorkspaceContext(SFDX_MULTI_ROOT_ABS);
 
     // .js is not a template
     document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -224,7 +231,7 @@ it('isLWCJavascript()', async () => {
     document = readAsTextDocument(SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/todo_util/todo_util.js');
     expect(await context.isLWCJavascript(document)).toBeTruthy();
 
-    context = new WorkspaceContext(SFDX_MULTI_ROOT);
+    context = new WorkspaceContext(SFDX_MULTI_ROOT_ABS);
 
     // lwc .js
     document = readAsTextDocument(SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -269,16 +276,16 @@ it('isLWCJavascript()', async () => {
 
 // add configureSfdxProject
 it('configureSfdxProject()', async () => {
-    const context = new WorkspaceContext(SFDX_ROOT);
-    const jsconfigPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
-    const jsconfigPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig-orig.json';
-    const jsconfigPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/.eslintrc.json';
-    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
-    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
-    const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
+    let context = new WorkspaceContext(SFDX_ROOT);
+    let jsconfigPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    let jsconfigPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    let jsconfigPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/jsconfig.json';
+    let eslintrcPathForceApp = SFDX_ROOT + '/' + FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    let eslintrcPathUtilsOrig = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    let eslintrcPathUtils = SFDX_ROOT + '/' + UTILS_ROOT + '/lwc/.eslintrc.json';
+    let sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    let forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+    let settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
@@ -293,22 +300,22 @@ it('configureSfdxProject()', async () => {
     expect(eslintrcPathUtils).toExist();
     await context.configureProject();
 
-    const sfdxProjectConfigs = await context.getSfdxProjectConfig();
+    let sfdxProjectConfigs = await context.getSfdxProjectConfig();
     expect(sfdxProjectConfigs[0].sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
 
     // verify newly created jsconfig.json
-    const jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');
+    let jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');
     expect(jsconfigForceAppContent).toContain('    "compilerOptions": {'); // check formatting
-    const jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
+    let jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
     expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigForceApp.include[0]).toBe('**/*');
     expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
     expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
     expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
     // verify updated jsconfig.json
-    const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
+    let jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
     expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
-    const jsconfigUtils = JSON.parse(jsconfigUtilsContent);
+    let jsconfigUtils = JSON.parse(jsconfigUtilsContent);
     expect(jsconfigUtils.compilerOptions.target).toBe('es2017');
     expect(jsconfigUtils.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigUtils.include[0]).toBe('util/*.js');
@@ -317,19 +324,19 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
 
     // verify newly created .eslintrc.json
-    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
+    let eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
     expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
+    let eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
     expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     // verify updated .eslintrc.json
-    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
+    let eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
     expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
+    let eslintrcUtils = JSON.parse(eslintrcUtilsContent);
     expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
     expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
-    const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
+    let forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
     expect(forceignoreContent).toContain('**/jsconfig.json');
     expect(forceignoreContent).toContain('**/.eslintrc.json');
 
@@ -337,10 +344,244 @@ it('configureSfdxProject()', async () => {
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
     expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
     expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
-    const schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
+    let schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
     expect(schemaContents).toContain('declare module "@salesforce/schema" {');
-    const apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
+    let apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
     expect(apexContents).not.toContain('declare type');
+
+    // MULTI ROOT SFDX
+
+    context = new WorkspaceContext(SFDX_MULTI_ROOT_ABS);
+    jsconfigPathForceApp = SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    jsconfigPathUtilsOrig = SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    jsconfigPathUtils = SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/jsconfig.json';
+    eslintrcPathForceApp = SFDX_MULTI_ROOT[0] + '/' + FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    eslintrcPathUtilsOrig = SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    eslintrcPathUtils = SFDX_MULTI_ROOT[0] + '/' + UTILS_ROOT + '/lwc/.eslintrc.json';
+    sfdxTypingsPath = 'test-workspaces/sfdx-multi-workspace/sfdx-workspace-1/.sfdx/typings/lwc';
+    forceignorePath = 'test-workspaces/sfdx-multi-workspace/sfdx-workspace-1/.forceignore';
+    settingsPath = 'test-workspaces/sfdx-multi-workspace/sfdx-worksapce-1/.vscode/settings.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
+    fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
+
+    // verify typings/jsconfig after configuration:
+    expect(jsconfigPathUtils).toExist();
+    expect(eslintrcPathUtils).toExist();
+    await context.configureProject();
+
+    sfdxProjectConfigs = await context.getSfdxProjectConfig();
+    expect(sfdxProjectConfigs[0].sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
+
+    // verify newly created jsconfig.json
+    jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');
+    expect(jsconfigForceAppContent).toContain('    "compilerOptions": {'); // check formatting
+    jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
+    expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfigForceApp.include[0]).toBe('**/*');
+    expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
+    // verify updated jsconfig.json
+    jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
+    expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
+    jsconfigUtils = JSON.parse(jsconfigUtilsContent);
+    expect(jsconfigUtils.compilerOptions.target).toBe('es2017');
+    expect(jsconfigUtils.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfigUtils.include[0]).toBe('util/*.js');
+    expect(jsconfigUtils.include[1]).toBe('**/*');
+    expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
+
+    // verify newly created .eslintrc.json
+    eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
+    expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
+    eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
+    expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
+    // verify updated .eslintrc.json
+    eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
+    expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
+    eslintrcUtils = JSON.parse(eslintrcUtilsContent);
+    expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
+    expect(eslintrcUtils.rules.semi).toBe('error');
+
+    // .forceignore
+    forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
+    expect(forceignoreContent).toContain('**/jsconfig.json');
+    expect(forceignoreContent).toContain('**/.eslintrc.json');
+
+    // typings
+    expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
+    schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
+    expect(schemaContents).toContain('declare module "@salesforce/schema" {');
+    apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
+    expect(apexContents).not.toContain('declare type');
+
+    // SECOND ROOT SFDX
+    jsconfigPathForceApp = SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    jsconfigPathUtilsOrig = SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/jsconfig-orig.json';
+    jsconfigPathUtils = SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/jsconfig.json';
+    eslintrcPathForceApp = SFDX_MULTI_ROOT[1] + '/' + FORCE_APP_ROOT + '/lwc/.eslintrc.json';
+    eslintrcPathUtilsOrig = SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/eslintrc-orig.json';
+    eslintrcPathUtils = SFDX_MULTI_ROOT[1] + '/' + UTILS_ROOT + '/lwc/.eslintrc.json';
+    sfdxTypingsPath = 'test-workspaces/sfdx-multi-workspace/sfdx-workspace-2/.sfdx/typings/lwc';
+    forceignorePath = 'test-workspaces/sfdx-multi-workspace/sfdx-workspace-2/.forceignore';
+    settingsPath = 'test-workspaces/sfdx-multi-workspace/sfdx-worksapce-2/.vscode/settings.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(eslintrcPathForceApp);
+    fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
+    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
+
+    // verify typings/jsconfig after configuration:
+    expect(jsconfigPathUtils).toExist();
+    expect(eslintrcPathUtils).toExist();
+    await context.configureProject();
+
+    sfdxProjectConfigs = await context.getSfdxProjectConfig();
+    expect(sfdxProjectConfigs[1].sfdxPackageDirsPattern).toBe('{force-app,utils,registered-empty-folder}');
+
+    // verify newly created jsconfig.json
+    jsconfigForceAppContent = fs.readFileSync(jsconfigPathForceApp, 'utf8');
+    expect(jsconfigForceAppContent).toContain('    "compilerOptions": {'); // check formatting
+    jsconfigForceApp = JSON.parse(jsconfigForceAppContent);
+    expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfigForceApp.include[0]).toBe('**/*');
+    expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
+    // verify updated jsconfig.json
+    jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
+    expect(jsconfigUtilsContent).toContain('    "compilerOptions": {'); // check formatting
+    jsconfigUtils = JSON.parse(jsconfigUtilsContent);
+    expect(jsconfigUtils.compilerOptions.target).toBe('es2017');
+    expect(jsconfigUtils.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfigUtils.include[0]).toBe('util/*.js');
+    expect(jsconfigUtils.include[1]).toBe('**/*');
+    expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
+    expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
+
+    // verify newly created .eslintrc.json
+    eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
+    expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
+    eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
+    expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
+    // verify updated .eslintrc.json
+    eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
+    expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
+    eslintrcUtils = JSON.parse(eslintrcUtilsContent);
+    expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
+    expect(eslintrcUtils.rules.semi).toBe('error');
+
+    // .forceignore
+    forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
+    expect(forceignoreContent).toContain('**/jsconfig.json');
+    expect(forceignoreContent).toContain('**/.eslintrc.json');
+
+    // typings
+    expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
+    expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
+    schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
+    expect(schemaContents).toContain('declare module "@salesforce/schema" {');
+    apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
+    expect(apexContents).not.toContain('declare type');
+});
+
+it('configureCoreProject()', async () => {
+    const context = new WorkspaceContext(CORE_PROJECT_ROOT);
+    const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
+    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
+    const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPath);
+    fs.removeSync(typingsPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    verifyJsconfigCore(jsconfigPath);
+    verifyTypingsCore();
+
+    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    verifyCoreSettings(settings);
+});
+
+it('configureCoreMulti()', async () => {
+    const context = new WorkspaceContext(CORE_MULTI_ROOT);
+
+    const jsconfigPathForce = context.workspaceRoots[0] + '/modules/jsconfig.json';
+    const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
+    const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
+    const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathGlobal);
+    fs.removeSync(jsconfigPathForce);
+    fs.removeSync(codeWorkspacePath);
+    fs.removeSync(launchPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    // verify newly created jsconfig.json
+    verifyJsconfigCore(jsconfigPathGlobal);
+    verifyJsconfigCore(jsconfigPathForce);
+    verifyTypingsCore();
+});
+
+it('configureCoreProject()', async () => {
+    const context = new WorkspaceContext(CORE_PROJECT_ROOT);
+    const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
+    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
+    const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPath);
+    fs.removeSync(typingsPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    verifyJsconfigCore(jsconfigPath);
+    verifyTypingsCore();
+
+    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    verifyCoreSettings(settings);
+});
+
+it('configureCoreMulti()', async () => {
+    const context = new WorkspaceContext(CORE_MULTI_ROOT);
+
+    const jsconfigPathForce = context.workspaceRoots[0] + '/modules/jsconfig.json';
+    const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
+    const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
+    const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathGlobal);
+    fs.removeSync(jsconfigPathForce);
+    fs.removeSync(codeWorkspacePath);
+    fs.removeSync(launchPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    // verify newly created jsconfig.json
+    verifyJsconfigCore(jsconfigPathGlobal);
+    verifyJsconfigCore(jsconfigPathForce);
+    verifyTypingsCore();
 });
 
 it('configureCoreProject()', async () => {
@@ -435,8 +676,8 @@ function verifyTypingsCore() {
     fs.removeSync(typingsPath);
 }
 
-function verifyCodeWorkspace(path: string) {
-    const content = fs.readFileSync(path, 'utf8');
+function verifyCodeWorkspace(wsPath: string) {
+    const content = fs.readFileSync(wsPath, 'utf8');
     const workspace = JSON.parse(content);
     const folders = workspace.folders;
     expect(folders.length).toBe(1);

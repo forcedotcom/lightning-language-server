@@ -38,7 +38,6 @@ export class WorkspaceContext {
     public indexers: Map<string, Indexer> = new Map();
 
     private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
-    // private initSfdxProjectConfigCache: () => Promise<ISfdxProjectConfig>;
     private initSfdxProjectConfigCache: () => Promise<ISfdxProjectConfig[]>;
     private AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
@@ -47,15 +46,7 @@ export class WorkspaceContext {
      * @return WorkspaceContext representing the workspace with workspaceRoots
      */
     public constructor(workspaceRoots: string[] | string) {
-        if (typeof workspaceRoots === 'string') {
-            this.workspaceRoots = [path.resolve(workspaceRoots)];
-        } else {
-            const resolved: string[] = [];
-            for (const ws of workspaceRoots) {
-                resolved.push(path.resolve(ws));
-            }
-            this.workspaceRoots = resolved;
-        }
+        this.workspaceRoots = typeof workspaceRoots === 'string' ? [path.resolve(workspaceRoots)] : workspaceRoots;
         this.type = detectWorkspaceType(this.workspaceRoots);
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
@@ -239,10 +230,17 @@ export class WorkspaceContext {
 
     private async writeTypings() {
         let typingsDir: string;
+        const typingsDirs: string[] = [];
 
         switch (this.type) {
             case WorkspaceType.SFDX:
-                typingsDir = join(this.workspaceRoots[0], '.sfdx', 'typings', 'lwc');
+                if (this.workspaceRoots.length === 0) {
+                    typingsDir = join(this.workspaceRoots[0], '.sfdx', 'typings', 'lwc');
+                } else {
+                    for (const ws of this.workspaceRoots) {
+                        typingsDirs.push(join(ws, '.sfdx', 'typings', 'lwc'));
+                    }
+                }
                 break;
             case WorkspaceType.CORE_PARTIAL:
                 typingsDir = join(this.workspaceRoots[0], '..', '.vscode', 'typings', 'lwc');
@@ -267,6 +265,26 @@ export class WorkspaceContext {
                     await fs.copy(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
                 } catch (ignore) {
                     // ignore
+                }
+            }
+        }
+        if (typingsDirs) {
+            for (const dir of typingsDirs) {
+                // copy typings to typingsDir
+                const resourceTypingsDir = utils.getSfdxResource('typings');
+                await fs.ensureDir(dir);
+                try {
+                    await fs.copy(join(resourceTypingsDir, 'lds.d.ts'), join(dir, 'lds.d.ts'));
+                } catch (ignore) {
+                    // ignore
+                }
+                const dirs = await fs.readdir(join(resourceTypingsDir, 'copied'));
+                for (const file of dirs) {
+                    try {
+                        await fs.copy(join(resourceTypingsDir, 'copied', file), join(dir, file));
+                    } catch (ignore) {
+                        // ignore
+                    }
                 }
             }
         }

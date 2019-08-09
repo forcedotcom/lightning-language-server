@@ -48,8 +48,6 @@ async function processStaticResources(workspace: string, writeConfigs: boolean):
 
 export async function indexStaticResources(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const { workspaceRoots } = context;
-    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    // const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
     for (let i = 0; i < workspaceRoots.length; i = i + 1) {
         const ws = workspaceRoots[i];
         const sfdxProjectConfigs = await context.getSfdxProjectConfig();

@@ -49,8 +49,6 @@ function processContentAssets(workspace: string, writeConfig: boolean): Promise<
 
 export async function indexContentAssets(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
     const { workspaceRoots } = context;
-    // const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
-    // const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
     for (let i = 0; i < workspaceRoots.length; i = i + 1) {
         const sfdxProjectConfigs = await context.getSfdxProjectConfig();
         const CONTENT_ASSET_GLOB_PATTERN = `${sfdxProjectConfigs[i].sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
