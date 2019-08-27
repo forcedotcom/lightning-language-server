@@ -575,7 +575,7 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
     for (const subdir of subdirs) {
         const basename = path.basename(subdir);
         const modulePath = path.join(subdir, basename + '.js');
-        if ((await fs.pathExists(modulePath)) && componentUtil.isJSComponent(modulePath)) {
+        if ((await fs.pathExists(modulePath)) && (componentUtil.isJSComponent(modulePath) || componentUtil.isTSComponent(modulePath))) {
             // TODO: check contents for: from 'lwc'?
             files.push(modulePath);
         }

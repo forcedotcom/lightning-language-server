@@ -71,6 +71,16 @@ export function isJSComponent(file: string): boolean {
     return tagFromFile(file, true) != null;
 }
 
+/**
+ * @return true if file is the main .ts file for a component
+ */
+export function isTSComponent(file: string): boolean {
+    if (!file.toLowerCase().endsWith('.ts')) {
+        return false;
+    }
+    return tagFromFile(file, true) != null;
+}
+
 function tagName(namespace: string, tag: string) {
     if (namespace === 'interop') {
         // treat interop as lightning, i.e. needed when using extension with lightning-global
