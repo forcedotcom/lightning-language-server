@@ -78,6 +78,14 @@ connection.onInitialize(
                 return { capabilities: {} };
             }
 
+            const lwcServicesConfig = path.resolve(workspaceRoot, 'lwc-services.config.js');
+
+            // TODO-RW: Aura server still starts
+            if (lwcServicesConfig) {
+                console.warn(`LWC Open Source project, Aura server not needed.`);
+                return { capabilities: {} };
+            }
+
             console.info(`Starting *AURA* language server at ${workspaceRoot}`);
             const startTime = process.hrtime();
             await startServer(rootPath, workspaceRoot);

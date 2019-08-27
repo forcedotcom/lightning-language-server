@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const SFDX_PROJECT: string = 'sfdx-project.json';
+const LWC_SERVICES_CONFIG: string = 'lwc-services.config.js';
 
 export enum WorkspaceType {
     /** standard workspace with a package.json but no lwc dependencies */
@@ -19,6 +20,8 @@ export enum WorkspaceType {
     CORE_ALL,
     /** workspace including only one single core project (should not be used in java mode) */
     CORE_SINGLE_PROJECT,
+    /** create-lwc-app workspace with an lwc-services.config.js */
+    OSS_LWC,
 
     UNKNOWN,
 }
@@ -33,11 +36,21 @@ export function isUnknown(type: WorkspaceType) {
     return false;
 }
 export function isLWC(type: WorkspaceType): boolean {
-    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
+    return (
+        type === WorkspaceType.SFDX ||
+        type === WorkspaceType.STANDARD_LWC ||
+        type === WorkspaceType.CORE_ALL ||
+        type === WorkspaceType.CORE_SINGLE_PROJECT ||
+        type === WorkspaceType.OSS_LWC
+    );
 }
 
 export function getSfdxProjectFile(workspaceRoot: string) {
     return path.join(workspaceRoot, SFDX_PROJECT);
+}
+
+export function getLwcServicesConfigFile(workspaceRoot: string): any {
+    return path.join(workspaceRoot, LWC_SERVICES_CONFIG);
 }
 
 export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
@@ -49,6 +62,9 @@ export function detectWorkspaceType(workspaceRoot: string): WorkspaceType {
     }
     if (fs.existsSync(path.join(workspaceRoot, '..', 'workspace-user.xml'))) {
         return WorkspaceType.CORE_SINGLE_PROJECT;
+    }
+    if (fs.existsSync(getLwcServicesConfigFile(workspaceRoot))) {
+        return WorkspaceType.OSS_LWC;
     }
 
     const packageJson = path.join(workspaceRoot, 'package.json');

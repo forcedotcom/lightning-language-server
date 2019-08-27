@@ -113,9 +113,9 @@ export function getCoreResource(resourceName: string) {
 }
 
 export async function appendLineIfMissing(file: string, line: string): Promise<void> {
-    if (!await fs.pathExists(file)) {
+    if (!(await fs.pathExists(file))) {
         return fs.writeFile(file, line + '\n');
-    } else if (!await fileContainsLine(file, line)) {
+    } else if (!(await fileContainsLine(file, line))) {
         return fs.appendFile(file, '\n' + line + '\n');
     }
 }
@@ -190,7 +190,7 @@ export const memoize = (fn: any) => {
 };
 
 export function readJsonSync(file: string): any {
-    const exists =  fs.pathExistsSync(file);
+    const exists = fs.pathExistsSync(file);
     try {
         return exists ? fs.readJsonSync(file) : {};
     } catch (err) {

@@ -12,7 +12,7 @@ import template from 'lodash.template';
 // @ts-ignore
 import { parse } from 'properties';
 
-import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
+import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, getLwcServicesConfigFile, isLWC } from './shared';
 import * as utils from './utils';
 import { componentUtil } from './index';
 
@@ -178,6 +178,11 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 list.push('modules');
                 break;
+            case WorkspaceType.OSS_LWC:
+                const config = require(getLwcServicesConfigFile(this.workspaceRoot));
+                const moduleDir = config.moduleDir ? config.moduleDir : 'src/modules';
+                list.push(moduleDir);
+                break;
         }
         return list;
     }
@@ -208,24 +213,38 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_ALL:
                 typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
                 break;
+            case WorkspaceType.OSS_LWC:
+                typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
+                break;
         }
 
         if (typingsDir) {
             // copy typings to typingsDir
             const resourceTypingsDir = utils.getSfdxResource('typings');
             await fs.ensureDir(typingsDir);
-            try {
-                await fs.copy(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
-            } catch (ignore) {
-                // ignore
-            }
-            const dirs = await fs.readdir(join(resourceTypingsDir, 'copied'));
-            for (const file of dirs) {
-                try {
-                    await fs.copy(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
-                } catch (ignore) {
-                    // ignore
-                }
+
+            switch (this.type) {
+                case WorkspaceType.OSS_LWC:
+                    try {
+                        await fs.copy(join(resourceTypingsDir, 'copied', 'engine.d.ts'), join(typingsDir, 'engine.d.ts'));
+                    } catch (ignore) {
+                        // ignore
+                    }
+                    break;
+                default:
+                    try {
+                        await fs.copy(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
+                    } catch (ignore) {
+                        // ignore
+                    }
+                    const dirs = await fs.readdir(join(resourceTypingsDir, 'copied'));
+                    for (const file of dirs) {
+                        try {
+                            await fs.copy(join(resourceTypingsDir, 'copied', file), join(typingsDir, file));
+                        } catch (ignore) {
+                            // ignore
+                        }
+                    }
             }
         }
     }
@@ -266,6 +285,22 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_SINGLE_PROJECT:
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
+                for (const relativeModulesDir of relativeModulesDirs) {
+                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
+                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                }
+                break;
+
+            case WorkspaceType.OSS_LWC:
+                jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
+                const fileName = path.resolve(process.cwd(), 'lwc-services.config.js');
+                const config = require(fileName);
+                let projectRoot = { project_root: '../..' };
+                if (config.moduleDir) {
+                    // TODO-RW: Resolve relative based on folder structure
+                    projectRoot = { project_root: '../../..' };
+                }
+                jsConfigContent = this.processTemplate(jsConfigTemplate, projectRoot);
                 for (const relativeModulesDir of relativeModulesDirs) {
                     const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
                     this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
@@ -424,6 +459,7 @@ export class WorkspaceContext {
             case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
             case WorkspaceType.MONOREPO:
+            case WorkspaceType.OSS_LWC:
             case WorkspaceType.UNKNOWN: {
                 let depth = 6;
                 if (this.type === WorkspaceType.MONOREPO) {
