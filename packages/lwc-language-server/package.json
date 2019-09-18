@@ -19,7 +19,10 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
+    "@babel/plugin-syntax-class-properties": "^7.2.0",
+    "@babel/plugin-syntax-decorators": "^7.2.0",
     "@lwc/babel-plugin-component": "0.34.8",
+    "@babel/preset-typescript": "^7.3.3",
     "@lwc/compiler": "0.34.8",
     "@lwc/engine": "0.34.8",
     "@lwc/errors": "0.34.8",

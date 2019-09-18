@@ -119,7 +119,6 @@ async function addCustomTag(context: WorkspaceContext, tag: string, uri: string,
 
 export async function indexCustomComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const files = await context.findAllModules();
-
     await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, writeConfigs);
     if (writeConfigs) {
         await onIndexCustomComponents(context, files);

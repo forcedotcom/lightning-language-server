@@ -82,7 +82,7 @@ connection.onInitialize(
 
             // TODO-RW: Aura server still starts
             if (lwcServicesConfig) {
-                console.warn(`LWC Open Source project, Aura server not needed.`);
+                console.info(`LWC Open Source project, Aura language server not needed.`);
                 return { capabilities: {} };
             }
 
@@ -111,6 +111,12 @@ connection.onInitialize(
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getAuraTagProvider());
             console.info('... language server started in ' + utils.elapsedMillis(startTime));
+
+            documents.onDidOpen(addFile);
+            documents.onDidChangeContent(addFile);
+            documents.onDidClose(delFile);
+            connection.onReferences(onReferences);
+            connection.onSignatureHelp(onSignatureHelp);
 
             return {
                 capabilities: {
@@ -295,12 +301,6 @@ connection.onRequest('salesforce/listNamespaces', () => {
 // connection.onRequest((method: string, ...params: any[]) => {
 //     // debugger
 // });
-
-documents.onDidOpen(addFile);
-documents.onDidChangeContent(addFile);
-documents.onDidClose(delFile);
-connection.onReferences(onReferences);
-connection.onSignatureHelp(onSignatureHelp);
 
 // Listen on the connection
 connection.listen();

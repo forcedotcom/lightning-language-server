@@ -297,8 +297,9 @@ export class WorkspaceContext {
                 const config = require(fileName);
                 let projectRoot = { project_root: '../..' };
                 if (config.moduleDir) {
-                    // TODO-RW: Resolve relative based on folder structure
-                    projectRoot = { project_root: '../../..' };
+                    const foldersLength: number = config.moduleDir.match(/\//gi).length;
+                    const constructedRoot = new Array(foldersLength + 1).fill('..').join('/');
+                    projectRoot = { project_root: constructedRoot };
                 }
                 jsConfigContent = this.processTemplate(jsConfigTemplate, projectRoot);
                 for (const relativeModulesDir of relativeModulesDirs) {
@@ -567,17 +568,20 @@ async function findNamespaceRoots(root: string, maxDepth: number = 5): Promise<{
 }
 
 /**
- * @return list of .js modules inside namespaceRoot folder
+ * @return list of .js and .ts modules inside namespaceRoot folder
  */
 async function findModulesIn(namespaceRoot: string): Promise<string[]> {
     const files: string[] = [];
     const subdirs = await findSubdirectories(namespaceRoot);
     for (const subdir of subdirs) {
         const basename = path.basename(subdir);
-        const modulePath = path.join(subdir, basename + '.js');
-        if ((await fs.pathExists(modulePath)) && (componentUtil.isJSComponent(modulePath) || componentUtil.isTSComponent(modulePath))) {
+        const modulePathJs = path.join(subdir, basename + '.js');
+        const modulePathTs = path.join(subdir, basename + '.ts');
+        if ((await fs.pathExists(modulePathJs)) && componentUtil.isJSComponent(modulePathJs)) {
             // TODO: check contents for: from 'lwc'?
-            files.push(modulePath);
+            files.push(modulePathJs);
+        } else if ((await fs.pathExists(modulePathTs)) && componentUtil.isTSComponent(modulePathTs)) {
+            files.push(modulePathTs);
         }
     }
     return files;

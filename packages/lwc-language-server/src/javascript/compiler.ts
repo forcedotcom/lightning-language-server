@@ -10,6 +10,8 @@ import { ClassMember } from '@lwc/babel-plugin-component';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from 'lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
+// tslint:disable-next-line:no-var-requires
+const babel = require('@babel/core');
 
 export interface ICompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic
@@ -91,7 +93,33 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
             namespace: 'x',
             files: {},
         };
-        const transformerResult = await transform(source, fileName, options);
+
+        let codeTransformed = source;
+
+        if (fileName.endsWith('.ts')) {
+            try {
+                const { code } = babel.transform(source, {
+                    filename: fileName,
+                    plugins: [
+                        require.resolve('@babel/plugin-syntax-class-properties'),
+                        [
+                            require.resolve('@babel/plugin-syntax-decorators'),
+                            {
+                                decoratorsBeforeExport: true,
+                            },
+                        ],
+                    ],
+                    presets: [require.resolve('@babel/preset-typescript')],
+                });
+                codeTransformed = code;
+                // It's a hack, but the LWC compiler throws an error when filename doesn't end on '.js'.
+                fileName = fileName.replace('.ts', '.js');
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        const transformerResult = await transform(codeTransformed, fileName, options);
         const metadata = transformerResult.metadata as Metadata;
         patchComments(metadata);
         return { metadata, diagnostics: [] };
