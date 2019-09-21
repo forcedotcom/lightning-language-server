@@ -68,13 +68,15 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
     expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
+});
 
-    context = new WorkspaceContext(OSS_LWC_PROJECT_ROOT);
+it('isLwcOssWorkspaceContext', async () => {
+    const context = new WorkspaceContext(OSS_LWC_PROJECT_ROOT);
     expect(context.type).toBe(WorkspaceType.OSS_LWC);
-    roots = await context.getNamespaceRoots();
+    const roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(OSS_LWC_PROJECT_ROOT, 'src', 'modules', 'my'));
     expect(roots.lwc.length).toBe(1);
-    modules = await context.findAllModules();
+    const modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(OSS_LWC_PROJECT_ROOT, 'src', 'modules', 'my', 'app', 'app.js'));
     expect(modules.length).toBe(2);
     expect(await context.getRelativeModulesDirs()).toEqual(['src/modules']);
