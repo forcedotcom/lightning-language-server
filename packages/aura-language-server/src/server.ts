@@ -58,8 +58,6 @@ documents.listen(connection);
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
-let isLwcOss = false;
-
 function startIndexing() {
     setTimeout(async () => {
         const indexer = context.getIndexingProvider('aura') as AuraIndexer;
@@ -77,14 +75,6 @@ connection.onInitialize(
         try {
             if (!workspaceRoot) {
                 console.warn(`No workspace found`);
-                return { capabilities: {} };
-            }
-
-            const lwcServicesConfig = path.resolve(workspaceRoot, 'lwc-services.config.js');
-
-            if (lwcServicesConfig) {
-                console.info(`LWC Open Source project, Aura language server not needed.`);
-                isLwcOss = true;
                 return { capabilities: {} };
             }
 
@@ -250,10 +240,6 @@ connection.onDefinition(
 );
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    if (isLwcOss) {
-        return;
-    }
-
     console.info('aura onDidChangeWatchedFiles...');
     const changes = change.changes;
 

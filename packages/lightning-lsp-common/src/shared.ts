@@ -45,6 +45,10 @@ export function isLWC(type: WorkspaceType): boolean {
     );
 }
 
+export function isAura(type: WorkspaceType): boolean {
+    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_SINGLE_PROJECT;
+}
+
 export function getSfdxProjectFile(workspaceRoot: string) {
     return path.join(workspaceRoot, SFDX_PROJECT);
 }
