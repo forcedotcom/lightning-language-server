@@ -97,26 +97,9 @@ export async function compileSource(source: string, fileName: string = 'foo.js')
         let codeTransformed = source;
 
         if (fileName.endsWith('.ts')) {
-            try {
-                const { code } = babel.transform(source, {
-                    filename: fileName,
-                    plugins: [
-                        require.resolve('@babel/plugin-syntax-class-properties'),
-                        [
-                            require.resolve('@babel/plugin-syntax-decorators'),
-                            {
-                                decoratorsBeforeExport: true,
-                            },
-                        ],
-                    ],
-                    presets: [require.resolve('@babel/preset-typescript')],
-                });
-                codeTransformed = code;
-                // It's a hack, but the LWC compiler throws an error when filename doesn't end on '.js'.
-                fileName = fileName.replace('.ts', '.js');
-            } catch (e) {
-                // ignore
-            }
+            codeTransformed = transformTypescript(fileName, source);
+            // It's a hack, but the LWC compiler throws an error when filename doesn't end on '.js'.
+            fileName = fileName.replace('.ts', '.js');
         }
 
         const transformerResult = await transform(codeTransformed, fileName, options);
@@ -208,4 +191,27 @@ function patchComments(metadata: Metadata): void {
 function sanitizeComment(comment: string): string {
     const parsed = commentParser('/*' + comment + '*/');
     return parsed && parsed.length > 0 ? parsed[0].source : null;
+}
+
+function transformTypescript(filename: string, source: string) {
+    let codeTransformed = source;
+    try {
+        const { code } = babel.transform(source, {
+            filename,
+            plugins: [
+                require.resolve('@babel/plugin-syntax-class-properties'),
+                [
+                    require.resolve('@babel/plugin-syntax-decorators'),
+                    {
+                        decoratorsBeforeExport: true,
+                    },
+                ],
+            ],
+            presets: [require.resolve('@babel/preset-typescript')],
+        });
+        codeTransformed = code;
+    } catch (e) {
+        // ignore
+    }
+    return codeTransformed;
 }
