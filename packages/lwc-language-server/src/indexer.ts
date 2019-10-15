@@ -1,16 +1,16 @@
-import { indexCustomComponents, loadStandardComponents, resetCustomComponents } from './metadata-utils/custom-components-util';
-import { indexCustomLabels, resetCustomLabels } from './metadata-utils/custom-labels-util';
-import { indexStaticResources, resetStaticResources } from './metadata-utils/static-resources-util';
-import { indexContentAssets, resetContentAssets } from './metadata-utils/content-assets-util';
-import { WorkspaceContext, shared, Indexer } from 'lightning-lsp-common';
-import { getLanguageService, LanguageService } from 'lightning-lsp-common';
-import { getLwcTags } from './metadata-utils/custom-components-util';
-
-import { updateLabelsIndex } from './metadata-utils/custom-labels-util';
-import { updateStaticResourceIndex } from './metadata-utils/static-resources-util';
-import { updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { updateCustomComponentIndex, eventEmitter } from './metadata-utils/custom-components-util';
-import { utils } from 'lightning-lsp-common';
+import {
+    indexCustomComponents,
+    loadStandardComponents,
+    resetCustomComponents,
+    getLwcTags,
+    updateCustomComponentIndex,
+    eventEmitter,
+} from './metadata-utils/custom-components-util';
+import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
+import { indexStaticResources, resetStaticResources, updateStaticResourceIndex } from './metadata-utils/static-resources-util';
+import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
+import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex } from './metadata-utils/message-channel-util';
+import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from 'lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
 
@@ -39,6 +39,7 @@ export class LWCIndexer implements Indexer {
             indexingTasks.push(indexStaticResources(this.context, this.writeConfigs));
             indexingTasks.push(indexContentAssets(this.context, this.writeConfigs));
             indexingTasks.push(indexCustomLabels(this.context, this.writeConfigs));
+            indexingTasks.push(indexMessageChannels(this.context, this.writeConfigs));
         }
         this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
         return this.indexingTasks;
@@ -53,6 +54,7 @@ export class LWCIndexer implements Indexer {
         resetCustomLabels();
         resetStaticResources();
         resetContentAssets();
+        resetMessageChannels();
     }
 
     public async handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
@@ -69,6 +71,7 @@ export class LWCIndexer implements Indexer {
                 updateContentAssetIndex(changes, workspaceContext, this.writeConfigs),
                 updateLabelsIndex(changes, workspaceContext, this.writeConfigs),
                 updateCustomComponentIndex(changes, workspaceContext, this.writeConfigs),
+                updateMessageChannelsIndex(changes, workspaceContext, this.writeConfigs),
             ]);
         }
     }
