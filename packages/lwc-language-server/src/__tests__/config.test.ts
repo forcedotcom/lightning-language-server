@@ -51,13 +51,21 @@ it('lifecycle', async () => {
         'c/todo_utils': ['todo_utils/todo_utils.js'],
     });
 
-    // onCreateCustomComponent:
+    // onSetCustomComponent (create):
     const newCompTag = 'c/new_comp';
     const newCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
-    await config.onCreatedCustomComponent(context, newCompPath);
+    await config.onSetCustomComponent(context, newCompPath);
     jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
+
+    // onSetCustomComponent (update):
+    const existingCompTag = 'c/new_comp';
+    const existingCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
+    expect(jsconfigForceApp.compilerOptions.paths[existingCompTag]).toBeDefined();
+    await config.onSetCustomComponent(context, existingCompPath);
+    jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
+    expect(jsconfigForceApp.compilerOptions.paths[existingCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
 
     // onDeleteCustomComponent:
     const moduleTag = componentUtil.moduleFromFile(newCompPath, true);

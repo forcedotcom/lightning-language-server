@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
 import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
+import equal from 'deep-equal';
 
 const { WorkspaceType } = shared;
 
@@ -55,7 +56,7 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
     }
 }
 
-export async function onCreatedCustomComponent(context: WorkspaceContext, file: string): Promise<void> {
+export async function onSetCustomComponent(context: WorkspaceContext, file: string): Promise<void> {
     if (!file) {
         // could be a non-local tag, like LGC, etc
         return;
@@ -74,15 +75,22 @@ export async function onCreatedCustomComponent(context: WorkspaceContext, file: 
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
+            // deep clone of jsconfig created for update comparison
+            const newJsconfig: IJsconfig = JSON.parse(JSON.stringify(jsconfig));
             if (!jsconfig.compilerOptions) {
-                jsconfig.compilerOptions = {};
+                newJsconfig.compilerOptions = {};
             }
-            jsconfig.compilerOptions.baseUrl = '.';
+
             if (!jsconfig.compilerOptions.paths) {
-                jsconfig.compilerOptions.paths = {};
+                newJsconfig.compilerOptions.paths = {};
             }
-            jsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
-            writeJsonSync(jsconfigFile, jsconfig);
+
+            newJsconfig.compilerOptions.baseUrl = '.';
+            newJsconfig.compilerOptions.paths[moduleTag] = [relativeFilePath];
+
+            if (!equal(jsconfig, newJsconfig)) {
+                writeJsonSync(jsconfigFile, newJsconfig);
+            }
         } catch (err) {
             console.log(`onCreatedCustomComponent(${file}): Error reading jsconfig ${jsconfigFile}`, err);
         }
