@@ -251,16 +251,12 @@ export class WorkspaceContext {
         switch (this.type) {
             case WorkspaceType.SFDX:
                 jsConfigTemplate = await fs.readFile(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
-                const eslintrcTemplate = await fs.readFile(utils.getSfdxResource('eslintrc-sfdx.json'), 'utf8');
                 const forceignore = join(this.workspaceRoots[0], '.forceignore');
                 for (const modulesDir of modulesDirs) {
                     const jsConfigPath = join(modulesDir, 'jsconfig.json');
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoots[0]);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
                     this.updateConfigFile(jsConfigPath, jsConfigContent);
-                    // write/update .eslintrc.json
-                    const eslintrcPath = join(modulesDir, '.eslintrc.json');
-                    this.updateConfigFile(eslintrcPath, eslintrcTemplate);
                     await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
