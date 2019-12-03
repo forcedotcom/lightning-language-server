@@ -12,17 +12,12 @@ beforeEach(() => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
-    fs.removeSync(eslintrcPathForceApp);
     fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
-    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
     fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 });

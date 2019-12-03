@@ -153,25 +153,18 @@ it('configureSfdxProject()', async () => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
-    const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
-    fs.removeSync(eslintrcPathForceApp);
     fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
-    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
     fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 
     // verify typings/jsconfig after configuration:
 
     expect(jsconfigPathUtils).toExist();
-    expect(eslintrcPathUtils).toExist();
     await context.configureProject();
 
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
@@ -196,18 +189,6 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigUtils.include[1]).toBe('**/*');
     expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
     expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
-
-    // verify newly created .eslintrc.json
-    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
-    expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
-    expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
-    // verify updated .eslintrc.json
-    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
-    expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
-    expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
-    expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
