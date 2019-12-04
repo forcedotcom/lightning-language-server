@@ -281,12 +281,8 @@ export class WorkspaceContext {
 
     private async writeSettings() {
         switch (this.type) {
-            case WorkspaceType.SFDX:
-                break;
             case WorkspaceType.CORE_ALL:
-            // Removing these for now
-            // await this.updateCoreCodeWorkspace();
-            // await this.updateCoreLaunch();
+                await this.updateCoreCodeWorkspace();
             case WorkspaceType.CORE_PARTIAL:
                 // updateCoreSettings is performed by core's setupVSCode
                 await this.updateCoreSettings();
