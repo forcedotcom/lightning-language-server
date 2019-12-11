@@ -2,6 +2,9 @@
 
 Mono repo for the LWC and Aura Language Services that are used in the [Salesforce Extensions for VS Code](https://github.com/forcedotcom/salesforcedx-vscode).
 
+## Issues & Features
+Open issues and feature requests on the [SalesforceDX-VSCode Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
+
 ## Setup
 
 ### Pre-requisites
