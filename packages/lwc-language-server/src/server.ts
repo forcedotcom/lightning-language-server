@@ -107,6 +107,18 @@ documents.onDidChangeContent(async change => {
         const { metadata, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
         if (metadata) {
+            // writeConfigs is set to false to avoid config updates on every keystroke.
+            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, false);
+        }
+    }
+});
+
+documents.onDidSave(async change => {
+    const { document } = change;
+    const { uri } = document;
+    if (await context.isLWCJavascript(document)) {
+        const { metadata } = await javascriptCompileDocument(document);
+        if (metadata) {
             addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
         }
     }
