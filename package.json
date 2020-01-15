@@ -30,5 +30,9 @@
   "private": true,
   "workspaces": {
     "packages": ["packages/*"]
+  },
+  "resolutions": {
+    "set-value": "^2.0.1",
+    "js-yaml": "^3.13.1"
   }
 }
