@@ -1,0 +1,55 @@
+{
+  "folders": [
+    {
+      "name": "LSP",
+      "path": ".."
+    },
+    {
+      "name": "DX",
+      "path": "../../salesforcedx-vscode"
+    }
+  ],
+  "settings": {
+    "workbench.editor.labelFormat": "small",
+    "terminal.integrated.env.osx": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "terminal.integrated.env.linux": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "terminal.integrated.env.windows": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "npm.packageManager": "yarn",
+    "eslint.packageManager": "yarn",
+    "tslint.packageManager": "yarn",
+    "search.exclude": {
+      "**/node_modules": true,
+      "lib": true
+    }
+  },
+  "launch": {
+    "configurations": [],
+    "compounds": [
+      {
+        "name": "Launch DX - Aura",
+        "configurations": [
+          "Launch Extensions without compile",
+          "Debug Aura LSP"
+        ]
+      },
+      {
+        "name": "Launch DX - LWC",
+        "configurations": ["Launch Extensions without compile", "Debug LWC LSP"]
+      },
+      {
+        "name": "Launch DX - Aura & LWC",
+        "configurations": [
+          "Launch Extensions without compile",
+          "Debug LWC LSP",
+          "Debug Aura LSP"
+        ]
+      }
+    ]
+  }
+}
