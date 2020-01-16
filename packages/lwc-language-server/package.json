@@ -3,7 +3,7 @@
   "version": "2.2.5",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "build": "tsc -p . && cp -r src/resources lib/",

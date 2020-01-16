@@ -4,7 +4,7 @@
   "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -rf lib",
     "build": "tsc -p . && yarn copy-static-assets",
