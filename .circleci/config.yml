@@ -17,14 +17,14 @@ jobs:
       - run: yarn lint
       - run: yarn test_with_coverage
       - codecov/upload:
-        file: aura-language-server/coverage/*.json
-        flags: frontend,aura
+          file: aura-language-server/coverage/*.json
+          flags: frontend,aura
       - codecov/upload:
-        file: lwc-language-server/coverage/*.json
-        flags: frontend,lwc
+          file: lwc-language-server/coverage/*.json
+          flags: frontend,lwc
       - codecov/upload:
-        file: lightning-lsp-common/coverage/*.json
-        flags: frontend,common
+          file: lightning-lsp-common/coverage/*.json
+          flags: frontend,common
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
