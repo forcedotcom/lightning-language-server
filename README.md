@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/forcedotcom/lightning-language-server/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/lightning-language-server)
+
 # Lightning Language Servers
 
 Mono repo for the LWC and Aura Language Services that are used in the [Salesforce Extensions for VS Code](https://github.com/forcedotcom/salesforcedx-vscode).
