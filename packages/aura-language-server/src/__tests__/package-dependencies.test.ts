@@ -20,7 +20,8 @@ function readJsonFile(jsonFilePath: string) {
 const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 const packageJson = readJsonFile(packageJsonPath);
 
-// if we're in a monorepo, find other packages in the monorepo and include those in the check
+// if we're in a monorepo, find other packages in the monorepo and make sure
+// references to those also use exact versions
 const monorepoRootPath = path.join(packageJsonPath, '..', '..', '..');
 const monorepoConfigPath = path.join(monorepoRootPath, 'lerna.json');
 if (fs.existsSync(monorepoConfigPath)) {
