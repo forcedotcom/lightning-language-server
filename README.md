@@ -69,7 +69,7 @@ Login to the lwcjs npm registry using the 'lwcadmin' credentials. Note: package 
 
 ```
 npm login --registry https://npm.lwcjs.org
-lerna publish
+lerna publish --exact
 ```
 
 ### Open VSCode Workspace
