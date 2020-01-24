@@ -33,6 +33,8 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
         try {
             // note, this read/write file must be synchronous, so it is atomic
             const jsconfig: IJsconfig = readJsonSync(jsconfigFile);
+            // deep clone of jsconfig created for update comparison
+            const newJsconfig: IJsconfig = JSON.parse(JSON.stringify(jsconfig));
             if (
                 !jsconfig.compilerOptions ||
                 !jsconfig.compilerOptions.hasOwnProperty('baseUrl') ||
@@ -41,11 +43,14 @@ export async function onIndexCustomComponents(context: WorkspaceContext, files: 
                 JSON.stringify(jsconfig.compilerOptions.paths) !== JSON.stringify(paths)
             ) {
                 if (!jsconfig.compilerOptions) {
-                    jsconfig.compilerOptions = {};
+                    newJsconfig.compilerOptions = {};
                 }
-                jsconfig.compilerOptions.baseUrl = '.';
-                jsconfig.compilerOptions.paths = paths;
-                writeJsonSync(jsconfigFile, jsconfig);
+                newJsconfig.compilerOptions.baseUrl = '.';
+                newJsconfig.compilerOptions.paths = paths;
+
+                if (!equal(jsconfig, newJsconfig)) {
+                    writeJsonSync(jsconfigFile, newJsconfig);
+                }
             }
         } catch (err) {
             console.log(`onIndexCustomComponents(LOTS): Error reading jsconfig ${jsconfigFile}`, err);
