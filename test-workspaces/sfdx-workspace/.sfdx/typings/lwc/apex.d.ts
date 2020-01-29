@@ -1,4 +1,4 @@
-declare module "@salesforce/apex" {
+declare module '@salesforce/apex' {
     /**
      * Identifier for an object's field.
      */

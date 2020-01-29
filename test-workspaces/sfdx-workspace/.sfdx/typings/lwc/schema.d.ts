@@ -1,4 +1,4 @@
-declare module "@salesforce/schema" {
+declare module '@salesforce/schema' {
     /**
      * Identifier for an object.
      */
