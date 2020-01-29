@@ -9606,6 +9606,11 @@ vscode-nls@^4.0.0:
   resolved "http://npm.lwcjs.org/vscode-nls/-/vscode-nls-4.1.1/f9916b64e4947b20322defb1e676a495861f133c.tgz#f9916b64e4947b20322defb1e676a495861f133c"
   integrity sha512-4R+2UoUUU/LdnMnFjePxfLqNhBS8lrAFyX7pjb2ud/lqDkrUavFUTcG7wR0HBZFakae0Q6KLBFjMS6W93F403A==
 
+vscode-uri@1.0.6:
+  version "1.0.6"
+  resolved "http://npm.lwcjs.org/vscode-uri/-/vscode-uri-1.0.6/6b8f141b0bbc44ad7b07e94f82f168ac7608ad4d.tgz#6b8f141b0bbc44ad7b07e94f82f168ac7608ad4d"
+  integrity sha512-sLI2L0uGov3wKVb9EB+vIQBl9tVP90nqRvxSoJ35vI3NjxE8jfsE5DSOhWgSunHSZmKS4OCi2jrtfxK7uyp2ww==
+
 vscode-uri@^1.0.6:
   version "1.0.8"
   resolved "http://npm.lwcjs.org/vscode-uri/-/vscode-uri-1.0.8/9769aaececae4026fb6e22359cb38946580ded59.tgz#9769aaececae4026fb6e22359cb38946580ded59"
