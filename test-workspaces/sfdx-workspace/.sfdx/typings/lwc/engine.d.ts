@@ -8,8 +8,9 @@
  * Lightning Web Components core module
  */
 declare module 'lwc' {
+
     interface ComposableEvent extends Event {
-        composed: boolean;
+        composed: boolean
     }
 
     class HTMLElementTheGoodPart {
@@ -18,9 +19,9 @@ declare module 'lwc' {
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         getAttribute(name: string): string | null;
         getBoundingClientRect(): ClientRect;
-        querySelector(selectors: string): HTMLElement | null;
-        querySelectorAll(selectors: string): NodeListOf<HTMLElement>;
-        readonly tagName: string;
+        querySelector(selectors: string): HTMLElement | null
+        querySelectorAll(selectors: string): NodeListOf<HTMLElement>
+        readonly tagName: string
         readonly classList: DOMTokenList;
 
         // Default HTML Properties
@@ -85,12 +86,12 @@ declare module 'lwc' {
     interface ShadowRootTheGoodPart extends NodeSelector {
         mode: string;
         readonly host: null;
-        readonly firstChild: Node | null;
-        readonly lastChild: Node | null;
-        readonly innerHTML: string;
-        readonly textContent: string;
-        readonly childNodes: Node[];
-        readonly delegatesFocus: boolean;
+        readonly firstChild: Node | null,
+        readonly lastChild: Node | null,
+        readonly innerHTML: string,
+        readonly textContent: string,
+        readonly childNodes: Node[],
+        readonly delegatesFocus: boolean,
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         hasChildNodes(): boolean;
