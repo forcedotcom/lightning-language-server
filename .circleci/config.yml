@@ -8,7 +8,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/node:8.14.0
+      - image: circleci/node:10.15.3
     steps:
       - checkout
       - restore_cache:
