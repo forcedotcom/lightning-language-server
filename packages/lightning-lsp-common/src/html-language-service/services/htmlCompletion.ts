@@ -2,28 +2,36 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+'use strict';
 
-import { Position, CompletionList, CompletionItemKind, Range, TextEdit, InsertTextFormat, CompletionItem, MarkupKind } from 'vscode-languageserver-types';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+import {
+    TextDocument,
+    Position,
+    CompletionList,
+    CompletionItemKind,
+    Range,
+    TextEdit,
+    InsertTextFormat,
+    CompletionItem,
+    MarkupKind,
+} from 'vscode-languageserver-types';
 import { HTMLDocument, Node } from '../parser/htmlParser';
 import { createScanner } from '../parser/htmlScanner';
-import { CompletionConfiguration, ICompletionParticipant, ScannerState, TokenType, ClientCapabilities } from '../htmlLanguageTypes';
+import { isEmptyElement } from '../parser/htmlTags';
+import { getTagProviders } from './tagProviders';
+import { CompletionConfiguration, ICompletionParticipant, ScannerState, TokenType } from '../htmlLanguageTypes';
 import { entities } from '../parser/htmlEntities';
+import URI from 'vscode-uri';
+import * as componentUtil from '../../component-util';
 
 import * as nls from 'vscode-nls';
 import { isLetterOrDigit, endsWith, startsWith } from '../utils/strings';
-import { getAllDataProviders } from '../languageFacts/builtinDataProviders';
-import { isVoidElement } from '../languageFacts/fact';
-import { isDefined } from '../utils/object';
-import { generateDocumentation } from '../languageFacts/dataProvider';
-const localize = nls.loadMessageBundle();
+let localize = nls.loadMessageBundle();
 
 export class HTMLCompletion {
     completionParticipants: ICompletionParticipant[];
 
-    private supportsMarkdown: boolean | undefined;
-
-    constructor(private clientCapabilities: ClientCapabilities | undefined) {
+    constructor() {
         this.completionParticipants = [];
     }
 
@@ -31,29 +39,23 @@ export class HTMLCompletion {
         this.completionParticipants = registeredCompletionParticipants || [];
     }
 
-    doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings?: CompletionConfiguration): CompletionList {
-        const result = this._doComplete(document, position, htmlDocument, settings);
-        return this.convertCompletionList(result);
-    }
-
-    private _doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings?: CompletionConfiguration): CompletionList {
-        const result: CompletionList = {
+    doComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument, settings: CompletionConfiguration): CompletionList {
+        let result: CompletionList = {
             isIncomplete: false,
             items: [],
         };
-        const completionParticipants = this.completionParticipants;
-        const dataProviders = getAllDataProviders().filter(p => p.isApplicable(document.languageId) && (!settings || settings[p.getId()] !== false));
-        const doesSupportMarkdown = this.doesSupportMarkdown();
+        let completionParticipants = this.completionParticipants;
+        let tagProviders = getTagProviders().filter(p => p.isApplicable(document.languageId) && (!settings || settings[p.getId()] !== false));
 
-        const text = document.getText();
-        const offset = document.offsetAt(position);
+        let text = document.getText();
+        let offset = document.offsetAt(position);
 
-        const node = htmlDocument.findNodeBefore(offset);
+        let node = htmlDocument.findNodeBefore(offset);
         if (!node) {
             return result;
         }
 
-        const scanner = createScanner(text, node.start);
+        let scanner = createScanner(text, node.start);
         let currentTag: string = '';
         let currentAttributeName: string;
 
@@ -65,14 +67,15 @@ export class HTMLCompletion {
         }
 
         function collectOpenTagSuggestions(afterOpenBracket: number, tagNameEnd?: number): CompletionList {
-            const range = getReplaceRange(afterOpenBracket, tagNameEnd);
-            dataProviders.forEach(provider => {
-                provider.provideTags().forEach(tag => {
+            let range = getReplaceRange(afterOpenBracket, tagNameEnd);
+            tagProviders.forEach(provider => {
+                provider.collectTags((tag, label, info) => {
                     result.items.push({
-                        label: tag.name,
+                        label: tag,
                         kind: CompletionItemKind.Property,
-                        documentation: generateDocumentation(tag, doesSupportMarkdown),
-                        textEdit: TextEdit.replace(range, tag.name),
+                        detail: 'Lightning',
+                        documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
+                        textEdit: TextEdit.replace(range, tag),
                         insertTextFormat: InsertTextFormat.PlainText,
                     });
                 });
@@ -83,7 +86,7 @@ export class HTMLCompletion {
         function getLineIndent(offset: number) {
             let start = offset;
             while (start > 0) {
-                const ch = text.charAt(start - 1);
+                let ch = text.charAt(start - 1);
                 if ('\n\r'.indexOf(ch) >= 0) {
                     return text.substring(start, offset);
                 }
@@ -96,30 +99,31 @@ export class HTMLCompletion {
         }
 
         function collectCloseTagSuggestions(afterOpenBracket: number, inOpenTag: boolean, tagNameEnd: number = offset): CompletionList {
-            const range = getReplaceRange(afterOpenBracket, tagNameEnd);
-            const closeTag = isFollowedBy(text, tagNameEnd, ScannerState.WithinEndTag, TokenType.EndTagClose) ? '' : '>';
+            let range = getReplaceRange(afterOpenBracket, tagNameEnd);
+            let closeTag = isFollowedBy(text, tagNameEnd, ScannerState.WithinEndTag, TokenType.EndTagClose) ? '' : '>';
             let curr: Node | undefined = node;
             if (inOpenTag) {
                 curr = curr.parent; // don't suggest the own tag, it's not yet open
             }
             while (curr) {
-                const tag = curr.tag;
+                let tag = curr.tag;
                 if (tag && (!curr.closed || (curr.endTagStart && curr.endTagStart > offset))) {
-                    const item: CompletionItem = {
+                    let item: CompletionItem = {
                         label: '/' + tag,
                         kind: CompletionItemKind.Property,
-                        filterText: '/' + tag,
+                        filterText: '/' + tag + closeTag,
                         textEdit: TextEdit.replace(range, '/' + tag + closeTag),
                         insertTextFormat: InsertTextFormat.PlainText,
                     };
-                    const startIndent = getLineIndent(curr.start);
-                    const endIndent = getLineIndent(afterOpenBracket - 1);
+                    let startIndent = getLineIndent(curr.start);
+                    let endIndent = getLineIndent(afterOpenBracket - 1);
                     if (startIndent !== null && endIndent !== null && startIndent !== endIndent) {
-                        const insertText = startIndent + '</' + tag + closeTag;
+                        let insertText = startIndent + '</' + tag + closeTag;
                         item.textEdit = TextEdit.replace(getReplaceRange(afterOpenBracket - 1 - endIndent.length), insertText);
-                        item.filterText = endIndent + '</' + tag;
+                        item.filterText = endIndent + '</' + tag + closeTag;
                     }
                     result.items.push(item);
+                    5;
                     return result;
                 }
                 curr = curr.parent;
@@ -128,12 +132,13 @@ export class HTMLCompletion {
                 return result;
             }
 
-            dataProviders.forEach(provider => {
-                provider.provideTags().forEach(tag => {
+            tagProviders.forEach(provider => {
+                provider.collectTags((tag, label, info) => {
                     result.items.push({
-                        label: '/' + tag.name,
+                        label: '/' + tag,
                         kind: CompletionItemKind.Property,
-                        documentation: generateDocumentation(tag, doesSupportMarkdown),
+                        detail: 'Lightning',
+                        documentation: { kind: MarkupKind.Markdown, value: info.getHover(true) },
                         filterText: '/' + tag + closeTag,
                         textEdit: TextEdit.replace(range, '/' + tag + closeTag),
                         insertTextFormat: InsertTextFormat.PlainText,
@@ -147,8 +152,8 @@ export class HTMLCompletion {
             if (settings && settings.hideAutoCompleteProposals) {
                 return result;
             }
-            if (!isVoidElement(tag)) {
-                const pos = document.positionAt(tagCloseEnd);
+            if (!isEmptyElement(tag)) {
+                let pos = document.positionAt(tagCloseEnd);
                 result.items.push({
                     label: '</' + tag + '>',
                     kind: CompletionItemKind.Property,
@@ -172,22 +177,26 @@ export class HTMLCompletion {
                 // < is a valid attribute name character, but we rather assume the attribute name ends. See #23236.
                 replaceEnd++;
             }
-            const range = getReplaceRange(nameStart, replaceEnd);
-            const value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : '="$1"';
-            const tag = currentTag.toLowerCase();
-            const seenAttributes = Object.create(null);
-            dataProviders.forEach(provider => {
-                provider.provideAttributes(tag).forEach(attr => {
-                    if (seenAttributes[attr.name]) {
+            let range = getReplaceRange(nameStart, replaceEnd);
+
+            // LWC doesn't want quotes but aura does
+            const c = settings && settings.useAttributeValueQuotes ? '="$1"' : '=$1';
+
+            let value = isFollowedBy(text, nameEnd, ScannerState.AfterAttributeName, TokenType.DelimiterAssign) ? '' : c;
+            let tag = currentTag; // currentTag.toLowerCase();
+            let seenAttributes = Object.create(null);
+            tagProviders.forEach(provider => {
+                provider.collectAttributes(tag, (attribute, info, type?: string) => {
+                    if (seenAttributes[attribute]) {
                         return;
                     }
-                    seenAttributes[attr.name] = true;
+                    seenAttributes[attribute] = true;
 
-                    let codeSnippet = attr.name;
+                    let codeSnippet = attribute;
                     let command;
-                    if (attr.valueSet !== 'v' && value.length) {
+                    if (type !== 'v' && value.length) {
                         codeSnippet = codeSnippet + value;
-                        if (attr.valueSet || attr.name === 'style') {
+                        if (type) {
                             command = {
                                 title: 'Suggest',
                                 command: 'editor.action.triggerSuggest',
@@ -195,14 +204,18 @@ export class HTMLCompletion {
                         }
                     }
 
-                    result.items.push({
-                        label: attr.name,
-                        kind: attr.valueSet === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
-                        documentation: generateDocumentation(attr, doesSupportMarkdown),
+                    let retVal: CompletionItem = {
+                        label: attribute,
+                        kind: type === 'handler' ? CompletionItemKind.Function : CompletionItemKind.Value,
                         textEdit: TextEdit.replace(range, codeSnippet),
                         insertTextFormat: InsertTextFormat.Snippet,
                         command,
-                    });
+                    };
+                    if (info.documentation) {
+                        retVal.documentation = info.documentation;
+                        retVal.detail = info.detail;
+                    }
+                    result.items.push(retVal);
                 });
             });
             collectDataAttributesSuggestions(range, seenAttributes);
@@ -211,7 +224,7 @@ export class HTMLCompletion {
 
         function collectDataAttributesSuggestions(range: Range, seenAttributes: { [attribute: string]: boolean }) {
             const dataAttr = 'data-';
-            const dataAttributes: { [name: string]: string } = {};
+            let dataAttributes: { [name: string]: string } = {};
 
             dataAttributes[dataAttr] = `${dataAttr}$1="$2"`;
 
@@ -237,21 +250,57 @@ export class HTMLCompletion {
             );
         }
 
+        /**
+         * If current offset is inside curly brackets expression, add public properties, private properties, handler
+         * methods etc. to the suggestions list
+         * @param valueStart starting index of the current text token
+         * @returns returns true if expression suggestions are being provided, false otherwise
+         */
+        function collectExpressionSuggestions(valueStart: number): Boolean {
+            if (valueStart >= 0 && offset < text.length && (text[offset] === '}' || text[offset] === '>')) {
+                const expressionEnd = offset - 1;
+                for (let i = expressionEnd; i >= valueStart; i--) {
+                    if (text[i] === '{') {
+                        const templateTag = componentUtil.tagFromFile(URI.parse(document.uri).fsPath, settings.isSfdxProject);
+                        if (templateTag) {
+                            const range = getReplaceRange(i + 1, offset);
+                            tagProviders.forEach(provider => {
+                                provider.collectExpressionValues(templateTag, value => {
+                                    result.items.push({
+                                        label: value,
+                                        kind: CompletionItemKind.Reference,
+                                        textEdit: TextEdit.replace(range, value + (text[offset] === '}' ? '' : '}')),
+                                        insertTextFormat: InsertTextFormat.PlainText,
+                                    });
+                                });
+                            });
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
             let range: Range;
             let addQuotes: boolean;
+            if (collectExpressionSuggestions(valueStart)) {
+                return result;
+            }
+
             let valuePrefix: string;
             if (offset > valueStart && offset <= valueEnd && isQuote(text[valueStart])) {
                 // inside quoted attribute
-                const valueContentStart = valueStart + 1;
+                let valueContentStart = valueStart + 1;
                 let valueContentEnd = valueEnd;
                 // valueEnd points to the char after quote, which encloses the replace range
                 if (valueEnd > valueStart && text[valueEnd - 1] === text[valueStart]) {
                     valueContentEnd--;
                 }
 
-                const wsBefore = getWordStart(text, offset, valueContentStart);
-                const wsAfter = getWordEnd(text, offset, valueContentEnd);
+                let wsBefore = getWordStart(text, offset, valueContentStart);
+                let wsAfter = getWordEnd(text, offset, valueContentEnd);
                 range = getReplaceRange(wsBefore, wsAfter);
                 valuePrefix = offset >= valueContentStart && offset <= valueContentEnd ? text.substring(valueContentStart, offset) : '';
                 addQuotes = false;
@@ -261,27 +310,26 @@ export class HTMLCompletion {
                 addQuotes = true;
             }
 
-            const tag = currentTag.toLowerCase();
-            const attribute = currentAttributeName.toLowerCase();
+            let tag = currentTag.toLowerCase();
+            let attribute = currentAttributeName.toLowerCase();
 
             if (completionParticipants.length > 0) {
-                const fullRange = getReplaceRange(valueStart, valueEnd);
-                for (const participant of completionParticipants) {
+                let fullRange = getReplaceRange(valueStart, valueEnd);
+                for (let participant of completionParticipants) {
                     if (participant.onHtmlAttributeValue) {
                         participant.onHtmlAttributeValue({ document, position, tag, attribute, value: valuePrefix, range: fullRange });
                     }
                 }
             }
 
-            dataProviders.forEach(provider => {
-                provider.provideValues(tag, attribute).forEach(value => {
-                    const insertText = addQuotes ? '"' + value.name + '"' : value.name;
-
+            let value = scanner.getTokenText();
+            tagProviders.forEach(provider => {
+                provider.collectValues(tag, attribute, value => {
+                    let insertText = addQuotes ? '"' + value + '"' : value;
                     result.items.push({
-                        label: value.name,
+                        label: value,
                         filterText: insertText,
                         kind: CompletionItemKind.Unit,
-                        documentation: generateDocumentation(value, doesSupportMarkdown),
                         textEdit: TextEdit.replace(range, insertText),
                         insertTextFormat: InsertTextFormat.PlainText,
                     });
@@ -302,7 +350,7 @@ export class HTMLCompletion {
         }
 
         function collectInsideContent(): CompletionList {
-            for (const participant of completionParticipants) {
+            for (let participant of completionParticipants) {
                 if (participant.onHtmlContent) {
                     participant.onHtmlContent({ document, position });
                 }
@@ -320,8 +368,8 @@ export class HTMLCompletion {
                 characterStart--;
             }
             if (k >= 0 && text[k] === '&') {
-                const range = Range.create(Position.create(position.line, characterStart - 1), position);
-                for (const entity in entities) {
+                let range = Range.create(Position.create(position.line, characterStart - 1), position);
+                for (let entity in entities) {
                     if (endsWith(entity, ';')) {
                         const label = '&' + entity;
                         result.items.push({
@@ -337,27 +385,13 @@ export class HTMLCompletion {
             return result;
         }
 
-        function suggestDoctype(replaceStart: number, replaceEnd: number) {
-            const range = getReplaceRange(replaceStart, replaceEnd);
-            result.items.push({
-                label: '!DOCTYPE',
-                kind: CompletionItemKind.Property,
-                documentation: 'A preamble for an HTML document.',
-                textEdit: TextEdit.replace(range, '!DOCTYPE html>'),
-                insertTextFormat: InsertTextFormat.PlainText,
-            });
-        }
-
         let token = scanner.scan();
 
         while (token !== TokenType.EOS && scanner.getTokenOffset() <= offset) {
             switch (token) {
                 case TokenType.StartTagOpen:
                     if (scanner.getTokenEnd() === offset) {
-                        const endPos = scanNextForEndPos(TokenType.StartTag);
-                        if (position.line === 0) {
-                            suggestDoctype(offset, endPos);
-                        }
+                        let endPos = scanNextForEndPos(TokenType.StartTag);
                         return collectTagSuggestions(offset, endPos);
                     }
                     break;
@@ -375,7 +409,7 @@ export class HTMLCompletion {
                     break;
                 case TokenType.DelimiterAssign:
                     if (scanner.getTokenEnd() === offset) {
-                        const endPos = scanNextForEndPos(TokenType.AttributeValue);
+                        let endPos = scanNextForEndPos(TokenType.AttributeValue);
                         return collectAttributeValueSuggestions(offset, endPos);
                     }
                     break;
@@ -388,8 +422,8 @@ export class HTMLCompletion {
                     if (offset <= scanner.getTokenEnd()) {
                         switch (scanner.getScannerState()) {
                             case ScannerState.AfterOpeningStartTag:
-                                const startPos = scanner.getTokenOffset();
-                                const endTagPos = scanNextForEndPos(TokenType.StartTag);
+                                let startPos = scanner.getTokenOffset();
+                                let endTagPos = scanNextForEndPos(TokenType.StartTag);
                                 return collectTagSuggestions(startPos, endTagPos);
                             case ScannerState.WithinTag:
                             case ScannerState.AfterAttributeName:
@@ -405,8 +439,8 @@ export class HTMLCompletion {
                     break;
                 case TokenType.EndTagOpen:
                     if (offset <= scanner.getTokenEnd()) {
-                        const afterOpenBracket = scanner.getTokenOffset() + 1;
-                        const endOffset = scanNextForEndPos(TokenType.EndTag);
+                        let afterOpenBracket = scanner.getTokenOffset() + 1;
+                        let endOffset = scanNextForEndPos(TokenType.EndTag);
                         return collectCloseTagSuggestions(afterOpenBracket, false, endOffset);
                     }
                     break;
@@ -414,7 +448,7 @@ export class HTMLCompletion {
                     if (offset <= scanner.getTokenEnd()) {
                         let start = scanner.getTokenOffset() - 1;
                         while (start >= 0) {
-                            const ch = text.charAt(start);
+                            let ch = text.charAt(start);
                             if (ch === '/') {
                                 return collectCloseTagSuggestions(start, false, scanner.getTokenEnd());
                             } else if (!isWhiteSpace(ch)) {
@@ -432,11 +466,19 @@ export class HTMLCompletion {
                     }
                     break;
                 case TokenType.Content:
+                    // TODO move this to a completion participant
+                    if (collectExpressionSuggestions(scanner.getTokenLength())) {
+                        return result;
+                    }
                     if (offset <= scanner.getTokenEnd()) {
                         return collectInsideContent();
                     }
                     break;
                 default:
+                    if (collectExpressionSuggestions(scanner.getTokenLength())) {
+                        return result;
+                    }
+
                     if (offset <= scanner.getTokenEnd()) {
                         return result;
                     }
@@ -449,15 +491,15 @@ export class HTMLCompletion {
     }
 
     doTagComplete(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null {
-        const offset = document.offsetAt(position);
+        let offset = document.offsetAt(position);
         if (offset <= 0) {
             return null;
         }
-        const char = document.getText().charAt(offset - 1);
+        let char = document.getText().charAt(offset - 1);
         if (char === '>') {
-            const node = htmlDocument.findNodeBefore(offset);
-            if (node && node.tag && !isVoidElement(node.tag) && node.start < offset && (!node.endTagStart || node.endTagStart > offset)) {
-                const scanner = createScanner(document.getText(), node.start);
+            let node = htmlDocument.findNodeBefore(offset);
+            if (node && node.tag && !isEmptyElement(node.tag) && node.start < offset && (!node.endTagStart || node.endTagStart > offset)) {
+                let scanner = createScanner(document.getText(), node.start);
                 let token = scanner.scan();
                 while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset) {
                     if (token === TokenType.StartTagClose && scanner.getTokenEnd() === offset) {
@@ -472,7 +514,7 @@ export class HTMLCompletion {
                 node = node.parent;
             }
             if (node && node.tag) {
-                const scanner = createScanner(document.getText(), node.start);
+                let scanner = createScanner(document.getText(), node.start);
                 let token = scanner.scan();
                 while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset) {
                     if (token === TokenType.EndTagOpen && scanner.getTokenEnd() === offset) {
@@ -483,35 +525,6 @@ export class HTMLCompletion {
             }
         }
         return null;
-    }
-
-    private convertCompletionList(list: CompletionList) {
-        if (!this.doesSupportMarkdown()) {
-            list.items.forEach(item => {
-                if (item.documentation && typeof item.documentation !== 'string') {
-                    item.documentation = {
-                        kind: 'plaintext',
-                        value: item.documentation.value,
-                    };
-                }
-            });
-        }
-
-        return list;
-    }
-
-    private doesSupportMarkdown(): boolean {
-        if (!isDefined(this.supportsMarkdown)) {
-            if (!isDefined(this.clientCapabilities)) {
-                this.supportsMarkdown = true;
-                return this.supportsMarkdown;
-            }
-
-            const hover = this.clientCapabilities && this.clientCapabilities.textDocument && this.clientCapabilities.textDocument.hover;
-            this.supportsMarkdown =
-                hover && hover.contentFormat && Array.isArray(hover.contentFormat) && hover.contentFormat.indexOf(MarkupKind.Markdown) !== -1;
-        }
-        return <boolean>this.supportsMarkdown;
     }
 }
 
@@ -524,7 +537,7 @@ function isWhiteSpace(s: string): boolean {
 }
 
 function isFollowedBy(s: string, offset: number, intialState: ScannerState, expectedToken: TokenType) {
-    const scanner = createScanner(s, offset, intialState);
+    let scanner = createScanner(s, offset, intialState);
     let token = scanner.scan();
     while (token === TokenType.Whitespace) {
         token = scanner.scan();
