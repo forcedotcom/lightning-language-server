@@ -3,6 +3,9 @@ import { detectWorkspaceType, WorkspaceType } from '../shared';
 
 describe('detectWorkspaceType', () => {
     beforeAll(() => {
+        // Must be mocked when using mockFs
+        // Calls to these APIs will result in exceptions during the test.
+        // Issue: https://github.com/tschaub/mock-fs/issues/234
         console.log = jest.fn();
         console.error = jest.fn();
     });
@@ -15,7 +18,7 @@ describe('detectWorkspaceType', () => {
         mockFs.restore();
     });
 
-    test('when an sfdx-project.json file is present, workspaceType is SFDX', async () => {
+    test('when an sfdx-project.json file is present, workspaceType is SFDX', () => {
         mockFs({
             workspacedir: {
                 'sfdx-project.json': '{}',
@@ -27,7 +30,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.SFDX);
     });
 
-    test('when workspace-user.xml file is present at the root, workspaceType is CORE_ALL', async () => {
+    test('when workspace-user.xml file is present at the root, workspaceType is CORE_ALL', () => {
         mockFs({
             workspacedir: {
                 'workspace-user.xml': '<workspace></workspace>',
@@ -39,7 +42,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.CORE_ALL);
     });
 
-    test('when workspace-user.xml file is present at the parent of the root, workspaceType is CORE_PARTIAL', async () => {
+    test('when workspace-user.xml file is present at the parent of the root, workspaceType is CORE_PARTIAL', () => {
         mockFs({
             workspacedir: {},
             'workspace-user.xml': '<workspace></workspace>',
@@ -50,7 +53,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.CORE_PARTIAL);
     });
 
-    test('when package.json dependencies includes @lwc/engine, workspaceType is STANDARD_LWC', async () => {
+    test('when package.json dependencies includes @lwc/engine, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
@@ -66,7 +69,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
-    test('when package.json devDependencies include @lwc/engine, workspaceType is STANDARD_LWC', async () => {
+    test('when package.json devDependencies include @lwc/engine, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
@@ -84,7 +87,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
-    test('when package.json specifies workspaces, workspaceType is MONOREPO', async () => {
+    test('when package.json specifies workspaces, workspaceType is MONOREPO', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
@@ -98,7 +101,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.MONOREPO);
     });
 
-    test('when lerna.json exists in project, workspaceType is MONOREPO', async () => {
+    test('when lerna.json exists in project, workspaceType is MONOREPO', () => {
         mockFs({
             workspacedir: {
                 'package.json': '{}',
@@ -111,7 +114,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.MONOREPO);
     });
 
-    test('when package.json exists but no other conditions met, workspaceType is STANDARD', async () => {
+    test('when package.json exists but no other conditions met, workspaceType is STANDARD', () => {
         mockFs({
             workspacedir: {
                 'package.json': '{}',
@@ -123,7 +126,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD);
     });
 
-    test('when no package.json, workspace-user.xml or sfdx-project.json, workspaceType is UNKNOWN', async () => {
+    test('when no package.json, workspace-user.xml or sfdx-project.json, workspaceType is UNKNOWN', () => {
         mockFs({
             workspacedir: {
                 'file.txt': '',
@@ -141,7 +144,7 @@ describe('detectWorkspaceType with mutliroot', () => {
         mockFs.restore();
     });
 
-    test('when all projects are CORE_PARTIAL, workspaceType is CORE_PARTIAL', async () => {
+    test('when all projects are CORE_PARTIAL, workspaceType is CORE_PARTIAL', () => {
         mockFs({
             workspacedir: {
                 'pom.xml': '',
@@ -158,7 +161,7 @@ describe('detectWorkspaceType with mutliroot', () => {
     });
 
     // TODO: This will be invalid once we fix the logic to resolve against multiple project types.
-    test('when none of the projects are CORE_PARTIAL, workspaceType is UNKNOWN', async () => {
+    test('when none of the projects are CORE_PARTIAL, workspaceType is UNKNOWN', () => {
         mockFs({
             sfdx_workspace: {
                 'sfdx-project.json': '{}',
@@ -181,7 +184,7 @@ describe('detectWorkspaceType with mutliroot', () => {
     });
 
     // TODO: This will be invalid once we fix the logic to resolve against multiple project types.
-    test('when not all of the projects are CORE_PARTIAL, workspaceType is UNKNOWN', async () => {
+    test('when not all of the projects are CORE_PARTIAL, workspaceType is UNKNOWN', () => {
         mockFs({
             sfdx_workspace: {
                 'sfdx-project.json': '{}',
