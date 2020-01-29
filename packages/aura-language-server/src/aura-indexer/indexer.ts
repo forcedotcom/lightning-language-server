@@ -31,7 +31,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     public async configureAndIndex() {
-        const indexingTasks: Array<Promise<void>> = [];
+        const indexingTasks: Promise<void>[] = [];
 
         this.lwcIndexer = new LWCIndexer(this.context, false);
         this.context.addIndexingProvider({ name: 'lwc', indexer: this.lwcIndexer });

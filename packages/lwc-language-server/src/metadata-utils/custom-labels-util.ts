@@ -84,7 +84,7 @@ export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRo
 async function processLabels(workspacePath: string, writeConfigs: boolean): Promise<void> {
     CUSTOM_LABELS.clear();
     if (writeConfigs) {
-        const labelReadPromises: Array<Promise<void>> = [];
+        const labelReadPromises: Promise<void>[] = [];
 
         for (const filePath of CUSTOM_LABEL_FILES) {
             labelReadPromises.push(readLabelFile(filePath));

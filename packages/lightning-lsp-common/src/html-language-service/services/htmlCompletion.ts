@@ -285,7 +285,7 @@ export class HTMLCompletion {
         function collectAttributeValueSuggestions(valueStart: number, valueEnd: number = offset): CompletionList {
             let range: Range;
             let addQuotes: boolean;
-            if(collectExpressionSuggestions(valueStart)){
+            if (collectExpressionSuggestions(valueStart)) {
                 return result;
             }
 
