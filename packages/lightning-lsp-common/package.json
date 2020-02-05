@@ -41,7 +41,7 @@
     "@types/deep-equal": "^1.0.1",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
-    "@types/jest": "^24.9.0",
+    "@types/jest": "^25.1.1",
     "@types/lodash": "^4.14.119",
     "@types/lodash.template": "^4.4.4",
     "@types/mock-fs": "^4.10.0",
