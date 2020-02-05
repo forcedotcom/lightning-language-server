@@ -1678,10 +1678,10 @@
   dependencies:
     "@types/node" ">= 8"
 
-"@salesforce/apex@0.0.11":
-  version "0.0.11"
-  resolved "http://npm.lwcjs.org/@salesforce/apex/-/apex-0.0.11/63b5b32628d5a0621b8c990daa2f3d44ba9d347e.tgz#63b5b32628d5a0621b8c990daa2f3d44ba9d347e"
-  integrity sha512-o5gojXlREBmJC5aocw5QdY9+HWYVrpN9gy9M2QU26clzEmxW/jBMDQQkEHXiglLfjd1sda7WhgPvoLwI79Y7Rw==
+"@salesforce/apex@0.0.12":
+  version "0.0.12"
+  resolved "http://npm.lwcjs.org/@salesforce/apex/-/apex-0.0.12/dc155ef21fb870017cc5d812220b7cfe7c4e3424.tgz#dc155ef21fb870017cc5d812220b7cfe7c4e3424"
+  integrity sha512-L4zUDy4lxF7+mM7DYPfOKZ4lqiAIquRx0vHAUJMBaxD4bCiT+70Df++aOfGO9FOJNctvPtT5bLrFRfdos4y4Mg==
 
 "@salesforce/label@0.0.11":
   version "0.0.11"
