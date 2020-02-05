@@ -20,7 +20,7 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateMessageChannelsIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateMessageChannelsIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
     for (const f of updatedFiles) {
         if (f.uri.endsWith('.messageChannel-meta.xml')) {
@@ -34,21 +34,21 @@ export async function updateMessageChannelsIndex(updatedFiles: FileEvent[], { wo
         }
     }
     if (didChange) {
-        return processMessageChannels(workspaceRoot, writeConfigs);
+        return processMessageChannels(workspaceRoots[0], writeConfigs);
     }
 }
 
 export async function indexMessageChannels(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
-    const { workspaceRoot } = context;
+    const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const MESSAGE_CHANNEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/messageChannels/*.messageChannel-meta.xml`;
 
     try {
-        const files: string[] = await glob(MESSAGE_CHANNEL_GLOB_PATTERN, { cwd: workspaceRoot });
+        const files: string[] = await glob(MESSAGE_CHANNEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
             MESSAGE_CHANNELS.add(getResourceName(file));
         }
-        return processMessageChannels(workspaceRoot, writeConfigs);
+        return processMessageChannels(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of content resources. Error details:`, err);
         throw err;
