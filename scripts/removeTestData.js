@@ -5,15 +5,18 @@ const pathsToRemove = [
   // Remove the .vscode dirs
   'test-workspaces/sfdx-workspace/.vscode/',
   'test-workspaces/core-like-workspace/.vscode/',
+  'test-workspaces/core-like-workspace/app/main/core/.vscode/',
+  'test-workspaces/core-like-workspace/app/main/core/ui-force-components/.vscode/',
+  'test-workspaces/core-like-workspace/app/main/core/ui-global-components/.vscode/',
   'test-workspaces/standard-workspace/.vscode/',
  
   // Remove the .sfdx dirs
   'test-workspaces/sfdx-workspace/.sfdx/',
-  'test-workspaces/core-like-workspace/.sfdx/',
   'test-workspaces/standard-workspace/.sfdx/',
 
   // Remove the jsconfig.json
   'test-workspaces/sfdx-workspace/force-app/main/default/lwc/jsconfig.json',
+  'test-workspaces/core-like-workspace/app/main/core/jsconfig.json',
   'test-workspaces/core-like-workspace/app/main/core/ui-force-components/modules/jsconfig.json',
   'test-workspaces/core-like-workspace/app/main/core/ui-global-components/modules/jsconfig.json',
   'test-workspaces/standard-workspace/jsconfig.json',
