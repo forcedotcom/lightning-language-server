@@ -1,4 +1,3 @@
-// TODO: make this more generic and reuse code for static resources and this
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
@@ -38,6 +37,12 @@ export async function updateMessageChannelsIndex(updatedFiles: FileEvent[], { wo
     }
 }
 
+async function processMessageChannels(workspace: string, writeConfig: boolean): Promise<void> {
+    if (MESSAGE_CHANNELS.size > 0 && writeConfig) {
+        return fs.writeFile(join(workspace, MESSAGE_CHANNEL_DECLARATION_FILE), generateTypeDeclarations());
+    }
+}
+
 export async function indexMessageChannels(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
     const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
@@ -50,16 +55,12 @@ export async function indexMessageChannels(context: WorkspaceContext, writeConfi
         }
         return processMessageChannels(workspaceRoots[0], writeConfigs);
     } catch (err) {
-        console.log(`Error queuing up indexing of content resources. Error details:`, err);
+        console.log(`Error queuing up indexing of message channel resources. Error details:`, err);
         throw err;
     }
 }
 
-function processMessageChannels(workspace: string, writeConfig: boolean): Promise<void> {
-    if (MESSAGE_CHANNELS.size > 0 && writeConfig) {
-        return fs.writeFile(join(workspace, MESSAGE_CHANNEL_DECLARATION_FILE), generateTypeDeclarations());
-    }
-}
+
 
 function generateTypeDeclarations(): string {
     let resTypeDecs = '';

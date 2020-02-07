@@ -39,7 +39,7 @@ export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { wor
 
 async function processStaticResources(workspace: string, writeConfigs: boolean): Promise<void> {
     if (STATIC_RESOURCES.size > 0 && writeConfigs) {
-        fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
+        return fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
     }
 }
 
