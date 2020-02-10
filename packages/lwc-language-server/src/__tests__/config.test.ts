@@ -1,4 +1,4 @@
-import { WorkspaceContext, componentUtil } from 'lightning-lsp-common';
+import { WorkspaceContext, componentUtil } from '@salesforce/lightning-lsp-common';
 import { LWCIndexer } from '../indexer';
 import * as config from '../config';
 import * as path from 'path';

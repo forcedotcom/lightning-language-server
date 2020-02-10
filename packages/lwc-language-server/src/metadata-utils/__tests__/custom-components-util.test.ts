@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import URI from 'vscode-uri';
 import { LWCIndexer } from '../../indexer';
 import { FORCE_APP_ROOT, UTILS_ROOT } from '../../__tests__/test-utils';
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { addCustomTagFromFile, getLwcByTag } from '../custom-components-util';
 
 beforeEach(() => {

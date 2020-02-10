@@ -14,7 +14,6 @@ beforeEach(() => {
     fs.removeSync(sfdxTypingsPath);
 });
 
-
 it('indexMessageChannels', async done => {
     // Expect the message service d.ts file to get copied
     const expectedDTS = `declare module 'lightning/messageService' {

@@ -1,6 +1,6 @@
 import * as path from 'path'; // is this ok?
 import * as fs from 'fs-extra';
-import { WorkspaceContext, shared, utils, componentUtil } from 'lightning-lsp-common';
+import { WorkspaceContext, shared, utils, componentUtil } from '@salesforce/lightning-lsp-common';
 import { readJsonSync, writeJsonSync } from 'lightning-lsp-common/lib/utils';
 import equal from 'deep-equal';
 

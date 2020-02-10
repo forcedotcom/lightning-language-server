@@ -6,7 +6,7 @@ import {
     ICompletionParticipant,
     HtmlContentContext,
     HtmlAttributeValueContext,
-} from 'lightning-lsp-common';
+} from '@salesforce/lightning-lsp-common';
 import { getLwcTags, getLwcByTag } from '../metadata-utils/custom-components-util';
 // import { ClassMember } from '@lwc/babel-plugin-component';
 
