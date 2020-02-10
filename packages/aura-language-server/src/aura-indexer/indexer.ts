@@ -8,7 +8,7 @@ import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import changeCase from 'change-case';
 import EventsEmitter from 'events';
-import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
+import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 

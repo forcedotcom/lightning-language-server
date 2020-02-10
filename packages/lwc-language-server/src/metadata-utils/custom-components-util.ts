@@ -9,8 +9,8 @@ import { Metadata } from '@lwc/babel-plugin-component';
 import { utils, shared, componentUtil } from '@salesforce/lightning-lsp-common';
 import { join } from 'path';
 import EventsEmitter from 'events';
-import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
+import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
+import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 
