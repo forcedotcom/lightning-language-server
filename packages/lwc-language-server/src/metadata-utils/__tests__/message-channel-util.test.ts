@@ -4,8 +4,8 @@ import { validate } from './util';
 // @ts-ignore
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 
-jest.mock('lightning-lsp-common', () => {
-    const real = jest.requireActual('lightning-lsp-common');
+jest.mock('@salesforce/lightning-lsp-common', () => {
+    const real = jest.requireActual('@salesforce/lightning-lsp-common');
     return { utils: mockFileUtil(), WorkspaceContext: real.WorkspaceContext };
 });
 

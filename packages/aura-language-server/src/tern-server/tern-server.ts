@@ -8,7 +8,7 @@ import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './
 import { readFileSync, readdirSync, statSync } from 'fs';
 import URI from 'vscode-uri';
 
-import { memoize } from 'lightning-lsp-common/lib/utils';
+import { memoize } from '@salesforce/lightning-lsp-common/lib/utils';
 import {
     TextDocumentPositionParams,
     CompletionList,

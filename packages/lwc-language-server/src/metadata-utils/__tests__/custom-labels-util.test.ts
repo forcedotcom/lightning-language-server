@@ -2,8 +2,8 @@ import { mockFileUtil } from './mock-file-util';
 import { indexCustomLabels } from '../custom-labels-util';
 import { validate } from './util';
 
-jest.mock('lightning-lsp-common', () => {
-    const real = jest.requireActual('lightning-lsp-common');
+jest.mock('@salesforce/lightning-lsp-common', () => {
+    const real = jest.requireActual('@salesforce/lightning-lsp-common');
     return { utils: mockFileUtil(), WorkspaceContext: real.WorkspaceContext };
 });
 

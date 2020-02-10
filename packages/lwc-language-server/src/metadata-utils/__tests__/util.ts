@@ -1,7 +1,7 @@
 import { mockFileUtilHooks } from './mock-file-util';
 import { join } from 'path';
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
-import { ISfdxProjectConfig } from 'lightning-lsp-common/lib/context';
+import { ISfdxProjectConfig } from '@salesforce/lightning-lsp-common/lib/context';
 
 export async function validate(
     indexer: (context: WorkspaceContext, writeConfigs: boolean) => Promise<void>,

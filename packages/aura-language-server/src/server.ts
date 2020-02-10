@@ -34,9 +34,9 @@ import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onT
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
 import { LWCIndexer } from '@salesforce/lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
-import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
+import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
-import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
+import { WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 
 interface ITagParams {
     taginfo: TagInfo;
