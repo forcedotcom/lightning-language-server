@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { parseString as parseStringSync, OptionsV2, convertableToString } from 'xml2js';
 import { FileEvent, FileChangeType, Files } from 'vscode-languageserver';
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { promisify } from 'util';
 import { readFile } from 'fs-extra';
 

@@ -2,7 +2,7 @@ import { mockFileUtil } from './mock-file-util';
 import { indexContentAssets } from '../content-assets-util';
 import { validate } from './util';
 // @ts-ignore
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 
 jest.mock('lightning-lsp-common', () => {
     const real = jest.requireActual('lightning-lsp-common');
