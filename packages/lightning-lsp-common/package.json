@@ -1,5 +1,5 @@
 {
-  "name": "lightning-lsp-common",
+  "name": "@salesforce/lightning-lsp-common",
   "version": "2.2.7",
   "description": "Common components for lwc-language-server and aura-language-server.",
   "main": "lib/index.js",
@@ -61,6 +61,6 @@
     "typescript": "3.1.6"
   },
   "publishConfig": {
-    "registry": "https://npm.lwcjs.org"
+    "registry": "https://registry.npmjs.org"
   }
 }

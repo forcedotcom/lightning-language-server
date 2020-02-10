@@ -1,5 +1,5 @@
 {
-  "name": "lwc-language-server",
+  "name": "@salesforce/lwc-language-server",
   "version": "2.2.7",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
@@ -65,6 +65,6 @@
     "typescript": "3.1.6"
   },
   "publishConfig": {
-    "registry": "https://npm.lwcjs.org"
+    "registry": "https://registry.npmjs.org"
   }
 }

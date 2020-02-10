@@ -1,13 +1,14 @@
 [![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master)
 [![codecov](https://codecov.io/gh/forcedotcom/lightning-language-server/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/lightning-language-server)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-![npm (scoped)](https://img.shields.io/npm/v/lwc-language-server?registry_uri=https%3A%2F%2Fnpm.lwcjs.org%2F)
+![npm (scoped)](https://img.shields.io/npm/v/lwc-language-server?registry_uri=https%3A%2F%2Fregistry.npmjs.org%2F)
 
 # Lightning Language Servers
 
 Mono repo for the LWC and Aura Language Services that are used in the [Salesforce Extensions for VS Code](https://github.com/forcedotcom/salesforcedx-vscode).
 
 ## Issues & Features
+
 Open issues and feature requests on the [SalesforceDX-VSCode Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
 
 ## Setup
@@ -68,7 +69,7 @@ yarn test
 Login to the lwcjs npm registry using the 'lwcadmin' credentials. Note: package versions will be updated as part of the lerna publish command, so you don't need to update them yourself.
 
 ```
-npm login --registry https://npm.lwcjs.org
+npm login --registry https://registry.npmjs.org
 lerna publish --exact
 ```
 
