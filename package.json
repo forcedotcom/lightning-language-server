@@ -2,6 +2,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --force-local",
     "clean": "lerna run clean --stream",
+    "cleanTestData": "lerna run cleanTestData --stream",
     "build": "lerna run build --stream",
     "watch": "lerna run watch --stream --parallel",
     "prepare": "lerna run clean && lerna run build --stream",
@@ -17,8 +18,7 @@
     "publish-lsp": "lerna publish --force-publish",
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "name": "lightning-language-server",
   "license": "BSD-3-Clause",
   "devDependencies": {
@@ -26,11 +26,14 @@
     "husky": "^1.3.1",
     "lerna": "^3.10.6",
     "patch-package": "^6.0.5",
+    "rimraf": "^3.0.1",
     "typescript": "^3.2.4"
   },
   "private": true,
   "workspaces": {
-    "packages": ["packages/*"]
+    "packages": [
+      "packages/*"
+    ]
   },
   "resolutions": {
     "set-value": "^2.0.1",

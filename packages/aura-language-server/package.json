@@ -7,6 +7,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "clean": "rm -rf lib",
+    "cleanTestData": "node ../../scripts/removeTestData.js",
     "build": "tsc -p . && yarn copy-static-assets",
     "watch": "tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "copy-static-assets": "ts-node copy-static-assets.ts",

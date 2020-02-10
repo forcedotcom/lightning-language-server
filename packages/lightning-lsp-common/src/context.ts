@@ -220,12 +220,18 @@ export class WorkspaceContext {
                 break;
         }
 
+        // TODO should we just be copying every file in this directory rather than hardcoding?
         if (typingsDir) {
             // copy typings to typingsDir
             const resourceTypingsDir = utils.getSfdxResource('typings');
             await fs.ensureDir(typingsDir);
             try {
                 await fs.copy(join(resourceTypingsDir, 'lds.d.ts'), join(typingsDir, 'lds.d.ts'));
+            } catch (ignore) {
+                // ignore
+            }
+            try {
+                await fs.copy(join(resourceTypingsDir, 'messageservice.d.ts'), join(typingsDir, 'messageservice.d.ts'));
             } catch (ignore) {
                 // ignore
             }
