@@ -21,8 +21,8 @@ import {
 import { LWCIndexer } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
-import { WorkspaceContext, utils, shared, interceptConsoleLogger } from 'lightning-lsp-common';
-import { getLanguageService, LanguageService } from 'lightning-lsp-common';
+import { WorkspaceContext, utils, shared, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
 import URI from 'vscode-uri';
 import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
 import { getLwcTagProvider } from './markup/lwcTags';

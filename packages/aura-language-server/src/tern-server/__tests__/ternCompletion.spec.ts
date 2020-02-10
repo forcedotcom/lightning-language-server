@@ -1,4 +1,4 @@
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { startServer, onCompletion, onHover, onDefinition, onReferences } from '../tern-server';
 
 it('tern completions', async () => {

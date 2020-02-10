@@ -1,7 +1,7 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
 
@@ -59,8 +59,6 @@ export async function indexMessageChannels(context: WorkspaceContext, writeConfi
         throw err;
     }
 }
-
-
 
 function generateTypeDeclarations(): string {
     let resTypeDecs = '';

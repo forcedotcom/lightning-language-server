@@ -1,8 +1,8 @@
 import * as path from 'path';
 import { CompletionItem, Position, TextDocument, TextEdit } from 'vscode-languageserver';
-import { getLanguageService } from 'lightning-lsp-common';
+import { getLanguageService } from '@salesforce/lightning-lsp-common';
 import { LWCIndexer } from '../../indexer';
-import { WorkspaceContext, shared } from 'lightning-lsp-common';
+import { WorkspaceContext, shared } from '@salesforce/lightning-lsp-common';
 const { WorkspaceType } = shared;
 
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
