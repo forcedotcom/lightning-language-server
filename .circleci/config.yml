@@ -54,6 +54,9 @@ jobs:
       - attach_workspace:
           at: ~/lightning-language-server
 
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+
       - run: yarn test_with_coverage
 
       # Upload Coverage to CodeCov.io
@@ -74,6 +77,8 @@ jobs:
   #   steps:
   #     - attach_workspace:
   #         at: ~/lightning-language-server
+  #     - restore_cache:
+  #         key: dependency-cache-{{ checksum "package.json" }}
   #     - run:
   #         name: Setup workspace Symlinks for Windows
   #         command: yarn windowsCopySymlinks
