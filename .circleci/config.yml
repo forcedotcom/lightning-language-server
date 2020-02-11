@@ -1,16 +1,31 @@
-version: 2
+---
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.5
+  browser-tools: circleci/browser-tools@0.1.3
+
 jobs:
-   build:
-     docker:
-       - image: circleci/node:8.14.0
-     steps:
-       - checkout
-       - restore_cache:
+  build:
+    docker:
+      - image: circleci/node:10.15.3
+    steps:
+      - checkout
+      - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
-       - run: yarn install
-       - run: yarn lint
-       - run: yarn test
-       - save_cache:
+      - run: yarn install
+      - run: yarn lint
+      - run: yarn test_with_coverage
+      - codecov/upload:
+          file: aura-language-server/coverage/*.json
+          flags: frontend,aura
+      - codecov/upload:
+          file: lwc-language-server/coverage/*.json
+          flags: frontend,lwc
+      - codecov/upload:
+          file: lightning-lsp-common/coverage/*.json
+          flags: frontend,common
+      - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules

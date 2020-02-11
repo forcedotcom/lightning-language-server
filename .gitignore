@@ -1,7 +1,21 @@
+# Dependencies
 node_modules/
-lerna-debug.log
-npm-debug.log
+
+# ?
 packages/*/lib
 lib
+
+# Mac Artifact
 .DS_Store
+
+# Yarn Error Output
 yarn-error.log
+
+# Lerna logging
+lerna-debug.log
+
+# Npm logging
+npm-debug.log
+
+# VSCode
+.vscode/settings.json

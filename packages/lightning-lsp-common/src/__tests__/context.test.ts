@@ -9,15 +9,16 @@ import {
     FORCE_APP_ROOT,
     STANDARDS_ROOT,
     UTILS_ROOT,
-    OSS_LWC_PROJECT_ROOT,
     readAsTextDocument,
     REGISTERED_EMPTY_FOLDER_ROOT,
+    CORE_MULTI_ROOT,
+    OSS_LWC_PROJECT_ROOT
 } from './test-utils';
 
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
-    expect(context.workspaceRoot).toBeAbsolutePath();
+    expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toBeAbsolutePath();
     expect(roots.lwc[0]).toEndWith(join(FORCE_APP_ROOT, 'lwc'));
@@ -28,7 +29,7 @@ it('WorkspaceContext', async () => {
     expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
     expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
     expect(modules.length).toBe(10);
-    expect((await context.getRelativeModulesDirs()).length).toBe(3);
+    expect((await context.getModulesDirs()).length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
@@ -43,7 +44,7 @@ it('WorkspaceContext', async () => {
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
-    expect(await context.getRelativeModulesDirs()).toEqual([]);
+    expect(await context.getModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
@@ -57,17 +58,34 @@ it('WorkspaceContext', async () => {
     expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
     expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
     expect(modules.length).toBe(3);
-    expect((await context.getRelativeModulesDirs()).length).toBe(2);
+    expect((await context.getModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
-    expect(context.type).toBe(WorkspaceType.CORE_SINGLE_PROJECT);
+    expect(context.type).toBe(WorkspaceType.CORE_PARTIAL);
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.lwc.length).toBe(1);
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
     expect(modules.length).toBe(1);
-    expect(await context.getRelativeModulesDirs()).toEqual(['modules']);
+    expect(await context.getModulesDirs()).toEqual([join(context.workspaceRoots[0], 'modules')]);
+
+    context = new WorkspaceContext(CORE_MULTI_ROOT);
+    expect(context.workspaceRoots.length).toBe(2);
+    roots = await context.getNamespaceRoots();
+    expect(roots.lwc[0]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/clients'));
+    expect(roots.lwc[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
+    expect(roots.lwc[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
+    expect(roots.lwc.length).toBe(3);
+    modules = await context.findAllModules();
+    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
+    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
+    expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
+    expect(modules.length).toBe(3);
+    const modulesDirs = await context.getModulesDirs();
+    for (let i = 0; i < context.workspaceRoots.length; i = i + 1) {
+        expect(modulesDirs[i]).toMatch(context.workspaceRoots[i]);
+    }
 });
 
 it('isLwcOssWorkspaceContext', async () => {
@@ -148,25 +166,18 @@ it('configureSfdxProject()', async () => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
-    const settingsPath = 'test-workspaces/sfdx-workspace/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
-    fs.removeSync(eslintrcPathForceApp);
     fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
-    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
     fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 
     // verify typings/jsconfig after configuration:
 
     expect(jsconfigPathUtils).toExist();
-    expect(eslintrcPathUtils).toExist();
     await context.configureProject();
 
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
@@ -191,18 +202,6 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigUtils.include[1]).toBe('**/*');
     expect(jsconfigUtils.include[2]).toBe('../../../.sfdx/typings/lwc/**/*.d.ts');
     expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
-
-    // verify newly created .eslintrc.json
-    const eslintrcForceAppContent = fs.readFileSync(eslintrcPathForceApp, 'utf8');
-    expect(eslintrcForceAppContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcForceApp = JSON.parse(eslintrcForceAppContent);
-    expect(eslintrcForceApp.extends).toBe('@salesforce/eslint-config-lwc/recommended');
-    // verify updated .eslintrc.json
-    const eslintrcUtilsContent = fs.readFileSync(eslintrcPathUtils, 'utf8');
-    expect(eslintrcUtilsContent).toContain('    "extends": "@salesforce/eslint-config-lwc/recommended"'); // check formatting
-    const eslintrcUtils = JSON.parse(eslintrcUtilsContent);
-    expect(eslintrcUtils.extends).toBe('@salesforce/eslint-config-lwc/recommended');
-    expect(eslintrcUtils.rules.semi).toBe('error');
 
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
@@ -237,6 +236,29 @@ it('configureCoreProject()', async () => {
 
     const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     verifyCoreSettings(settings);
+});
+
+it('configureCoreMulti()', async () => {
+    const context = new WorkspaceContext(CORE_MULTI_ROOT);
+
+    const jsconfigPathForce = context.workspaceRoots[0] + '/modules/jsconfig.json';
+    const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
+    const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
+    const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathGlobal);
+    fs.removeSync(jsconfigPathForce);
+    fs.removeSync(codeWorkspacePath);
+    fs.removeSync(launchPath);
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProject();
+
+    // verify newly created jsconfig.json
+    verifyJsconfigCore(jsconfigPathGlobal);
+    verifyJsconfigCore(jsconfigPathForce);
+    verifyTypingsCore();
 });
 
 it('configureCoreAll()', async () => {

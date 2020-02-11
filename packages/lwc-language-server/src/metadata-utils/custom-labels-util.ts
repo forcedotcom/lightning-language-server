@@ -49,22 +49,22 @@ export function resetCustomLabels() {
 }
 
 export async function indexCustomLabels(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
-    const { workspaceRoot } = context;
+    const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
     try {
-        const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoot });
+        const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
-            CUSTOM_LABEL_FILES.add(join(workspaceRoot, file));
+            CUSTOM_LABEL_FILES.add(join(workspaceRoots[0], file));
         }
-        return processLabels(workspaceRoot, writeConfigs);
+        return processLabels(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of labels. Error details:`, err);
         throw err;
     }
 }
 
-export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
     for (const f of updatedFiles) {
         if (f.uri.endsWith('CustomLabels.labels-meta.xml')) {
@@ -77,14 +77,14 @@ export async function updateLabelsIndex(updatedFiles: FileEvent[], { workspaceRo
         }
     }
     if (didChange) {
-        await processLabels(workspaceRoot, writeConfigs);
+        await processLabels(workspaceRoots[0], writeConfigs);
     }
 }
 
 async function processLabels(workspacePath: string, writeConfigs: boolean): Promise<void> {
     CUSTOM_LABELS.clear();
     if (writeConfigs) {
-        const labelReadPromises: Array<Promise<void>> = [];
+        const labelReadPromises: Promise<void>[] = [];
 
         for (const filePath of CUSTOM_LABEL_FILES) {
             labelReadPromises.push(readLabelFile(filePath));

@@ -26,7 +26,6 @@
             "**/target/**": true,
             "**/bin/**": true
         },
-        "files.useExperimentalFileWatcher": true,
         "eslint.nodePath": "${eslint_node_path}",
         "perforce.maxBuffer": 10485760,
         "perforce.editOnFileSave": true,
@@ -36,9 +35,6 @@
         "perforce.client": "${p4_client}",
         "perforce.user": "${p4_user}",
         "perforce.port": "${p4_port}",
-        "java.autobuild.enabled": false,
-        "java.import.maven.enabled": false,
-        "java.import.gradle.enabled": false,
         "extensions.ignoreRecommendations": true,
         "salesforcedx-vscode-lightning.activationMode": "always",
         "salesforcedx-vscode-lightning.showLightningExplorer": true,

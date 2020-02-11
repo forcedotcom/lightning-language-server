@@ -214,7 +214,6 @@ function fileToUri(file: string): string {
     if (path.isAbsolute(file)) {
         return URI.file(file).toString();
     } else {
-        // internally, tern will strip the project root, so we have to add it back
         return URI.file(path.join(theRootPath, file)).toString();
     }
 }

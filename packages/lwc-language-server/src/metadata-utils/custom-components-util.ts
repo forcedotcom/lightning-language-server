@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import { onCreatedCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
+import { onSetCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
 import { WorkspaceContext, AttributeInfo, TagInfo } from 'lightning-lsp-common';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
@@ -40,7 +40,7 @@ async function setCustomTag(context: WorkspaceContext, info: TagInfo, writeConfi
     LWC_TAGS.set(info.name, info);
 
     if (writeConfigs) {
-        await onCreatedCustomComponent(context, info.file);
+        await onSetCustomComponent(context, info.file);
     }
 
     eventEmitter.emit('set', info);
@@ -119,7 +119,9 @@ async function addCustomTag(context: WorkspaceContext, tag: string, uri: string,
 
 export async function indexCustomComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const files = await context.findAllModules();
-    await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, writeConfigs);
+    // writeConfigs is set to false to avoid updating config twice for the same tag.
+    // loadCustomTagsFromFiles and onIndexCustomComponents lead to the same config updates.
+    await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, false);
     if (writeConfigs) {
         await onIndexCustomComponents(context, files);
     }

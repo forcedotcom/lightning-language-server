@@ -9,6 +9,6 @@ module.exports = {
       "js",
       "json"
     ],
-    setupTestFrameworkScriptFile: "<rootDir>/jest/matchers.ts",
+    setupFilesAfterEnv: ["jest-extended"],
     testURL: "http://localhost"
 };

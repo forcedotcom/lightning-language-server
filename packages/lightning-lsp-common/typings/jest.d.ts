@@ -1,7 +1,10 @@
-declare namespace jest {
-    interface Matchers<R> {
-        toExist(): R;
-        toBeAbsolutePath(): R;
-        toEndWith(suffix: string): R;
+import 'jest-extended';
+
+declare global {
+    namespace jest {
+        interface Matchers<R, T> {
+            toExist(): R;
+            toBeAbsolutePath(): R;
+        }
     }
 }

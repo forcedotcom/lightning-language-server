@@ -19,7 +19,7 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoot }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
     for (const f of updatedFiles) {
         if (f.uri.endsWith('.resource-meta.xml')) {
@@ -33,26 +33,26 @@ export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { wor
         }
     }
     if (didChange) {
-        return processStaticResources(workspaceRoot, writeConfigs);
+        return processStaticResources(workspaceRoots[0], writeConfigs);
     }
 }
 
 async function processStaticResources(workspace: string, writeConfigs: boolean): Promise<void> {
     if (STATIC_RESOURCES.size > 0 && writeConfigs) {
-        fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
+        return fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
     }
 }
 
 export async function indexStaticResources(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
-    const { workspaceRoot } = context;
+    const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
     try {
-        const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoot });
+        const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
             STATIC_RESOURCES.add(getResourceName(file));
         }
-        processStaticResources(workspaceRoot, writeConfigs);
+        processStaticResources(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of static resources. Error details:`, err);
         throw err;

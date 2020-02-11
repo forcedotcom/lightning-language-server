@@ -9,17 +9,12 @@ beforeEach(() => {
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-    const eslintrcPathForceApp = FORCE_APP_ROOT + '/lwc/.eslintrc.json';
-    const eslintrcPathUtilsOrig = UTILS_ROOT + '/lwc/eslintrc-orig.json';
-    const eslintrcPathUtils = UTILS_ROOT + '/lwc/.eslintrc.json';
     const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
     const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathForceApp);
-    fs.removeSync(eslintrcPathForceApp);
     fs.copySync(jsconfigPathUtilsOrig, jsconfigPathUtils);
-    fs.copySync(eslintrcPathUtilsOrig, eslintrcPathUtils);
     fs.removeSync(forceignorePath);
     fs.removeSync(sfdxTypingsPath);
 });
@@ -51,13 +46,21 @@ it('lifecycle', async () => {
         'c/todo_utils': ['todo_utils/todo_utils.js'],
     });
 
-    // onCreateCustomComponent:
+    // onSetCustomComponent (create):
     const newCompTag = 'c/new_comp';
     const newCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toBeUndefined();
-    await config.onCreatedCustomComponent(context, newCompPath);
+    await config.onSetCustomComponent(context, newCompPath);
     jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
     expect(jsconfigForceApp.compilerOptions.paths[newCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
+
+    // onSetCustomComponent (update):
+    const existingCompTag = 'c/new_comp';
+    const existingCompPath = UTILS_ROOT + path.join('meta', 'lwc', 'new_comp', 'new_comp.js');
+    expect(jsconfigForceApp.compilerOptions.paths[existingCompTag]).toBeDefined();
+    await config.onSetCustomComponent(context, existingCompPath);
+    jsconfigForceApp = JSON.parse(fs.readFileSync(jsconfigPathForceApp, 'utf8'));
+    expect(jsconfigForceApp.compilerOptions.paths[existingCompTag]).toEqual(['../../../../utils/metameta/lwc/new_comp/new_comp.js']);
 
     // onDeleteCustomComponent:
     const moduleTag = componentUtil.moduleFromFile(newCompPath, true);

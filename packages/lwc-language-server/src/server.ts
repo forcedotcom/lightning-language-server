@@ -14,6 +14,8 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
+    RequestType,
+    RegistrationRequest,
 } from 'vscode-languageserver';
 
 import { LWCIndexer } from './indexer';
@@ -41,19 +43,24 @@ let context: WorkspaceContext;
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath } = params;
+        const { workspaceFolders } = params;
 
-        // Early exit if no workspace is opened
-        const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
+        const workspaceRoots: string[] = [];
+        for (const folder of workspaceFolders) {
+            workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
+        }
         try {
-            if (!workspaceRoot) {
+            if (workspaceRoots.length === 0) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting [[LWC]] language server at ${workspaceRoot}`);
+            for (const root of workspaceRoots) {
+                console.info(`Starting [[LWC]] language server at ${root}`);
+            }
             const startTime = process.hrtime();
-            context = new WorkspaceContext(workspaceRoot);
+            context = new WorkspaceContext(workspaceRoots);
+
             context.configureProject();
             const lwcIndexer = new LWCIndexer(context);
 
@@ -63,7 +70,6 @@ connection.onInitialize(
             htmlLS = getLanguageService();
             htmlLS.addTagProvider(getLwcTagProvider());
             console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
-            // Return the language server capabilities
             return {
                 capabilities: {
                     textDocumentSync: documents.syncKind,
@@ -72,6 +78,11 @@ connection.onInitialize(
                     },
                     hoverProvider: true,
                     definitionProvider: true,
+                    workspace: {
+                        workspaceFolders: {
+                            supported: true,
+                        },
+                    },
                 },
             };
         } catch (e) {
@@ -95,6 +106,18 @@ documents.onDidChangeContent(async change => {
     } else if (await context.isLWCJavascript(document)) {
         const { metadata, diagnostics } = await javascriptCompileDocument(document);
         connection.sendDiagnostics({ uri, diagnostics });
+        if (metadata) {
+            // writeConfigs is set to false to avoid config updates on every keystroke.
+            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, false);
+        }
+    }
+});
+
+documents.onDidSave(async change => {
+    const { document } = change;
+    const { uri } = document;
+    if (await context.isLWCJavascript(document)) {
+        const { metadata } = await javascriptCompileDocument(document);
         if (metadata) {
             addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
         }

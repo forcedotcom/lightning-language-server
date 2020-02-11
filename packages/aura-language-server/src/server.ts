@@ -69,20 +69,28 @@ function startIndexing() {
 
 connection.onInitialize(
     async (params: InitializeParams): Promise<InitializeResult> => {
-        const { rootUri, rootPath, capabilities } = params;
-
-        const workspaceRoot = path.resolve(rootUri ? URI.parse(rootUri).fsPath : rootPath);
+        const { workspaceFolders } = params;
+        const workspaceRoots: string[] = [];
+        for (const folder of workspaceFolders) {
+            workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
+        }
         try {
-            if (!workspaceRoot) {
+            if (workspaceRoots.length === 0) {
                 console.warn(`No workspace found`);
                 return { capabilities: {} };
             }
 
-            console.info(`Starting *AURA* language server at ${workspaceRoot}`);
+            for (const root of workspaceRoots) {
+                console.info(`Starting *AURA* language server at ${root}`);
+            }
             const startTime = process.hrtime();
-            await startServer(rootPath, workspaceRoot);
 
-            context = new WorkspaceContext(workspaceRoot);
+            context = new WorkspaceContext(workspaceRoots);
+            if (context.type === WorkspaceType.CORE_PARTIAL) {
+                await startServer(path.join(workspaceRoots[0], '..'), path.join(workspaceRoots[0], '..'));
+            } else {
+                await startServer(workspaceRoots[0], workspaceRoots[0]);
+            }
             context.configureProject();
 
             const auraIndexer = new AuraIndexer(context);
@@ -115,6 +123,11 @@ connection.onInitialize(
                     textDocumentSync: documents.syncKind,
                     completionProvider: {
                         resolveProvider: true,
+                    },
+                    workspace: {
+                        workspaceFolders: {
+                            supported: true,
+                        },
                     },
                     signatureHelpProvider: {
                         triggerCharacters: ['('],
@@ -290,9 +303,10 @@ connection.onRequest('salesforce/listNamespaces', () => {
     return result;
 });
 
-// connection.onRequest((method: string, ...params: any[]) => {
-//     // debugger
-// });
+connection.onRequest((method: string, ...params: any[]) => {
+    // debugger
+    console.log(method);
+});
 
 // Listen on the connection
 connection.listen();

@@ -32,19 +32,4 @@ expect.extend({
             };
         }
     },
-    toEndWith(str, suffix) {
-        const pass = str.endsWith(suffix);
-        if (pass) {
-            return {
-                message: () =>
-                    `expected ${str} not to end with ${suffix}`,
-                pass: true,
-            };
-        } else {
-            return {
-                message: () => `expected ${str} to end with ${suffix}`,
-                pass: false,
-            };
-        }
-    },
 });
