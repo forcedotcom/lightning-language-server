@@ -97,7 +97,7 @@ it('isLwcOssWorkspaceContext', async () => {
     const modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(OSS_LWC_PROJECT_ROOT, 'src', 'modules', 'my', 'app', 'app.js'));
     expect(modules.length).toBe(2);
-    expect(await context.getRelativeModulesDirs()).toEqual(['src/modules']);
+    expect((await context.getModulesDirs()).length).toBe(1);
 });
 
 it('isInsideModulesRoots()', async () => {
