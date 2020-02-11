@@ -83,10 +83,10 @@ jobs:
         at: ~/lightning-language-server
       - run:
         name: Authenticate with NPM
-        command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc
+        command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc'
       - run:
         name: Publish to NPM
-        command: lerna publish --exact
+        command: yarn publish-lsp
 
 workflows:
   version: 2.1
