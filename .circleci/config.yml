@@ -69,6 +69,8 @@ jobs:
 
   tests-on-windows:
     <<: *defaults
+    docker:
+      - image: circleci/node:12.15.0
     description: "Run tests on windows"
     executor: win/default
     steps:
