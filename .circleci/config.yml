@@ -68,11 +68,11 @@ jobs:
       - attach_workspace:
         at: ~/lightning-language-server
       - run:
-        name: Setup workspace Symlinks for Windows
-        command: yarn windowsCopySymlinks
+          name: Setup workspace Symlinks for Windows
+          command: yarn windowsCopySymlinks
       - run:
-        name: Run tests on windows (Without coverage)
-        command: yarn test
+          name: Run tests on windows (Without coverage)
+          command: yarn test
 
   # Publish to NPM
   deploy:
@@ -82,11 +82,11 @@ jobs:
       - attach_workspace:
         at: ~/lightning-language-server
       - run:
-        name: Authenticate with NPM
-        command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc'
+          name: Authenticate with NPM
+          command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc'
       - run:
-        name: Publish to NPM
-        command: yarn publish-lsp
+          name: Publish to NPM
+          command: yarn publish-lsp
 
 workflows:
   version: 2.1
