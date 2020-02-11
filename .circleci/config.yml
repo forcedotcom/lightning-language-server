@@ -90,22 +90,19 @@ jobs:
 
 workflows:
   version: 2.1
-  build:
-    jobs:
-      - build
   build_and_test:
     jobs:
+      - build
       - tests-with-coverage:
           requires:
             - build
       - tests-on-windows:
           requires:
             - build
-  deploy:
-    jobs:
       - deploy:
           requires:
-            - build
+            - test-with-coverage
+            - test-on-windows
           filters:
             branches:
               only:
