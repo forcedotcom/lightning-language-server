@@ -2,6 +2,7 @@ import { join } from 'path';
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { ISfdxProjectConfig } from '@salesforce/lightning-lsp-common/lib/context';
 import * as fs from 'fs-extra';
+import utf8 from 'utf8';
 
 export async function validate(
     indexer: (context: WorkspaceContext, writeConfigs: boolean) => Promise<void>,
@@ -25,5 +26,5 @@ export async function validate(
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
     const contents = fs.readFileSync(path, 'utf8');
-    expect(contents).toEqual(expectedTypeDeclarations);
+    expect(contents).toEqual(utf8.encode(expectedTypeDeclarations));
 }

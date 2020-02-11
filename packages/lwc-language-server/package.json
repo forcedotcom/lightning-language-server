@@ -62,7 +62,8 @@
     "ts-jest": "^24.3.0",
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "3.1.6"
+    "typescript": "3.1.6",
+    "utf8": "^3.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
