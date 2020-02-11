@@ -66,7 +66,7 @@ jobs:
     executor: win/default
     steps:
       - attach_workspace:
-        at: ~/lightning-language-server
+          at: ~/lightning-language-server
       - run:
           name: Setup workspace Symlinks for Windows
           command: yarn windowsCopySymlinks
@@ -80,7 +80,7 @@ jobs:
     description: "Publish package to npmjs.org"
     steps:
       - attach_workspace:
-        at: ~/lightning-language-server
+          at: ~/lightning-language-server
       - run:
           name: Authenticate with NPM
           command: 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc'
