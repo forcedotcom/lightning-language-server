@@ -60,8 +60,6 @@ export async function indexMessageChannels(context: WorkspaceContext, writeConfi
     }
 }
 
-
-
 function generateTypeDeclarations(): string {
     let resTypeDecs = '';
     const sortedContentAssets = Array.from(MESSAGE_CHANNELS).sort();

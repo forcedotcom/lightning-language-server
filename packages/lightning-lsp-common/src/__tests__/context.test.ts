@@ -12,7 +12,7 @@ import {
     readAsTextDocument,
     REGISTERED_EMPTY_FOLDER_ROOT,
     CORE_MULTI_ROOT,
-    OSS_LWC_PROJECT_ROOT
+    OSS_LWC_PROJECT_ROOT,
 } from './test-utils';
 
 it('WorkspaceContext', async () => {
