@@ -39,6 +39,13 @@ jobs:
       # re-use it without having to do the build over again.
       - persist_to_workspace:
           root: ~/lightning-language-server
+          paths:
+            - packages
+            - scripts
+            - test-workspaces
+            - vscode-workspaces
+            - package.json
+            - lerna.json
 
   tests-with-coverage:
     <<: *defaults
