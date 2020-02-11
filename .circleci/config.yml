@@ -45,7 +45,7 @@ jobs:
     description: "Run tests and publish coverage to CodeCov"
     steps:
       - attach_workspace:
-        at: ~/lightning-language-server
+          at: ~/lightning-language-server
 
       - run: yarn test_with_coverage
 
