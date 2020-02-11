@@ -22,7 +22,6 @@ export async function validate(
     await context.configureProject();
 
     await indexer(context, true);
-    debugger;
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
     const contents = fs.readFileSync(path, 'utf8');
