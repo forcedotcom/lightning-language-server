@@ -28,11 +28,17 @@ export async function validate(
     const contents = fs.readFileSync(path, 'utf8');
     const expected = utf8.encode(expectedTypeDeclarations);
 
+    const output = [];
     for (let c = 0; c < contents.length; c++) {
-        if (contents.charCodeAt(c) !== expected.charCodeAt(c)) {
-            fail(`Characters at position: ${c} did not equal. Expected: ${expected[c]} Actual: ${contents[c]}`);
+        if (contents.charCodeAt(c) === expected.charCodeAt(c)) {
+            output.push(contents[c]);
+        } else {
+            // fail(`Characters at position: ${c} did not equal. Expected: ${expected[c]} Actual: ${contents[c]}`);
+            output.push(`[${contents[c]}:${expected[c]}]`);
         }
     }
+    console.log(output.join(''));
+
     expect(contents.length).toEqual(expected.length);
     expect(contents).toEqual(expected);
 }
