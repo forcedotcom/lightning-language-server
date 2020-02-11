@@ -34,7 +34,7 @@ export async function validate(
             output.push(contents[c]);
         } else {
             // fail(`Characters at position: ${c} did not equal. Expected: ${expected[c]} Actual: ${contents[c]}`);
-            output.push(`[${contents[c]}:${expected[c]}]`);
+            output.push(`[${contents.charCodeAt(c)}:${contents[c]}:${expected[c]}]`);
         }
     }
     console.log(output.join(''));
