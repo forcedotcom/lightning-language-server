@@ -71,9 +71,9 @@ jobs:
           flags: frontend,common
 
   tests-on-windows:
-    <<: *defaults
     description: "Run tests on windows"
     executor: win/default
+    working_directory: ~/lightning-language-server
     steps:
       - attach_workspace:
           at: ~/lightning-language-server
@@ -114,7 +114,7 @@ workflows:
       - deploy:
           requires:
             - tests-with-coverage
-            # - tests-on-windows
+            - tests-on-windows
           filters:
             branches:
               only:
