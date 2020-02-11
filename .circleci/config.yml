@@ -67,21 +67,19 @@ jobs:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
 
-  tests-on-windows:
-    <<: *defaults
-    docker:
-      - image: circleci/node:12.15.0
-    description: "Run tests on windows"
-    executor: win/default
-    steps:
-      - attach_workspace:
-          at: ~/lightning-language-server
-      - run:
-          name: Setup workspace Symlinks for Windows
-          command: yarn windowsCopySymlinks
-      - run:
-          name: Run tests on windows (Without coverage)
-          command: yarn test
+  # tests-on-windows:
+  #   <<: *defaults
+  #   description: "Run tests on windows"
+  #   executor: win/default
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/lightning-language-server
+  #     - run:
+  #         name: Setup workspace Symlinks for Windows
+  #         command: yarn windowsCopySymlinks
+  #     - run:
+  #         name: Run tests on windows (Without coverage)
+  #         command: yarn test
 
   # Publish to NPM
   deploy:
@@ -105,13 +103,13 @@ workflows:
       - tests-with-coverage:
           requires:
             - build
-      - tests-on-windows:
-          requires:
-            - build
+      # - tests-on-windows:
+      #     requires:
+      #       - build
       - deploy:
           requires:
             - tests-with-coverage
-            - tests-on-windows
+            # - tests-on-windows
           filters:
             branches:
               only:
