@@ -26,7 +26,6 @@ jobs:
 
       # Build and Lint
       - run: yarn install
-      - run: yarn lint
 
       # Cache the node_modules folder so if package.json doesn't change
       # then we can prevent downloading it all over again.
@@ -113,6 +112,7 @@ workflows:
   version: 2.1
   build_and_test:
     jobs:
+      - build
       - tests-with-coverage:
       # - tests-on-windows:
       #     requires:
