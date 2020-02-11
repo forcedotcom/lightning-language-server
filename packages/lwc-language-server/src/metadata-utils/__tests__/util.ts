@@ -26,5 +26,13 @@ export async function validate(
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
     const contents = fs.readFileSync(path, 'utf8');
-    expect(contents).toEqual(utf8.encode(expectedTypeDeclarations));
+    const expected = utf8.encode(expectedTypeDeclarations);
+
+    for (let c = 0; c < contents.length; c++) {
+        if (contents.charCodeAt(c) !== expected.charCodeAt(c)) {
+            fail(`Characters at position: ${c} did not equal. Expected: ${expected[c]} Actual: ${contents[c]}`);
+        }
+    }
+    expect(contents.length).toEqual(expected.length);
+    expect(contents).toEqual(expected);
 }
