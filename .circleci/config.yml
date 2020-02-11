@@ -96,17 +96,17 @@ workflows:
   build_and_test:
     jobs:
       - tests-with-coverage:
-        requires:
-          - build
+          requires:
+            - build
       - tests-on-windows:
-        requires:
-          - build
+          requires:
+            - build
   deploy:
     jobs:
       - deploy:
-        requires:
-          - build
-        filters:
-          branches:
-            only:
-              - master
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
