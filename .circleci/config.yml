@@ -2,20 +2,54 @@
 version: 2.1
 
 orbs:
+  # Code Coverage
   codecov: codecov/codecov@1.0.5
+  # For Installing Browsers
   browser-tools: circleci/browser-tools@0.1.3
+  # For Testing on windows
+  win: circleci/windows@2.2.0
+
+defaults: &defaults
+  working_directory: ~/lightning-language-server
+  docker:
+    - image: circleci/node:12.15.0
 
 jobs:
+  # Default Job
   build:
-    docker:
-      - image: circleci/node:10.15.3
+    <<: *defaults
+    description: "Lint, Build"
     steps:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
+
+      # Build and Lint
       - run: yarn install
       - run: yarn lint
+
+      # Cache the node_modules folder so if package.json doesn't change
+      # then we can prevent downloading it all over again.
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      # Save the current workspace state so the next jobs can
+      # re-use it without having to do the build over again.
+      - persist_to_workspace:
+        root: ~/lightning-language-server
+
+  tests-with-coverage:
+    <<: *defaults
+    description: "Run tests and publish coverage to CodeCov"
+    steps:
+      - attach_workspace:
+        at: ~/lightning-language-server
+
       - run: yarn test_with_coverage
+
+      # Upload Coverage to CodeCov.io
       - codecov/upload:
           file: aura-language-server/coverage/*.json
           flags: frontend,aura
@@ -25,7 +59,54 @@ jobs:
       - codecov/upload:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - node_modules
+
+  tests-on-windows:
+    <<: *defaults
+    description: "Run tests on windows"
+    executor: win/default
+    steps:
+      - attach_workspace:
+        at: ~/lightning-language-server
+      - run:
+        name: Setup workspace Symlinks for Windows
+        command: yarn windowsCopySymlinks
+      - run:
+        name: Run tests on windows (Without coverage)
+        command: yarn test
+
+  # Publish to NPM
+  deploy:
+    <<: *defaults
+    description: "Publish package to npmjs.org"
+    steps:
+      - attach_workspace:
+        at: ~/lightning-language-server
+      - run:
+        name: Authenticate with NPM
+        command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/lightning-language-server/.npmrc
+      - run:
+        name: Publish to NPM
+        command: lerna publish --exact
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - build
+  build_and_test:
+    jobs:
+      - tests-with-coverage:
+        requires:
+          - build
+      - tests-on-windows:
+        requires:
+          - build
+  deploy:
+    jobs:
+      - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only:
+              - master
