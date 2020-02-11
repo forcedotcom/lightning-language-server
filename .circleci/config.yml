@@ -38,7 +38,7 @@ jobs:
       # Save the current workspace state so the next jobs can
       # re-use it without having to do the build over again.
       - persist_to_workspace:
-        root: ~/lightning-language-server
+          root: ~/lightning-language-server
 
   tests-with-coverage:
     <<: *defaults
