@@ -190,7 +190,7 @@ export class WorkspaceContext {
                 }
                 break;
             case WorkspaceType.OSS_LWC:
-                const config = require(getLwcServicesConfigFile(this.workspaceRoot));
+                const config = require(getLwcServicesConfigFile(this.workspaceRoots[0]));
                 const moduleDir = config.moduleDir ? config.moduleDir : 'src/modules';
                 list.push(moduleDir);
                 break;
@@ -224,7 +224,7 @@ export class WorkspaceContext {
                 typingsDir = join(this.workspaceRoots[0], '.vscode', 'typings', 'lwc');
                 break;
             case WorkspaceType.OSS_LWC:
-                typingsDir = join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
+                typingsDir = join(this.workspaceRoots[0], '.vscode', 'typings', 'lwc');
                 break;
         }
 
@@ -313,9 +313,9 @@ export class WorkspaceContext {
                     projectRoot = { project_root: constructedRoot };
                 }
                 jsConfigContent = this.processTemplate(jsConfigTemplate, projectRoot);
-                for (const relativeModulesDir of relativeModulesDirs) {
-                    const relativeJsConfigPath = join(relativeModulesDir, 'jsconfig.json');
-                    this.updateConfigFile(relativeJsConfigPath, jsConfigContent);
+                for (const modulesDir of modulesDirs) {
+                    const jsConfigPath = join(modulesDir, 'jsconfig.json');
+                    this.updateConfigFile(jsConfigPath, jsConfigContent);
                 }
                 break;
         }
