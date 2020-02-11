@@ -25,5 +25,5 @@ export async function validate(
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
     const contents = fs.readFileSync(path, 'utf8');
-    expect(contents).toBe(expectedTypeDeclarations);
+    expect(contents).toEqual(expectedTypeDeclarations);
 }
