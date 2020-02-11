@@ -1680,6 +1680,11 @@
   resolved "http://npm.lwcjs.org/@lwc/errors/-/errors-0.34.8/8ffdad50cb8d3d3ed745014ead599a387bf89421.tgz#8ffdad50cb8d3d3ed745014ead599a387bf89421"
   integrity sha512-2KyYWxUsMaQf1lEeE+TEpbWHlL3xzvLntdMvofRbERNtpD8Te2MJbjp59sqSk6EpfLA4y2P2htn+gigWw272sA==
 
+"@lwc/errors@1.1.1":
+  version "1.1.1"
+  resolved "http://npm.lwcjs.org/@lwc/errors/-/errors-1.1.1/9a385e47b9d09f629faebe6a39bf2af8d6662567.tgz#9a385e47b9d09f629faebe6a39bf2af8d6662567"
+  integrity sha512-W/ClgkcA5lB9rdzhWgvP2kpkp1YEFguwi6s/84S+6Hi8A5A7g2co3J9mxIzPGaV5O4XL8Oy/rmAORBCzsmu3rg==
+
 "@lwc/style-compiler@0.34.8":
   version "0.34.8"
   resolved "http://npm.lwcjs.org/@lwc/style-compiler/-/style-compiler-0.34.8/ecd52d8a9b7017e0bd48beb0f88dc7a182f1394e.tgz#ecd52d8a9b7017e0bd48beb0f88dc7a182f1394e"
