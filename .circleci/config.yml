@@ -51,11 +51,20 @@ jobs:
     <<: *defaults
     description: "Run tests and publish coverage to CodeCov"
     steps:
-      - attach_workspace:
-          at: ~/lightning-language-server
-
+      - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
+
+      # Build and Lint
+      - run: yarn install
+      - run: yarn lint
+
+      # Cache the node_modules folder so if package.json doesn't change
+      # then we can prevent downloading it all over again.
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
 
       - run: yarn test_with_coverage
 
@@ -104,10 +113,7 @@ workflows:
   version: 2.1
   build_and_test:
     jobs:
-      - build
       - tests-with-coverage:
-          requires:
-            - build
       # - tests-on-windows:
       #     requires:
       #       - build
