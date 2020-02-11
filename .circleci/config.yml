@@ -73,12 +73,11 @@ jobs:
   tests-on-windows:
     description: "Run tests on windows"
     executor: win/default
-    working_directory: ~/lightning-language-server
     steps:
-      - attach_workspace:
-          at: ~/lightning-language-server
+      - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
+      - run: yarn install
       - run:
           name: Setup workspace Symlinks for Windows
           command: yarn windowsCopySymlinks
