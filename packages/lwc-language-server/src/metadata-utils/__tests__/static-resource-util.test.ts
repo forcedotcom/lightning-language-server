@@ -1,12 +1,17 @@
-import { mockFileUtil } from './mock-file-util';
 import { indexStaticResources } from '../static-resources-util';
 import { validate } from './util';
-// @ts-ignore
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { FORCE_APP_ROOT } from '../../__tests__/test-utils';
+import * as fs from 'fs-extra';
 
-jest.mock('lightning-lsp-common', () => {
-    const real = jest.requireActual('lightning-lsp-common');
-    return { utils: mockFileUtil(), WorkspaceContext: real.WorkspaceContext };
+beforeEach(() => {
+    const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
+    const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+
+    // make sure no generated files are there from previous runs
+    fs.removeSync(jsconfigPathForceApp);
+    fs.removeSync(forceignorePath);
+    fs.removeSync(sfdxTypingsPath);
 });
 
 it('indexStaticResources', async done => {
