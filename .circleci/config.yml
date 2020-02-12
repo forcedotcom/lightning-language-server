@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Publish to NPM
           command: |
-            yarn version
+            yarn run version
             yarn publish-lsp
 
 workflows:
