@@ -43,14 +43,13 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run: yarn install
       - run: yarn build
+      - run: yarn run version
       - run:
           name: Authenticate with NPM
           command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > .npmrc'
       - run:
           name: Publish to NPM
-          command: |
-            yarn run version
-            yarn publish-lsp
+          command: yarn publish-lsp
 
 workflows:
   version: 2.1
