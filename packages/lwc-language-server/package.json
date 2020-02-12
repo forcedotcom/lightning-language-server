@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "2.2.13",
+  "version": "2.2.14",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "BSD-3-Clause",
