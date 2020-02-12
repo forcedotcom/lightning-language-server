@@ -25,19 +25,8 @@ export async function validate(
     await indexer(context, true);
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
+    // For windows we need to normalize line endings, we do that using eol.
     const contents = eol.auto(fs.readFileSync(path, 'utf8'));
     const expected = eol.auto(expectedTypeDeclarations);
-
-    const output = [];
-    for (let c = 0; c < contents.length; c++) {
-        if (contents.charCodeAt(c) === expected.charCodeAt(c)) {
-            output.push(contents[c]);
-        } else {
-            output.push(`[${contents.charCodeAt(c)}:${contents[c]}:${expected[c]}]`);
-        }
-    }
-    console.log(output.join(''));
-
-    expect(contents.length).toEqual(expected.length);
     expect(contents).toEqual(expected);
 }
