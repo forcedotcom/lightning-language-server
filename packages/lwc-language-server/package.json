@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "2.2.9",
+  "version": "2.2.12",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "BSD-3-Clause",
@@ -27,8 +27,8 @@
     "@lwc/template-compiler": "0.34.8",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.11",
-    "@salesforce/lightning-lsp-common": "2.2.9",
-    "@salesforce/resourceurl": "0.0.11",
+    "@salesforce/lightning-lsp-common": "2.2.12",
+    "@salesforce/resourceurl": "0.0.12",
     "@salesforce/schema": "0.0.11",
     "@salesforce/user": "0.0.11",
     "babel-core": "7.0.0-bridge.0",
@@ -66,6 +66,7 @@
     "typescript": "3.1.6"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "private": false
   }
 }
