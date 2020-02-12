@@ -43,6 +43,8 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run: yarn install
       - run: yarn build
+      - run: git config user.email "nkruk@salesforce.com"
+      - run: git config user.name "Nick Kruk"
       - run: yarn run version
       - run:
           name: Authenticate with NPM
