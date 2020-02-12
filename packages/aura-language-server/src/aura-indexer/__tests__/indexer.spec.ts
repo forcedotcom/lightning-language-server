@@ -1,4 +1,4 @@
-import { utils, WorkspaceContext } from 'lightning-lsp-common';
+import { utils, WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import AuraIndexer from '../indexer';
 import * as path from 'path';
 import URI from 'vscode-uri';

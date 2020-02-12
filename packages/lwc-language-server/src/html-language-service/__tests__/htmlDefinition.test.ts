@@ -1,7 +1,7 @@
 import { TextDocument, Location, Range, Position } from 'vscode-languageserver-types';
-import { getLanguageService } from 'lightning-lsp-common';
+import { getLanguageService } from '@salesforce/lightning-lsp-common';
 import { loadStandardComponents, indexCustomComponents } from '../../metadata-utils/custom-components-util';
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { FORCE_APP_ROOT, UTILS_ROOT } from './test-utils';
 import * as fs from 'fs-extra';
 import { getLwcTagProvider } from '../../markup/lwcTags';

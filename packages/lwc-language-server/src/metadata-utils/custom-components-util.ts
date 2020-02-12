@@ -3,14 +3,14 @@ import * as path from 'path';
 import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { onSetCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
-import { WorkspaceContext, AttributeInfo, TagInfo } from 'lightning-lsp-common';
+import { WorkspaceContext, AttributeInfo, TagInfo } from '@salesforce/lightning-lsp-common';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
-import { utils, shared, componentUtil } from 'lightning-lsp-common';
+import { utils, shared, componentUtil } from '@salesforce/lightning-lsp-common';
 import { join } from 'path';
 import EventsEmitter from 'events';
-import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
+import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
+import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 

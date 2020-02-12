@@ -1,5 +1,5 @@
 import { TextDocument } from 'vscode-languageserver';
-import { utils } from 'lightning-lsp-common';
+import { utils } from '@salesforce/lightning-lsp-common';
 import { join } from 'path';
 
 const AURA_STANDARD: string = 'aura-standard.json';

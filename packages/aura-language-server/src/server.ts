@@ -29,14 +29,14 @@ import {
 
 import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
-import { getLanguageService, LanguageService } from 'lightning-lsp-common';
+import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
-import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from 'lightning-lsp-common';
-import { LWCIndexer } from 'lwc-language-server';
+import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
+import { LWCIndexer } from '@salesforce/lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
-import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
+import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
-import { WorkspaceType } from 'lightning-lsp-common/lib/shared';
+import { WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 
 interface ITagParams {
     taginfo: TagInfo;
