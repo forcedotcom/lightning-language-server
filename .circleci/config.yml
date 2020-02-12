@@ -16,9 +16,9 @@ defaults: &defaults
 
 jobs:
   # Default Job
-  build:
+  build-and-test:
     <<: *defaults
-    description: "Lint, Build"
+    description: "Lint, Build, Test with Coverage"
     steps:
       - checkout
       - restore_cache:
@@ -40,22 +40,12 @@ jobs:
       - persist_to_workspace:
           root: ~/lightning-language-server
           paths:
-            - node_modules
             - packages
             - scripts
             - test-workspaces
             - vscode-workspaces
             - package.json
             - lerna.json
-
-  tests-with-coverage:
-    <<: *defaults
-    description: "Run tests and publish coverage to CodeCov"
-    steps:
-      - attach_workspace:
-          at: ~/lightning-language-server
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
 
       - run: yarn test_with_coverage
 
@@ -70,7 +60,7 @@ jobs:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
 
-  tests-on-windows:
+  test-on-windows:
     description: "Run tests on windows"
     executor: win/default
     steps:
@@ -90,6 +80,8 @@ jobs:
     <<: *defaults
     description: "Publish package to npmjs.org"
     steps:
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - attach_workspace:
           at: ~/lightning-language-server
       - run:
@@ -103,17 +95,12 @@ workflows:
   version: 2.1
   build_and_test:
     jobs:
-      - build
-      - tests-with-coverage:
-          requires:
-            - build
-      - tests-on-windows:
-          requires:
-            - build
+      - build-and-test
+      - test-on-windows
       - deploy:
           requires:
-            - tests-with-coverage
-            - tests-on-windows
+            - build-and-test
+            - test-on-windows
           filters:
             branches:
               only:
