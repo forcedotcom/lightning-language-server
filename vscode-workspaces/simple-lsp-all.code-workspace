@@ -26,6 +26,11 @@
     "search.exclude": {
       "**/node_modules": true,
       "lib": true
+    },
+    "workbench.colorCustomizations": {
+      "activityBar.background": "#3C1842",
+      "titleBar.activeBackground": "#54215C",
+      "titleBar.activeForeground": "#FDFAFD"
     }
   },
   "launch": {

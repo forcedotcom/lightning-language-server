@@ -14,10 +14,6 @@ defaults: &defaults
   docker:
     - image: circleci/node:12.15.0
 
-defaults: &defaults
-  docker:
-    - image: circleci/node:12.15.0
-
 jobs:
   # Default Job
   build-and-test:
