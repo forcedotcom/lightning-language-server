@@ -48,7 +48,9 @@ jobs:
           command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > .npmrc'
       - run:
           name: Publish to NPM
-          command: yarn publish-lsp
+          command: |
+            yarn version
+            yarn publish-lsp
 
 workflows:
   version: 2.1
