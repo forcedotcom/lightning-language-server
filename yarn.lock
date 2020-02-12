@@ -1762,17 +1762,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.11.tgz#5e78b283af4fe6878132507345318a5adaff43a4"
   integrity sha512-FT0j1Ms0SCPdAcce4IgNtxxEWc0Og80Ah+TxU5IqHFS2ImCDhfGUycTGxzONbw6p4vS4M6UWpv0vJzOWW3KUYg==
 
-<<<<<<< HEAD
 "@salesforce/resourceurl@0.0.12":
   version "0.0.12"
-  resolved "http://npm.lwcjs.org/@salesforce/resourceurl/-/resourceurl-0.0.12/e2eba97c2f560cf7c1456605a621be0b1fa48087.tgz#e2eba97c2f560cf7c1456605a621be0b1fa48087"
+  resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.12.tgz#e2eba97c2f560cf7c1456605a621be0b1fa48087"
   integrity sha512-R47F3db89BHheRmUK5jctZd9TeOvno2q3e+V8snyVc5SbbqXZAsfB5QSI8fgjRlbWE8l/1wlv4/vfn7Zcgaang==
-=======
-"@salesforce/resourceurl@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.11.tgz#ce104588d1c11243d8cf31d7383b3f3c48a21ee7"
-  integrity sha512-s56Q6A6CD6T0qQ5enpmfiAzyxWfZmYS3b3PKRJ9O7/v4hx9a03htH1T/m24aiVHexQsivMRVxoOFEbUSN4vlKQ==
->>>>>>> Publish to npmjs  instead of lwcjs
 
 "@salesforce/schema@0.0.11":
   version "0.0.11"
