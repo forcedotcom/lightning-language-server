@@ -45,7 +45,7 @@ jobs:
       - run: yarn build
       - run:
           name: Authenticate with NPM
-          command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > ~/lightning-language-server/.npmrc'
+          command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > .npmrc'
       - run:
           name: Publish to NPM
           command: yarn publish-lsp
