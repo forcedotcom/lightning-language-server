@@ -29,7 +29,7 @@
     "rimraf": "^3.0.1",
     "typescript": "^3.2.4"
   },
-  "private": true,
+  "private": false,
   "workspaces": {
     "packages": [
       "packages/*"
