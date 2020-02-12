@@ -25,7 +25,7 @@ export async function validate(
     await indexer(context, true);
     const path = join(workspacePath, '.sfdx', 'typings', 'lwc', expectedTypeDeclarationFileName);
     expect(path).toExist();
-    const contents = fs.readFileSync(path, 'utf8');
+    const contents = eol.auto(fs.readFileSync(path, 'utf8'));
     const expected = eol.auto(expectedTypeDeclarations);
 
     const output = [];
@@ -33,7 +33,6 @@ export async function validate(
         if (contents.charCodeAt(c) === expected.charCodeAt(c)) {
             output.push(contents[c]);
         } else {
-            // fail(`Characters at position: ${c} did not equal. Expected: ${expected[c]} Actual: ${contents[c]}`);
             output.push(`[${contents.charCodeAt(c)}:${contents[c]}:${expected[c]}]`);
         }
     }
