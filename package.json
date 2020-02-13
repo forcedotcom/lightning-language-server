@@ -34,6 +34,7 @@
     "publish-lsp": "lerna publish from-git --force-publish --exact --yes",
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail"
   },
+  "private": true,
   "workspaces": {
     "packages": [
       "packages/*"
