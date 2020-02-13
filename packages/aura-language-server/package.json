@@ -5,6 +5,10 @@
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
   "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forcedotcom/lightning-language-server.git"
+  },
   "scripts": {
     "clean": "rm -rf lib",
     "cleanTestData": "node ../../scripts/removeTestData.js",
@@ -69,9 +73,5 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "3.1.6"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org",
-    "private": false
   }
 }

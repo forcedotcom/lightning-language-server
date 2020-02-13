@@ -1,4 +1,19 @@
 {
+  "name": "lightning-language-server",
+  "description": "Mono-repo for the Aura and LWC langauge servers",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forcedotcom/lightning-language-server.git"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "husky": "^1.3.1",
+    "lerna": "^3.10.6",
+    "patch-package": "^6.0.5",
+    "rimraf": "^3.0.1",
+    "typescript": "^3.2.4"
+  },
   "scripts": {
     "bootstrap": "lerna bootstrap --force-local",
     "bump-versions": "lerna version patch --force-publish --exact --yes --message 'Publish %s to npm [skip ci]'",
@@ -19,18 +34,6 @@
     "publish-lsp": "lerna publish from-git --force-publish --exact --yes",
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail"
   },
-  "dependencies": {},
-  "name": "lightning-language-server",
-  "license": "BSD-3-Clause",
-  "devDependencies": {
-    "@types/node": "^10.12.18",
-    "husky": "^1.3.1",
-    "lerna": "^3.10.6",
-    "patch-package": "^6.0.5",
-    "rimraf": "^3.0.1",
-    "typescript": "^3.2.4"
-  },
-  "private": true,
   "workspaces": {
     "packages": [
       "packages/*"
