@@ -28,7 +28,7 @@
     "@lwc/compiler": "0.34.8",
     "@lwc/engine": "0.34.8",
     "@lwc/errors": "0.34.8",
-    "@lwc/template-compiler": "0.34.8",
+    "@lwc/template-compiler": "1.1.1",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.11",
     "@salesforce/lightning-lsp-common": "2.2.16",
