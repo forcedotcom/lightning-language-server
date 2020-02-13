@@ -54,6 +54,7 @@
     "@types/node": "^8.10.0",
     "@types/xml2js": "^0.4.3",
     "babel-types": "^6.26.0",
+    "eol": "^0.9.1",
     "husky": "^1.1.0",
     "jest": "^25.1.0",
     "jest-extended": "^0.11.4",
