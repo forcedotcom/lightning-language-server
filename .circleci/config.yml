@@ -16,7 +16,7 @@ defaults: &defaults
 
 jobs:
   # Default Job
-  build-and-test:
+  build-and-test-linux:
     <<: *defaults
     description: "Lint, Build, Test with Coverage"
     steps:
@@ -60,7 +60,7 @@ jobs:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
 
-  test-on-windows:
+  build-and-test-win:
     description: "Run tests on windows"
     executor: win/default
     steps:
@@ -97,12 +97,12 @@ workflows:
   version: 2.1
   build_and_test:
     jobs:
-      - build-and-test
-      - test-on-windows
+      - build-and-test-linux
+      - build-and-test-win
       - deploy:
           requires:
-            - build-and-test
-            - test-on-windows
+            - build-and-test-linux
+            - build-and-test-win
           filters:
             branches:
               only:
