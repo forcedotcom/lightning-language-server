@@ -16,7 +16,7 @@
     "link-lsp": "lerna exec yarn link --no-bail",
     "unlink-lsp": "lerna exec yarn unlink --no-bail",
     "publish-lsp": "lerna publish from-git --force-publish --exact --yes",
-    "version": "lerna version patch --exact --yes --message 'Publish %s to npm [skip ci]'",
+    "version": "lerna version patch --force-publish --exact --yes --message 'Publish %s to npm [skip ci]'",
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail"
   },
   "dependencies": {},
