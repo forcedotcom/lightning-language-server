@@ -10,7 +10,7 @@ orbs:
   win: circleci/windows@2.4.0
 
 defaults: &defaults
-  #working_directory: ~/lightning-language-server
+  working_directory: ~/lightning-language-server
   docker:
     - image: circleci/node:12.15.0
 
@@ -21,33 +21,24 @@ jobs:
     description: "Lint, Build, Test with Coverage"
     steps:
       - checkout
-#      - restore_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
+      - restore_cache:
+          key: dependency-cache-linux-{{ checksum "package.json" }}
 
       # Build and Lint
       - run: yarn install
       - run: yarn lint
-
-      # Cache the node_modules folder so if package.json doesn't change
-      # then we can prevent downloading it all over again.
-#      - save_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
-#          paths:
-#            - node_modules
-
-      # Save the current workspace state so the next jobs can
-      # re-use it without having to do the build over again.
-#      - persist_to_workspace:
- #         root: ~/lightning-language-server
-  #        paths:
-   #         - packages
-   #         - scripts
-   #         - test-workspaces
-   #         - vscode-workspaces
-   #         - package.json
-   #         - lerna.json
-
       - run: yarn test_with_coverage
+
+      # Cache the node_modules folder
+      - save_cache:
+          key: dependency-cache-linux-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      # Save the current workspace state for deployment to npm
+      - persist_to_workspace:
+          root: ~/lightning-language-server
+          paths: .
 
       # Upload Coverage to CodeCov.io
       - codecov/upload:
@@ -65,36 +56,36 @@ jobs:
     executor: win/default
     steps:
       - checkout
-#      - restore_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
+      - restore_cache:
+          key: dependency-cache-win-{{ checksum "package.json" }}
+      # Build
       - run: yarn install
-#      - save_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
-#          paths:
-#            - node_modules
+      # Copy linked packages so we can run the tests correctly on windows
       - run:
           name: Setup workspace Symlinks for Windows
           command: yarn windowsCopySymlinks
       - run:
           name: Run tests on windows (Without coverage)
-          command: yarn test
+          command: yarn test    
+      - save_cache:
+          key: dependency-cache-win-{{ checksum "package.json" }}
+          paths:
+            - node_modules
 
   # Publish to NPM
   deploy:
     <<: *defaults
     description: "Publish package to npmjs.org"
     steps:
-#      - restore_cache:
-#          key: dependency-cache-{{ checksum "package.json" }}
-#      - attach_workspace:
-#          at: ~/lightning-language-server
-      - run: yarn install
-      - run: yarn build
-  #    - run: git config user.email "kgray@salesforce.com"
-  #   - run: git config user.name "Kris Gray"
+      - attach_workspace:
+          at: ~/lightning-language-server
+#      - run: yarn install
+#      - run: yarn build
+#      - run: git config user.email "kgray@salesforce.com"
+#      - run: git config user.name "Kris Gray"
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: |
-            yarn run version
+            yarn bump-versions
             yarn publish-lsp
 
 workflows:
