@@ -84,12 +84,13 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - attach_workspace:
           at: ~/lightning-language-server
-      - run:
-          name: Authenticate with NPM
-          command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > ~/lightning-language-server/.npmrc'
-      - run:
-          name: Publish to NPM
-          command: yarn publish-lsp
+      - run: yarn install
+      - run: yarn build
+      - run: git config user.email "nkruk@salesforce.com"
+      - run: git config user.name "Nick Kruk"
+      - run: |
+            yarn run version
+            yarn publish-lsp
 
 workflows:
   version: 2.1

@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/aura-language-server",
-  "version": "2.2.12",
+  "version": "2.2.14",
   "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
@@ -22,8 +22,8 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
-    "@salesforce/lightning-lsp-common": "2.2.12",
-    "@salesforce/lwc-language-server": "2.2.12",
+    "@salesforce/lightning-lsp-common": "2.2.13",
+    "@salesforce/lwc-language-server": "2.2.14",
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
