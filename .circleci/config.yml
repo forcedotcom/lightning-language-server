@@ -79,6 +79,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/lightning-language-server
+      - add_ssh_keys:
+          fingerprints:
+            - "54:a1:fe:d3:35:0c:02:85:62:c3:ef:e2:b5:4a:64:c7"
 #      - run: yarn install --frozen-lockfile
 #      - run: yarn build
 #      - run: git config user.email "kgray@salesforce.com"
