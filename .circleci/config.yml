@@ -89,6 +89,8 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
+      - run: git config --global user.email "nkruk@salesforce.com"
+      - run: git config --global user.name "Nicolas Kruk"   
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: |
             yarn bump-versions
