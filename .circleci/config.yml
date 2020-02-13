@@ -45,13 +45,9 @@ jobs:
       - run: yarn build
       - run: git config user.email "nkruk@salesforce.com"
       - run: git config user.name "Nick Kruk"
-      - run: yarn run version
-      - run:
-          name: Authenticate with NPM
-          command: 'echo "//registry.npmjs.org/:_authToken=$NPM_PUBLISH_TOKEN" > .npmrc'
-      - run:
-          name: Publish to NPM
-          command: yarn publish-lsp
+      - run: |
+            yarn run version
+            yarn publish-lsp
 
 workflows:
   version: 2.1
