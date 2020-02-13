@@ -12,7 +12,7 @@ orbs:
 defaults: &defaults
   working_directory: ~/lightning-language-server
   docker:
-    - image: circleci/node:12.15.0
+    - image: circleci/node:lts
 
 jobs:
   # Default Job
@@ -86,6 +86,9 @@ jobs:
 #      - run: yarn build
 #      - run: git config user.email "kgray@salesforce.com"
 #      - run: git config user.name "Kris Gray"
+      - run:
+          name: Avoid hosts unknown for github
+          command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: |
             yarn bump-versions
