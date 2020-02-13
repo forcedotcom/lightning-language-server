@@ -50,13 +50,13 @@ jobs:
       - codecov/upload:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
-      - add_ssh_keys:
-          fingerprints:
-            - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
-      - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
-      - run: |
-            yarn bump-versions
-            yarn publish-lsp
+      #- add_ssh_keys:
+      #    fingerprints:
+      #      - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
+     # - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
+      #- run: |
+       #     yarn bump-versions
+        #    yarn publish-lsp
 
   build-and-test-win:
     description: "Run tests on windows"
@@ -86,13 +86,14 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/lightning-language-server
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
-      - run: git config user.email "nkruk@salesforce.com"
-      - run: git config user.name "Nicolas Kruk"   
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: |
+            git config user.email "nkruk@salesforce.com"
+            git config user.name "Nicolas Kruk"   
             yarn bump-versions
             yarn publish-lsp
 
