@@ -122,7 +122,7 @@ workflows:
               only:
                 - master
 
-  # Weekly scheduled build/deploy to NPM on Saturdays
+  # Weekly scheduled build/deploy to NPM on Sundays
   # This gives us Monday to merge in the Dependabot PR into the vscode repo
   weekly_deploy:
     triggers:
