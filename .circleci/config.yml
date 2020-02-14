@@ -127,7 +127,7 @@ workflows:
   weekly_deploy:
     triggers:
       - schedule:
-          cron: "0 0 * * SAT"
+          cron: "0 0 * * 0"
           filters:
             branches:
               only:
