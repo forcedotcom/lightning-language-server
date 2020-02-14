@@ -104,7 +104,6 @@ jobs:
             yarn bump-versions << pipeline.parameters.version >>
             yarn publish-lsp
       - run: echo "${CIRCLE_TAG} ${CIRCLE_PULL_REQUEST} ${CIRCLE_BRANCH} ${CIRCLE_REPOSITORY_URL}"
-      - run: 
       - slack/notify:
           channel: "lightning-tools-team"
           color: "#42e2f4"
