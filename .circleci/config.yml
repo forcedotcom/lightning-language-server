@@ -103,12 +103,10 @@ jobs:
             git config user.name "Nicolas Kruk"
             yarn bump-versions << pipeline.parameters.version >>
             yarn publish-lsp
-      - run: echo "${CIRCLE_TAG} ${CIRCLE_PULL_REQUEST} ${CIRCLE_BRANCH} ${CIRCLE_REPOSITORY_URL}"
       - slack/notify:
           channel: "lightning-tools-team"
           color: "#42e2f4"
-          mentions: "@nkruk"
-          message: "Test NPM Deploy Message ${CIRCLE_TAG} ${CIRCLE_PULL_REQUEST} ${CIRCLE_BRANCH} ${CIRCLE_REPOSITORY_URL}"
+          message: "Lightning Language Servers have been published to NPM"
 
 workflows:
   version: 2.1
