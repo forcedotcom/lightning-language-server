@@ -1,9 +1,9 @@
+![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lwc-language-server?label=lwc-language-server&logo=npm)
+![npm (scoped)](https://img.shields.io/npm/v/@salesforce/aura-language-server?label=aura-language-server&logo=npm)
+![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lightning-lsp-common?label=lightning-lsp-common&logo=npm)<br/>
 [![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master)
 [![codecov](https://codecov.io/gh/forcedotcom/lightning-language-server/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/lightning-language-server)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lwc-language-server?label=lwc-language-server&logo=npm)
-![npm (scoped)](https://img.shields.io/npm/v/@salesforce/aura-language-server?label=aura-language-server&logo=npm)
-![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lightning-lsp-common?label=lightning-lsp-common&logo=npm)
 
 # Lightning Language Servers
 
