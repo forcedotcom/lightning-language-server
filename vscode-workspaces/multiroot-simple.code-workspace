@@ -10,7 +10,7 @@
     }
   ],
   "settings": {
-    "workbench.editor.labelFormat": "small",
+    "workbench.editor.labelFormat": "default",
     "terminal.integrated.env.osx": {
       "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
     },
@@ -20,12 +20,31 @@
     "terminal.integrated.env.windows": {
       "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
     },
-    "npm.packageManager": "yarn",
-    "eslint.packageManager": "yarn",
-    "tslint.packageManager": "yarn",
+    "tslint.exclude": [
+      "**/src/html-language-service/htmlLanguageService.ts",
+      "**/src/html-language-service/htmlLanguageTypes.ts",
+      "**/src/html-language-service/parser/htmlParser.ts",
+      "**/src/html-language-service/parser/htmlScanner.ts",
+      "**/src/html-language-service/parser/htmlTags.ts",
+      "**/src/html-language-service/services/htmlCompletion.ts",
+      "**/src/html-language-service/utils/strings.ts",
+      "**/src/html-language-service/utils/paths.ts",
+      "**/src/html-language-service/utils/arrays.ts"
+    ],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/.vscode-test": true
+    },
     "search.exclude": {
       "**/node_modules": true,
-      "lib": true
+      "lib": true,
+      "out": true,
+      "**/aura-language-server/resources": true,
+      "**/aura-language-server/src/tern": true
     }
   },
   "launch": {

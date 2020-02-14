@@ -1,0 +1,97 @@
+{
+  "folders": [
+    {
+      "name": "aura-language-server",
+      "path": "../packages/aura-language-server"
+    },
+    {
+      "name": "lightning-lsp-common",
+      "path": "../packages/lightning-lsp-common"
+    },
+    {
+      "name": "lwc-language-server",
+      "path": "../packages/lwc-language-server"
+    },
+    {
+      "name": "lightning-language-server (mono-repo)",
+      "path": ".."
+    },
+    {
+      "name": "salesforcedx-vscode-lightning",
+      "path": "../../salesforcedx-vscode/packages/salesforcedx-vscode-lightning"
+    },
+    {
+      "name": "salesforcedx-vscode-lwc",
+      "path": "../../salesforcedx-vscode/packages/salesforcedx-vscode-lwc"
+    },
+    {
+      "name": "salesforcedx-vscode (mono-repo)",
+      "path": "../../salesforcedx-vscode"
+    }
+  ],
+  "settings": {
+    "workbench.editor.labelFormat": "default",
+    "terminal.integrated.env.osx": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "terminal.integrated.env.linux": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "terminal.integrated.env.windows": {
+      "SFDX_SET_CLIENT_IDS": "sfdx-vscode"
+    },
+    "tslint.exclude": [
+      "**/src/html-language-service/htmlLanguageService.ts",
+      "**/src/html-language-service/htmlLanguageTypes.ts",
+      "**/src/html-language-service/parser/htmlParser.ts",
+      "**/src/html-language-service/parser/htmlScanner.ts",
+      "**/src/html-language-service/parser/htmlTags.ts",
+      "**/src/html-language-service/services/htmlCompletion.ts",
+      "**/src/html-language-service/utils/strings.ts",
+      "**/src/html-language-service/utils/paths.ts",
+      "**/src/html-language-service/utils/arrays.ts"
+    ],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/.vscode-test": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "lib": true,
+      "out": true,
+      "**/aura-language-server/resources": true,
+      "**/aura-language-server/src/tern": true,
+      "**/lightning-language-server/packages": true,
+      "**/salesforcedx-vscode/packages/salesforcedx-vscode-lwc": true,
+      "**/salesforcedx-vscode/packages/salesforcedx-vscode-lightning": true
+    }
+  },
+  "launch": {
+    "configurations": [],
+    "compounds": [
+      {
+        "name": "Launch DX - Aura",
+        "configurations": [
+          "Launch Extensions without compile",
+          "Debug Aura LSP"
+        ]
+      },
+      {
+        "name": "Launch DX - LWC",
+        "configurations": ["Launch Extensions without compile", "Debug LWC LSP"]
+      },
+      {
+        "name": "Launch DX - Aura & LWC",
+        "configurations": [
+          "Launch Extensions without compile",
+          "Debug LWC LSP",
+          "Debug Aura LSP"
+        ]
+      }
+    ]
+  }
+}

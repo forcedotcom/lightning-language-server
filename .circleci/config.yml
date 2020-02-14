@@ -14,6 +14,11 @@ defaults: &defaults
   docker:
     - image: circleci/node:lts
 
+parameters:
+  deploy:
+    type: boolean
+    default: false
+
 jobs:
   # Default Job
   build-and-test-linux:
@@ -50,13 +55,6 @@ jobs:
       - codecov/upload:
           file: lightning-lsp-common/coverage/*.json
           flags: frontend,common
-      #- add_ssh_keys:
-      #    fingerprints:
-      #      - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
-     # - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
-      #- run: |
-       #     yarn bump-versions
-        #    yarn publish-lsp
 
   build-and-test-win:
     description: "Run tests on windows"
@@ -100,7 +98,40 @@ jobs:
 
 workflows:
   version: 2.1
+  # Commit workflow - build and test on windows/linux
   build_and_test:
+    # If deploy param is specified, the build_test_deploy sequence will run below
+    unless: << pipeline.parameters.deploy >>
+    jobs:
+      - build-and-test-linux
+      - build-and-test-win
+
+  # Run build/test and then deploy if deploy param is specified
+  # Provides a way to do on demand deploys to NPM
+  build_test_deploy:
+    when: << pipeline.parameters.deploy >>
+    jobs:
+      - build-and-test-linux
+      - build-and-test-win
+      - deploy:
+          requires:
+            - build-and-test-linux
+            - build-and-test-win
+          filters:
+            branches:
+              only:
+                - master
+
+  # Weekly scheduled build/deploy to NPM on Saturdays
+  # This gives us Monday to merge in the Dependabot PR into the vscode repo
+  weekly_deploy:
+    triggers:
+      - schedule:
+          cron: '0 0 * * SAT'
+          filters:
+            branches:
+              only:
+                - master
     jobs:
       - build-and-test-linux
       - build-and-test-win
