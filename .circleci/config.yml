@@ -9,15 +9,15 @@ orbs:
   # For Testing on windows
   win: circleci/windows@2.4.0
 
-defaults: &defaults
-  working_directory: ~/lightning-language-server
-  docker:
-    - image: circleci/node:lts
-
 parameters:
   deploy:
     type: boolean
     default: false
+
+defaults: &defaults
+  working_directory: ~/lightning-language-server
+  docker:
+    - image: circleci/node:lts
 
 jobs:
   # Default Job
@@ -127,7 +127,7 @@ workflows:
   weekly_deploy:
     triggers:
       - schedule:
-          cron: '0 0 * * SAT'
+          cron: "0 0 * * SAT"
           filters:
             branches:
               only:
