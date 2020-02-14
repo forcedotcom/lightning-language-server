@@ -9,28 +9,16 @@
 
 Mono repo for the LWC and Aura Language Services that are used in the [Salesforce Extensions for VS Code](https://github.com/forcedotcom/salesforcedx-vscode).
 
-## Contributing
-
-See [Contributing](https://github.com/forcedotcom/lightning-language-server/blob/master/CONTRIBUTING.md)
-
-
-## Issues & Features
+### Issues & Features
 
 Open issues and feature requests on the [Salesforce VSCode Extensions Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
 
-## Setup
+## Setup Development Environment
 
 ### Pre-requisites
 
 Follow the pre-requisites here:
 https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/CONTRIBUTING.md
-
-### Create a common directory for the language servers and the Salesforce VSCode extensions
-
-```
-mkdir ~/git/LSP
-cd ~/git/LSP
-```
 
 ### Clone this repository and Salesforce VSCode Extensions
 
@@ -39,7 +27,9 @@ git clone git@github.com:forcedotcom/lightning-language-server.git
 git clone git@github.com:forcedotcom/salesforcedx-vscode.git
 ```
 
-### Setup lightning-language-server
+Note: These projects need to be cloned into the same parent directory
+
+### Setup lightning-language-server repository
 
 ```
 cd lightning-language-server
@@ -47,7 +37,7 @@ yarn install
 yarn link-lsp
 ```
 
-### Setup Salesforce VSCode Extensions
+### Setup Salesforce VSCode Extensions repository
 
 ```
 cd ../salesforcedx-vscode
@@ -59,7 +49,7 @@ npm run compile
 ### Open both repositories in a vscode workspace
 
 ```
-code ./vscode-workspaces/multiroot-flat.code-workspace
+code ./vscode-workspaces/multiroot-simple.code-workspace
 ```
 
 ### Debugging with VSCode
@@ -78,19 +68,34 @@ npm run watch
 Note: You need to restart vscode each time you make changes to the language server or the lightning vscode extensions.
 Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
 
-### Publishing
+## Publishing
 
-Automated deploys to NPM will occur weekly on Sundays @midnight. If you need to manually trigger a deploy on master, you can run the following script:
+### Automated publish to NPM
+Automated deploys to NPM will occur weekly on Sundays @midnight via CircleCI.
+https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master 
+
+### On-Demand publish to NPM
+If you want to have CircleCI publish the current master branch to NPM, you can run the following script to trigger the deploy job to run:
 
 ```
 curl -v -u ${CircleCIToken}: -X POST --header "Content-Type: application/json" -d '{
   "branch": "master",
   "parameters": {
-    "deploy": true
+    "deploy": true,
+    "version": "patch"
   }
 }' https://circleci.com/api/v2/project/gh/forcedotcom/lightning-language-server/pipeline
 ```
 
-Note: You need to substitute in your CircleCIToken to make this script work. You can create a Personal API Token by following the instructions here:
+You can also modify the version parameter in the curl script to configure how the version is bumped. Valid values are: [major | minor | patch | premajor | preminor | prepatch | prerelease]. By default the weekly builds only bump the patch version.
+
+Note: You need to substitute in your own ${CircleCIToken} to make this script work. You can create a Personal API Token by following the instructions here:
 https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token
 
+### Manual publish to NPM (from your local machine)
+```
+yarn bump-versions
+yarn publish-lsp
+```
+
+Note: you will have to be authenticated to an account that has access to the @salesforce org on NPM

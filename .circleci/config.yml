@@ -10,9 +10,14 @@ orbs:
   win: circleci/windows@2.4.0
 
 parameters:
+  # Deploy the master branch to public npm
   deploy:
     type: boolean
     default: false
+  # Version bump for upgrade: [major | minor | patch | premajor | preminor | prepatch | prerelease]
+  version:
+    type: string
+    default: "patch"
 
 defaults: &defaults
   working_directory: ~/lightning-language-server
@@ -94,7 +99,7 @@ jobs:
             git config user.email "nkruk@salesforce.com"
             git config user.name "Nicolas Kruk"   
             yarn bump-versions
-            yarn publish-lsp
+            yarn publish-lsp << pipeline.parameters.version >>
 
 workflows:
   version: 2.1

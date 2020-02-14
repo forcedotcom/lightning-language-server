@@ -16,7 +16,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap --force-local",
-    "bump-versions": "lerna version patch --force-publish --exact --yes --message 'Publish %s to npm [skip ci]'",
+    "bump-versions": "lerna version --force-publish --exact --yes --message 'Publish %s to npm [skip ci]'",
     "clean": "lerna run clean --stream",
     "cleanTestData": "lerna run cleanTestData --stream",
     "build": "lerna run build --stream",
