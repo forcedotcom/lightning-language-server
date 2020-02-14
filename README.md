@@ -11,12 +11,12 @@ Mono repo for the LWC and Aura Language Services that are used in the [Salesforc
 
 ## Contributing
 
-https://github.com/forcedotcom/lightning-language-server/blob/master/CONTRIBUTING.md
+See [Contributing](https://github.com/forcedotcom/lightning-language-server/blob/master/CONTRIBUTING.md)
 
 
 ## Issues & Features
 
-Open issues and feature requests on the [SalesforceDX-VSCode Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
+Open issues and feature requests on the [Salesforce VSCode Extensions Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
 
 ## Setup
 
@@ -25,7 +25,7 @@ Open issues and feature requests on the [SalesforceDX-VSCode Repository](https:/
 Follow the pre-requisites here:
 https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/CONTRIBUTING.md
 
-### Create a common directory the language servers and the Salesforce VSCode extensions
+### Create a common directory for the language servers and the Salesforce VSCode extensions
 
 ```
 mkdir ~/git/LSP
@@ -80,7 +80,17 @@ Easiest way to do this is to kill the vscode client and hit F5 to relaunch your 
 
 ### Publishing
 
-Every commit to master will get automatically published on NPM.
+Automated deploys to NPM will occur weekly on Sundays @midnight. If you need to manually trigger a deploy on master, you can run the following script:
 
+```
+curl -v -u ${CircleCIToken}: -X POST --header "Content-Type: application/json" -d '{
+  "branch": "master",
+  "parameters": {
+    "deploy": true
+  }
+}' https://circleci.com/api/v2/project/gh/forcedotcom/lightning-language-server/pipeline
+```
 
+Note: You need to substitute in your CircleCIToken to make this script work. You can create a Personal API Token by following the instructions here:
+https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token
 
