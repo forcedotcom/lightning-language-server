@@ -1620,6 +1620,16 @@
   resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-0.34.8.tgz#8ffdad50cb8d3d3ed745014ead599a387bf89421"
   integrity sha512-2KyYWxUsMaQf1lEeE+TEpbWHlL3xzvLntdMvofRbERNtpD8Te2MJbjp59sqSk6EpfLA4y2P2htn+gigWw272sA==
 
+"@lwc/errors@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-1.2.0.tgz#f095ad95e694074e88c758e926b25b686ac0cc25"
+  integrity sha512-WJmX7QxRQD5XO8vbv83g2h4EtH3LYleRZPekS6A1OPogp60Vd/hbD9oOG3Z5gL6oZBWsdxpBTF16g7VhMB+naA==
+
+"@lwc/shared@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@lwc/shared/-/shared-1.2.0.tgz#c34548bbedbc8a529cc51d8fb98803a6140c476a"
+  integrity sha512-fadgNp3QE1fkpHSBBIwpPZB/eg0fKDq5OKtXEYg17GgS3nHnEkCzm/AkSGf7QKvo2UWO6KDUs+vhmd0W9OVShw==
+
 "@lwc/style-compiler@0.34.8":
   version "0.34.8"
   resolved "https://registry.yarnpkg.com/@lwc/style-compiler/-/style-compiler-0.34.8.tgz#ecd52d8a9b7017e0bd48beb0f88dc7a182f1394e"
@@ -1645,6 +1655,22 @@
     camelcase "~5.0.0"
     he "^1.1.1"
     parse5-with-errors "^4.0.1"
+
+"@lwc/template-compiler@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@lwc/template-compiler/-/template-compiler-1.2.0.tgz#f01a5bffd9df1781303c01f0a364744d9ad04b64"
+  integrity sha512-WRHa8H0pv3GT8jzlTTbVx0psQWOSFiZ2D1iI7ttizYB4dKXH1qOXhLPJ2nayV+PUaWcSO4EDnlFq1CNWhutWsQ==
+  dependencies:
+    "@babel/generator" "~7.1.5"
+    "@babel/parser" "~7.1.5"
+    "@babel/template" "~7.1.2"
+    "@babel/traverse" "~7.1.5"
+    "@babel/types" "~7.1.5"
+    "@lwc/errors" "1.2.0"
+    "@lwc/shared" "1.2.0"
+    esutils "^2.0.2"
+    he "^1.1.1"
+    parse5-with-errors "4.0.3-beta1"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -7634,6 +7660,13 @@ parse-url@^5.0.0:
     normalize-url "^3.3.0"
     parse-path "^4.0.0"
     protocols "^1.4.0"
+
+parse5-with-errors@4.0.3-beta1:
+  version "4.0.3-beta1"
+  resolved "https://registry.yarnpkg.com/parse5-with-errors/-/parse5-with-errors-4.0.3-beta1.tgz#0e9107363d5c1b1db9bd0f75c296bd10cff5c8bd"
+  integrity sha512-Y6IDQO1t0ZT0FuYJhoVh1W1+FS25EG1xBeQPtnX8gyQGcT4JvT3de7hCWHAOStdKW8/9cw9iS0WoFcIxjI8Ymg==
+  dependencies:
+    "@types/node" "^6.0.46"
 
 parse5-with-errors@^4.0.1:
   version "4.0.1"
