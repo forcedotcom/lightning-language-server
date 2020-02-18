@@ -1772,10 +1772,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.11.tgz#7688e02300b6acfb0fa7648c1620078e3cc54a5a"
   integrity sha512-U2f3UzSHdjlGnwX0X3d0SfYRnNDIm6EVvI0QXH1m+ReiqerDD/SyhyNW+uhAHYvLx++QdgObdZHDOHaw4qQDHw==
 
-"@salesforce/user@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.11.tgz#8e642e50b1994cb5c411b4c7ef1c9a648869a0a2"
-  integrity sha512-lbSysyNQ93YW3wbB+l34UT/7+QPXZHp3DFk6WW24I+AruI51Ie7WlYeoQ3sygHJG4HPYuhqPUFouUyxuuuFwBQ==
+"@salesforce/user@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.12.tgz#5099762b3c68d6a188a10cdbf865545bcd15a63d"
+  integrity sha512-FjI8Zf+MAPwWu+ViXurGk2Ka3H7QDzLUqGulu22ONzmiidz63Lp3N2uzDQ/p7RAsIpC27ZLxomRlje4WhOjuXg==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
