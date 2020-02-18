@@ -1757,25 +1757,25 @@
   resolved "https://registry.yarnpkg.com/@salesforce/apex/-/apex-0.0.12.tgz#dc155ef21fb870017cc5d812220b7cfe7c4e3424"
   integrity sha512-L4zUDy4lxF7+mM7DYPfOKZ4lqiAIquRx0vHAUJMBaxD4bCiT+70Df++aOfGO9FOJNctvPtT5bLrFRfdos4y4Mg==
 
-"@salesforce/label@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.11.tgz#5e78b283af4fe6878132507345318a5adaff43a4"
-  integrity sha512-FT0j1Ms0SCPdAcce4IgNtxxEWc0Og80Ah+TxU5IqHFS2ImCDhfGUycTGxzONbw6p4vS4M6UWpv0vJzOWW3KUYg==
+"@salesforce/label@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.12.tgz#cdc2d22f95790ea1575aa0b177c66603e04b29a2"
+  integrity sha512-/ZiVwtVkmq2jWRRzgsC4SEy8m54gPaDc8e+jIfnIiR04iSeSRhYJxG+ktLSYVN2jMbVWA58HfEJSCx+73GcQCg==
 
 "@salesforce/resourceurl@0.0.12":
   version "0.0.12"
   resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.12.tgz#e2eba97c2f560cf7c1456605a621be0b1fa48087"
   integrity sha512-R47F3db89BHheRmUK5jctZd9TeOvno2q3e+V8snyVc5SbbqXZAsfB5QSI8fgjRlbWE8l/1wlv4/vfn7Zcgaang==
 
-"@salesforce/schema@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.11.tgz#7688e02300b6acfb0fa7648c1620078e3cc54a5a"
-  integrity sha512-U2f3UzSHdjlGnwX0X3d0SfYRnNDIm6EVvI0QXH1m+ReiqerDD/SyhyNW+uhAHYvLx++QdgObdZHDOHaw4qQDHw==
+"@salesforce/schema@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.12.tgz#f59b124b0d7abf23490e0411fa1ad65f06458b29"
+  integrity sha512-RbZBlljl+LjMZtzFsLpE9LneX7uiWS35M0ecJGkEI6ACIV0sKH48PRbSANVko+FNyzzSkLCc2m6HvXnwiaQoTQ==
 
-"@salesforce/user@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.11.tgz#8e642e50b1994cb5c411b4c7ef1c9a648869a0a2"
-  integrity sha512-lbSysyNQ93YW3wbB+l34UT/7+QPXZHp3DFk6WW24I+AruI51Ie7WlYeoQ3sygHJG4HPYuhqPUFouUyxuuuFwBQ==
+"@salesforce/user@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/user/-/user-0.0.12.tgz#5099762b3c68d6a188a10cdbf865545bcd15a63d"
+  integrity sha512-FjI8Zf+MAPwWu+ViXurGk2Ka3H7QDzLUqGulu22ONzmiidz63Lp3N2uzDQ/p7RAsIpC27ZLxomRlje4WhOjuXg==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
