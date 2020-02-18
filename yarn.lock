@@ -1767,10 +1767,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/resourceurl/-/resourceurl-0.0.12.tgz#e2eba97c2f560cf7c1456605a621be0b1fa48087"
   integrity sha512-R47F3db89BHheRmUK5jctZd9TeOvno2q3e+V8snyVc5SbbqXZAsfB5QSI8fgjRlbWE8l/1wlv4/vfn7Zcgaang==
 
-"@salesforce/schema@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.11.tgz#7688e02300b6acfb0fa7648c1620078e3cc54a5a"
-  integrity sha512-U2f3UzSHdjlGnwX0X3d0SfYRnNDIm6EVvI0QXH1m+ReiqerDD/SyhyNW+uhAHYvLx++QdgObdZHDOHaw4qQDHw==
+"@salesforce/schema@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/schema/-/schema-0.0.12.tgz#f59b124b0d7abf23490e0411fa1ad65f06458b29"
+  integrity sha512-RbZBlljl+LjMZtzFsLpE9LneX7uiWS35M0ecJGkEI6ACIV0sKH48PRbSANVko+FNyzzSkLCc2m6HvXnwiaQoTQ==
 
 "@salesforce/user@0.0.12":
   version "0.0.12"
