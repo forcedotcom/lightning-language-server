@@ -1757,10 +1757,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/apex/-/apex-0.0.12.tgz#dc155ef21fb870017cc5d812220b7cfe7c4e3424"
   integrity sha512-L4zUDy4lxF7+mM7DYPfOKZ4lqiAIquRx0vHAUJMBaxD4bCiT+70Df++aOfGO9FOJNctvPtT5bLrFRfdos4y4Mg==
 
-"@salesforce/label@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.11.tgz#5e78b283af4fe6878132507345318a5adaff43a4"
-  integrity sha512-FT0j1Ms0SCPdAcce4IgNtxxEWc0Og80Ah+TxU5IqHFS2ImCDhfGUycTGxzONbw6p4vS4M6UWpv0vJzOWW3KUYg==
+"@salesforce/label@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@salesforce/label/-/label-0.0.12.tgz#cdc2d22f95790ea1575aa0b177c66603e04b29a2"
+  integrity sha512-/ZiVwtVkmq2jWRRzgsC4SEy8m54gPaDc8e+jIfnIiR04iSeSRhYJxG+ktLSYVN2jMbVWA58HfEJSCx+73GcQCg==
 
 "@salesforce/resourceurl@0.0.12":
   version "0.0.12"
