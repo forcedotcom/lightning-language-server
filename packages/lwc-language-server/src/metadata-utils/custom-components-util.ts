@@ -86,6 +86,7 @@ export function getlwcStandardResourcePath() {
 export async function loadStandardComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const data = await fs.readFile(getlwcStandardResourcePath(), 'utf-8');
     const lwcStandard = JSON.parse(data);
+
     for (const tag in lwcStandard) {
         if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
             const standardTag = lwcStandard[tag];
@@ -94,9 +95,7 @@ export async function loadStandardComponents(context: WorkspaceContext, writeCon
             let attributes = [];
             if (standardTag.attributes) {
                 attributes = standardTag.attributes.map((attribute: any) => {
-                    // Convert from camelCase to kebab-case
-                    const name = attribute.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    return new AttributeInfo(name, attribute.description, undefined, undefined, attribute.type, undefined, 'LWC standard attribute');
+                    return new AttributeInfo(attribute.name, attribute.description, undefined, undefined, attribute.type, undefined, 'LWC standard attribute');
                 });
             }
             const info = new TagInfo(null, TagType.STANDARD, true, attributes, undefined, description, tag, namespace);
