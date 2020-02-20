@@ -63,3 +63,17 @@ $ git push origin master
 ### Merging Pull Requests
 
 - Pull request merging is restricted to squash & merge only.
+
+## Updating serialized definition files
+
+_To eventually be replaced by the mini-shape-api_
+
+Run the ftest in core
+ui.lightning.tools.impl.test.func.shape.DefinitionShapeIntegrationTest#testShapeGeneration
+
+This should generate a definition json file that you can replace aura-standard.json with.
+
+To update lwc-standard.json, you'll need to change the test to output a version for modules.
+
+See this repo on updating the shape of lwc-standard.json after generating it from the ftest.
+https://git.soma.salesforce.com/kgray/lwc-standard-format

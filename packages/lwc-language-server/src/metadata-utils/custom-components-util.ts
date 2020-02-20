@@ -86,19 +86,19 @@ export function getlwcStandardResourcePath() {
 export async function loadStandardComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const data = await fs.readFile(getlwcStandardResourcePath(), 'utf-8');
     const lwcStandard = JSON.parse(data);
+
     for (const tag in lwcStandard) {
         if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-            const info = new TagInfo(null, TagType.STANDARD, true, []);
-            if (lwcStandard[tag].attributes) {
-                lwcStandard[tag].attributes.map((a: any) => {
-                    const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    info.attributes.push(new AttributeInfo(name, a.description, undefined, undefined, a.type, undefined, 'LWC standard attribute'));
+            const standardTag = lwcStandard[tag];
+            const description = standardTag.description;
+            const namespace = standardTag.namespace;
+            let attributes = [];
+            if (standardTag.attributes) {
+                attributes = standardTag.attributes.map((attribute: any) => {
+                    return new AttributeInfo(attribute.name, attribute.description, undefined, undefined, attribute.type, undefined, 'LWC standard attribute');
                 });
             }
-            info.documentation = lwcStandard[tag].description;
-            // TODO this needs cleanup for things outside the lightning namespace
-            info.name = 'lightning-' + tag;
-            info.namespace = 'lightning';
+            const info = new TagInfo(null, TagType.STANDARD, true, attributes, undefined, description, tag, namespace);
             await setCustomTag(context, info, writeConfigs);
         }
     }
