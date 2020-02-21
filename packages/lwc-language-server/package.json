@@ -1,9 +1,13 @@
 {
-  "name": "lwc-language-server",
-  "version": "2.2.7",
+  "name": "@salesforce/lwc-language-server",
+  "version": "2.3.2",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forcedotcom/lightning-language-server.git"
+  },
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "cleanTestData": "node ../../scripts/removeTestData.js",
@@ -28,11 +32,12 @@
     "@lwc/engine": "0.34.8",
     "@lwc/errors": "0.34.8",
     "@lwc/template-compiler": "0.34.8",
-    "@salesforce/apex": "0.0.11",
-    "@salesforce/label": "0.0.11",
-    "@salesforce/resourceurl": "0.0.11",
-    "@salesforce/schema": "0.0.11",
-    "@salesforce/user": "0.0.11",
+    "@salesforce/apex": "0.0.12",
+    "@salesforce/label": "0.0.12",
+    "@salesforce/lightning-lsp-common": "2.3.2",
+    "@salesforce/resourceurl": "0.0.12",
+    "@salesforce/schema": "0.0.12",
+    "@salesforce/user": "0.0.12",
     "babel-core": "7.0.0-bridge.0",
     "camelcase": "^5.3.1",
     "comment-parser": "^0.7.2",
@@ -40,7 +45,6 @@
     "deep-equal": "^1.0.1",
     "fs-extra": "^5.0.0",
     "glob": "^7.1.3",
-    "lightning-lsp-common": "2.2.7",
     "properties": "^1.2.1",
     "vscode-languageserver": "^5.2.1",
     "vscode-nls": "^4.0.0",
@@ -57,7 +61,8 @@
     "@types/node": "^8.10.0",
     "@types/xml2js": "^0.4.3",
     "babel-types": "^6.26.0",
-    "husky": "^1.1.0",
+    "eol": "^0.9.1",
+    "husky": "^4.2.3",
     "jest": "^25.1.0",
     "jest-extended": "^0.11.4",
     "lint-staged": "^7.3.0",
@@ -66,8 +71,5 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "3.1.6"
-  },
-  "publishConfig": {
-    "registry": "https://npm.lwcjs.org"
   }
 }

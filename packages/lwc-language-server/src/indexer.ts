@@ -10,7 +10,7 @@ import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metad
 import { indexStaticResources, resetStaticResources, updateStaticResourceIndex } from './metadata-utils/static-resources-util';
 import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
 import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex } from './metadata-utils/message-channel-util';
-import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from 'lightning-lsp-common';
+import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
 

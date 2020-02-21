@@ -1,10 +1,14 @@
 {
-  "name": "aura-language-server",
-  "version": "2.2.7",
+  "name": "@salesforce/aura-language-server",
+  "version": "2.3.2",
   "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
   "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forcedotcom/lightning-language-server.git"
+  },
   "scripts": {
     "clean": "rm -rf lib",
     "cleanTestData": "node ../../scripts/removeTestData.js",
@@ -22,6 +26,8 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
+    "@salesforce/lightning-lsp-common": "2.3.2",
+    "@salesforce/lwc-language-server": "2.3.2",
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
@@ -34,9 +40,7 @@
     "fs-extra": "^5.0.0",
     "glob": "^7.1.1",
     "lazy.js": "^0.5.1",
-    "lightning-lsp-common": "2.2.7",
     "line-column": "^1.0.2",
-    "lwc-language-server": "2.2.7",
     "minimatch": "^3.0.3",
     "patch-package": "^6.0.5",
     "properties": "^1.2.1",
@@ -58,7 +62,7 @@
     "@types/shelljs": "^0.8.1",
     "@types/xml2js": "^0.4.3",
     "babel-types": "^6.26.0",
-    "husky": "^0.14.3",
+    "husky": "^4.2.3",
     "jest": "^25.1.0",
     "lint-staged": "^8.1.0",
     "npm-run": "^5.0.1",
@@ -69,8 +73,5 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "3.1.6"
-  },
-  "publishConfig": {
-    "registry": "https://npm.lwcjs.org"
   }
 }

@@ -7,7 +7,7 @@ import { DIAGNOSTIC_SOURCE } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
-import { AttributeInfo, Decorator as DecoratorType, MemberType } from 'lightning-lsp-common';
+import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 // tslint:disable-next-line:no-var-requires

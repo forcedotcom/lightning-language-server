@@ -1,7 +1,7 @@
 import { parse, join } from 'path';
 import { Glob } from 'glob';
 import { FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext } from 'lightning-lsp-common';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
 
@@ -52,7 +52,7 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
         for (const file of files) {
             STATIC_RESOURCES.add(getResourceName(file));
         }
-        processStaticResources(workspaceRoots[0], writeConfigs);
+        return processStaticResources(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of static resources. Error details:`, err);
         throw err;

@@ -1,37 +1,35 @@
 [![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master)
 [![codecov](https://codecov.io/gh/forcedotcom/lightning-language-server/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/lightning-language-server)
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-![npm (scoped)](https://img.shields.io/npm/v/lwc-language-server?registry_uri=https%3A%2F%2Fnpm.lwcjs.org%2F)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)<br/>
+[![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lwc-language-server?label=lwc-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/lwc-language-server)
+[![npm (scoped)](https://img.shields.io/npm/v/@salesforce/aura-language-server?label=aura-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/aura-language-server)
+[![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lightning-lsp-common?label=lightning-lsp-common&logo=npm)](https://www.npmjs.com/package/@salesforce/lightning-lsp-common)
 
 # Lightning Language Servers
 
 Mono repo for the LWC and Aura Language Services that are used in the [Salesforce Extensions for VS Code](https://github.com/forcedotcom/salesforcedx-vscode).
 
-## Issues & Features
-Open issues and feature requests on the [SalesforceDX-VSCode Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
+### Issues & Features
 
-## Setup
+Open issues and feature requests on the [Salesforce VSCode Extensions Repository](https://github.com/forcedotcom/salesforcedx-vscode/issues/new/choose).
+
+## Setup Development Environment
 
 ### Pre-requisites
 
 Follow the pre-requisites here:
-https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/docs/developing.md
+https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/CONTRIBUTING.md
 
-### Create a common directory for LSP
-
-```
-mkdir ~/git/LSP
-cd ~/git/LSP
-```
-
-### Clone this repo and DX Plugins
+### Clone this repository and Salesforce VSCode Extensions
 
 ```
 git clone git@github.com:forcedotcom/lightning-language-server.git
 git clone git@github.com:forcedotcom/salesforcedx-vscode.git
 ```
 
-### Setup lightning-language-server
+Note: These projects need to be cloned into the same parent directory
+
+### Setup lightning-language-server repository
 
 ```
 cd lightning-language-server
@@ -39,7 +37,7 @@ yarn install
 yarn link-lsp
 ```
 
-### Setup the DX Plugins
+### Setup Salesforce VSCode Extensions repository
 
 ```
 cd ../salesforcedx-vscode
@@ -48,38 +46,56 @@ npm run link-lsp
 npm run compile
 ```
 
-### Recompile LSP on changes
+### Open both repositories in a vscode workspace
+
+```
+code ./vscode-workspaces/multiroot-simple.code-workspace
+```
+
+### Debugging with VSCode
+
+Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). 
+
+### Recompile on change
 
 ```
 cd ../lightning-language-server
 yarn watch
+cd ../salesforcedx-vscode
+npm run watch
 ```
 
-### Testing
+Note: You need to restart vscode each time you make changes to the language server or the lightning vscode extensions.
+Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
 
-Runs all our tests across every package
+## Publishing
 
-```
-yarn test
-```
+### Automated publish to NPM
+Automated deploys to NPM will occur weekly on Sundays @midnight via CircleCI.
+https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master 
 
-### Publishing
-
-Login to the lwcjs npm registry using the 'lwcadmin' credentials. Note: package versions will be updated as part of the lerna publish command, so you don't need to update them yourself.
-
-```
-npm login --registry https://npm.lwcjs.org
-lerna publish --exact
-```
-
-### Open VSCode Workspace
-
-This workspace has top level folders for lightning-lsp-common / aura-language-server / lwc-language-server / DX so you can see everything from a single workspace.
+### On-Demand publish to NPM
+If you want to have CircleCI publish the current master branch to NPM, you can run the following script to trigger the deploy job to run:
 
 ```
-code ./vscode-workspaces/lsp-all.code-workspace
+curl -v -u ${CircleCIToken}: -X POST --header "Content-Type: application/json" -d '{
+  "branch": "master",
+  "parameters": {
+    "deploy": true,
+    "version": "patch"
+  }
+}' https://circleci.com/api/v2/project/gh/forcedotcom/lightning-language-server/pipeline
 ```
 
-### Launch VSCode Debug
+You can also modify the version parameter in the curl script to configure how the version is bumped. Valid values are: [major | minor | patch | premajor | preminor | prepatch | prerelease]. By default the weekly builds only bump the patch version.
 
-Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). Note: you need to restart vscode each time you make language server changes (even though the file watcher is compiling them on the fly). Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
+Note: You need to substitute in your own ${CircleCIToken} to make this script work. You can create a Personal API Token by following the instructions here:
+https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token
+
+### Manual publish to NPM (from your local machine)
+```
+yarn bump-versions
+yarn publish-lsp
+```
+
+Note: you will have to be authenticated to an account that has access to the @salesforce org on NPM

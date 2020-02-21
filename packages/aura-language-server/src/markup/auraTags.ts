@@ -1,6 +1,13 @@
 import AuraIndexer from '../aura-indexer/indexer';
-import { TagInfo, AttributeInfo, IHTMLTagProvider, ICompletionParticipant, HtmlContentContext, HtmlAttributeValueContext } from 'lightning-lsp-common';
-import { Decorator } from 'lightning-lsp-common/lib/indexer/attributeInfo';
+import {
+    TagInfo,
+    AttributeInfo,
+    IHTMLTagProvider,
+    ICompletionParticipant,
+    HtmlContentContext,
+    HtmlAttributeValueContext,
+} from '@salesforce/lightning-lsp-common';
+import { Decorator } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 let indexer: AuraIndexer;
 

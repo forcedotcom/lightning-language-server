@@ -3,14 +3,14 @@ import * as path from 'path';
 import { FileChangeType, FileEvent, Location, Position, Range } from 'vscode-languageserver';
 import URI from 'vscode-uri';
 import { onSetCustomComponent, onDeletedCustomComponent, onIndexCustomComponents } from '../config';
-import { WorkspaceContext, AttributeInfo, TagInfo } from 'lightning-lsp-common';
+import { WorkspaceContext, AttributeInfo, TagInfo } from '@salesforce/lightning-lsp-common';
 import { compileFile, extractAttributes, getMethods, getProperties, toVSCodeRange } from '../javascript/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
-import { utils, shared, componentUtil } from 'lightning-lsp-common';
+import { utils, shared, componentUtil } from '@salesforce/lightning-lsp-common';
 import { join } from 'path';
 import EventsEmitter from 'events';
-import { toResolvedPath } from 'lightning-lsp-common/lib/utils';
-import { TagType } from 'lightning-lsp-common/lib/indexer/tagInfo';
+import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
+import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 
 const { WorkspaceType } = shared;
 
@@ -86,19 +86,19 @@ export function getlwcStandardResourcePath() {
 export async function loadStandardComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const data = await fs.readFile(getlwcStandardResourcePath(), 'utf-8');
     const lwcStandard = JSON.parse(data);
+
     for (const tag in lwcStandard) {
         if (lwcStandard.hasOwnProperty(tag) && typeof tag === 'string') {
-            const info = new TagInfo(null, TagType.STANDARD, true, []);
-            if (lwcStandard[tag].attributes) {
-                lwcStandard[tag].attributes.map((a: any) => {
-                    const name = a.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-                    info.attributes.push(new AttributeInfo(name, a.description, undefined, undefined, a.type, undefined, 'LWC standard attribute'));
+            const standardTag = lwcStandard[tag];
+            const description = standardTag.description;
+            const namespace = standardTag.namespace;
+            let attributes = [];
+            if (standardTag.attributes) {
+                attributes = standardTag.attributes.map((attribute: any) => {
+                    return new AttributeInfo(attribute.name, attribute.description, undefined, undefined, attribute.type, undefined, 'LWC standard attribute');
                 });
             }
-            info.documentation = lwcStandard[tag].description;
-            // TODO this needs cleanup for things outside the lightning namespace
-            info.name = 'lightning-' + tag;
-            info.namespace = 'lightning';
+            const info = new TagInfo(null, TagType.STANDARD, true, attributes, undefined, description, tag, namespace);
             await setCustomTag(context, info, writeConfigs);
         }
     }
