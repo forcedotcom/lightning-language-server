@@ -29,12 +29,6 @@ declare module 'lightning/messageService' {
      */
     export function unsubscribe(subscription: Object): void;
     /**
-     * Creates an anonymous MessageChannel object for use with Message Service.
-     *
-     * @return {Object} - Anonymous MessageChannel.
-     */
-    export function createMessageChannel(): Object;
-    /**
      * Creates a message context for an LWC library.
      *
      * @return {Object} - MessageContext for use by LWC Library.
