@@ -58,7 +58,7 @@
     "@types/glob": "^5.0.35",
     "@types/jest": "^25.1.2",
     "@types/lazy.js": "^0.3.32",
-    "@types/node": "^8.10.0",
+    "@types/node": "^13.7.7",
     "@types/shelljs": "^0.8.1",
     "@types/xml2js": "^0.4.3",
     "babel-types": "^6.26.0",

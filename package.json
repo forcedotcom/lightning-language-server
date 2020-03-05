@@ -7,7 +7,7 @@
     "url": "https://github.com/forcedotcom/lightning-language-server.git"
   },
   "devDependencies": {
-    "@types/node": "^10.12.18",
+    "@types/node": "^13.7.7",
     "husky": "^4.2.3",
     "lerna": "^3.10.6",
     "patch-package": "^6.0.5",
