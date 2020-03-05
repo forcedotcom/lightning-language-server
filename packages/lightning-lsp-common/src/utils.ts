@@ -7,6 +7,7 @@ import { WorkspaceContext } from './context';
 import { WorkspaceType } from './shared';
 import { promisify } from 'util';
 import { Glob } from 'glob';
+import * as jsonc from 'jsonc-parser';
 
 export const glob = promisify(Glob);
 
@@ -192,7 +193,10 @@ export const memoize = (fn: any) => {
 export function readJsonSync(file: string): any {
     const exists = fs.pathExistsSync(file);
     try {
-        return exists ? fs.readJsonSync(file) : {};
+        // jsonc.parse will return an object without comments.
+        // Comments will be lost if this object is written back to file.
+        // Individual properties should be updated directly via VS Code API to preserve comments.
+        return exists ? jsonc.parse(fs.readFileSync(file, 'utf8')) : {};
     } catch (err) {
         console.log(`onIndexCustomComponents(LOTS): Error reading jsconfig ${file}`, err);
     }
