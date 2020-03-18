@@ -5,6 +5,7 @@ import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import * as fs from 'fs-extra';
+import mockFs from 'mock-fs';
 
 jest.mock('../context');
 const real = jest.requireActual('../context');
@@ -154,4 +155,41 @@ it('deepMerge()', () => {
     from = { a: [1, 2] };
     expect(utils.deepMerge(to, from)).toBeTruthy();
     expect(to).toEqual({ a: [2, 1] });
+});
+
+describe('readJsonSync()', () => {
+    afterEach(() => {
+        mockFs.restore();
+    });
+
+    it('should read json files', () => {
+        mockFs({
+            '/path/to/settings.json': '{"foo": "bar"}',
+        });
+
+        const settings = utils.readJsonSync('/path/to/settings.json');
+
+        expect(settings).toHaveProperty('foo');
+        expect(settings.foo).toEqual('bar');
+    });
+
+    it('should read json files with comments', () => {
+        mockFs({
+            '/path/to/settings.json': `{
+                // this is a comment
+                "foo": "bar"
+            }`,
+        });
+
+        const settings = utils.readJsonSync('/path/to/settings.json');
+
+        expect(settings).toHaveProperty('foo');
+        expect(settings.foo).toEqual('bar');
+    });
+
+    it('should return empty object for non-existing files', () => {
+        const settings = utils.readJsonSync('/path/to/settings.json');
+
+        expect(Object.keys(settings).length).toEqual(0);
+    });
 });
