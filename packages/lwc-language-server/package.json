@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@lwc/babel-plugin-component": "0.34.8",
-    "@lwc/compiler": "0.34.8",
+    "@lwc/compiler": "1.3.2",
     "@lwc/engine": "0.34.8",
     "@lwc/errors": "0.34.8",
     "@lwc/template-compiler": "0.34.8",
