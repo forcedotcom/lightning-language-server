@@ -1609,12 +1609,12 @@
     rollup "0.66.2"
     rollup-plugin-replace "^2.0.0"
 
-"@lwc/engine@0.34.8":
-  version "0.34.8"
-  resolved "https://registry.yarnpkg.com/@lwc/engine/-/engine-0.34.8.tgz#53caae1525ddb3708ba3a0dba1ec2076b3d834e3"
-  integrity sha512-T/oTEao6N6Z2Z0H/HjZirPRgHj29HuFCPg3nTg1qG+o0KwgdukmzgrA7bmHBD52cHioktivDpqmEa7pKRd5uYw==
+"@lwc/engine@1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@lwc/engine/-/engine-1.3.2.tgz#ffcceb5590f7bd8970554d3d983910709fa8100a"
+  integrity sha512-cA11f0J3kzC/YpvIF63VOue9d4bVgy8Kfv+EZIrApkzYRsjaIYVYEX+paMsrT6oS737aIY7ByVl078SRElib3g==
   dependencies:
-    observable-membrane "0.25.0"
+    observable-membrane "0.26.1"
 
 "@lwc/errors@0.34.8":
   version "0.34.8"
@@ -7238,10 +7238,10 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-observable-membrane@0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/observable-membrane/-/observable-membrane-0.25.0.tgz#d0f20e1c98c5425396fd021bc320eb96874508e2"
-  integrity sha512-ySxObvl89y6EeHnjDNQDmcDZFs4EpVmtEimmf/joIgxwhfVLHONEkf8aSNgDLCjFY2n2cAnG9Ww1yldigq7wPQ==
+observable-membrane@0.26.1:
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/observable-membrane/-/observable-membrane-0.26.1.tgz#5619a7b2f4b0414d62b3e6cc2ea65734a08cce7a"
+  integrity sha512-fBxLHtd0pUFI/rKh6Dfn9fxjEgY4NkRIqlPEKa9fR28rC9CQDfQ5P+t292CtAArtXOQ1mF8Nq9m1cF52IdN8DA==
 
 octokit-pagination-methods@^1.1.0:
   version "1.1.0"
