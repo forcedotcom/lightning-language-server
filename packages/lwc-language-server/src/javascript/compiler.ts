@@ -197,6 +197,7 @@ function transformTypescript(filename: string, source: string) {
     let codeTransformed = source;
     try {
         const { code } = babel.transform(source, {
+            sourceMaps: 'inline',
             filename,
             plugins: [
                 require.resolve('@babel/plugin-syntax-class-properties'),
