@@ -16,10 +16,14 @@ import {
     MessageType,
     RequestType,
     RegistrationRequest,
+    CodeActionKind,
+    CodeActionParams,
+    CodeAction,
 } from 'vscode-languageserver';
 
 import { LWCIndexer } from './indexer';
 import templateLinter from './template/linter';
+import { quickfix } from './template/code-actions';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
@@ -27,6 +31,7 @@ import URI from 'vscode-uri';
 import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
 import { getLwcTagProvider } from './markup/lwcTags';
 import decamelize from 'decamelize';
+import { isNullOrUndefined } from 'util';
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
@@ -82,6 +87,9 @@ connection.onInitialize(
                         workspaceFolders: {
                             supported: true,
                         },
+                    },
+                    codeActionProvider: {
+                        codeActionKinds: [CodeActionKind.QuickFix],
                     },
                 },
             };
@@ -220,3 +228,16 @@ connection.onRequest('salesforce/listComponents', () => {
     const tags = getLwcTags();
     return JSON.stringify([...tags]);
 });
+
+connection.onCodeAction(provideCodeActions);
+
+async function provideCodeActions(params: CodeActionParams): Promise<CodeAction[]> {
+    if (!params.context.diagnostics.length) {
+        return [];
+    }
+    const document = documents.get(params.textDocument.uri);
+    if (isNullOrUndefined(document)) {
+        return [];
+    }
+    return quickfix(document, params);
+}
