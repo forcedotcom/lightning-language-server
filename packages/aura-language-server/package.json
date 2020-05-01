@@ -23,7 +23,9 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
     "prepush": "yarn prepare && yarn lint && yarn test",
-    "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
+    "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@salesforce/lightning-lsp-common": "2.3.12",
@@ -49,7 +51,8 @@
     "vscode-languageserver": "^5.2.1",
     "vscode-nls": "^4.0.0",
     "vscode-uri": "1.0.6",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "@types/babel-types": "^7.0.4",
@@ -73,5 +76,6 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "3.1.6"
-  }
+  },
+  "snyk": true
 }
