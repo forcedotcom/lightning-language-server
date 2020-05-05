@@ -79,11 +79,11 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
             // Check if package.json contains @lwc/engine
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
             const dependencies = Object.keys(packageInfo.dependencies || {});
-            if (dependencies.includes('@lwc/engine')) {
+            if (dependencies.includes('@lwc/engine') || dependencies.includes('lwc-services')) {
                 return WorkspaceType.STANDARD_LWC;
             }
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
-            if (devDependencies.includes('@lwc/engine')) {
+            if (devDependencies.includes('@lwc/engine') || devDependencies.includes('lwc-services')) {
                 return WorkspaceType.STANDARD_LWC;
             }
             if (packageInfo.workspaces) {

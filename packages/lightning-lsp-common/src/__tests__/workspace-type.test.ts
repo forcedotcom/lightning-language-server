@@ -87,6 +87,42 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
+    test('when package.json dependencies include lwc-services, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    dependencies: {
+                        'lwc-services': 1,
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        mockFs.restore();
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
+    test('when package.json devDependencies include lwc-services, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    devDependencies: {
+                        'lwc-services': 1,
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        mockFs.restore();
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
     test('when package.json specifies workspaces, workspaceType is MONOREPO', () => {
         mockFs({
             workspacedir: {
