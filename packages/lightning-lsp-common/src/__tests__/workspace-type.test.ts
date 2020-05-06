@@ -30,6 +30,18 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.SFDX);
     });
 
+    test('when an lwc.config.js file is present, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'lwc.config.js': '',
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
     test('when workspace-user.xml file is present at the root, workspaceType is CORE_ALL', () => {
         mockFs({
             workspacedir: {

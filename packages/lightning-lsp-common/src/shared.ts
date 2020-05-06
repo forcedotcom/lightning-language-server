@@ -73,6 +73,10 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
         return WorkspaceType.CORE_PARTIAL;
     }
 
+    if (fs.existsSync(path.join(root, 'lwc.config.js'))) {
+        return WorkspaceType.STANDARD_LWC;
+    }
+
     const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
