@@ -112,8 +112,6 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        mockFs.restore();
-
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
@@ -129,8 +127,6 @@ describe('detectWorkspaceType', () => {
         });
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
-
-        mockFs.restore();
 
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
