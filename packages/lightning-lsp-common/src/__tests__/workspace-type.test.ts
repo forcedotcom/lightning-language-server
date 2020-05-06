@@ -81,6 +81,53 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
+    test('when package.json dependencies includes @lwc/<anything>, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    dependencies: {
+                        '@lwc/compiler': 1,
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
+    test('when package.json devDependencies includes @lwc/<anything>, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    devDependencies: {
+                        '@lwc/compiler': 1,
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+    test('when package.json dependencies includes @lwc/engine, workspaceType is STANDARD_LWC', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    dependencies: {
+                        '@lwc/engine': 1,
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
     test('when package.json devDependencies include @lwc/engine, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
@@ -93,9 +140,21 @@ describe('detectWorkspaceType', () => {
         });
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
 
-        mockFs.restore();
+    test('when package.json has any dependency that starts with "@lwc"', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    dependencies: {
+                        'lwc-services': 1,
+                    },
+                }),
+            },
+        });
 
+        const workspaceType = detectWorkspaceType(['workspacedir']);
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
