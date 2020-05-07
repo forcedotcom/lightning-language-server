@@ -80,18 +80,26 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
     const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
-            // Check if package.json contains @lwc/engine
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
             const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             const allDependencies = [...dependencies, ...devDependencies];
             const hasLWCdependencies = allDependencies.some(key => key.includes('@lwc/'));
 
+            // any type of @lwc is a dependency
             if (hasLWCdependencies) {
                 return WorkspaceType.STANDARD_LWC;
             }
 
+            // has and type of lwc configuration
+            if (packageInfo.lwc) {
+                return WorkspaceType.STANDARD_LWC;
+            }
+
+            // has a lwc-services dependency (this ca be removed once the
+            // `lwc.config.js` becomes required
             if (allDependencies.includes('lwc-services')) {
+                // has
                 return WorkspaceType.STANDARD_LWC;
             }
 

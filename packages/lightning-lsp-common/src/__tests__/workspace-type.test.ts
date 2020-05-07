@@ -158,6 +158,22 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
+    test('when package.json has `lwc` configuration', () => {
+        mockFs({
+            workspacedir: {
+                'package.json': JSON.stringify({
+                    lwc: {
+                        mapNamespaceFromPath: true,
+                        modules: ['src/main/modules'],
+                    },
+                }),
+            },
+        });
+
+        const workspaceType = detectWorkspaceType(['workspacedir']);
+        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+    });
+
     test('when package.json dependencies include lwc-services, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
