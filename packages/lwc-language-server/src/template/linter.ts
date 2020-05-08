@@ -10,11 +10,13 @@ const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
     [DiagnosticLevel.Fatal, DiagnosticSeverity.Error],
 ]);
 
-export default function lint(document: TextDocument): Diagnostic[] {
+const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
+
+export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
     const source = document.getText();
     const { warnings } = templateCompiler(source, {});
 
-    return warnings.map(warning => {
+    let warningsLwc: Diagnostic[] = warnings.map(warning => {
         const { start = 0, length = 0 } = warning.location || { start: 0, length: 0 };
 
         return {
@@ -24,6 +26,36 @@ export default function lint(document: TextDocument): Diagnostic[] {
             source: DIAGNOSTIC_SOURCE,
         };
     });
+
+    const warningsTypos: Diagnostic[] = lintTypos(document);
+    warningsLwc = warningsLwc.concat(warningsTypos);
+    return warningsLwc;
+}
+
+function lintTypos(document: TextDocument): Diagnostic[] {
+    const source = document.getText();
+    const lines = source.split(/\r?\n/g);
+
+    const errors: Diagnostic[] = [];
+
+    lines.forEach((line, idx) => {
+        TYPOS.forEach(typo => {
+            const idxTypo = line.indexOf(typo);
+            if (idxTypo > -1) {
+                errors.push({
+                    range: {
+                        start: { line: idx, character: idxTypo },
+                        end: { line: idx, character: idxTypo + typo.length },
+                    },
+                    message: `${typo} is not a valid namespace, sure you didn't mean "<lightning-"?`,
+                    severity: LEVEL_MAPPING.get(DiagnosticLevel.Error),
+                    source: DIAGNOSTIC_SOURCE,
+                });
+            }
+        });
+    });
+
+    return errors;
 }
 
 function toRange(textDocument: TextDocument, start: number, length: number): Range {
