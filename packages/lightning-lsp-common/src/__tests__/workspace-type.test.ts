@@ -148,7 +148,7 @@ describe('detectWorkspaceType', () => {
                 'package.json': JSON.stringify({
                     lwc: {
                         mapNamespaceFromPath: true,
-                        modules: ['src/main/modules'],
+                        modules: [{ dir: 'src/main/modules' }],
                     },
                 }),
             },
