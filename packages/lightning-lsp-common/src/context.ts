@@ -12,7 +12,7 @@ import template from 'lodash.template';
 // @ts-ignore
 import { parse } from 'properties';
 
-import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, getLwcServicesConfigFile, isLWC } from './shared';
+import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, getLwcConfigFile, getPackageJson } from './shared';
 import * as utils from './utils';
 import { componentUtil } from './index';
 
@@ -189,10 +189,22 @@ export class WorkspaceContext {
                     }
                 }
                 break;
-            case WorkspaceType.OSS_LWC:
-                const config = require(getLwcServicesConfigFile(this.workspaceRoots[0]));
-                const moduleDir = config.moduleDir ? config.moduleDir : 'src/modules';
-                list.push(moduleDir);
+            case WorkspaceType.STANDARD_LWC:
+                let fileName = getLwcConfigFile(this.workspaceRoots[0]);
+                let config: any;
+                if (!fs.existsSync(fileName)) {
+                    fileName = getPackageJson(this.workspaceRoots[0]);
+                    const file = require(fileName);
+                    config = file.lwc.modules;
+                } else {
+                    const file = require(fileName);
+                    config = file.modules;
+                }
+                for (const moduleEntry of config) {
+                    if (moduleEntry.dir) {
+                        list.push(moduleEntry.dir);
+                    }
+                }
                 break;
         }
         return list;
@@ -223,7 +235,7 @@ export class WorkspaceContext {
             case WorkspaceType.CORE_ALL:
                 typingsDir = join(this.workspaceRoots[0], '.vscode', 'typings', 'lwc');
                 break;
-            case WorkspaceType.OSS_LWC:
+            case WorkspaceType.STANDARD_LWC:
                 typingsDir = join(this.workspaceRoots[0], '.vscode', 'typings', 'lwc');
                 break;
         }
@@ -235,7 +247,7 @@ export class WorkspaceContext {
             await fs.ensureDir(typingsDir);
 
             switch (this.type) {
-                case WorkspaceType.OSS_LWC:
+                case WorkspaceType.STANDARD_LWC:
                     try {
                         await fs.copy(join(resourceTypingsDir, 'copied', 'engine.d.ts'), join(typingsDir, 'engine.d.ts'));
                     } catch (ignore) {
@@ -302,9 +314,9 @@ export class WorkspaceContext {
                 }
                 break;
 
-            case WorkspaceType.OSS_LWC:
+            case WorkspaceType.STANDARD_LWC:
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
-                const fileName = path.resolve(process.cwd(), 'lwc-services.config.js');
+                const fileName = getPackageJson(this.workspaceRoots[0]);
                 const config = require(fileName);
                 let projectRoot = { project_root: '../..' };
                 if (config.moduleDir) {
@@ -471,8 +483,25 @@ export class WorkspaceContext {
                 return roots;
             case WorkspaceType.STANDARD:
             case WorkspaceType.STANDARD_LWC:
+                // TODO: Add module resolution
+                let fileName = getLwcConfigFile(this.workspaceRoots[0]);
+                let config: any;
+                if (!fs.existsSync(fileName)) {
+                    fileName = getPackageJson(this.workspaceRoots[0]);
+                    const file = require(fileName);
+                    config = file.lwc.modules;
+                } else {
+                    const file = require(fileName);
+                    config = file.modules;
+                }
+                for (const moduleEntry of config) {
+                    if (moduleEntry.dir) {
+                        const modulesDir = join(this.workspaceRoots[0], moduleEntry.dir);
+                        const subroots = await findNamespaceRoots(modulesDir, 1);
+                        roots.lwc.push(...subroots.lwc);
+                    }
+                }
             case WorkspaceType.MONOREPO:
-            case WorkspaceType.OSS_LWC:
             case WorkspaceType.UNKNOWN: {
                 let depth = 6;
                 if (this.type === WorkspaceType.MONOREPO) {

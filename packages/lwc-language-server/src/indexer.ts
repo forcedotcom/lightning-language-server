@@ -31,7 +31,7 @@ export class LWCIndexer implements Indexer {
 
     public async configureAndIndex() {
         const indexingTasks: Promise<void>[] = [];
-        if (this.context.type !== WorkspaceType.STANDARD_LWC && this.context.type !== WorkspaceType.OSS_LWC) {
+        if (this.context.type !== WorkspaceType.STANDARD_LWC) {
             indexingTasks.push(loadStandardComponents(this.context, this.writeConfigs));
         }
         indexingTasks.push(indexCustomComponents(this.context, this.writeConfigs));

@@ -2,8 +2,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+const LWC_CONFIG: string = 'lwc.config.json';
+const PACKAGE_JSON: string = 'package.json';
 const SFDX_PROJECT: string = 'sfdx-project.json';
-const LWC_SERVICES_CONFIG: string = 'lwc-services.config.js';
 
 export enum WorkspaceType {
     /** standard workspace with a package.json but no lwc dependencies */
@@ -16,8 +17,6 @@ export enum WorkspaceType {
     MONOREPO_LWC,
     /** sfdx workspace */
     SFDX,
-    /** create-lwc-app workspace with an lwc-services.config.js */
-    OSS_LWC,
     /** workspace including all core projects */
     CORE_ALL,
     /** workspace including only one or more core projects */
@@ -36,13 +35,7 @@ export function isUnknown(type: WorkspaceType) {
     return false;
 }
 export function isLWC(type: WorkspaceType): boolean {
-    return (
-        type === WorkspaceType.SFDX ||
-        type === WorkspaceType.STANDARD_LWC ||
-        type === WorkspaceType.CORE_ALL ||
-        type === WorkspaceType.CORE_PARTIAL ||
-        type === WorkspaceType.OSS_LWC
-    );
+    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
 }
 
 export function isAura(type: WorkspaceType): boolean {
@@ -53,8 +46,12 @@ export function getSfdxProjectFile(root: string) {
     return path.join(root, SFDX_PROJECT);
 }
 
-export function getLwcServicesConfigFile(workspaceRoot: string): any {
-    return path.join(workspaceRoot, LWC_SERVICES_CONFIG);
+export function getLwcConfigFile(workspaceRoot: string): any {
+    return path.join(workspaceRoot, LWC_CONFIG);
+}
+
+export function getPackageJson(workspaceRoot: string): any {
+    return path.join(workspaceRoot, PACKAGE_JSON);
 }
 
 /**
@@ -89,21 +86,22 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
     if (fs.existsSync(path.join(root, '..', 'workspace-user.xml'))) {
         return WorkspaceType.CORE_PARTIAL;
     }
-    if (fs.existsSync(getLwcServicesConfigFile(root))) {
-        return WorkspaceType.OSS_LWC;
+    if (fs.existsSync(getLwcConfigFile(root))) {
+        return WorkspaceType.STANDARD_LWC;
     }
 
     const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
-            // Check if package.json contains @lwc/engine
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
-            const dependencies = Object.keys(packageInfo.dependencies || {});
-            if (dependencies.includes('@lwc/engine')) {
+            if (packageInfo.lwc) {
                 return WorkspaceType.STANDARD_LWC;
             }
+            const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
-            if (devDependencies.includes('@lwc/engine')) {
+            const allDependencies = [...dependencies, ...devDependencies];
+            const hasLWCdependencies = allDependencies.some(key => key.startsWith('@lwc/') || key === 'lwc');
+            if (hasLWCdependencies) {
                 return WorkspaceType.STANDARD_LWC;
             }
             if (packageInfo.workspaces) {
