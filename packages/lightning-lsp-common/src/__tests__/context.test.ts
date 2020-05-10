@@ -33,9 +33,9 @@ it('WorkspaceContext', async () => {
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
-    expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'example'));
-    expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'interop'));
-    expect(roots.lwc[3]).toEndWith(join(STANDARDS_ROOT, 'other'));
+    expect(roots.lwc[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
+    expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
+    expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
     expect(roots.lwc.length).toBe(4);
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
