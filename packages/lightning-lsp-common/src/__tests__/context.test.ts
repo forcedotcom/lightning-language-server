@@ -12,7 +12,6 @@ import {
     readAsTextDocument,
     REGISTERED_EMPTY_FOLDER_ROOT,
     CORE_MULTI_ROOT,
-    OSS_LWC_PROJECT_ROOT,
 } from './test-utils';
 
 it('WorkspaceContext', async () => {
@@ -34,17 +33,17 @@ it('WorkspaceContext', async () => {
     context = new WorkspaceContext('test-workspaces/standard-workspace');
     roots = await context.getNamespaceRoots();
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
-    expect(roots.lwc[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
-    expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
-    expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
-    expect(roots.lwc.length).toBe(3);
+    expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'example'));
+    expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'interop'));
+    expect(roots.lwc[3]).toEndWith(join(STANDARDS_ROOT, 'other'));
+    expect(roots.lwc.length).toBe(4);
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
     expect(modules[1]).toEndWith(join(STANDARDS_ROOT, 'example', 'line', 'line.js'));
     expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
     expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
     expect(modules.length).toBe(4);
-    expect(await context.getModulesDirs()).toEqual([]);
+    expect(await context.getModulesDirs()).toEqual(['src/modules']);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
     expect(context.type).toBe(WorkspaceType.CORE_ALL);
@@ -86,18 +85,6 @@ it('WorkspaceContext', async () => {
     for (let i = 0; i < context.workspaceRoots.length; i = i + 1) {
         expect(modulesDirs[i]).toMatch(context.workspaceRoots[i]);
     }
-});
-
-it('isLwcOssWorkspaceContext', async () => {
-    const context = new WorkspaceContext(OSS_LWC_PROJECT_ROOT);
-    expect(context.type).toBe(WorkspaceType.OSS_LWC);
-    const roots = await context.getNamespaceRoots();
-    expect(roots.lwc[0]).toEndWith(join(OSS_LWC_PROJECT_ROOT, 'src', 'modules', 'my'));
-    expect(roots.lwc.length).toBe(1);
-    const modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(OSS_LWC_PROJECT_ROOT, 'src', 'modules', 'my', 'app', 'app.js'));
-    expect(modules.length).toBe(2);
-    expect((await context.getModulesDirs()).length).toBe(1);
 });
 
 it('isInsideModulesRoots()', async () => {
