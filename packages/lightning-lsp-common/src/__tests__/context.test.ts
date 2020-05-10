@@ -36,7 +36,7 @@ it('WorkspaceContext', async () => {
     expect(roots.lwc[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
     expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
     expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
-    expect(roots.lwc.length).toBe(4);
+    expect(roots.lwc.length).toBe(3);
     modules = await context.findAllModules();
     expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
     expect(modules[1]).toEndWith(join(STANDARDS_ROOT, 'example', 'line', 'line.js'));
