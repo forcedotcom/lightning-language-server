@@ -143,7 +143,7 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
-    test('when package.json has any dependency that starts with "@lwc"', () => {
+    test('when package.json has the `lwc-services` dependency', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({

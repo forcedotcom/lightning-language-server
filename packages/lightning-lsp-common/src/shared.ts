@@ -91,7 +91,7 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
                 return WorkspaceType.STANDARD_LWC;
             }
 
-            // has and type of lwc configuration
+            // has any type of lwc configuration
             if (packageInfo.lwc) {
                 return WorkspaceType.STANDARD_LWC;
             }
