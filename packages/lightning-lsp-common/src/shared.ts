@@ -84,7 +84,9 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
             const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             const allDependencies = [...dependencies, ...devDependencies];
-            const hasLWCdependencies = allDependencies.some(key => key.includes('@lwc/'));
+            const hasLWCdependencies = allDependencies.some(key => {
+                return key.startsWith('@lwc/') || key === 'lwc';
+            });
 
             // any type of @lwc is a dependency
             if (hasLWCdependencies) {
