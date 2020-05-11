@@ -98,13 +98,6 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
                 return WorkspaceType.STANDARD_LWC;
             }
 
-            // has a lwc-services dependency (this ca be removed once the
-            // `lwc.config.js` becomes required
-            if (allDependencies.includes('lwc-services')) {
-                // has
-                return WorkspaceType.STANDARD_LWC;
-            }
-
             if (packageInfo.workspaces) {
                 return WorkspaceType.MONOREPO;
             }
