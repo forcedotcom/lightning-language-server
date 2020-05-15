@@ -90,26 +90,39 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
         return WorkspaceType.STANDARD_LWC;
     }
 
+    if (fs.existsSync(path.join(root, 'lwc.config.js'))) {
+        return WorkspaceType.STANDARD_LWC;
+    }
+
     const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
-            if (packageInfo.lwc) {
-                return WorkspaceType.STANDARD_LWC;
-            }
             const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             const allDependencies = [...dependencies, ...devDependencies];
-            const hasLWCdependencies = allDependencies.some(key => key.startsWith('@lwc/') || key === 'lwc');
+            const hasLWCdependencies = allDependencies.some(key => {
+                return key.startsWith('@lwc/') || key === 'lwc';
+            });
+
+            // any type of @lwc is a dependency
             if (hasLWCdependencies) {
                 return WorkspaceType.STANDARD_LWC;
             }
+
+            // has any type of lwc configuration
+            if (packageInfo.lwc) {
+                return WorkspaceType.STANDARD_LWC;
+            }
+
             if (packageInfo.workspaces) {
                 return WorkspaceType.MONOREPO;
             }
+
             if (fs.existsSync(path.join(root, 'lerna.json'))) {
                 return WorkspaceType.MONOREPO;
             }
+
             return WorkspaceType.STANDARD;
         } catch (e) {
             // Log error and fallback to setting workspace type to Unknown
