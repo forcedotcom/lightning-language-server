@@ -53,6 +53,7 @@ const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 documents.onDidClose(onClose);
 documents.onDidChangeContent(onChangeContent);
+documents.onDidSave(onSave);
 
 async function initialize(params: InitializeParams): Promise<InitializeResult> {
     try {
@@ -131,16 +132,17 @@ async function onChangeContent(change) {
     }
 }
 
-documents.onDidSave(async change => {
+async function onSave(change) {
     const { document } = change;
-    const { uri } = document;
-    if (await context.isLWCJavascript(document)) {
+    const isLWCDocument = await context.isLWCJavascript(document);
+
+    if (isLWCDocument) {
         const { metadata } = await javascriptCompileDocument(document);
         if (metadata) {
-            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
+            addCustomTagFromResults(context, document.uri, metadata, context.type === WorkspaceType.SFDX);
         }
     }
-});
+}
 
 async function completion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
     const document = documents.get(textDocumentPosition.textDocument.uri);
