@@ -14,8 +14,7 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
-    RequestType,
-    RegistrationRequest,
+    WorkspaceFolder,
 } from 'vscode-languageserver';
 
 import { LWCIndexer } from './indexer';
@@ -27,69 +26,79 @@ import URI from 'vscode-uri';
 import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
 import { getLwcTagProvider } from './markup/lwcTags';
 import decamelize from 'decamelize';
+
+let htmlLS: LanguageService;
+let context: WorkspaceContext;
+let indexer: LWCIndexer;
+
 const { WorkspaceType } = shared;
+
 // Create a standard connection and let the caller decide the strategy
 // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 
 const connection: IConnection = createConnection();
 interceptConsoleLogger(connection);
+connection.onInitialize(initialize);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
-let htmlLS: LanguageService;
-let context: WorkspaceContext;
+async function initialize(params: InitializeParams): Promise<InitializeResult> {
+    try {
+        const roots: string[] = workspaceRoots(params.workspaceFolders);
 
-connection.onInitialize(
-    async (params: InitializeParams): Promise<InitializeResult> => {
-        const { workspaceFolders } = params;
-
-        const workspaceRoots: string[] = [];
-        for (const folder of workspaceFolders) {
-            workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
+        if (roots.length === 0) {
+            console.warn(`No workspace found`);
+            return { capabilities: {} };
         }
-        try {
-            if (workspaceRoots.length === 0) {
-                console.warn(`No workspace found`);
-                return { capabilities: {} };
-            }
 
-            for (const root of workspaceRoots) {
-                console.info(`Starting [[LWC]] language server at ${root}`);
-            }
-            const startTime = process.hrtime();
-            context = new WorkspaceContext(workspaceRoots);
+        for (const root of roots) {
+            console.info(`Starting [[LWC]] language server at ${root}`);
+        }
 
-            context.configureProject();
-            const lwcIndexer = new LWCIndexer(context);
+        const startTime = process.hrtime();
 
-            lwcIndexer.configureAndIndex();
+        context = new WorkspaceContext(roots);
+        context.configureProject();
 
-            context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
-            htmlLS = getLanguageService();
-            htmlLS.addTagProvider(getLwcTagProvider());
-            console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
-            return {
-                capabilities: {
-                    textDocumentSync: documents.syncKind,
-                    completionProvider: {
-                        resolveProvider: true,
-                    },
-                    hoverProvider: true,
-                    definitionProvider: true,
-                    workspace: {
-                        workspaceFolders: {
-                            supported: true,
-                        },
+        indexer = new LWCIndexer(context);
+        indexer.configureAndIndex();
+
+        context.addIndexingProvider({ name: 'lwc', indexer });
+
+        htmlLS = getLanguageService();
+        htmlLS.addTagProvider(getLwcTagProvider());
+
+        console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
+
+        const capabilities = {
+            capabilities: {
+                textDocumentSync: documents.syncKind,
+                completionProvider: {
+                    resolveProvider: true,
+                },
+                hoverProvider: true,
+                definitionProvider: true,
+                workspace: {
+                    workspaceFolders: {
+                        supported: true,
                     },
                 },
-            };
-        } catch (e) {
-            throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
-        }
-    },
-);
+            },
+        };
+
+        return capabilities;
+    } catch (e) {
+        throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
+    }
+}
+
+function workspaceRoots(folders: WorkspaceFolder[]): string[] {
+    return folders.map(folder => {
+        return path.resolve(URI.parse(folder.uri).fsPath);
+    });
+}
 
 // Make sure to clear all the diagnostics when a document gets closed
 documents.onDidClose(event => {
@@ -209,7 +218,6 @@ connection.listen();
 
 connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
     try {
-        const indexer: LWCIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
         return indexer.handleWatchedFiles(context, change);
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
