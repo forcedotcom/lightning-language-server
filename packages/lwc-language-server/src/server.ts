@@ -39,6 +39,7 @@ const { WorkspaceType } = shared;
 const connection: IConnection = createConnection();
 interceptConsoleLogger(connection);
 connection.onInitialize(initialize);
+connection.onCompletion(completion);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -133,19 +134,17 @@ documents.onDidSave(async change => {
     }
 });
 
-connection.onCompletion(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return { isIncomplete: false, items: [] };
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, {
-            isSfdxProject: context.type === WorkspaceType.SFDX,
-            useAttributeValueQuotes: false,
-        });
-    },
-);
+async function completion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!(await context.isLWCTemplate(document))) {
+        return { isIncomplete: false, items: [] };
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, {
+        isSfdxProject: context.type === WorkspaceType.SFDX,
+        useAttributeValueQuotes: false,
+    });
+}
 
 connection.onCompletionResolve(
     (item: CompletionItem): CompletionItem => {
