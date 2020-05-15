@@ -41,6 +41,7 @@ interceptConsoleLogger(connection);
 connection.onInitialize(initialize);
 connection.onCompletion(completion);
 connection.onCompletionResolve(completionResolve);
+connection.onHover(hover);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -151,16 +152,14 @@ function completionResolve(item: CompletionItem): CompletionItem {
     return item;
 }
 
-connection.onHover(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
-    },
-);
+async function hover(textDocumentPosition: TextDocumentPositionParams): Promise<Hover> {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!(await context.isLWCTemplate(document))) {
+        return null;
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
+}
 
 function findJavascriptProperty(valueProperty: string, textDocumentPosition: TextDocumentPositionParams) {
     // couldn't find it within the markup file, try looking for it as a javascript property
