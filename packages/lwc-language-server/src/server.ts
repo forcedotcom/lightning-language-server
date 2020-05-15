@@ -42,6 +42,7 @@ connection.onInitialize(initialize);
 connection.onCompletion(completion);
 connection.onCompletionResolve(completionResolve);
 connection.onHover(hover);
+connection.onDefinition(definition);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -189,26 +190,25 @@ function findJavascriptProperty(valueProperty: string, textDocumentPosition: Tex
     }
     return null;
 }
-connection.onDefinition(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+
+async function definition(textDocumentPosition: TextDocumentPositionParams): Promise<Location> {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!(await context.isLWCTemplate(document))) {
+        return null;
+    }
+    const htmlDocument = htmlLS.parseHTMLDocument(document);
+    let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+    if (!def) {
+        def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
         if (!def) {
-            def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
-            if (!def) {
-                const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
-                if (valueProperty) {
-                    def = findJavascriptProperty(valueProperty, textDocumentPosition);
-                }
+            const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
+            if (valueProperty) {
+                def = findJavascriptProperty(valueProperty, textDocumentPosition);
             }
         }
-        return def;
-    },
-);
+    }
+    return def;
+}
 
 // Listen on the connection
 connection.listen();
