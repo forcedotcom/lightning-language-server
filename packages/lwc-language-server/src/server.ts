@@ -52,6 +52,7 @@ connection.onRequest('salesforce/listComponents', () => {
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 documents.onDidClose(onClose);
+documents.onDidChangeContent(onChangeContent);
 
 async function initialize(params: InitializeParams): Promise<InitializeResult> {
     try {
@@ -113,7 +114,7 @@ function onClose(event) {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 }
 
-documents.onDidChangeContent(async change => {
+async function onChangeContent(change) {
     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
     const { document } = change;
     const { uri } = document;
@@ -128,7 +129,7 @@ documents.onDidChangeContent(async change => {
             addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, false);
         }
     }
-});
+}
 
 documents.onDidSave(async change => {
     const { document } = change;
