@@ -40,6 +40,7 @@ const connection: IConnection = createConnection();
 interceptConsoleLogger(connection);
 connection.onInitialize(initialize);
 connection.onCompletion(completion);
+connection.onCompletionResolve(completionResolve);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -146,11 +147,9 @@ async function completion(textDocumentPosition: TextDocumentPositionParams): Pro
     });
 }
 
-connection.onCompletionResolve(
-    (item: CompletionItem): CompletionItem => {
-        return item;
-    },
-);
+function completionResolve(item: CompletionItem): CompletionItem {
+    return item;
+}
 
 connection.onHover(
     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
