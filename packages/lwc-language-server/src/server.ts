@@ -44,6 +44,9 @@ connection.onCompletionResolve(completionResolve);
 connection.onHover(hover);
 connection.onDefinition(definition);
 connection.onDidChangeWatchedFiles(changedFile);
+connection.onRequest('salesforce/listComponents', () => {
+    return JSON.stringify(getLwcTags());
+});
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -221,8 +224,3 @@ async function changedFile(change: DidChangeWatchedFilesParams) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }
 }
-
-connection.onRequest('salesforce/listComponents', () => {
-    const tags = getLwcTags();
-    return JSON.stringify([...tags]);
-});
