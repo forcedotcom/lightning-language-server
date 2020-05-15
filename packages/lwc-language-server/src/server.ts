@@ -43,6 +43,7 @@ connection.onCompletion(completion);
 connection.onCompletionResolve(completionResolve);
 connection.onHover(hover);
 connection.onDefinition(definition);
+connection.onDidChangeWatchedFiles(changedFile);
 
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
@@ -213,13 +214,13 @@ async function definition(textDocumentPosition: TextDocumentPositionParams): Pro
 // Listen on the connection
 connection.listen();
 
-connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
+async function changedFile(change: DidChangeWatchedFilesParams) {
     try {
         return indexer.handleWatchedFiles(context, change);
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }
-});
+}
 
 connection.onRequest('salesforce/listComponents', () => {
     const tags = getLwcTags();
