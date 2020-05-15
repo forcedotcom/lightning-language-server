@@ -51,6 +51,7 @@ connection.onRequest('salesforce/listComponents', () => {
 // Create a document namager supporting only full document sync
 const documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
+documents.onDidClose(onClose);
 
 async function initialize(params: InitializeParams): Promise<InitializeResult> {
     try {
@@ -108,10 +109,9 @@ function workspaceRoots(folders: WorkspaceFolder[]): string[] {
     });
 }
 
-// Make sure to clear all the diagnostics when a document gets closed
-documents.onDidClose(event => {
+function onClose(event) {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
-});
+}
 
 documents.onDidChangeContent(async change => {
     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
