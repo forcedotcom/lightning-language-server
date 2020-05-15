@@ -38,6 +38,9 @@ const { WorkspaceType } = shared;
 
 const connection: IConnection = createConnection();
 interceptConsoleLogger(connection);
+
+// Listen on the connection
+connection.listen();
 connection.onInitialize(initialize);
 connection.onCompletion(completion);
 connection.onCompletionResolve(completionResolve);
@@ -216,9 +219,6 @@ async function definition(textDocumentPosition: TextDocumentPositionParams): Pro
     }
     return def;
 }
-
-// Listen on the connection
-connection.listen();
 
 async function changedFile(change: DidChangeWatchedFilesParams) {
     try {
