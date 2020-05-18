@@ -80,3 +80,12 @@ function resourceDeclaration(resourceName: string) {
 }
 `;
 }
+
+export function persistStaticResources(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], STATIC_RESOURCE_INDEX_FILE);
+    const index = Array.from(STATIC_RESOURCES);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
+}

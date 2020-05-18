@@ -48,6 +48,7 @@ connection.onCompletionResolve(completionResolve);
 connection.onHover(hover);
 connection.onDefinition(definition);
 connection.onDidChangeWatchedFiles(changedFile);
+connection.onShutdown(shutdown);
 connection.onRequest('salesforce/listComponents', () => {
     return JSON.stringify(getLwcTags());
 });
@@ -227,4 +228,8 @@ async function changedFile(change: DidChangeWatchedFilesParams) {
     } catch (e) {
         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
     }
+}
+
+async function shutdown() {
+    return indexer.persistIndex();
 }
