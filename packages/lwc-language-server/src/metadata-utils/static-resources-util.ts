@@ -43,7 +43,10 @@ export async function updateStaticResourceIndex(updates: FileEvent[], { workspac
 
 async function processStaticResources(workspace: string, writeConfigs: boolean): Promise<void> {
     if (STATIC_RESOURCES.size > 0 && writeConfigs) {
-        return fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
+        const filename = join(workspace, STATIC_RESOURCE_DECLARATION_FILE);
+        const fileContent = generateResourceTypeDeclarations();
+
+        return fs.writeFile(filename, fileContent);
     }
 }
 
