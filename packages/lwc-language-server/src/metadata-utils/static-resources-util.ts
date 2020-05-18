@@ -8,7 +8,8 @@ import * as fs from 'fs-extra';
 const glob = promisify(Glob);
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
-const STATIC_RESOURCES: Set<string> = new Set();
+const STATIC_RESOURCE_INDEX_FILE = '.sfdx/indexes/lwc/staticresources.json';
+let STATIC_RESOURCES: Set<string> = new Set();
 
 export function resetStaticResources() {
     STATIC_RESOURCES.clear();
@@ -54,8 +55,12 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
     const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
+
+    initStaticResourceIndex(workspaceRoots[0]);
+
     try {
         const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
+
         for (const file of files) {
             STATIC_RESOURCES.add(getResourceName(file));
         }
@@ -79,6 +84,18 @@ function resourceDeclaration(resourceName: string) {
     export default ${resourceName};
 }
 `;
+}
+
+function initStaticResourceIndex(workspace: string): Set<string> {
+    const indexPath: string = join(workspace, STATIC_RESOURCE_INDEX_FILE);
+    const shouldInit: boolean = STATIC_RESOURCES.size === 0 && fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const staticIndex = JSON.parse(indexJsonString);
+        STATIC_RESOURCES = new Set(staticIndex);
+        return STATIC_RESOURCES;
+    }
 }
 
 export function persistStaticResources(context: WorkspaceContext) {
