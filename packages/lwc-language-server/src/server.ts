@@ -10,6 +10,7 @@ import {
     CompletionList,
     CompletionItem,
     DidChangeWatchedFilesParams,
+    TextDocumentChangeEvent,
     Hover,
     Location,
     ShowMessageNotification,
@@ -114,11 +115,11 @@ function workspaceRoots(folders: WorkspaceFolder[]): string[] {
     });
 }
 
-function onClose(event) {
+function onClose(event: TextDocumentChangeEvent) {
     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 }
 
-async function onChangeContent(change) {
+async function onChangeContent(change: TextDocumentChangeEvent) {
     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
     const { document } = change;
     const { uri } = document;
@@ -135,7 +136,7 @@ async function onChangeContent(change) {
     }
 }
 
-async function onSave(change) {
+async function onSave(change: TextDocumentChangeEvent) {
     const { document } = change;
     const isLWCDocument = await context.isLWCJavascript(document);
 
