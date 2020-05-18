@@ -64,19 +64,16 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
 }
 
 function generateResourceTypeDeclarations(): string {
-    let resTypeDecs = '';
-    const sortedStaticResources = Array.from(STATIC_RESOURCES).sort();
-    sortedStaticResources.forEach(res => {
-        resTypeDecs += generateResourceTypeDeclaration(res);
-    });
-    return resTypeDecs;
+    return Array.from(STATIC_RESOURCES)
+        .sort()
+        .map(resourceDeclaration)
+        .join('');
 }
 
-function generateResourceTypeDeclaration(resourceName: string) {
-    const result = `declare module "@salesforce/resourceUrl/${resourceName}" {
+function resourceDeclaration(resourceName: string) {
+    return `declare module "@salesforce/resourceUrl/${resourceName}" {
     var ${resourceName}: string;
     export default ${resourceName};
 }
 `;
-    return result;
 }
