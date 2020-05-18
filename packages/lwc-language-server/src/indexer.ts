@@ -7,7 +7,7 @@ import {
     eventEmitter,
 } from './metadata-utils/custom-components-util';
 import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
-import { indexStaticResources, resetStaticResources, updateStaticResourceIndex } from './metadata-utils/static-resources-util';
+import { indexStaticResources, resetStaticResources, updateStaticResourceIndex, persistStaticResources } from './metadata-utils/static-resources-util';
 import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
 import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex } from './metadata-utils/message-channel-util';
 import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
@@ -30,18 +30,24 @@ export class LWCIndexer implements Indexer {
     }
 
     public async configureAndIndex() {
-        const indexingTasks: Promise<void>[] = [];
+        const tasks: Promise<void>[] = [indexCustomComponents(this.context, this.writeConfigs)];
+
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
-            indexingTasks.push(loadStandardComponents(this.context, this.writeConfigs));
+            tasks.push(loadStandardComponents(this.context, this.writeConfigs));
         }
-        indexingTasks.push(indexCustomComponents(this.context, this.writeConfigs));
+
         if (this.context.type === WorkspaceType.SFDX) {
-            indexingTasks.push(indexStaticResources(this.context, this.writeConfigs));
-            indexingTasks.push(indexContentAssets(this.context, this.writeConfigs));
-            indexingTasks.push(indexCustomLabels(this.context, this.writeConfigs));
-            indexingTasks.push(indexMessageChannels(this.context, this.writeConfigs));
+            tasks.push(
+                ...[
+                    indexStaticResources(this.context, this.writeConfigs),
+                    indexContentAssets(this.context, this.writeConfigs),
+                    indexCustomLabels(this.context, this.writeConfigs),
+                    indexMessageChannels(this.context, this.writeConfigs),
+                ],
+            );
         }
-        this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
+
+        this.indexingTasks = Promise.all(tasks).then(() => undefined);
         return this.indexingTasks;
     }
 
@@ -55,6 +61,10 @@ export class LWCIndexer implements Indexer {
         resetStaticResources();
         resetContentAssets();
         resetMessageChannels();
+    }
+
+    public persistIndex() {
+        persistStaticResources(this.context);
     }
 
     public async handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
