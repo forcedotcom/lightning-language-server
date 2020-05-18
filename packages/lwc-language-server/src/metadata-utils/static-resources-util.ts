@@ -19,21 +19,25 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateStaticResourceIndex(updates: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
-    for (const f of updatedFiles) {
-        if (f.uri.endsWith('.resource-meta.xml')) {
-            if (f.type === FileChangeType.Created) {
-                didChange = true;
-                STATIC_RESOURCES.add(getResourceName(f.uri));
-            } else if (f.type === FileChangeType.Deleted) {
-                STATIC_RESOURCES.delete(getResourceName(f.uri));
-                didChange = true;
+
+    for (const update of updates) {
+        if (update.uri.endsWith('.resource-meta.xml')) {
+            const resourceName = getResourceName(update.uri);
+
+            switch (update.type) {
+                case FileChangeType.Created:
+                    didChange = true;
+                    STATIC_RESOURCES.add(resourceName);
+                case FileChangeType.Deleted:
+                    STATIC_RESOURCES.delete(resourceName);
+                    didChange = true;
             }
         }
-    }
-    if (didChange) {
-        return processStaticResources(workspaceRoots[0], writeConfigs);
+        if (didChange) {
+            return processStaticResources(workspaceRoots[0], writeConfigs);
+        }
     }
 }
 
