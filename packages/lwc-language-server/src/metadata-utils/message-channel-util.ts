@@ -8,7 +8,8 @@ import * as fs from 'fs-extra';
 const glob = promisify(Glob);
 
 const MESSAGE_CHANNEL_DECLARATION_FILE = '.sfdx/typings/lwc/messagechannels.d.ts';
-const MESSAGE_CHANNELS: Set<string> = new Set();
+const MESSAGE_CHANNEL_INDEX_FILE = '.sfdx/indexes/lwc/messagechannels.json';
+let MESSAGE_CHANNELS: Set<string> = new Set();
 
 export function resetMessageChannels() {
     MESSAGE_CHANNELS.clear();
@@ -45,15 +46,20 @@ async function processMessageChannels(workspace: string, writeConfig: boolean): 
 
 export async function indexMessageChannels(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
     const { workspaceRoots } = context;
+    const workspace: string = workspaceRoots[0];
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const MESSAGE_CHANNEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/messageChannels/*.messageChannel-meta.xml`;
 
     try {
-        const files: string[] = await glob(MESSAGE_CHANNEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
-        for (const file of files) {
-            MESSAGE_CHANNELS.add(getResourceName(file));
+        if (initMessageChannelIndex(workspace)) {
+            return;
+        } else {
+            const files: string[] = await glob(MESSAGE_CHANNEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
+            for (const file of files) {
+                MESSAGE_CHANNELS.add(getResourceName(file));
+            }
+            return processMessageChannels(workspaceRoots[0], writeConfigs);
         }
-        return processMessageChannels(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of message channel resources. Error details:`, err);
         throw err;
@@ -61,19 +67,36 @@ export async function indexMessageChannels(context: WorkspaceContext, writeConfi
 }
 
 function generateTypeDeclarations(): string {
-    let resTypeDecs = '';
-    const sortedContentAssets = Array.from(MESSAGE_CHANNELS).sort();
-    sortedContentAssets.forEach(res => {
-        resTypeDecs += generateTypeDeclaration(res);
-    });
-    return resTypeDecs;
+    return Array.from(MESSAGE_CHANNELS)
+        .sort()
+        .map(generateTypeDeclaration)
+        .join('');
 }
 
 function generateTypeDeclaration(resourceName: string) {
-    const result = `declare module "@salesforce/messageChannel/${resourceName}__c" {
+    return `declare module "@salesforce/messageChannel/${resourceName}__c" {
     var ${resourceName}: string;
     export default ${resourceName};
 }
 `;
-    return result;
+}
+
+function initMessageChannelIndex(workspace: string): Set<string> {
+    const indexPath: string = join(workspace, MESSAGE_CHANNEL_INDEX_FILE);
+    const shouldInit: boolean = MESSAGE_CHANNELS.size === 0 && fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const staticIndex = JSON.parse(indexJsonString);
+        MESSAGE_CHANNELS = new Set(staticIndex);
+        return MESSAGE_CHANNELS;
+    }
+}
+export function persistMessageChannels(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], MESSAGE_CHANNEL_INDEX_FILE);
+    const index = Array.from(MESSAGE_CHANNELS);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
 }

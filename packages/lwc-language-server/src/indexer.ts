@@ -9,7 +9,7 @@ import {
 import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { indexStaticResources, resetStaticResources, updateStaticResourceIndex, persistStaticResources } from './metadata-utils/static-resources-util';
 import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex } from './metadata-utils/message-channel-util';
+import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex, persistMessageChannels } from './metadata-utils/message-channel-util';
 import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
@@ -65,6 +65,7 @@ export class LWCIndexer implements Indexer {
 
     public persistIndex() {
         persistStaticResources(this.context);
+        persistMessageChannels(this.context);
     }
 
     public async handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
