@@ -55,8 +55,7 @@ export async function indexCustomLabels(context: WorkspaceContext, writeConfigs:
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
     try {
-        initCustomLabelsIndex(workspace);
-        if (CUSTOM_LABELS) {
+        if (initCustomLabelsIndex(workspace)) {
             return Promise.resolve();
         }
         const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
@@ -130,7 +129,7 @@ const generateLabelTypeDeclaration = (labelName: string): string =>
 }
 `;
 
-function initCustomLabelsIndex(workspace: string) {
+function initCustomLabelsIndex(workspace: string): boolean {
     const indexPath: string = join(workspace, CUSTOM_LABELS_INDEX_FILE);
     const shouldInit: boolean = CUSTOM_LABELS.size === 0 && fs.existsSync(indexPath);
 
@@ -138,6 +137,9 @@ function initCustomLabelsIndex(workspace: string) {
         const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
         const staticIndex = JSON.parse(indexJsonString);
         CUSTOM_LABELS = new Set(staticIndex);
+        return true;
+    } else {
+        return false;
     }
 }
 export function persistCustomLabels(context: WorkspaceContext) {

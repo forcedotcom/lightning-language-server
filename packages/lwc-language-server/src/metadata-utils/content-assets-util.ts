@@ -52,8 +52,7 @@ export async function indexContentAssets(context: WorkspaceContext, writeConfigs
     const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
 
     try {
-        initContentAssetsIndex(workspace);
-        if (CONTENT_ASSETS) {
+        if (initContentAssetsIndex(workspace)) {
             return Promise.resolve();
         }
         const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoots[0] });
@@ -80,7 +79,7 @@ const generateTypeDeclaration = (resourceName: string): string =>
 }
 `;
 
-function initContentAssetsIndex(workspace: string) {
+function initContentAssetsIndex(workspace: string): boolean {
     const indexPath: string = join(workspace, CONTENT_ASSET_INDEX_FILE);
     const shouldInit: boolean = CONTENT_ASSETS.size === 0 && fs.existsSync(indexPath);
 
@@ -88,6 +87,9 @@ function initContentAssetsIndex(workspace: string) {
         const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
         const staticIndex = JSON.parse(indexJsonString);
         CONTENT_ASSETS = new Set(staticIndex);
+        return true;
+    } else {
+        return false;
     }
 }
 export function persistContentAssets(context: WorkspaceContext) {
