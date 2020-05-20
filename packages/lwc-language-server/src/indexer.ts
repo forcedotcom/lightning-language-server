@@ -5,6 +5,7 @@ import {
     getLwcTags,
     updateCustomComponentIndex,
     eventEmitter,
+    persistCustomComponents,
 } from './metadata-utils/custom-components-util';
 import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
 import { indexStaticResources, resetStaticResources, updateStaticResourceIndex, persistStaticResources } from './metadata-utils/static-resources-util';
@@ -64,6 +65,7 @@ export class LWCIndexer implements Indexer {
     }
 
     public persistIndex() {
+        persistCustomComponents(this.context);
         persistStaticResources(this.context);
         persistMessageChannels(this.context);
     }

@@ -16,6 +16,7 @@ const { WorkspaceType } = shared;
 
 const LWC_STANDARD: string = 'lwc-standard.json';
 const RESOURCES_DIR = '../resources';
+const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/customcomponents.json';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
@@ -160,4 +161,13 @@ export async function addCustomTagFromFile(context: WorkspaceContext, file: stri
             console.log('error compiling ' + file, error);
         }
     }
+}
+
+export function persistCustomComponents(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], CUSTOM_COMPONENT_INDEX_FILE);
+    const index = Array.from(LWC_TAGS);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
 }
