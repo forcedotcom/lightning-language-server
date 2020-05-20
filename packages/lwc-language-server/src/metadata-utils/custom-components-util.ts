@@ -18,7 +18,7 @@ const LWC_STANDARD: string = 'lwc-standard.json';
 const RESOURCES_DIR = '../resources';
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
 
-let LWC_TAGS: Map<string, TagInfo> = new Map();
+const LWC_TAGS: Map<string, TagInfo> = new Map();
 
 export const eventEmitter = new EventsEmitter();
 
@@ -119,18 +119,15 @@ async function addCustomTag(context: WorkspaceContext, tag: string, uri: string,
 }
 
 export async function indexCustomComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
-    const workspace = context.workspaceroots[0];
-
-    if (initCustomComponents(workspace)) {
-        return;
-    } else {
-        const files = await context.findAllModules();
+    const workspace = context.workspaceRoots[0];
+    const files = await context.findAllModules();
+    if (!initCustomComponents(workspace)) {
         // writeConfigs is set to false to avoid updating config twice for the same tag.
         // loadCustomTagsFromFiles and onIndexCustomComponents lead to the same config updates.
         await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, false);
-        if (writeConfigs) {
-            await onIndexCustomComponents(context, files);
-        }
+    }
+    if (writeConfigs) {
+        await onIndexCustomComponents(context, files);
     }
 }
 
@@ -171,21 +168,27 @@ export async function addCustomTagFromFile(context: WorkspaceContext, file: stri
 export function persistCustomComponents(context: WorkspaceContext) {
     const { workspaceRoots } = context;
     const indexPath = join(workspaceRoots[0], CUSTOM_COMPONENT_INDEX_FILE);
-    const index = Array.from(LWC_TAGS);
-    const indexJsonString = JSON.stringify(index);
+    const indexJsonString = JSON.stringify(Array.from(LWC_TAGS.entries()));
 
     fs.writeFile(indexPath, indexJsonString);
 }
 
-export function initCustomComponents(workspace: string): Set<string> {
+export function initCustomComponents(workspace: string): boolean {
     const indexPath: string = join(workspace, CUSTOM_COMPONENT_INDEX_FILE);
     const shouldInit: boolean = LWC_TAGS.size === 0 && fs.existsSync(indexPath);
 
     if (shouldInit) {
         const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
-        const index = JSON.parse(indexJsonString);
-        const indexEntries = Object.entries(index);
-        LWC_TAGS = new Map(indexEntries);
-        return LWC_TAGS;
+        const index: [string, object][] = JSON.parse(indexJsonString);
+        index.forEach(([key, value]) => {
+            LWC_TAGS.set(key, TagInfo.createFromJSON(value));
+        });
+        return true;
+    } else {
+        return false;
     }
+}
+
+function castToTagInfo(tagObject: object) {
+    return tagObject as TagInfo;
 }

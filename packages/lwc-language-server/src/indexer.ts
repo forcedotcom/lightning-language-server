@@ -48,7 +48,7 @@ export class LWCIndexer implements Indexer {
             );
         }
 
-        this.indexingTasks = Promise.all(tasks).then(() => undefined);
+        this.indexingTasks = await Promise.all(tasks).then(() => undefined);
         return this.indexingTasks;
     }
 
