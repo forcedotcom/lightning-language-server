@@ -9,7 +9,8 @@ import * as fs from 'fs-extra';
 const glob = promisify(Glob);
 
 const CONTENT_ASSET_DECLARATION_FILE = '.sfdx/typings/lwc/contentassets.d.ts';
-const CONTENT_ASSETS: Set<string> = new Set();
+const CONTENT_ASSET_INDEX_FILE = '.sfdx/indexes/lwc/contentassets.json';
+let CONTENT_ASSETS: Set<string> = new Set();
 
 export function resetContentAssets() {
     CONTENT_ASSETS.clear();
@@ -46,10 +47,15 @@ function processContentAssets(workspace: string, writeConfig: boolean): Promise<
 
 export async function indexContentAssets(context: WorkspaceContext, writeConfigs: boolean): Promise<void> {
     const { workspaceRoots } = context;
+    const workspace: string = workspaceRoots[0];
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CONTENT_ASSET_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/contentassets/*.asset-meta.xml`;
 
     try {
+        initContentAssetsIndex(workspace);
+        if (CONTENT_ASSETS) {
+            return Promise.resolve();
+        }
         const files: string[] = await glob(CONTENT_ASSET_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
             CONTENT_ASSETS.add(getResourceName(file));
@@ -61,20 +67,34 @@ export async function indexContentAssets(context: WorkspaceContext, writeConfigs
     }
 }
 
-function generateTypeDeclarations(): string {
-    let resTypeDecs = '';
-    const sortedContentAssets = Array.from(CONTENT_ASSETS).sort();
-    sortedContentAssets.forEach(res => {
-        resTypeDecs += generateTypeDeclaration(res);
-    });
-    return resTypeDecs;
-}
+const generateTypeDeclarations = (): string =>
+    Array.from(CONTENT_ASSETS)
+        .sort()
+        .map(generateTypeDeclaration)
+        .join('');
 
-function generateTypeDeclaration(resourceName: string) {
-    const result = `declare module "@salesforce/contentAssetUrl/${resourceName}" {
+const generateTypeDeclaration = (resourceName: string): string =>
+    `declare module "@salesforce/contentAssetUrl/${resourceName}" {
     var ${resourceName}: string;
     export default ${resourceName};
 }
 `;
-    return result;
+
+function initContentAssetsIndex(workspace: string) {
+    const indexPath: string = join(workspace, CONTENT_ASSET_INDEX_FILE);
+    const shouldInit: boolean = CONTENT_ASSETS.size === 0 && fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const staticIndex = JSON.parse(indexJsonString);
+        CONTENT_ASSETS = new Set(staticIndex);
+    }
+}
+export function persistContentAssets(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], CONTENT_ASSET_INDEX_FILE);
+    const index = Array.from(CONTENT_ASSETS);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
 }

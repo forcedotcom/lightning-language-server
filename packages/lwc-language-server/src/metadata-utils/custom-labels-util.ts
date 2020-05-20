@@ -19,9 +19,10 @@ interface ILabel {
     fullName: string[];
 }
 
-const CUSTOM_LABELS: Set<string> = new Set();
+let CUSTOM_LABELS: Set<string> = new Set();
 const CUSTOM_LABEL_FILES: Set<string> = new Set();
 const CUSTOM_LABELS_DECLARATION_FILE = '.sfdx/typings/lwc/customlabels.d.ts';
+const CUSTOM_LABELS_INDEX_FILE = '.sfdx/indexes/lwc/customlabels.json';
 
 function parseString(xml: convertableToString, options?: OptionsV2): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -50,9 +51,14 @@ export function resetCustomLabels() {
 
 export async function indexCustomLabels(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
     const { workspaceRoots } = context;
+    const workspace: string = workspaceRoots[0];
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const CUSTOM_LABEL_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`;
     try {
+        initCustomLabelsIndex(workspace);
+        if (CUSTOM_LABELS) {
+            return Promise.resolve();
+        }
         const files: string[] = await glob(CUSTOM_LABEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
         for (const file of files) {
             CUSTOM_LABEL_FILES.add(join(workspaceRoots[0], file));
@@ -111,21 +117,34 @@ async function readLabelFile(filePath: string) {
     }
 }
 
-function generateLabelTypeDeclarations(): string {
-    let resTypeDecs = '';
-    const sortedCustomLabels = Array.from(CUSTOM_LABELS).sort();
-    for (const res of sortedCustomLabels) {
-        resTypeDecs += generateLabelTypeDeclaration(res);
-    }
-    return resTypeDecs;
-}
+const generateLabelTypeDeclarations = (): string =>
+    Array.from(CUSTOM_LABELS)
+        .sort()
+        .map(generateLabelTypeDeclaration)
+        .join('');
 
-function generateLabelTypeDeclaration(labelName: string) {
-    const ns = 'c';
-    const result = `declare module "@salesforce/label/${ns}.${labelName}" {
+const generateLabelTypeDeclaration = (labelName: string): string =>
+    `declare module "@salesforce/label/c.${labelName}" {
     var ${labelName}: string;
     export default ${labelName};
 }
 `;
-    return result;
+
+function initCustomLabelsIndex(workspace: string) {
+    const indexPath: string = join(workspace, CUSTOM_LABELS_INDEX_FILE);
+    const shouldInit: boolean = CUSTOM_LABELS.size === 0 && fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const staticIndex = JSON.parse(indexJsonString);
+        CUSTOM_LABELS = new Set(staticIndex);
+    }
+}
+export function persistCustomLabels(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], CUSTOM_LABELS_INDEX_FILE);
+    const index = Array.from(CUSTOM_LABELS);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
 }
