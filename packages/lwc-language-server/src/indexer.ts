@@ -14,8 +14,11 @@ import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex,
 import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
+import { join } from 'path';
+import { mkdirSync } from 'fs';
 
 const { WorkspaceType } = shared;
+const INDEX_DIR = '.sfdx/indexes/lwc';
 
 export class LWCIndexer implements Indexer {
     public readonly eventEmitter = new EventEmitter();
@@ -65,6 +68,7 @@ export class LWCIndexer implements Indexer {
     }
 
     public persistIndex() {
+        this.ensureIndexDirectory(this.context);
         persistCustomComponents(this.context);
         persistStaticResources(this.context);
         persistContentAssets(this.context);
@@ -89,6 +93,12 @@ export class LWCIndexer implements Indexer {
                 updateMessageChannelsIndex(changes, workspaceContext, this.writeConfigs),
             ]);
         }
+    }
+
+    private ensureIndexDirectory(context: WorkspaceContext): void {
+        const { workspaceRoots } = context;
+        const indexDirPath = join(workspaceRoots[0], INDEX_DIR);
+        mkdirSync(indexDirPath, { recursive: true });
     }
 }
 
