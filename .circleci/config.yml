@@ -104,7 +104,7 @@ jobs:
             yarn bump-versions << pipeline.parameters.version >>
             yarn publish-lsp
       - slack/notify:
-          channel: "lightning-tools-team"
+          channel: "lightning-tools-bots"
           color: "#42e2f4"
           message: "Lightning Language Servers have been published to NPM"
 
