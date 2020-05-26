@@ -55,11 +55,11 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
     const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
-    const workspace:string = workspaceRoots[0];
+    const workspace: string = workspaceRoots[0];
 
     try {
         if (initStaticResourceIndex(workspace)) {
-            return;
+            return Promise.resolve();
         } else {
             const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
             for (const file of files) {

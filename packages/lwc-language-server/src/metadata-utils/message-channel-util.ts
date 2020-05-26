@@ -52,7 +52,7 @@ export async function indexMessageChannels(context: WorkspaceContext, writeConfi
 
     try {
         if (initMessageChannelIndex(workspace)) {
-            return;
+            return Promise.resolve();
         } else {
             const files: string[] = await glob(MESSAGE_CHANNEL_GLOB_PATTERN, { cwd: workspaceRoots[0] });
             for (const file of files) {
