@@ -188,7 +188,3 @@ export function initCustomComponents(workspace: string): boolean {
         return false;
     }
 }
-
-function castToTagInfo(tagObject: object) {
-    return tagObject as TagInfo;
-}
