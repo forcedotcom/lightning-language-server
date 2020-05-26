@@ -7,9 +7,9 @@ import {
     eventEmitter,
     persistCustomComponents,
 } from './metadata-utils/custom-components-util';
-import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
+import { indexCustomLabels, resetCustomLabels, updateLabelsIndex, persistCustomLabels } from './metadata-utils/custom-labels-util';
 import { indexStaticResources, resetStaticResources, updateStaticResourceIndex, persistStaticResources } from './metadata-utils/static-resources-util';
-import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
+import { indexContentAssets, resetContentAssets, updateContentAssetIndex, persistContentAssets } from './metadata-utils/content-assets-util';
 import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex, persistMessageChannels } from './metadata-utils/message-channel-util';
 import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
@@ -67,6 +67,8 @@ export class LWCIndexer implements Indexer {
     public persistIndex() {
         persistCustomComponents(this.context);
         persistStaticResources(this.context);
+        persistContentAssets(this.context);
+        persistCustomLabels(this.context);
         persistMessageChannels(this.context);
     }
 
