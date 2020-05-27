@@ -34,18 +34,24 @@ export class LWCIndexer implements Indexer {
     }
 
     public async configureAndIndex() {
-        const indexingTasks: Promise<void>[] = [];
+        const tasks: Promise<void>[] = [indexCustomComponents(this.context, this.writeConfigs)];
+
         if (this.context.type !== WorkspaceType.STANDARD_LWC) {
-            indexingTasks.push(loadStandardComponents(this.context, this.writeConfigs));
+            tasks.push(loadStandardComponents(this.context, this.writeConfigs));
         }
-        indexingTasks.push(indexCustomComponents(this.context, this.writeConfigs));
+
         if (this.context.type === WorkspaceType.SFDX) {
-            indexingTasks.push(indexStaticResources(this.context, this.writeConfigs));
-            indexingTasks.push(indexContentAssets(this.context, this.writeConfigs));
-            indexingTasks.push(indexCustomLabels(this.context, this.writeConfigs));
-            indexingTasks.push(indexMessageChannels(this.context, this.writeConfigs));
+            tasks.push(
+                ...[
+                    indexStaticResources(this.context, this.writeConfigs),
+                    indexContentAssets(this.context, this.writeConfigs),
+                    indexCustomLabels(this.context, this.writeConfigs),
+                    indexMessageChannels(this.context, this.writeConfigs),
+                ],
+            );
         }
-        this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
+
+        this.indexingTasks = await Promise.all(tasks).then(() => undefined);
         return this.indexingTasks;
     }
 
