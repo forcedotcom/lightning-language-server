@@ -95,4 +95,19 @@ export class TagInfo {
 
         return '';
     }
+
+    static createFromJSON(json: any) {
+        return new TagInfo(
+            json.file,
+            json.type,
+            json.lwc,
+            json.attributes,
+            json.location,
+            json.documentation,
+            json.name,
+            json.namespace,
+            json.properties,
+            json.methods,
+        );
+    }
 }
