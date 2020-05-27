@@ -175,13 +175,15 @@ export function persistCustomComponents(context: WorkspaceContext) {
 
 export function initCustomComponents(workspace: string): boolean {
     const indexPath: string = join(workspace, CUSTOM_COMPONENT_INDEX_FILE);
-    const shouldInit: boolean = LWC_TAGS.size === 0 && fs.existsSync(indexPath);
+    const shouldInit: boolean = fs.existsSync(indexPath);
 
     if (shouldInit) {
         const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
         const index: [string, object][] = JSON.parse(indexJsonString);
         index.forEach(([key, value]) => {
-            LWC_TAGS.set(key, TagInfo.createFromJSON(value));
+            const info = TagInfo.createFromJSON(value);
+            LWC_TAGS.set(key, info);
+            eventEmitter.emit('set', info);
         });
         return true;
     } else {
