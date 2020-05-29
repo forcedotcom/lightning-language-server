@@ -29,4 +29,15 @@ describe('Typing.declaration', () => {
 
         expect(Typing.declaration(staticResourceMetaFilename)).toEqual(expectedDeclaration);
     });
+
+    it('generate the typing declaration for a message channels file', () => {
+        const staticResourceMetaFilename: string = 'Channel1.messageChannel-meta.xml';
+        const expectedDeclaration = `declare module "@salesforce/messageChannel/Channel1__c" {
+    var Channel1: string;
+    export default Channel1;
+}
+`;
+
+        expect(Typing.declaration(staticResourceMetaFilename)).toEqual(expectedDeclaration);
+    });
 });
