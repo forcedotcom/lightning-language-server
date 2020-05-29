@@ -1,9 +1,9 @@
 export default class Typing {
     public static declaration(metaFilename: string): string {
-        const regex = /^(?<name>.+)\.(?<metaType>.+)-meta.xml$/;
+        const regex = /(?<name>[\w-]+)\.(?<metaType>.+)-meta.xml$/;
         const { name, metaType } = regex.exec(metaFilename).groups;
-        let modulePath: string;
 
+        let modulePath: string;
         switch (metaType) {
             case 'asset':
                 modulePath = `@salesforce/contentAssetUrl/${name}`;

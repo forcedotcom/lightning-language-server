@@ -12,6 +12,17 @@ describe('Typing.declaration', () => {
         expect(declaration).toEqual(expectedDeclaration);
     });
 
+    it('handls a full path', () => {
+        const declaration = Typing.declaration('logo.asset-meta.xml');
+        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+    var logo: string;
+    export default logo;
+}
+`;
+
+        expect(declaration).toEqual(expectedDeclaration);
+    });
+
     it('generate the typing declaration for a static resource file', () => {
         const declaration = Typing.declaration('d3.resource-meta.xml');
         const expectedDeclaration: string = `declare module "@salesforce/resourceUrl/d3" {
@@ -39,5 +50,15 @@ describe('Typing.declaration', () => {
         expect(() => {
             Typing.declaration(filename);
         }).toThrow();
+    });
+
+    it('handles a full path', () => {
+        const declaration = Typing.declaration('./foo/bar/buz/logo.asset-meta.xml');
+        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+    var logo: string;
+    export default logo;
+}
+`;
+        expect(declaration).toEqual(expectedDeclaration);
     });
 });
