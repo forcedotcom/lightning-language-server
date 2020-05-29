@@ -1,11 +1,15 @@
-import { parse } from 'path';
-
 export default class Typing {
     public static declaration(metaFilename: string): string {
-        const filename: string = metaFilename.substring(0, metaFilename.lastIndexOf('-'));
-        const name: string = parse(filename).name;
+        const regex = /^(?<name>.+)\.(?<metaType>.+)-meta.xml$/;
+        const { name, metaType } = regex.exec(metaFilename).groups;
+        const typeMap: { [key: string]: string } = {
+            asset: 'contentAssetUrl',
+            resource: 'resourceUrl',
+        };
 
-        return `declare module "@salesforce/contentAssetUrl/${name}" {
+        const type: string = typeMap[metaType];
+
+        return `declare module "@salesforce/${type}/${name}" {
     var ${name}: string;
     export default ${name};
 }
