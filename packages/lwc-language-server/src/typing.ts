@@ -9,6 +9,10 @@ export default class Typing {
 
         const type: string = typeMap[metaType];
 
+        if (type === undefined) {
+            throw new Error(`meta file ${metaType} not supported`);
+        }
+
         return `declare module "@salesforce/${type}/${name}" {
     var ${name}: string;
     export default ${name};

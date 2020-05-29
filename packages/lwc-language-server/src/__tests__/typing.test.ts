@@ -1,6 +1,13 @@
 import Typing from '../typing';
 
-describe('Typing', () => {
+describe('Typing.declaration', () => {
+    it('throws an error if the wrong -meta.xml file is passed in', () => {
+        const badFilename = 'asset.foobar-meta.xml';
+        expect(() => {
+            Typing.declaration(badFilename);
+        }).toThrow();
+    });
+
     it('generates the typing declaration for a content asset file.', () => {
         const contentAssetMetaFilename: string = 'logo.asset-meta.xml';
         const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
