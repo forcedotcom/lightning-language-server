@@ -1,3 +1,5 @@
+import { parseStringPromise } from 'xml2js';
+
 export default class Typing {
     public static declaration(metaFilename: string): string {
         const regex = /(?<name>[\w-]+)\.(?<metaType>.+)-meta.xml$/;
@@ -19,6 +21,22 @@ export default class Typing {
         }
 
         return `declare module "${modulePath}" {
+    var ${name}: string;
+    export default ${name};
+}
+`;
+    }
+
+    public static async declarationsFromCustomLabels(xmlDocument: string): Promise<string[]> {
+        const { CustomLabels } = await parseStringPromise(xmlDocument);
+        const { labels } = CustomLabels;
+        return labels.map(this.customLabelDeclaration);
+    }
+
+    private static customLabelDeclaration(label: any): string {
+        const name = label.fullName[0];
+
+        return `declare module "@salesforce/label/c.${name}" {
     var ${name}: string;
     export default ${name};
 }
