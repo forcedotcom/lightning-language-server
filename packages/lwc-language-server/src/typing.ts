@@ -1,7 +1,7 @@
 import { parseStringPromise } from 'xml2js';
 
 export default class Typing {
-    public static declaration(metaFilename: string): string {
+    public static fromMeta(metaFilename: string): string {
         const regex = /(?<name>[\w-]+)\.(?<metaType>.+)-meta.xml$/;
         const { name, metaType } = regex.exec(metaFilename).groups;
 
@@ -27,7 +27,7 @@ export default class Typing {
 `;
     }
 
-    public static async declarationsFromCustomLabels(xmlDocument: string): Promise<string[]> {
+    public static async fromCustomLabel(xmlDocument: string): Promise<string[]> {
         const { CustomLabels } = await parseStringPromise(xmlDocument);
         const { labels } = CustomLabels;
         return labels.map(this.customLabelDeclaration);
