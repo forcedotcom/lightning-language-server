@@ -1,45 +1,63 @@
 import { parseStringPromise } from 'xml2js';
 
 export default class Typing {
-    public static fromMeta(metaFilename: string): string {
-        const regex = /(?<name>[\w-]+)\.(?<metaType>.+)-meta.xml$/;
-        const { name, metaType } = regex.exec(metaFilename).groups;
+    private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
 
+    readonly type: string;
+    readonly name: string;
+
+    constructor(attributes: any) {
+        if (!Typing.allowedTypes.includes(attributes.type)) {
+            const errorMessage: string = 'Cannot create a Typing with "' + attributes.type + '" type. Must be one of [' + Typing.allowedTypes.toString() + ']';
+
+            throw new Error(errorMessage);
+        }
+
+        this.type = attributes.type;
+        this.name = attributes.name;
+    }
+
+    public static fromMetas(metaFilenames: string[]): Typing[] {
+        return metaFilenames.map(this.fromMeta);
+    }
+
+    public static fromMeta(metaFilename: string): Typing {
+        const regex = /(?<name>[\w-]+)\.(?<type>.+)-meta.xml$/;
+        const { name, type } = regex.exec(metaFilename).groups;
+        return new Typing({ name, type });
+    }
+
+    public static async fromCustomLabels(xmlDocument: string): Promise<[Typing]> {
+        const { CustomLabels } = await parseStringPromise(xmlDocument);
+        return CustomLabels.labels.map((label: any) => {
+            const name = label.fullName[0];
+            const type = 'customLabel';
+            return new Typing({ name, type });
+        });
+    }
+
+    public declaration(): string {
         let modulePath: string;
-        switch (metaType) {
+        switch (this.type) {
             case 'asset':
-                modulePath = `@salesforce/contentAssetUrl/${name}`;
+                modulePath = `@salesforce/contentAssetUrl/${this.name}`;
                 break;
             case 'resource':
-                modulePath = `@salesforce/resourceUrl/${name}`;
+                modulePath = `@salesforce/resourceUrl/${this.name}`;
                 break;
             case 'messageChannel':
-                modulePath = `@salesforce/messageChannel/${name}__c`;
+                modulePath = `@salesforce/messageChannel/${this.name}__c`;
+                break;
+            case 'customLabel':
+                modulePath = `@salesforce/label/c.${this.name}`;
                 break;
             default:
-                throw new Error(`meta file ${metaType} not supported`);
+                throw new Error(`${this.type} not supported`);
         }
 
         return `declare module "${modulePath}" {
-    var ${name}: string;
-    export default ${name};
-}
-`;
-    }
-
-    public static async fromCustomLabel(xmlDocument: string): Promise<string[]> {
-        const { CustomLabels } = await parseStringPromise(xmlDocument);
-        const { labels } = CustomLabels;
-        return labels.map(this.customLabelDeclaration);
-    }
-
-    private static customLabelDeclaration(label: any): string {
-        const name = label.fullName[0];
-
-        return `declare module "@salesforce/label/c.${name}" {
-    var ${name}: string;
-    export default ${name};
-}
-`;
+    var ${this.name}: string;
+    export default ${this.name};
+}`;
     }
 }
