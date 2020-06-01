@@ -1,69 +1,75 @@
 import Typing from '../typing';
 
-describe('Typing.fromMeta', () => {
-    it('generates the typing declaration for a content asset file.', () => {
-        const declaration: string = Typing.fromMeta('logo.asset-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
-    var logo: string;
-    export default logo;
-}
-`;
-
-        expect(declaration).toEqual(expectedDeclaration);
+describe('new Typing', () => {
+    it('cannot create a Typing with an invalid type', () => {
+        expect(() => {
+            return new Typing({
+                name: 'logo',
+                type: 'invalidType',
+            });
+        }).toThrow();
     });
 
-    it('handls a full path', () => {
-        const declaration: string = Typing.fromMeta('logo.asset-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
-    var logo: string;
-    export default logo;
-}
-`;
-
-        expect(declaration).toEqual(expectedDeclaration);
-    });
-
-    it('generate the typing declaration for a static resource file', () => {
-        const declaration: string = Typing.fromMeta('d3.resource-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/resourceUrl/d3" {
-    var d3: string;
-    export default d3;
-}
-`;
-
-        expect(declaration).toEqual(expectedDeclaration);
-    });
-
-    it('generate the typing declaration for a message channels file', () => {
-        const declaration: string = Typing.fromMeta('Channel1.messageChannel-meta.xml');
-        const expectedDeclaration = `declare module "@salesforce/messageChannel/Channel1__c" {
-    var Channel1: string;
-    export default Channel1;
-}
-`;
-
-        expect(declaration).toEqual(expectedDeclaration);
-    });
-
-    it('throws an error if the wrong -meta.xml file is passed in', () => {
+    it('cannot create a Typing with an invalid meta file', () => {
         const filename: string = 'asset.foobar-meta.xml';
         expect(() => {
             Typing.fromMeta(filename);
         }).toThrow();
     });
+});
 
-    it('handles a full path', async () => {
-        const declaration: string = Typing.fromMeta('./foo/bar/buz/logo.asset-meta.xml');
+describe('Typing.declaration', () => {
+    it('generates the typing declaration for a content asset file.', () => {
+        const typing: Typing = Typing.fromMeta('logo.asset-meta.xml');
         const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;
-}
-`;
-        expect(declaration).toEqual(expectedDeclaration);
+}`;
+
+        expect(typing.declaration()).toEqual(expectedDeclaration);
+    });
+
+    it('handles a full path', () => {
+        const typing: Typing = Typing.fromMeta('logo.asset-meta.xml');
+        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+    var logo: string;
+    export default logo;
+}`;
+
+        expect(typing.declaration()).toEqual(expectedDeclaration);
+    });
+
+    it('generate the typing declaration for a static resource file', () => {
+        const typing: Typing = Typing.fromMeta('d3.resource-meta.xml');
+        const expectedDeclaration: string = `declare module "@salesforce/resourceUrl/d3" {
+    var d3: string;
+    export default d3;
+}`;
+
+        expect(typing.declaration()).toEqual(expectedDeclaration);
+    });
+
+    it('generate the typing declaration for a message channels file', () => {
+        const typing: Typing = Typing.fromMeta('Channel1.messageChannel-meta.xml');
+        const expectedDeclaration = `declare module "@salesforce/messageChannel/Channel1__c" {
+    var Channel1: string;
+    export default Channel1;
+}`;
+
+        expect(typing.declaration()).toEqual(expectedDeclaration);
+    });
+
+    it('handles a full path', async () => {
+        const typing: Typing = Typing.fromMeta('./foo/bar/buz/logo.asset-meta.xml');
+        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+    var logo: string;
+    export default logo;
+}`;
+        expect(typing.declaration()).toEqual(expectedDeclaration);
     });
 });
 
-describe('Typing.fromCustomLabel', () => {
+describe('Typing.fromCustomLabels', () => {
     it('Generates declarations from parsed xml document', async () => {
         const xmlDocument: string = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -88,17 +94,16 @@ describe('Typing.fromCustomLabel', () => {
         const expectedDeclaration1: string = `declare module "@salesforce/label/c.greeting" {
     var greeting: string;
     export default greeting;
-}
-`;
+}`;
 
         const expectedDeclaration2: string = `declare module "@salesforce/label/c.other_greeting" {
     var other_greeting: string;
     export default other_greeting;
-}
-`;
+}`;
 
-        const declarations: string[] = await Typing.fromCustomLabel(xmlDocument);
+        const typings: Typing[] = await Typing.fromCustomLabels(xmlDocument);
         const expectedDeclarations: string[] = [expectedDeclaration1, expectedDeclaration2];
+        const declarations: string[] = [typings[0].declaration(), typings[1].declaration()];
 
         expect(declarations).toEqual(expectedDeclarations);
     });
