@@ -17,17 +17,17 @@ export default class Typing {
         this.name = attributes.name;
     }
 
-    public static fromMetas(metaFilenames: string[]): Typing[] {
+    static fromMetas(metaFilenames: string[]): Typing[] {
         return metaFilenames.map(this.fromMeta);
     }
 
-    public static fromMeta(metaFilename: string): Typing {
+    static fromMeta(metaFilename: string): Typing {
         const regex = /(?<name>[\w-]+)\.(?<type>.+)-meta.xml$/;
         const { name, type } = regex.exec(metaFilename).groups;
         return new Typing({ name, type });
     }
 
-    public static async fromCustomLabels(xmlDocument: string): Promise<[Typing]> {
+    static async fromCustomLabels(xmlDocument: string): Promise<[Typing]> {
         const { CustomLabels } = await parseStringPromise(xmlDocument);
         return CustomLabels.labels.map((label: any) => {
             const name = label.fullName[0];
@@ -36,7 +36,19 @@ export default class Typing {
         });
     }
 
-    public declaration(): string {
+    filePath(): string {
+        // `typings/lwc/${filepath()}`
+        switch (this.type) {
+            case 'asset':
+                return `contentassets/${this.name}.d.ts`;
+            case 'resource':
+                return `staticresources/${this.name}.d.ts`;
+            case 'messageChannel':
+                return `messageChannels/${this.name}.d.ts`;
+        }
+    }
+
+    declaration(): string {
         let modulePath: string;
         switch (this.type) {
             case 'asset':
