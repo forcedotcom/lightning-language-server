@@ -34,4 +34,23 @@ describe('Index.metaFilePaths', () => {
 
         expect(metaFilePaths).toEqual(expectedMetaFilePaths);
     });
+
+    describe('Index.metaFileTypingPaths', () => {
+        test('it returns all the paths for meta files\' typings', () => {
+            const index: Index = new Index({
+                workspaceRoot: '../../test-workspaces/sfdx-workspace',
+                sfdxPackageDirsPattern: '{force-app,utils}',
+            });
+
+            const metaFilePaths: string[] = index.metaFileTypingPaths();
+            const expectedMetaFileTypingPaths: string[] = [
+                '.sfdx/typings/lwc/messageChannels/Channel1.d.ts',
+                '.sfdx/typings/lwc/staticresources/bike_assets.d.ts',
+                '.sfdx/typings/lwc/staticresources/logo.d.ts',
+                '.sfdx/typings/lwc/staticresources/todocss.d.ts',
+            ];
+
+            expect(metaFilePaths).toEqual(expectedMetaFileTypingPaths);
+        });
+    });
 });
