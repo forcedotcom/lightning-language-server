@@ -5,6 +5,7 @@ export default class Typing {
 
     readonly type: string;
     readonly name: string;
+    readonly fileName: string;
 
     constructor(attributes: any) {
         if (!Typing.allowedTypes.includes(attributes.type)) {
@@ -15,6 +16,7 @@ export default class Typing {
 
         this.type = attributes.type;
         this.name = attributes.name;
+        this.fileName = `${attributes.name}.d.ts`;
     }
 
     static fromMetas(metaFilenames: string[]): Typing[] {
@@ -34,18 +36,6 @@ export default class Typing {
             const type = 'customLabel';
             return new Typing({ name, type });
         });
-    }
-
-    filePath(): string {
-        // `typings/lwc/${filepath()}`
-        switch (this.type) {
-            case 'asset':
-                return `contentassets/${this.name}.d.ts`;
-            case 'resource':
-                return `staticresources/${this.name}.d.ts`;
-            case 'messageChannel':
-                return `messageChannels/${this.name}.d.ts`;
-        }
     }
 
     declaration(): string {
