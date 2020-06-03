@@ -69,16 +69,6 @@ describe('Typing.declaration', () => {
     });
 });
 
-describe('Typing.filePath()', () => {
-    it('Returns the relative path within `<base>/typings/lwc`', () => {
-        expect(new Typing({ name: 'foo', type: 'asset' }).filePath()).toEqual('contentassets/foo.d.ts');
-
-        expect(new Typing({ name: 'foo', type: 'resource' }).filePath()).toEqual('staticresources/foo.d.ts');
-
-        expect(new Typing({ name: 'foo', type: 'messageChannel' }).filePath()).toEqual('messageChannels/foo.d.ts');
-    });
-});
-
 describe('Typing.fromCustomLabels', () => {
     it('Generates declarations from parsed xml document', async () => {
         const xmlDocument: string = `
