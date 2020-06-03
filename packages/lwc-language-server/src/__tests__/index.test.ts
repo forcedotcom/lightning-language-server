@@ -53,4 +53,32 @@ describe('Index.metaFilePaths', () => {
             expect(metaFilePaths).toEqual(expectedMetaFileTypingPaths);
         });
     });
+
+    describe('Index.diff', () => {
+        it('returns a list of strings that do not exist in the compare list', () => {
+            const list1: string[] = [
+                'force-app/main/default/contentassets/logo.asset-meta.xml',
+                'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
+                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
+                'force-app/main/default/staticresources/todocss.resource-meta.xml',
+                'utils/meta/staticresources/todoutil.resource-meta.xml',
+            ];
+
+            const list2: string[] = [
+                '.sfdx/typings/lwc/messageChannels/Channel1.d.ts',
+                '.sfdx/typings/lwc/staticresources/bike_assets.d.ts',
+                '.sfdx/typings/lwc/staticresources/logo.d.ts',
+                '.sfdx/typings/lwc/staticresources/todocss.d.ts',
+                '.sfdx/typings/lwc/staticresources/foobar.d.ts',
+            ];
+
+            expect(Index.diff(list1, list2)).toEqual([
+                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                'utils/meta/staticresources/todoutil.resource-meta.xml',
+            ]);
+
+            expect(Index.diff(list2, list1)).toEqual(['.sfdx/typings/lwc/staticresources/foobar.d.ts']);
+        });
+    });
 });

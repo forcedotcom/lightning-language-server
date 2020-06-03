@@ -14,6 +14,18 @@ export default class Index {
         this.projectType = detectWorkspaceHelper(attributes.workspaceRoot);
     }
 
+    static diff(items: string[], compareItems: string[]): string[] {
+        const regex = /\/(?<name>[\w-]+)\.[\w-]+\.\w+$/;
+        const basename = (filename: string) => filename.match(regex).groups.name;
+
+        compareItems = compareItems.map(basename);
+
+        return items.filter(item => {
+            const filename = basename(item);
+            return !compareItems.includes(filename);
+        });
+    }
+
     metaFilePaths(): string[] {
         const globString = `${this.sfdxPackageDirsPattern}/**/+(staticresources|contentassets|messageChannels)/*.+(resource|asset|messageChannel)-meta.xml`;
         return glob.sync(globString, { cwd: this.workspaceRoot });
