@@ -2,160 +2,133 @@ import Index from '../index';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 
-describe('new Index', () => {
-    it('initializes with the root of a workspace', () => {
-        const attributes = {
-            workspaceRoot: 'test-workspaces/sfdx-workspace',
-            sfdxPackageDirsPattern: '{force-app, utils}',
-        };
-        const index: Index = new Index(attributes);
-        const expectedPath: string = path.resolve('test-workspaces/sfdx-workspace');
-
-        expect(index.workspaceRoot).toEqual(expectedPath);
-        expect(index.sfdxPackageDirsPattern).toEqual(attributes.sfdxPackageDirsPattern);
-    });
+const index: Index = new Index({
+    workspaceRoot: '../../test-workspaces/sfdx-workspace',
+    sfdxPackageDirsPattern: '{force-app,utils}',
 });
 
-describe('Index#createNewMetaTypings', () => {
-    it('saves the meta files as t.ds files', async () => {
-        const index: Index = new Index({
-            workspaceRoot: '../../test-workspaces/sfdx-workspace',
-            sfdxPackageDirsPattern: '{force-app,utils}',
-        });
-
-        index.createNewMetaTypings();
-
-        const filepaths: string[] = [
-            'messageChannels/Channel1.d.ts',
-            'staticresources/bike_assets.d.ts',
-            'contentAssets/logo.d.ts',
-            'staticresources/todocss.d.ts',
-        ];
-        filepaths.forEach(filepath => {
-            filepath = path.join(index.workspaceRoot, index.typingsBaseDir(), filepath);
-            expect(fsExtra.pathExistsSync(filepath)).toBeTrue();
-        });
-
-        fsExtra.removeSync('../../test-workspaces/sfdx-workspace/.sfdx/typings/lwc/');
-    });
-});
-
-describe('Index#removeStaleTypings', () => {
-    const metaFileTypingPath: string = '.sfdx/typings/lwc/staticresources/logo.d.ts';
-    const staleMetaFileTypingPath: string = '.sfdx/typings/lwc/staticresources/extra.d.ts';
-    const typingDir: string = '.sfdx/typings/lwc/staticresources/';
-    const workspaceRoot: string = '../../test-workspaces/sfdx-workspace';
-
-    beforeEach(() => {
-        fsExtra.removeSync(path.join(workspaceRoot, '.sfdx/typings/lwc/'));
-        fsExtra.mkdirSync(path.join(workspaceRoot, typingDir), { recursive: true });
-
-        [metaFileTypingPath, staleMetaFileTypingPath].forEach((filePath: string) => {
-            filePath = path.join(workspaceRoot, filePath);
-            fsExtra.writeFileSync(filePath, 'foobar');
-        });
-    });
-
+describe('Index', () => {
     afterEach(() => {
-        fsExtra.removeSync('../../test-workspaces/sfdx-workspace/.sfdx/typings/lwc/');
+        fsExtra.removeSync(index.typingsBaseDir);
     });
 
-    it('saves the meta files as t.ds files', async () => {
-        const index: Index = new Index({
-            workspaceRoot: '../../test-workspaces/sfdx-workspace',
-            sfdxPackageDirsPattern: '{force-app,utils}',
-        });
-
-        index.deleteStaleMetaTypings();
-
-        const typing = path.join(index.workspaceRoot, metaFileTypingPath);
-        const staleTyping = path.join(index.workspaceRoot, staleMetaFileTypingPath);
-
-        expect(fsExtra.pathExistsSync(typing)).toBeTrue();
-        expect(fsExtra.pathExistsSync(staleTyping)).toBeFalse();
-    });
-});
-
-describe('Index#metaFilePaths', () => {
-    test('it returns all the paths  for meta files', () => {
-        const index: Index = new Index({
-            workspaceRoot: '../../test-workspaces/sfdx-workspace',
-            sfdxPackageDirsPattern: '{force-app,utils}',
-        });
-        const metaFilePaths: string[] = index.metaFilePaths();
-        const expectedMetaFilePaths: string[] = [
-            'force-app/main/default/contentassets/logo.asset-meta.xml',
-            'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
-            'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
-            'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
-            'force-app/main/default/staticresources/todocss.resource-meta.xml',
-            'utils/meta/staticresources/todoutil.resource-meta.xml',
-        ];
-
-        expect(metaFilePaths).toEqual(expectedMetaFilePaths);
-    });
-});
-
-describe('Index#metaFileTypingPaths', () => {
-    const expectedMetaFileTypingPaths: string[] = [
-        '.sfdx/typings/lwc/contentassets/logo.d.ts',
-        '.sfdx/typings/lwc/messageChannels/Channel1.d.ts',
-        '.sfdx/typings/lwc/staticresources/bike_assets.d.ts',
-        '.sfdx/typings/lwc/staticresources/todocss.d.ts',
-    ];
-    const typingsDirs: string[] = ['.sfdx/typings/lwc/staticresources/', '.sfdx/typings/lwc/messageChannels/', '.sfdx/typings/lwc/contentassets/'];
-    const workspaceRoot: string = '../../test-workspaces/sfdx-workspace';
-
-    beforeEach(() => {
-        typingsDirs.forEach(filepath => {
-            fsExtra.mkdirSync(path.join(workspaceRoot, filepath), { recursive: true });
-        });
-
-        expectedMetaFileTypingPaths.forEach((filePath: string) => {
-            filePath = path.join(workspaceRoot, filePath);
-            fsExtra.writeFileSync(filePath, 'foobar');
+    describe('new', () => {
+        it('initializes with the root of a workspace', () => {
+            const expectedPath: string = path.resolve('../../test-workspaces/sfdx-workspace');
+            expect(index.workspaceRoot).toEqual(expectedPath);
+            expect(index.sfdxPackageDirsPattern).toEqual('{force-app,utils}');
         });
     });
 
-    afterEach(() => {
-        fsExtra.removeSync(path.join(workspaceRoot, '.sfdx/typings/lwc/'));
+    describe('#createNewMetaTypings', () => {
+        it('saves the meta files as t.ds files', async () => {
+            index.createNewMetaTypings();
+            const filepaths: string[] = ['Channel1.messageChannel.d.ts', 'bike_assets.resource.d.ts', 'logo.asset.d.ts', 'todocss.resource.d.ts'];
+
+            filepaths.forEach(filepath => {
+                filepath = path.join(index.typingsBaseDir, filepath);
+                expect(fsExtra.pathExistsSync(filepath)).toBeTrue();
+            });
+        });
     });
 
-    test('it returns all the paths for meta files\' typings', () => {
-        const index: Index = new Index({
-            workspaceRoot: '../../test-workspaces/sfdx-workspace',
-            sfdxPackageDirsPattern: '{force-app,utils}',
+    describe('#removeStaleTypings', () => {
+        it('saves the meta files as t.ds files', async () => {
+            const typing: string = path.join(index.typingsBaseDir, 'logo.resource.d.ts');
+            const staleTyping: string = path.join(index.typingsBaseDir, 'extra.resource.d.ts');
+
+            fsExtra.mkdirSync(index.typingsBaseDir);
+            fsExtra.writeFileSync(typing, 'foobar');
+            fsExtra.writeFileSync(staleTyping, 'foobar');
+
+            index.deleteStaleMetaTypings();
+
+            expect(fsExtra.pathExistsSync(typing)).toBeTrue();
+            expect(fsExtra.pathExistsSync(staleTyping)).toBeFalse();
+        });
+    });
+
+    describe('#saveCustomLabelTypings', () => {
+        afterEach(() => {
+            fsExtra.removeSync(index.typingsBaseDir);
         });
 
-        const metaFilePaths: string[] = index.metaFileTypingPaths();
-        expect(metaFilePaths).toEqual(expectedMetaFileTypingPaths);
+        it('saves the custom labels xml file to 1 typings file', async () => {
+            await index.saveCustomLabelTypings();
+            const customLabelPath: string = path.join(index.workspaceRoot, '.sfdx/typings/lwc/customlabels.d.ts');
+
+            expect(fsExtra.pathExistsSync(customLabelPath)).toBeTrue();
+            expect(fsExtra.readFileSync(customLabelPath).toString()).toInclude('declare module');
+        });
     });
-});
 
-describe('Index.diff', () => {
-    it('returns a list of strings that do not exist in the compare list', () => {
-        const list1: string[] = [
-            'force-app/main/default/contentassets/logo.asset-meta.xml',
-            'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
-            'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
-            'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
-            'force-app/main/default/staticresources/todocss.resource-meta.xml',
-            'utils/meta/staticresources/todoutil.resource-meta.xml',
-        ];
+    describe('#metaFilePaths', () => {
+        test('it returns all the paths  for meta files', () => {
+            const metaFilePaths: string[] = index.metaFiles;
+            const expectedMetaFilePaths: string[] = [
+                'force-app/main/default/contentassets/logo.asset-meta.xml',
+                'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
+                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
+                'force-app/main/default/staticresources/todocss.resource-meta.xml',
+                'utils/meta/staticresources/todoutil.resource-meta.xml',
+            ];
 
-        const list2: string[] = [
-            '.sfdx/typings/lwc/messageChannels/Channel1.d.ts',
-            '.sfdx/typings/lwc/staticresources/bike_assets.d.ts',
-            '.sfdx/typings/lwc/staticresources/logo.d.ts',
-            '.sfdx/typings/lwc/staticresources/todocss.d.ts',
-            '.sfdx/typings/lwc/staticresources/foobar.d.ts',
-        ];
+            expect(metaFilePaths).toEqual(expectedMetaFilePaths);
+        });
+    });
 
-        expect(Index.diff(list1, list2)).toEqual([
-            'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
-            'utils/meta/staticresources/todoutil.resource-meta.xml',
-        ]);
+    describe('#metaTypings', () => {
+        test('it returns all the paths for meta files\' typings', () => {
+            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'staticresources'), { recursive: true });
+            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'messageChannels'), { recursive: true });
+            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'contentassets'), { recursive: true });
 
-        expect(Index.diff(list2, list1)).toEqual(['.sfdx/typings/lwc/staticresources/foobar.d.ts']);
+            const expectedMetaFileTypingPaths: string[] = [
+                '.sfdx/typings/lwc/logo.asset.d.ts',
+                '.sfdx/typings/lwc/Channel1.messageChannel.d.ts',
+                '.sfdx/typings/lwc/bike_assets.resource.d.ts',
+                '.sfdx/typings/lwc/todocss.resource.d.ts',
+            ];
+
+            expectedMetaFileTypingPaths.forEach((filePath: string) => {
+                filePath = path.join(index.workspaceRoot, filePath);
+                fsExtra.writeFileSync(filePath, 'foobar');
+            });
+
+            const metaFilePaths: string[] = index.metaTypings;
+
+            expectedMetaFileTypingPaths.forEach(expectedPath => {
+                expect(metaFilePaths).toContain(expectedPath);
+            });
+        });
+    });
+
+    describe('.diff', () => {
+        it('returns a list of strings that do not exist in the compare list', () => {
+            const list1: string[] = [
+                'force-app/main/default/contentassets/logo.asset-meta.xml',
+                'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
+                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
+                'force-app/main/default/staticresources/todocss.resource-meta.xml',
+                'utils/meta/staticresources/todoutil.resource-meta.xml',
+            ];
+
+            const list2: string[] = [
+                '.sfdx/typings/lwc/Channel1.messageChannel.d.ts',
+                '.sfdx/typings/lwc/bike_assets.resource.d.ts',
+                '.sfdx/typings/lwc/logo.resource.d.ts',
+                '.sfdx/typings/lwc/todocss.resource.d.ts',
+                '.sfdx/typings/lwc/foobar.resource.d.ts',
+            ];
+
+            expect(Index.diff(list1, list2)).toEqual([
+                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                'utils/meta/staticresources/todoutil.resource-meta.xml',
+            ]);
+
+            expect(Index.diff(list2, list1)).toEqual(['.sfdx/typings/lwc/foobar.resource.d.ts']);
+        });
     });
 });

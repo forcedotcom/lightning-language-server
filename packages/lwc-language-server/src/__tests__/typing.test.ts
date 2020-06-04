@@ -26,7 +26,7 @@ describe('Typing.declaration', () => {
     export default logo;
 }`;
 
-        expect(typing.declaration()).toEqual(expectedDeclaration);
+        expect(typing.declaration).toEqual(expectedDeclaration);
     });
 
     it('handles a full path', () => {
@@ -36,7 +36,7 @@ describe('Typing.declaration', () => {
     export default logo;
 }`;
 
-        expect(typing.declaration()).toEqual(expectedDeclaration);
+        expect(typing.declaration).toEqual(expectedDeclaration);
     });
 
     it('generate the typing declaration for a static resource file', () => {
@@ -46,7 +46,7 @@ describe('Typing.declaration', () => {
     export default d3;
 }`;
 
-        expect(typing.declaration()).toEqual(expectedDeclaration);
+        expect(typing.declaration).toEqual(expectedDeclaration);
     });
 
     it('generate the typing declaration for a message channels file', () => {
@@ -56,7 +56,7 @@ describe('Typing.declaration', () => {
     export default Channel1;
 }`;
 
-        expect(typing.declaration()).toEqual(expectedDeclaration);
+        expect(typing.declaration).toEqual(expectedDeclaration);
     });
 
     it('handles a full path', async () => {
@@ -65,7 +65,7 @@ describe('Typing.declaration', () => {
     var logo: string;
     export default logo;
 }`;
-        expect(typing.declaration()).toEqual(expectedDeclaration);
+        expect(typing.declaration).toEqual(expectedDeclaration);
     });
 });
 
@@ -101,10 +101,9 @@ describe('Typing.fromCustomLabels', () => {
     export default other_greeting;
 }`;
 
-        const typings: Typing[] = await Typing.fromCustomLabels(xmlDocument);
-        const expectedDeclarations: string[] = [expectedDeclaration1, expectedDeclaration2];
-        const declarations: string[] = [typings[0].declaration(), typings[1].declaration()];
+        const typings: string = await Typing.declarationsFromCustomLabels(xmlDocument);
+        const expectedDeclarations: string = [expectedDeclaration1, expectedDeclaration2].join('\n');
 
-        expect(declarations).toEqual(expectedDeclarations);
+        expect(typings).toEqual(expectedDeclarations);
     });
 });
