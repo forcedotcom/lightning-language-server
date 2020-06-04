@@ -1,4 +1,4 @@
-import { parseStringPromise } from 'xml2js';
+import * as xml2js from 'xml2js';
 
 export default class Typing {
     private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
@@ -16,11 +16,7 @@ export default class Typing {
 
         this.type = attributes.type;
         this.name = attributes.name;
-        this.fileName = `${attributes.name}.d.ts`;
-    }
-
-    static fromMetas(metaFilenames: string[]): Typing[] {
-        return metaFilenames.map(this.fromMeta);
+        this.fileName = `${attributes.name}.${attributes.type}.d.ts`;
     }
 
     static fromMeta(metaFilename: string): Typing {
@@ -29,37 +25,41 @@ export default class Typing {
         return new Typing({ name, type });
     }
 
-    static async fromCustomLabels(xmlDocument: string): Promise<[Typing]> {
-        const { CustomLabels } = await parseStringPromise(xmlDocument);
-        return CustomLabels.labels.map((label: any) => {
-            const name = label.fullName[0];
-            const type = 'customLabel';
-            return new Typing({ name, type });
+    static async declarationsFromCustomLabels(xmlDocument: string | Buffer): Promise<string> {
+        const doc = await new xml2js.Parser().parseStringPromise(xmlDocument);
+        const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => {
+            return declaration('customLabel', label.fullName[0]);
         });
+
+        return declarations.join('\n');
     }
 
-    declaration(): string {
-        let modulePath: string;
-        switch (this.type) {
-            case 'asset':
-                modulePath = `@salesforce/contentAssetUrl/${this.name}`;
-                break;
-            case 'resource':
-                modulePath = `@salesforce/resourceUrl/${this.name}`;
-                break;
-            case 'messageChannel':
-                modulePath = `@salesforce/messageChannel/${this.name}__c`;
-                break;
-            case 'customLabel':
-                modulePath = `@salesforce/label/c.${this.name}`;
-                break;
-            default:
-                throw new Error(`${this.type} not supported`);
-        }
+    get declaration() {
+        return declaration(this.type, this.name);
+    }
+}
 
-        return `declare module "${modulePath}" {
-    var ${this.name}: string;
-    export default ${this.name};
+function declaration(type: string, name: string): string {
+    let modulePath: string;
+    switch (type) {
+        case 'asset':
+            modulePath = `@salesforce/contentAssetUrl/${name}`;
+            break;
+        case 'resource':
+            modulePath = `@salesforce/resourceUrl/${name}`;
+            break;
+        case 'messageChannel':
+            modulePath = `@salesforce/messageChannel/${name}__c`;
+            break;
+        case 'customLabel':
+            modulePath = `@salesforce/label/c.${name}`;
+            break;
+        default:
+            throw new Error(`${type} not supported`);
+    }
+
+    return `declare module "${modulePath}" {
+    var ${name}: string;
+    export default ${name};
 }`;
-    }
 }
