@@ -29,7 +29,7 @@
     "@salesforce/lightning-lsp-common": "2.3.17",
     "@salesforce/lwc-language-server": "2.3.17",
     "acorn": "^6.0.0",
-    "acorn-loose": "^6.0.0",
+    "acorn-loose": "^7.0.0",
     "acorn-walk": "^6.0.0",
     "camelcase": "^5.3.1",
     "change-case": "^3.1.0",
