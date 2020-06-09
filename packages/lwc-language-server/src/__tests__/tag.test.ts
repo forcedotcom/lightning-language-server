@@ -28,6 +28,7 @@ describe('Tag', () => {
 
     describe('instance methods', () => {
         let tag: Tag;
+
         beforeEach(async () => {
             tag = await Tag.fromFile(filepath);
         });
@@ -49,14 +50,14 @@ describe('Tag', () => {
         });
 
         describe('#range', () => {
-            it('returns a range for the comopnent', () => {
+            it('returns a range for the component', () => {
                 const range = { end: { character: 1, line: 30 }, start: { character: 0, line: 2 } };
                 expect(tag.range).toEqual(range);
             });
         });
 
         describe('#location', () => {
-            it('returns a location for the comopnent', () => {
+            it('returns a location for the component', () => {
                 const location = {
                     range: tag.range,
                     uri: tag.uri,
@@ -66,14 +67,14 @@ describe('Tag', () => {
         });
 
         describe('#properties', () => {
-            it('returns a properties for the comopnent', () => {
+            it('returns a properties for the component', () => {
                 expect(tag.properties[0].decorator).toEqual('api');
                 expect(tag.properties[0].name).toEqual('todo');
             });
         });
 
         describe('#methods', () => {
-            it('returns a methods for the comopnent', () => {
+            it('returns a methods for the component', () => {
                 expect(tag.methods[0].name).toEqual('onclickAction');
             });
         });
@@ -106,16 +107,16 @@ describe('Tag', () => {
             });
         });
 
-        describe('#hoverDocs', () => {
+        describe('#description', () => {
             it('return markdown of component\'s documentation', () => {
-                const hoverDocs = `Foo doc
+                const description = `Foo doc
 ### Attributes
 - **todo**
 - **index**
 - **index-same-line**
 ### Methods
 - **apiMethod()**`;
-                expect(tag.hoverDocs).toEqual(hoverDocs);
+                expect(tag.description).toEqual(description);
             });
         });
     });

@@ -285,6 +285,12 @@ export class WorkspaceContext {
         }
     }
 
+    private async writeStandardConfig() {
+        if (this.type === WorkspaceType.STANDARD_LWC) {
+            return;
+        }
+    }
+
     private async writeSettings() {
         switch (this.type) {
             case WorkspaceType.CORE_ALL:

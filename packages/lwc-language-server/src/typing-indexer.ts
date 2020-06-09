@@ -9,7 +9,6 @@ const { detectWorkspaceHelper, WorkspaceType } = shared;
 export default class TypingIndexer {
     readonly workspaceRoot: string;
     readonly sfdxPackageDirsPattern: string;
-    readonly packageDirectories: string[];
     readonly typingsBaseDir: string;
 
     static diff(items: string[], compareItems: string[]): string[] {

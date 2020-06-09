@@ -1,4 +1,5 @@
 import { compileFile, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
+import { ITagData } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
 import * as path from 'path';
@@ -6,12 +7,13 @@ import { Location, Position, Range } from 'vscode-languageserver';
 import { Metadata, ClassMember } from '@lwc/babel-plugin-component';
 import { AttributeInfo } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
-export default class Tag {
+export default class Tag implements ITagData {
     public file: string;
     public metadata: Metadata;
     public namespace: 'lightning' | 'c' | 'interop' | null = 'c';
+    public namespaceDelimiter: ':' | '-' = '-';
 
-    private _attributes: { publicAttributes: AttributeInfo[]; privateAttributes: AttributeInfo[] } | null = null;
+    private _allAttributes: { publicAttributes: AttributeInfo[]; privateAttributes: AttributeInfo[] } | null = null;
     private _properties: ClassMember[] | null = null;
     private _methods: ClassMember[] | null = null;
 
@@ -21,14 +23,18 @@ export default class Tag {
         this.namespace = attributes.namespace || this.namespace;
     }
 
-    get hoverDocs(): string {
+    get description(): string {
         const docs: string[] = [this.documentation, this.reference, this.attributeDocs, this.methodDocs];
         return docs.filter(item => item !== null).join('\n');
     }
 
     get name(): string {
         const filename = path.parse(this.file).name;
-        return `${this.namespace}-${filename}`;
+        return `${this.namespace}${this.namespaceDelimiter}${filename}`;
+    }
+
+    get attributes(): AttributeInfo[] {
+        return this.publicAttributes;
     }
 
     get documentation(): string {
@@ -60,18 +66,18 @@ export default class Tag {
         return URI.file(path.resolve(this.file)).toString();
     }
 
-    get attributes() {
-        if (this._attributes) return this._attributes;
-        this._attributes = extractAttributes(this.metadata, this.uri);
-        return this._attributes;
+    get allAttributes() {
+        if (this._allAttributes) return this._allAttributes;
+        this._allAttributes = extractAttributes(this.metadata, this.uri);
+        return this._allAttributes;
     }
 
     get publicAttributes(): AttributeInfo[] {
-        return this.attributes.publicAttributes;
+        return this.allAttributes.publicAttributes;
     }
 
     get privateAttributes(): AttributeInfo[] {
-        return this.attributes.privateAttributes;
+        return this.allAttributes.privateAttributes;
     }
 
     get properties() {
@@ -104,12 +110,10 @@ export default class Tag {
 
     static async fromFile(file: string): Promise<Tag> | null {
         const { metadata, diagnostics } = await compileFile(file);
-
         if (diagnostics.length > 0) {
             console.log(`Could not create Tag from ${file}.\n${diagnostics}`);
             return null;
         }
-
         return new Tag({ file, metadata });
     }
 }

@@ -80,7 +80,8 @@ export async function compileDocument(document: TextDocument): Promise<ICompiler
 export async function compileFile(file: string): Promise<ICompilerResult> {
     const filePath = path.parse(file);
     const fileName = filePath.base;
-    return compileSource(await fs.readFile(file, 'utf-8'), fileName);
+    const data = await fs.readFile(file, 'utf-8');
+    return compileSource(data, fileName);
 }
 
 export async function compileSource(source: string, fileName: string = 'foo.js'): Promise<ICompilerResult> {

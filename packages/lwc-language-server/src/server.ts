@@ -16,16 +16,17 @@ import {
     MessageType,
     RequestType,
     RegistrationRequest,
+    MarkedString,
 } from 'vscode-languageserver';
 
 import { LWCIndexer } from './indexer';
 import templateLinter from './template/linter';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { WorkspaceContext, utils, shared, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
-import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
+import { getLanguageService, LanguageService } from 'vscode-html-languageservice';
 import URI from 'vscode-uri';
 import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
-import { getLwcTagProvider } from './markup/lwcTags';
+import { LWCDataProvider } from './lwc-data-provider';
 import decamelize from 'decamelize';
 const { WorkspaceType } = shared;
 // Create a standard connection and let the caller decide the strategy
@@ -50,26 +51,14 @@ connection.onInitialize(
             workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
         }
         try {
-            if (workspaceRoots.length === 0) {
-                console.warn(`No workspace found`);
-                return { capabilities: {} };
-            }
-
-            for (const root of workspaceRoots) {
-                console.info(`Starting [[LWC]] language server at ${root}`);
-            }
-            const startTime = process.hrtime();
-            context = new WorkspaceContext(workspaceRoots);
-
             context.configureProject();
-            const lwcIndexer = new LWCIndexer(context);
-
-            lwcIndexer.configureAndIndex();
-
-            context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
-            htmlLS = getLanguageService();
-            htmlLS.addTagProvider(getLwcTagProvider());
-            console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
+            // context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+            // comopnentIndexer = new ComponentIndexer(workspaceroot);
+            const lwcProvider = new LWCDataProvider();
+            htmlLS = getLanguageService({
+                customDataProviders: [lwcProvider],
+            });
+            // console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
             return {
                 capabilities: {
                     textDocumentSync: documents.syncKind,
@@ -131,10 +120,7 @@ connection.onCompletion(
             return { isIncomplete: false, items: [] };
         }
         const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument, {
-            isSfdxProject: context.type === WorkspaceType.SFDX,
-            useAttributeValueQuotes: false,
-        });
+        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
     },
 );
 
@@ -183,26 +169,26 @@ function findJavascriptProperty(valueProperty: string, textDocumentPosition: Tex
     }
     return null;
 }
-connection.onDefinition(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
-        if (!def) {
-            def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
-            if (!def) {
-                const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
-                if (valueProperty) {
-                    def = findJavascriptProperty(valueProperty, textDocumentPosition);
-                }
-            }
-        }
-        return def;
-    },
-);
+// connection.onDefinition(
+//     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+//         const document = documents.get(textDocumentPosition.textDocument.uri);
+//         if (!(await context.isLWCTemplate(document))) {
+//             return null;
+//         }
+//         const htmlDocument = htmlLS.parseHTMLDocument(document);
+//         let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+//         if (!def) {
+//             def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
+//             if (!def) {
+//                 const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
+//                 if (valueProperty) {
+//                     def = findJavascriptProperty(valueProperty, textDocumentPosition);
+//                 }
+//             }
+//         }
+//         return def;
+//     },
+// );
 
 // Listen on the connection
 connection.listen();
