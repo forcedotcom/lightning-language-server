@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "decorators": [
+      {
+        "type": "api",
+        "targets": [
+          {
+            "type": "property",
+            "name": "todo"
+          },
+          {
+            "type": "property",
+            "name": "index",
+            "value": {
+              "type": "unresolved"
+            }
+          },
+          {
+            "type": "property",
+            "name": "indexSameLine",
+            "value": {
+              "type": "unresolved"
+            }
+          },
+          {
+            "type": "method",
+            "name": "apiMethod"
+          }
+        ]
+      },
+      {
+        "type": "track",
+        "targets": [
+          {
+            "name": "trackedPrivateIndex",
+            "type": "property"
+          }
+        ]
+      }
+    ],
+    "doc": "Foo doc",
+    "declarationLoc": {
+      "start": {
+        "line": 3,
+        "column": 0
+      },
+      "end": {
+        "line": 31,
+        "column": 1
+      }
+    },
+    "classMembers": [
+      {
+        "type": "property",
+        "name": "todo",
+        "loc": {
+          "start": {
+            "line": 5,
+            "column": 4
+          },
+          "end": {
+            "line": 7,
+            "column": 5
+          }
+        },
+        "decorator": "api"
+      },
+      {
+        "type": "property",
+        "name": "index",
+        "loc": {
+          "start": {
+            "line": 11,
+            "column": 4
+          },
+          "end": {
+            "line": 12,
+            "column": 10
+          }
+        },
+        "decorator": "api",
+        "value": {
+          "type": "unresolved"
+        }
+      },
+      {
+        "type": "property",
+        "name": "indexSameLine",
+        "loc": {
+          "start": {
+            "line": 14,
+            "column": 4
+          },
+          "end": {
+            "line": 14,
+            "column": 23
+          }
+        },
+        "decorator": "api",
+        "value": {
+          "type": "unresolved"
+        }
+      },
+      {
+        "type": "property",
+        "name": "trackedPrivateIndex",
+        "loc": {
+          "start": {
+            "line": 16,
+            "column": 4
+          },
+          "end": {
+            "line": 17,
+            "column": 24
+          }
+        },
+        "decorator": "track"
+      },
+      {
+        "type": "method",
+        "name": "onclickAction",
+        "loc": {
+          "start": {
+            "line": 19,
+            "column": 4
+          },
+          "end": {
+            "line": 20,
+            "column": 5
+          }
+        }
+      },
+      {
+        "type": "method",
+        "name": "apiMethod",
+        "loc": {
+          "start": {
+            "line": 22,
+            "column": 4
+          },
+          "end": {
+            "line": 23,
+            "column": 5
+          }
+        },
+        "decorator": "api"
+      },
+      {
+        "type": "property",
+        "name": "privateComputedValue",
+        "loc": {
+          "start": {
+            "line": 25,
+            "column": 4
+          },
+          "end": {
+            "line": 27,
+            "column": 5
+          }
+        }
+      },
+      {
+        "type": "method",
+        "name": "methodWithArguments",
+        "loc": {
+          "start": {
+            "line": 29,
+            "column": 4
+          },
+          "end": {
+            "line": 30,
+            "column": 5
+          }
+        }
+      }
+    ],
+    "exports": [
+      {
+        "type": "ExportDefaultDeclaration"
+      }
+    ]
+  },
+  "diagnostics": []
+}
