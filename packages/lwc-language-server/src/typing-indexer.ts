@@ -6,9 +6,10 @@ import { shared } from '@salesforce/lightning-lsp-common';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 
-export default class Index {
+export default class TypingIndexer {
     readonly workspaceRoot: string;
     readonly sfdxPackageDirsPattern: string;
+    readonly packageDirectories: string[];
     readonly typingsBaseDir: string;
 
     static diff(items: string[], compareItems: string[]): string[] {
@@ -19,7 +20,7 @@ export default class Index {
         });
     }
 
-    constructor(attributes: { [key: string]: string }) {
+    constructor(attributes: { [key: string]: any }) {
         this.workspaceRoot = path.resolve(attributes.workspaceRoot);
         this.sfdxPackageDirsPattern = attributes.sfdxPackageDirsPattern;
 
@@ -40,7 +41,7 @@ export default class Index {
 
     createNewMetaTypings(): void {
         fsExtra.ensureDirSync(this.typingsBaseDir);
-        const newFiles = Index.diff(this.metaFiles, this.metaTypings);
+        const newFiles = TypingIndexer.diff(this.metaFiles, this.metaTypings);
         newFiles.forEach(async (filename: string) => {
             const typing = Typing.fromMeta(filename);
             const filePath = path.join(this.typingsBaseDir, typing.fileName);
@@ -49,7 +50,7 @@ export default class Index {
     }
 
     deleteStaleMetaTypings(): void {
-        const staleTypings = Index.diff(this.metaTypings, this.metaFiles);
+        const staleTypings = TypingIndexer.diff(this.metaTypings, this.metaFiles);
         staleTypings.forEach(async (filename: string) => {
             const filePath = path.join(this.workspaceRoot, filename);
             fsExtra.removeSync(filePath);

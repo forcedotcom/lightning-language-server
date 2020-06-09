@@ -1,32 +1,32 @@
-import Index from '../index';
+import TypingIndexer from '../typing-indexer';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 
-const index: Index = new Index({
+const typingIndexer: TypingIndexer = new TypingIndexer({
     workspaceRoot: '../../test-workspaces/sfdx-workspace',
     sfdxPackageDirsPattern: '{force-app,utils}',
 });
 
-describe('Index', () => {
+describe('TypingIndexer', () => {
     afterEach(() => {
-        fsExtra.removeSync(index.typingsBaseDir);
+        fsExtra.removeSync(typingIndexer.typingsBaseDir);
     });
 
     describe('new', () => {
         it('initializes with the root of a workspace', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/sfdx-workspace');
-            expect(index.workspaceRoot).toEqual(expectedPath);
-            expect(index.sfdxPackageDirsPattern).toEqual('{force-app,utils}');
+            expect(typingIndexer.workspaceRoot).toEqual(expectedPath);
+            expect(typingIndexer.sfdxPackageDirsPattern).toEqual('{force-app,utils}');
         });
     });
 
     describe('#createNewMetaTypings', () => {
         it('saves the meta files as t.ds files', async () => {
-            index.createNewMetaTypings();
+            typingIndexer.createNewMetaTypings();
             const filepaths: string[] = ['Channel1.messageChannel.d.ts', 'bike_assets.resource.d.ts', 'logo.asset.d.ts', 'todocss.resource.d.ts'];
 
             filepaths.forEach(filepath => {
-                filepath = path.join(index.typingsBaseDir, filepath);
+                filepath = path.join(typingIndexer.typingsBaseDir, filepath);
                 expect(fsExtra.pathExistsSync(filepath)).toBeTrue();
             });
         });
@@ -34,14 +34,14 @@ describe('Index', () => {
 
     describe('#removeStaleTypings', () => {
         it('saves the meta files as t.ds files', async () => {
-            const typing: string = path.join(index.typingsBaseDir, 'logo.resource.d.ts');
-            const staleTyping: string = path.join(index.typingsBaseDir, 'extra.resource.d.ts');
+            const typing: string = path.join(typingIndexer.typingsBaseDir, 'logo.resource.d.ts');
+            const staleTyping: string = path.join(typingIndexer.typingsBaseDir, 'extra.resource.d.ts');
 
-            fsExtra.mkdirSync(index.typingsBaseDir);
+            fsExtra.mkdirSync(typingIndexer.typingsBaseDir);
             fsExtra.writeFileSync(typing, 'foobar');
             fsExtra.writeFileSync(staleTyping, 'foobar');
 
-            index.deleteStaleMetaTypings();
+            typingIndexer.deleteStaleMetaTypings();
 
             expect(fsExtra.pathExistsSync(typing)).toBeTrue();
             expect(fsExtra.pathExistsSync(staleTyping)).toBeFalse();
@@ -50,12 +50,12 @@ describe('Index', () => {
 
     describe('#saveCustomLabelTypings', () => {
         afterEach(() => {
-            fsExtra.removeSync(index.typingsBaseDir);
+            fsExtra.removeSync(typingIndexer.typingsBaseDir);
         });
 
         it('saves the custom labels xml file to 1 typings file', async () => {
-            await index.saveCustomLabelTypings();
-            const customLabelPath: string = path.join(index.workspaceRoot, '.sfdx/typings/lwc/customlabels.d.ts');
+            await typingIndexer.saveCustomLabelTypings();
+            const customLabelPath: string = path.join(typingIndexer.workspaceRoot, '.sfdx/typings/lwc/customlabels.d.ts');
 
             expect(fsExtra.pathExistsSync(customLabelPath)).toBeTrue();
             expect(fsExtra.readFileSync(customLabelPath).toString()).toInclude('declare module');
@@ -64,7 +64,7 @@ describe('Index', () => {
 
     describe('#metaFilePaths', () => {
         test('it returns all the paths  for meta files', () => {
-            const metaFilePaths: string[] = index.metaFiles;
+            const metaFilePaths: string[] = typingIndexer.metaFiles;
             const expectedMetaFilePaths: string[] = [
                 'force-app/main/default/contentassets/logo.asset-meta.xml',
                 'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
@@ -80,9 +80,9 @@ describe('Index', () => {
 
     describe('#metaTypings', () => {
         test('it returns all the paths for meta files\' typings', () => {
-            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'staticresources'), { recursive: true });
-            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'messageChannels'), { recursive: true });
-            fsExtra.mkdirSync(path.join(index.typingsBaseDir, 'contentassets'), { recursive: true });
+            fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'staticresources'), { recursive: true });
+            fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'messageChannels'), { recursive: true });
+            fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'contentassets'), { recursive: true });
 
             const expectedMetaFileTypingPaths: string[] = [
                 '.sfdx/typings/lwc/logo.asset.d.ts',
@@ -92,11 +92,11 @@ describe('Index', () => {
             ];
 
             expectedMetaFileTypingPaths.forEach((filePath: string) => {
-                filePath = path.join(index.workspaceRoot, filePath);
+                filePath = path.join(typingIndexer.workspaceRoot, filePath);
                 fsExtra.writeFileSync(filePath, 'foobar');
             });
 
-            const metaFilePaths: string[] = index.metaTypings;
+            const metaFilePaths: string[] = typingIndexer.metaTypings;
 
             expectedMetaFileTypingPaths.forEach(expectedPath => {
                 expect(metaFilePaths).toContain(expectedPath);
@@ -123,12 +123,12 @@ describe('Index', () => {
                 '.sfdx/typings/lwc/foobar.resource.d.ts',
             ];
 
-            expect(Index.diff(list1, list2)).toEqual([
+            expect(TypingIndexer.diff(list1, list2)).toEqual([
                 'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
                 'utils/meta/staticresources/todoutil.resource-meta.xml',
             ]);
 
-            expect(Index.diff(list2, list1)).toEqual(['.sfdx/typings/lwc/foobar.resource.d.ts']);
+            expect(TypingIndexer.diff(list2, list1)).toEqual(['.sfdx/typings/lwc/foobar.resource.d.ts']);
         });
     });
 });
