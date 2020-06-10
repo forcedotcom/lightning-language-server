@@ -16,6 +16,7 @@ const { WorkspaceType } = shared;
 
 const LWC_STANDARD: string = 'lwc-standard.json';
 const RESOURCES_DIR = '../resources';
+const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
 
 const LWC_TAGS: Map<string, TagInfo> = new Map();
 
@@ -118,10 +119,13 @@ async function addCustomTag(context: WorkspaceContext, tag: string, uri: string,
 }
 
 export async function indexCustomComponents(context: WorkspaceContext, writeConfigs: boolean = true): Promise<void> {
+    const workspace = context.workspaceRoots[0];
     const files = await context.findAllModules();
-    // writeConfigs is set to false to avoid updating config twice for the same tag.
-    // loadCustomTagsFromFiles and onIndexCustomComponents lead to the same config updates.
-    await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, false);
+    if (!initCustomComponents(workspace)) {
+        // writeConfigs is set to false to avoid updating config twice for the same tag.
+        // loadCustomTagsFromFiles and onIndexCustomComponents lead to the same config updates.
+        await loadCustomTagsFromFiles(context, files, context.type === WorkspaceType.SFDX, false);
+    }
     if (writeConfigs) {
         await onIndexCustomComponents(context, files);
     }
@@ -158,5 +162,31 @@ export async function addCustomTagFromFile(context: WorkspaceContext, file: stri
         } catch (error) {
             console.log('error compiling ' + file, error);
         }
+    }
+}
+
+export function persistCustomComponents(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], CUSTOM_COMPONENT_INDEX_FILE);
+    const indexJsonString = JSON.stringify(Array.from(LWC_TAGS.entries()));
+
+    fs.writeFile(indexPath, indexJsonString);
+}
+
+export function initCustomComponents(workspace: string): boolean {
+    const indexPath: string = join(workspace, CUSTOM_COMPONENT_INDEX_FILE);
+    const shouldInit: boolean = fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const index: [string, object][] = JSON.parse(indexJsonString);
+        index.forEach(([key, value]) => {
+            const info = TagInfo.createFromJSON(value);
+            LWC_TAGS.set(key, info);
+            eventEmitter.emit('set', info);
+        });
+        return true;
+    } else {
+        return false;
     }
 }

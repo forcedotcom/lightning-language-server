@@ -8,7 +8,8 @@ import * as fs from 'fs-extra';
 const glob = promisify(Glob);
 
 const STATIC_RESOURCE_DECLARATION_FILE = '.sfdx/typings/lwc/staticresources.d.ts';
-const STATIC_RESOURCES: Set<string> = new Set();
+const STATIC_RESOURCE_INDEX_FILE = '.sfdx/indexes/lwc/staticresources.json';
+let STATIC_RESOURCES: Set<string> = new Set();
 
 export function resetStaticResources() {
     STATIC_RESOURCES.clear();
@@ -19,27 +20,34 @@ function getResourceName(resourceMetaFile: string) {
     return parse(resourceFile).name;
 }
 
-export async function updateStaticResourceIndex(updatedFiles: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
+export async function updateStaticResourceIndex(updates: FileEvent[], { workspaceRoots }: WorkspaceContext, writeConfigs: boolean = true) {
     let didChange = false;
-    for (const f of updatedFiles) {
-        if (f.uri.endsWith('.resource-meta.xml')) {
-            if (f.type === FileChangeType.Created) {
-                didChange = true;
-                STATIC_RESOURCES.add(getResourceName(f.uri));
-            } else if (f.type === FileChangeType.Deleted) {
-                STATIC_RESOURCES.delete(getResourceName(f.uri));
-                didChange = true;
+
+    for (const update of updates) {
+        if (update.uri.endsWith('.resource-meta.xml')) {
+            const resourceName = getResourceName(update.uri);
+
+            switch (update.type) {
+                case FileChangeType.Created:
+                    didChange = true;
+                    STATIC_RESOURCES.add(resourceName);
+                case FileChangeType.Deleted:
+                    STATIC_RESOURCES.delete(resourceName);
+                    didChange = true;
             }
         }
-    }
-    if (didChange) {
-        return processStaticResources(workspaceRoots[0], writeConfigs);
+        if (didChange) {
+            return processStaticResources(workspaceRoots[0], writeConfigs);
+        }
     }
 }
 
 async function processStaticResources(workspace: string, writeConfigs: boolean): Promise<void> {
     if (STATIC_RESOURCES.size > 0 && writeConfigs) {
-        return fs.writeFile(join(workspace, STATIC_RESOURCE_DECLARATION_FILE), generateResourceTypeDeclarations());
+        const filename = join(workspace, STATIC_RESOURCE_DECLARATION_FILE);
+        const fileContent = generateResourceTypeDeclarations();
+
+        return fs.writeFile(filename, fileContent);
     }
 }
 
@@ -47,12 +55,18 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
     const { workspaceRoots } = context;
     const { sfdxPackageDirsPattern } = await context.getSfdxProjectConfig();
     const STATIC_RESOURCE_GLOB_PATTERN = `${sfdxPackageDirsPattern}/**/staticresources/*.resource-meta.xml`;
+    const workspace: string = workspaceRoots[0];
+
     try {
-        const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
-        for (const file of files) {
-            STATIC_RESOURCES.add(getResourceName(file));
+        if (initStaticResourceIndex(workspace)) {
+            return Promise.resolve();
+        } else {
+            const files: string[] = await glob(STATIC_RESOURCE_GLOB_PATTERN, { cwd: workspaceRoots[0] });
+            for (const file of files) {
+                STATIC_RESOURCES.add(getResourceName(file));
+            }
+            return processStaticResources(workspace, writeConfigs);
         }
-        return processStaticResources(workspaceRoots[0], writeConfigs);
     } catch (err) {
         console.log(`Error queuing up indexing of static resources. Error details:`, err);
         throw err;
@@ -60,19 +74,37 @@ export async function indexStaticResources(context: WorkspaceContext, writeConfi
 }
 
 function generateResourceTypeDeclarations(): string {
-    let resTypeDecs = '';
-    const sortedStaticResources = Array.from(STATIC_RESOURCES).sort();
-    sortedStaticResources.forEach(res => {
-        resTypeDecs += generateResourceTypeDeclaration(res);
-    });
-    return resTypeDecs;
+    return Array.from(STATIC_RESOURCES)
+        .sort()
+        .map(resourceDeclaration)
+        .join('');
 }
 
-function generateResourceTypeDeclaration(resourceName: string) {
-    const result = `declare module "@salesforce/resourceUrl/${resourceName}" {
+function resourceDeclaration(resourceName: string) {
+    return `declare module "@salesforce/resourceUrl/${resourceName}" {
     var ${resourceName}: string;
     export default ${resourceName};
 }
 `;
-    return result;
+}
+
+function initStaticResourceIndex(workspace: string): Set<string> {
+    const indexPath: string = join(workspace, STATIC_RESOURCE_INDEX_FILE);
+    const shouldInit: boolean = fs.existsSync(indexPath);
+
+    if (shouldInit) {
+        const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
+        const staticIndex = JSON.parse(indexJsonString);
+        STATIC_RESOURCES = new Set(staticIndex);
+        return STATIC_RESOURCES;
+    }
+}
+
+export function persistStaticResources(context: WorkspaceContext) {
+    const { workspaceRoots } = context;
+    const indexPath = join(workspaceRoots[0], STATIC_RESOURCE_INDEX_FILE);
+    const index = Array.from(STATIC_RESOURCES);
+    const indexJsonString = JSON.stringify(index);
+
+    fs.writeFile(indexPath, indexJsonString);
 }
