@@ -73,25 +73,39 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
         return WorkspaceType.CORE_PARTIAL;
     }
 
+    if (fs.existsSync(path.join(root, 'lwc.config.js'))) {
+        return WorkspaceType.STANDARD_LWC;
+    }
+
     const packageJson = path.join(root, 'package.json');
     if (fs.existsSync(packageJson)) {
         try {
-            // Check if package.json contains @lwc/engine
             const packageInfo = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
             const dependencies = Object.keys(packageInfo.dependencies || {});
-            if (dependencies.includes('@lwc/engine')) {
-                return WorkspaceType.STANDARD_LWC;
-            }
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
-            if (devDependencies.includes('@lwc/engine')) {
+            const allDependencies = [...dependencies, ...devDependencies];
+            const hasLWCdependencies = allDependencies.some(key => {
+                return key.startsWith('@lwc/') || key === 'lwc';
+            });
+
+            // any type of @lwc is a dependency
+            if (hasLWCdependencies) {
                 return WorkspaceType.STANDARD_LWC;
             }
+
+            // has any type of lwc configuration
+            if (packageInfo.lwc) {
+                return WorkspaceType.STANDARD_LWC;
+            }
+
             if (packageInfo.workspaces) {
                 return WorkspaceType.MONOREPO;
             }
+
             if (fs.existsSync(path.join(root, 'lerna.json'))) {
                 return WorkspaceType.MONOREPO;
             }
+
             return WorkspaceType.STANDARD;
         } catch (e) {
             // Log error and fallback to setting workspace type to Unknown

@@ -5,16 +5,20 @@ import {
     getLwcTags,
     updateCustomComponentIndex,
     eventEmitter,
+    persistCustomComponents,
 } from './metadata-utils/custom-components-util';
-import { indexCustomLabels, resetCustomLabels, updateLabelsIndex } from './metadata-utils/custom-labels-util';
-import { indexStaticResources, resetStaticResources, updateStaticResourceIndex } from './metadata-utils/static-resources-util';
-import { indexContentAssets, resetContentAssets, updateContentAssetIndex } from './metadata-utils/content-assets-util';
-import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex } from './metadata-utils/message-channel-util';
+import { indexCustomLabels, resetCustomLabels, updateLabelsIndex, persistCustomLabels } from './metadata-utils/custom-labels-util';
+import { indexStaticResources, resetStaticResources, updateStaticResourceIndex, persistStaticResources } from './metadata-utils/static-resources-util';
+import { indexContentAssets, resetContentAssets, updateContentAssetIndex, persistContentAssets } from './metadata-utils/content-assets-util';
+import { indexMessageChannels, resetMessageChannels, updateMessageChannelsIndex, persistMessageChannels } from './metadata-utils/message-channel-util';
 import { WorkspaceContext, shared, Indexer, getLanguageService, LanguageService, utils } from '@salesforce/lightning-lsp-common';
 import { DidChangeWatchedFilesParams } from 'vscode-languageserver';
 import { EventEmitter } from 'events';
+import { join } from 'path';
+import { mkdirSync } from 'fs';
 
 const { WorkspaceType } = shared;
+const INDEX_DIR = '.sfdx/indexes/lwc';
 
 export class LWCIndexer implements Indexer {
     public readonly eventEmitter = new EventEmitter();
@@ -57,6 +61,15 @@ export class LWCIndexer implements Indexer {
         resetMessageChannels();
     }
 
+    public persistIndex() {
+        this.ensureIndexDirectory(this.context);
+        persistCustomComponents(this.context);
+        persistStaticResources(this.context);
+        persistContentAssets(this.context);
+        persistCustomLabels(this.context);
+        persistMessageChannels(this.context);
+    }
+
     public async handleWatchedFiles(workspaceContext: WorkspaceContext, change: DidChangeWatchedFilesParams): Promise<void> {
         const changes = change.changes;
 
@@ -74,6 +87,12 @@ export class LWCIndexer implements Indexer {
                 updateMessageChannelsIndex(changes, workspaceContext, this.writeConfigs),
             ]);
         }
+    }
+
+    private ensureIndexDirectory(context: WorkspaceContext): void {
+        const { workspaceRoots } = context;
+        const indexDirPath = join(workspaceRoots[0], INDEX_DIR);
+        mkdirSync(indexDirPath, { recursive: true });
     }
 }
 
