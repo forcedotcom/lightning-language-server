@@ -29,16 +29,6 @@ describe('Typing.declaration', () => {
         expect(typing.declaration).toEqual(expectedDeclaration);
     });
 
-    it('handles a full path', () => {
-        const typing: Typing = Typing.fromMeta('logo.asset-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
-    var logo: string;
-    export default logo;
-}`;
-
-        expect(typing.declaration).toEqual(expectedDeclaration);
-    });
-
     it('generate the typing declaration for a static resource file', () => {
         const typing: Typing = Typing.fromMeta('d3.resource-meta.xml');
         const expectedDeclaration: string = `declare module "@salesforce/resourceUrl/d3" {
