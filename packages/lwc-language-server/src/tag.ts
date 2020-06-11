@@ -1,4 +1,4 @@
-import { compileFile, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
+import { compileSource, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
 import { ITagData } from 'vscode-html-languageservice';
 import * as fs from 'fs-extra';
 import decamelize from 'decamelize';
@@ -112,7 +112,13 @@ export default class Tag implements ITagData {
     }
 
     static async fromFile(file: string): Promise<Tag> | null {
-        const { metadata, diagnostics } = await compileFile(file);
+        const filePath = path.parse(file);
+        const fileName = filePath.base;
+        const data = await fs.readFile(file, 'utf-8');
+        if (!(data.includes(`from "lwc"`) || data.includes(`from 'lwc'`))) {
+            return null;
+        }
+        const { metadata, diagnostics } = await compileSource(data, fileName);
         if (diagnostics.length > 0) {
             console.log(`Could not create Tag from ${file}.\n${diagnostics}`);
             return null;
