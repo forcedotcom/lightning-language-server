@@ -1,5 +1,7 @@
 import { compileFile, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
 import { ITagData } from 'vscode-html-languageservice';
+import * as fs from 'fs-extra';
+import decamelize from 'decamelize';
 
 import URI from 'vscode-uri';
 import * as path from 'path';
@@ -30,7 +32,8 @@ export default class Tag implements ITagData {
 
     get name(): string {
         const filename = path.parse(this.file).name;
-        return `${this.namespace}${this.namespaceDelimiter}${filename}`;
+        const basename = decamelize(filename, '-');
+        return `${this.namespace}${this.namespaceDelimiter}${basename}`;
     }
 
     get attributes(): AttributeInfo[] {
