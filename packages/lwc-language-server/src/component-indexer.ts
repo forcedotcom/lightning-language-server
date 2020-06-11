@@ -27,27 +27,26 @@ export default class ComponentIndexer {
         this.workspaceType = detectWorkspaceHelper(attributes.workspaceRoot);
     }
 
-    get componentDirectories(): string[] {
+    get customComponents(): string[] {
+        let files: string[] = [];
         switch (this.workspaceType) {
             case WorkspaceType.SFDX:
                 const dirs = sfdxConfig(this.workspaceRoot).packageDirectories;
                 const paths: string[] = dirs.map((item: { path: string }): string => item.path);
                 const globBase: string = paths.length === 1 ? paths[0] : `{${paths.join()}}`;
-                return glob.sync(path.join(this.workspaceRoot, globBase, '**/*/lwc/'));
+                files = glob.sync(path.join(this.workspaceRoot, globBase, '**/*/lwc/**/*.js'));
+                return files.filter((item: string): boolean => {
+                    const data = path.parse(item);
+                    return data.dir.endsWith(data.name);
+                });
             default:
                 // For CORE_ALL and CORE_PARTIAL
-                return glob.sync(path.join(this.workspaceRoot, '**/*/modules/'));
+                files = glob.sync(path.join(this.workspaceRoot, '**/*/modules/**/*.js'));
+                return files.filter((item: string): boolean => {
+                    const data = path.parse(item);
+                    return data.dir.endsWith(data.name);
+                });
         }
-    }
-
-    get customComponents(): string[] {
-        const dirs: string[] = this.componentDirectories;
-        const globBase: string = dirs.length === 1 ? dirs[0] : `{${dirs.join()}}`;
-        const paths = glob.sync(path.join(globBase, '/*/*.js'));
-        return paths.filter((item: string): boolean => {
-            const data = path.parse(item);
-            return data.dir.endsWith(data.name);
-        });
     }
 
     get customData(): any {

@@ -18,28 +18,6 @@ describe('ComponentIndexer', () => {
     });
 
     describe('instance methods', () => {
-        describe('#componentDirectories', () => {
-            it('returns a list of directories where components can live for sfdx projects', () => {
-                const expectedPaths = ['force-app/main/default/lwc/', 'registered-empty-folder/meta/lwc/', 'utils/meta/lwc/'].map(item =>
-                    path.join(componentIndexer.workspaceRoot, item),
-                );
-                expect(componentIndexer.componentDirectories).toEqual(expectedPaths);
-                expect(componentIndexer.componentDirectories).not.toContain('non-registered-folder/meta/lwc/');
-            });
-
-            it('returns a list of directories where components can live for CORE_ALL projects', () => {
-                const indexer: ComponentIndexer = new ComponentIndexer({
-                    workspaceRoot: '../../test-workspaces/core-like-workspace',
-                });
-
-                const expectedPaths = ['app/main/core/ui-force-components/modules/', 'app/main/core/ui-global-components/modules/'].map(item =>
-                    path.join(indexer.workspaceRoot, item),
-                );
-                expect(indexer.componentDirectories).toEqual(expectedPaths);
-                expect(indexer.componentDirectories).not.toContain('non-registered-folder/meta/lwc/');
-            });
-        });
-
         describe('#customComponents', () => {
             it('returns a list of files where the .js filename is the same as its parent directory name', () => {
                 const expectedComponents: string[] = [
