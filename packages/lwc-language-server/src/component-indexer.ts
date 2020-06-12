@@ -3,8 +3,11 @@ import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
 import * as glob from 'glob';
 import * as fsExtra from 'fs-extra';
+import { join } from 'path';
+import decamelize from 'decamelize';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
+const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
 
 type ComponentIndexerAttributes = {
     workspaceRoot: string;
@@ -49,15 +52,50 @@ export default class ComponentIndexer {
         }
     }
 
-    get customData(): any {
+    get customData(): Tag[] {
         return Array.from(this.tags.values());
     }
 
-    async generateIndex() {
-        const promises = this.customComponents.map(filepath => Tag.fromFile(filepath));
+    loadTagsFromIndex() {
+        const indexPath: string = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+        const shouldInit: boolean = fsExtra.existsSync(indexPath);
+
+        if (shouldInit) {
+            const indexJsonString: string = fsExtra.readFileSync(indexPath, 'utf8');
+            const index: object[] = JSON.parse(indexJsonString);
+            index.forEach(data => {
+                const info = new Tag(data);
+                this.tags.set(info.name, info);
+            });
+        }
+    }
+
+    persistCustomComponents() {
+        const indexPath = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+        const indexJsonString = JSON.stringify(this.customData);
+        fsExtra.writeFileSync(indexPath, indexJsonString);
+    }
+
+    get unIndexedFiles(): string[] {
+        return this.customComponents.filter(filepath => {
+            return !this.customData.some(tag => tag.file === filepath);
+        });
+    }
+
+    get staleTags(): Tag[] {
+        return this.customData.filter(tag => {
+            return !this.customComponents.some(filepath => filepath === tag.file);
+        });
+    }
+
+    async init() {
+        this.loadTagsFromIndex();
+        const promises = this.unIndexedFiles.map(filepath => Tag.fromFile(filepath));
         const tags = await Promise.all(promises);
         tags.filter(Boolean).forEach(tag => {
             this.tags.set(tag.name, tag);
         });
+
+        this.staleTags.forEach(tag => this.tags.delete(tag.name));
     }
 }
