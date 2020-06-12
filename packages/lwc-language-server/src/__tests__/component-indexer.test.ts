@@ -39,10 +39,23 @@ describe('ComponentIndexer', () => {
             });
         });
 
+        describe('#unIndexedFiles', () => {
+            it('returns a list of files not yet indexed', () => {
+                const unIndexed = componentIndexer.unIndexedFiles;
+                expect(unIndexed.length).toBe(10);
+            });
+        });
+
+        describe('#', () => {
+            it('returns a list of tags that are stale and should be removed', () => {
+                const stale = componentIndexer.staleTags;
+                expect(stale.length).toBe(0);
+            });
+        });
+
         describe('#generateIndex()', () => {
             it('creates Tag objects for all the component JS files', async () => {
-                await componentIndexer.generateIndex();
-                console.log(componentIndexer.tags);
+                await componentIndexer.init();
                 expect(componentIndexer.tags.size).toBe(8);
             });
         });
