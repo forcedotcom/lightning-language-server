@@ -1621,6 +1621,11 @@
   resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-0.34.8.tgz#8ffdad50cb8d3d3ed745014ead599a387bf89421"
   integrity sha512-2KyYWxUsMaQf1lEeE+TEpbWHlL3xzvLntdMvofRbERNtpD8Te2MJbjp59sqSk6EpfLA4y2P2htn+gigWw272sA==
 
+"@lwc/errors@1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-1.6.2.tgz#ef19a90dfe472c0946d4834f4aa6cb4dfa052c88"
+  integrity sha512-bgWukkFUFj/lHsHP7qBBVkJ54zDSGka45hQ2ls8EYi285vCs3hBj2ekQZr5Kc0RmbFXXonwXR+iruoPRHqKiIQ==
+
 "@lwc/style-compiler@0.34.8":
   version "0.34.8"
   resolved "https://registry.yarnpkg.com/@lwc/style-compiler/-/style-compiler-0.34.8.tgz#ecd52d8a9b7017e0bd48beb0f88dc7a182f1394e"
