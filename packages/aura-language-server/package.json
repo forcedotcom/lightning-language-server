@@ -35,7 +35,7 @@
     "change-case": "^3.1.0",
     "comment-parser": "^0.7.2",
     "deep-equal": "^1.0.1",
-    "enhanced-resolve": "^2.2.2",
+    "enhanced-resolve": "^4.1.1",
     "eslint": "^5.15.3",
     "fs-extra": "^5.0.0",
     "glob": "^7.1.1",
