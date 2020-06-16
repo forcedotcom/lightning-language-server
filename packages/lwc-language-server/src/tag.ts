@@ -57,6 +57,14 @@ export default class Tag implements ITagData {
         return ['### Attributes', ...this.publicAttributes.map(attributeDoc)].join('\n');
     }
 
+    get classMembers(): ClassMember[] {
+        return this.metadata.classMembers;
+    }
+
+    classMember(name: string): ClassMember {
+        return this.classMembers.find(item => item.name === name) || null;
+    }
+
     get methodDocs(): string | null {
         if (this.apiMethods.length === 0) {
             return null;

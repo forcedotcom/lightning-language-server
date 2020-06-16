@@ -1,4 +1,5 @@
 import Tag from '../tag';
+import { ClassMember } from '@lwc/babel-plugin-component';
 
 describe('Tag', () => {
     const filepath = './src/javascript/__tests__/fixtures/metadata.js';
@@ -31,6 +32,22 @@ describe('Tag', () => {
 
         beforeEach(async () => {
             tag = await Tag.fromFile(filepath);
+        });
+
+        describe('#classMembers', () => {
+            it('returns methods, properties, attributes. Everything defined on the component', () => {
+                expect(tag.classMembers).not.toBeEmpty();
+                expect(tag.classMembers[0].name).toEqual('todo');
+                expect(tag.classMembers[0].type).toEqual('property');
+            });
+        });
+
+        describe('#classMember', () => {
+            it('returns a classMember of a Tag by name', () => {
+                expect(tag.classMember('todo'));
+                expect(tag.classMember('index'));
+                expect(tag.classMember('foo')).toBeNull();
+            });
         });
 
         describe('#publicAttributes', () => {
