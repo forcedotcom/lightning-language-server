@@ -38,6 +38,12 @@ export default class TypingIndexer {
         }
     }
 
+    init(): void {
+        this.createNewMetaTypings();
+        this.deleteStaleMetaTypings();
+        this.saveCustomLabelTypings();
+    }
+
     createNewMetaTypings(): void {
         fsExtra.ensureDirSync(this.typingsBaseDir);
         const newFiles = TypingIndexer.diff(this.metaFiles, this.metaTypings);

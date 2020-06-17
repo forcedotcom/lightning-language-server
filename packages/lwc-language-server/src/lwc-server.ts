@@ -48,9 +48,7 @@ export default class Server {
         });
 
         this.componentIndexer.init();
-        this.typingIndexer.createNewMetaTypings();
-        this.typingIndexer.deleteStaleMetaTypings();
-        this.typingIndexer.saveCustomLabelTypings();
+        this.typingIndexer.init();
 
         return this.capabilities;
     }
