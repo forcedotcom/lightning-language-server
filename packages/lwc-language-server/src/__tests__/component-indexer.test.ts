@@ -52,10 +52,10 @@ describe('ComponentIndexer', () => {
         describe('#findTagByURI', () => {
             it('finds a Tag by matching the end of the URI', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByURI(URI.parse('force-app/main/default/lwc/hello_world/hello_world.js')));
-                expect(componentIndexer.findTagByURI(URI.parse('lwc/hello_world/hello_world.js')));
-                expect(componentIndexer.findTagByURI(URI.parse('hello_world.js')));
-                expect(componentIndexer.findTagByURI(URI.parse('foo/bar/baz'))).toBeUndefined();
+                expect(componentIndexer.findTagByURI('force-app/main/default/lwc/hello_world/hello_world.js'));
+                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js'));
+                expect(componentIndexer.findTagByURI('hello_world.js'));
+                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeUndefined();
 
                 componentIndexer.tags.clear();
             });
