@@ -10,7 +10,7 @@ import {
     TextDocumentPositionParams,
 } from 'vscode-languageserver';
 
-import { getLanguageService, LanguageService, IHTMLDataProvider, HTMLDocument } from 'vscode-html-languageservice';
+import { getLanguageService, LanguageService, IHTMLDataProvider, HTMLDocument, CompletionList } from 'vscode-html-languageservice';
 import { findDefinition } from '@salesforce/lightning-lsp-common/lib/html-language-service/services/HTMLDefinition';
 import { getPropertyBindingTemplateDeclaration } from '@salesforce/lightning-lsp-common/lib/html-language-service/services/lwcExtensions';
 import { getPropertyBindingValue } from '@salesforce/lightning-lsp-common/lib/html-language-service/services/lwcExtensions';
@@ -21,11 +21,13 @@ import { LWCDataProvider } from './lwc-data-provider';
 import * as path from 'path';
 import URI from 'vscode-uri';
 import { create } from 'domain';
+import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 
 export default class Server {
     readonly connection: IConnection = createConnection();
     readonly documents: TextDocuments = new TextDocuments();
 
+    context: WorkspaceContext;
     workspaceFolders: WorkspaceFolder[];
     workspaceRoots: string[];
     dataProvider: IHTMLDataProvider;
@@ -36,11 +38,13 @@ export default class Server {
     constructor() {
         this.documents.listen(this.connection);
         this.connection.onInitialize(this.onInitialize.bind(this));
+        this.connection.onCompletion(this.onCompletion.bind(this));
     }
 
     onInitialize(params: InitializeParams) {
         this.workspaceFolders = params.workspaceFolders;
-        this.workspaceRoots = this.workspaceFolders.map(folder => folder.uri);
+        this.workspaceRoots = this.workspaceFolders.map(folder => URI.parse(folder.uri).fsPath);
+        this.context = new WorkspaceContext(this.workspaceRoots);
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.dataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
@@ -72,6 +76,19 @@ export default class Server {
                 },
             },
         };
+    }
+
+    async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
+        const document = this.documents.get(textDocumentPosition.textDocument.uri);
+        if (!(await this.context.isLWCTemplate(document))) {
+            return { isIncomplete: false, items: [] };
+        }
+        const htmlDocument = this.languageService.parseHTMLDocument(document);
+        return this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
+    }
+
+    listen() {
+        this.connection.listen();
     }
 
     // offsetOnElementTag(params: any): boolean {
