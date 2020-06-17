@@ -1,11 +1,12 @@
 import ComponentIndexer from '../component-indexer';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
+import URI from 'vscode-uri';
 
 const { WorkspaceType } = shared;
-
+const workspaceRoot: string = '../../test-workspaces/sfdx-workspace';
 const componentIndexer: ComponentIndexer = new ComponentIndexer({
-    workspaceRoot: '../../test-workspaces/sfdx-workspace',
+    workspaceRoot,
 });
 
 describe('ComponentIndexer', () => {
@@ -18,6 +19,15 @@ describe('ComponentIndexer', () => {
     });
 
     describe('instance methods', () => {
+        describe('#init', () => {
+            it('adds a Tag to `tags` for each custom component', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.tags.size).toEqual(8);
+                expect(componentIndexer.tags.get('c-hello_world'));
+                componentIndexer.tags.clear();
+            });
+        });
+
         describe('#customComponents', () => {
             it('returns a list of files where the .js filename is the same as its parent directory name', () => {
                 const expectedComponents: string[] = [
@@ -39,6 +49,18 @@ describe('ComponentIndexer', () => {
             });
         });
 
+        describe('#findTagByURI', () => {
+            it('finds a Tag by matching the end of the URI', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.findTagByURI(URI.parse('force-app/main/default/lwc/hello_world/hello_world.js')));
+                expect(componentIndexer.findTagByURI(URI.parse('lwc/hello_world/hello_world.js')));
+                expect(componentIndexer.findTagByURI(URI.parse('hello_world.js')));
+                expect(componentIndexer.findTagByURI(URI.parse('foo/bar/baz'))).toBeUndefined();
+
+                componentIndexer.tags.clear();
+            });
+        });
+
         describe('#unIndexedFiles', () => {
             it('returns a list of files not yet indexed', () => {
                 const unIndexed = componentIndexer.unIndexedFiles;
@@ -46,7 +68,7 @@ describe('ComponentIndexer', () => {
             });
         });
 
-        describe('#', () => {
+        describe('#staleTags', () => {
             it('returns a list of tags that are stale and should be removed', () => {
                 const stale = componentIndexer.staleTags;
                 expect(stale.length).toBe(0);

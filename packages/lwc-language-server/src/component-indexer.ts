@@ -4,7 +4,7 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import * as glob from 'glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
-import decamelize from 'decamelize';
+import URI from 'vscode-uri';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
@@ -54,6 +54,12 @@ export default class ComponentIndexer {
 
     get customData(): Tag[] {
         return Array.from(this.tags.values());
+    }
+
+    findTagByURI(uri: URI): Tag {
+        return Array.from(this.tags.values()).find(tag => {
+            return tag.uri.endsWith(uri.toString());
+        });
     }
 
     loadTagsFromIndex() {
