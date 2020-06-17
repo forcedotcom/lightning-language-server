@@ -1,47 +1,31 @@
-// import { WorkspaceFolder, TextDocument } from 'vscode-languageserver';
+import Server from '../lwc-server';
+import * as fsExtra from 'fs-extra';
+import URI from 'vscode-uri';
+import { getLanguageService, HTMLDocument } from 'vscode-html-languageservice';
 
-// import Server from '../lwc-server';
-// import * as fsExtra from 'fs-extra';
-// import URI from 'vscode-uri';
-// import { getLanguageService, HTMLDocument } from 'vscode-html-languageservice';
+import { WorkspaceFolder, TextDocuments, createConnection } from 'vscode-languageserver';
 
-// describe('new', () => {
-//     const workspaceFolder: WorkspaceFolder = {
-//         uri: '../../test-workspaces/sfdx-workspace',
-//         name: 'sfdx-workspace',
-//     };
+jest.mock('vscode-languageserver', () => {
+    return {
+        createConnection: jest.fn().mockImplementation(() => {
+            return {
+                onInitialize: () => true,
+                onCompletion: () => true,
+            };
+        }),
+        TextDocuments: jest.fn().mockImplementation(() => {
+            return {
+                listen: () => true,
+            };
+        }),
+    };
+});
 
-//     const filename = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html';
-//     const uri = URI.parse(filename).fsPath;
-//     const server: Server = new Server([workspaceFolder]);
-//     const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
-//     const languageService = getLanguageService();
-//     const htmlDoc: HTMLDocument = languageService.parseHTMLDocument(document);
+describe('new', () => {
+    const server: Server = new Server();
 
-//     it('creates a new instance', () => {
-//         expect(server.workspaceRoots);
-//         expect(server.componentIndexer);
-//     });
-
-//     describe('Instance methods', () => {
-//         // describe('#offsetOnElementTag', () => {
-//         //     it('returns true when the position is on the opening tag', () => {
-//         //         const params = {
-//         //             htmlDoc,
-//         //             document,
-//         //             offset: 680,
-//         //         };
-//         //         expect(server.offsetOnElementTag(params)).toBeTrue();
-//         //     });
-//         // });
-//         // describe('#definitionQuery', () => {
-//         //     it('returns the location of a tag when cursor is over the node tag', () => {
-//         //         const params = {
-//         //             textDocument: { uri },
-//         //             position: { line: 17, character: 25 }
-//         //         }
-//         //         server.definitionQuery(params, document)
-//         //     });
-//         // });
-//     });
-// });
+    it('creates a new instance', () => {
+        expect(server.connection);
+        expect(server.documents);
+    });
+});
