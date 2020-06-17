@@ -56,9 +56,9 @@ export default class ComponentIndexer {
         return Array.from(this.tags.values());
     }
 
-    findTagByURI(uri: URI): Tag {
+    findTagByURI(uri: string): Tag {
         return Array.from(this.tags.values()).find(tag => {
-            return tag.uri.endsWith(uri.toString());
+            return tag.uri.endsWith(uri);
         });
     }
 

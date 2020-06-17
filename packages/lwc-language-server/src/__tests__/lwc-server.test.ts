@@ -1,12 +1,10 @@
 import Server from '../lwc-server';
-import * as fsExtra from 'fs-extra';
-import URI from 'vscode-uri';
-import { getLanguageService, HTMLDocument } from 'vscode-html-languageservice';
-
-import { WorkspaceFolder, TextDocuments, createConnection } from 'vscode-languageserver';
+import { TextDocuments, createConnection } from 'vscode-languageserver';
 
 jest.mock('vscode-languageserver', () => {
+    const actual = jest.requireActual('vscode-languageserver');
     return {
+        ...actual,
         createConnection: jest.fn().mockImplementation(() => {
             return {
                 onInitialize: () => true,
@@ -16,6 +14,7 @@ jest.mock('vscode-languageserver', () => {
         TextDocuments: jest.fn().mockImplementation(() => {
             return {
                 listen: () => true,
+                onDidChangeContent: () => true,
             };
         }),
     };
