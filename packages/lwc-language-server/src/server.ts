@@ -1,208 +1,215 @@
-import * as path from 'path';
+import Server from 'lwc-server';
 
-import {
-    createConnection,
-    IConnection,
-    TextDocuments,
-    InitializeParams,
-    InitializeResult,
-    TextDocumentPositionParams,
-    CompletionList,
-    CompletionItem,
-    DidChangeWatchedFilesParams,
-    Hover,
-    Location,
-    ShowMessageNotification,
-    MessageType,
-    RequestType,
-    RegistrationRequest,
-    MarkedString,
-} from 'vscode-languageserver';
+const server = new Server();
 
-import { LWCIndexer } from './indexer';
-import templateLinter from './template/linter';
-import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
-import { WorkspaceContext, utils, shared, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
-import { getLanguageService, LanguageService } from 'vscode-html-languageservice';
-import URI from 'vscode-uri';
-import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
-import { LWCDataProvider } from './lwc-data-provider';
-import decamelize from 'decamelize';
-const { WorkspaceType } = shared;
-// Create a standard connection and let the caller decide the strategy
-// Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
+server.listen();
+//
+//
+// import * as path from 'path';
 
-const connection: IConnection = createConnection();
-interceptConsoleLogger(connection);
+// import {
+//     createConnection,
+//     IConnection,
+//     TextDocuments,
+//     InitializeParams,
+//     InitializeResult,
+//     TextDocumentPositionParams,
+//     CompletionList,
+//     CompletionItem,
+//     DidChangeWatchedFilesParams,
+//     Hover,
+//     Location,
+//     ShowMessageNotification,
+//     MessageType,
+//     RequestType,
+//     RegistrationRequest,
+//     MarkedString,
+// } from 'vscode-languageserver';
 
-// Create a document namager supporting only full document sync
-const documents: TextDocuments = new TextDocuments();
-documents.listen(connection);
+// import { LWCIndexer } from './indexer';
+// import templateLinter from './template/linter';
+// import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+// import { WorkspaceContext, utils, shared, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+// import { getLanguageService, LanguageService } from 'vscode-html-languageservice';
+// import URI from 'vscode-uri';
+// import { addCustomTagFromResults, getLwcTags, getLwcByTag } from './metadata-utils/custom-components-util';
+// import { LWCDataProvider } from './lwc-data-provider';
+// import decamelize from 'decamelize';
+// const { WorkspaceType } = shared;
+// // Create a standard connection and let the caller decide the strategy
+// // Available strategies: '--node-ipc', '--stdio' or '--socket={number}'
 
-let htmlLS: LanguageService;
-let context: WorkspaceContext;
+// const connection: IConnection = createConnection();
+// interceptConsoleLogger(connection);
 
-connection.onInitialize(
-    async (params: InitializeParams): Promise<InitializeResult> => {
-        const { workspaceFolders } = params;
+// // Create a document namager supporting only full document sync
+// const documents: TextDocuments = new TextDocuments();
+// documents.listen(connection);
 
-        const workspaceRoots: string[] = [];
-        for (const folder of workspaceFolders) {
-            workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
-        }
-        try {
-            context.configureProject();
-            // context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
-            // comopnentIndexer = new ComponentIndexer(workspaceroot);
-            const lwcProvider = new LWCDataProvider();
-            htmlLS = getLanguageService({
-                customDataProviders: [lwcProvider],
-            });
-            // console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
-            return {
-                capabilities: {
-                    textDocumentSync: documents.syncKind,
-                    completionProvider: {
-                        resolveProvider: true,
-                    },
-                    hoverProvider: true,
-                    definitionProvider: true,
-                    workspace: {
-                        workspaceFolders: {
-                            supported: true,
-                        },
-                    },
-                },
-            };
-        } catch (e) {
-            throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
-        }
-    },
-);
+// let htmlLS: LanguageService;
+// let context: WorkspaceContext;
 
-// Make sure to clear all the diagnostics when a document gets closed
-documents.onDidClose(event => {
-    connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
-});
+// connection.onInitialize(
+//     async (params: InitializeParams): Promise<InitializeResult> => {
+//         const { workspaceFolders } = params;
 
-documents.onDidChangeContent(async change => {
-    // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
-    const { document } = change;
-    const { uri } = document;
-    if (await context.isLWCTemplate(document)) {
-        const diagnostics = templateLinter(document);
-        connection.sendDiagnostics({ uri, diagnostics });
-    } else if (await context.isLWCJavascript(document)) {
-        const { metadata, diagnostics } = await javascriptCompileDocument(document);
-        connection.sendDiagnostics({ uri, diagnostics });
-        if (metadata) {
-            // writeConfigs is set to false to avoid config updates on every keystroke.
-            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, false);
-        }
-    }
-});
+//         const workspaceRoots: string[] = [];
+//         for (const folder of workspaceFolders) {
+//             workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
+//         }
+//         try {
+//             context.configureProject();
+//             // context.addIndexingProvider({ name: 'lwc', indexer: lwcIndexer });
+//             // comopnentIndexer = new ComponentIndexer(workspaceroot);
+//             const lwcProvider = new LWCDataProvider();
+//             htmlLS = getLanguageService({
+//                 customDataProviders: [lwcProvider],
+//             });
+//             // console.info('     ... language server started in ' + utils.elapsedMillis(startTime));
+//             return {
+//                 capabilities: {
+//                     textDocumentSync: documents.syncKind,
+//                     completionProvider: {
+//                         resolveProvider: true,
+//                     },
+//                     hoverProvider: true,
+//                     definitionProvider: true,
+//                     workspace: {
+//                         workspaceFolders: {
+//                             supported: true,
+//                         },
+//                     },
+//                 },
+//             };
+//         } catch (e) {
+//             throw new Error(`LWC Language Server initialization unsuccessful. Error message: ${e.message}`);
+//         }
+//     },
+// );
 
-documents.onDidSave(async change => {
-    const { document } = change;
-    const { uri } = document;
-    if (await context.isLWCJavascript(document)) {
-        const { metadata } = await javascriptCompileDocument(document);
-        if (metadata) {
-            addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
-        }
-    }
-});
+// // Make sure to clear all the diagnostics when a document gets closed
+// documents.onDidClose(event => {
+//     connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
+// });
 
-connection.onCompletion(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return { isIncomplete: false, items: [] };
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
-    },
-);
+// documents.onDidChangeContent(async change => {
+//     // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
+//     const { document } = change;
+//     const { uri } = document;
+//     if (await context.isLWCTemplate(document)) {
+//         const diagnostics = templateLinter(document);
+//         connection.sendDiagnostics({ uri, diagnostics });
+//     } else if (await context.isLWCJavascript(document)) {
+//         const { metadata, diagnostics } = await javascriptCompileDocument(document);
+//         connection.sendDiagnostics({ uri, diagnostics });
+//         if (metadata) {
+//             // writeConfigs is set to false to avoid config updates on every keystroke.
+//             addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX, false);
+//         }
+//     }
+// });
 
-connection.onCompletionResolve(
-    (item: CompletionItem): CompletionItem => {
-        return item;
-    },
-);
+// documents.onDidSave(async change => {
+//     const { document } = change;
+//     const { uri } = document;
+//     if (await context.isLWCJavascript(document)) {
+//         const { metadata } = await javascriptCompileDocument(document);
+//         if (metadata) {
+//             addCustomTagFromResults(context, uri, metadata, context.type === WorkspaceType.SFDX);
+//         }
+//     }
+// });
 
-connection.onHover(
-    async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
-        const document = documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await context.isLWCTemplate(document))) {
-            return null;
-        }
-        const htmlDocument = htmlLS.parseHTMLDocument(document);
-        return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
-    },
-);
+// connection.onCompletion(
+//     async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> => {
+//         const document = documents.get(textDocumentPosition.textDocument.uri);
+//         if (!(await context.isLWCTemplate(document))) {
+//             return { isIncomplete: false, items: [] };
+//         }
+//         const htmlDocument = htmlLS.parseHTMLDocument(document);
+//         return htmlLS.doComplete(document, textDocumentPosition.position, htmlDocument);
+//     },
+// );
 
-function findJavascriptProperty(valueProperty: string, textDocumentPosition: TextDocumentPositionParams) {
-    // couldn't find it within the markup file, try looking for it as a javascript property
-    const fsPath = URI.parse(textDocumentPosition.textDocument.uri).fsPath;
-    const parsedPath = path.parse(fsPath);
-    const componentName = decamelize(parsedPath.name, '-');
-    const namespace = path.basename(path.dirname(parsedPath.dir));
-    const tagInfo = getLwcByTag(namespace + '-' + componentName);
-    if (tagInfo) {
-        for (const property of [...tagInfo.properties, ...tagInfo.methods]) {
-            if (property.name === valueProperty) {
-                return {
-                    uri: URI.file(tagInfo.file).toString(),
-                    range: {
-                        start: {
-                            character: property.loc.start.column,
-                            line: property.loc.start.line - 1,
-                        },
-                        end: {
-                            character: property.loc.end.column,
-                            line: property.loc.end.line - 1,
-                        },
-                    },
-                };
-            }
-        }
-    }
-    return null;
-}
-// connection.onDefinition(
-//     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+// connection.onCompletionResolve(
+//     (item: CompletionItem): CompletionItem => {
+//         return item;
+//     },
+// );
+
+// connection.onHover(
+//     async (textDocumentPosition: TextDocumentPositionParams): Promise<Hover> => {
 //         const document = documents.get(textDocumentPosition.textDocument.uri);
 //         if (!(await context.isLWCTemplate(document))) {
 //             return null;
 //         }
 //         const htmlDocument = htmlLS.parseHTMLDocument(document);
-//         let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
-//         if (!def) {
-//             def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
-//             if (!def) {
-//                 const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
-//                 if (valueProperty) {
-//                     def = findJavascriptProperty(valueProperty, textDocumentPosition);
-//                 }
-//             }
-//         }
-//         return def;
+//         return htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
 //     },
 // );
 
-// Listen on the connection
-connection.listen();
+// function findJavascriptProperty(valueProperty: string, textDocumentPosition: TextDocumentPositionParams) {
+//     // couldn't find it within the markup file, try looking for it as a javascript property
+//     const fsPath = URI.parse(textDocumentPosition.textDocument.uri).fsPath;
+//     const parsedPath = path.parse(fsPath);
+//     const componentName = decamelize(parsedPath.name, '-');
+//     const namespace = path.basename(path.dirname(parsedPath.dir));
+//     const tagInfo = getLwcByTag(namespace + '-' + componentName);
+//     if (tagInfo) {
+//         for (const property of [...tagInfo.properties, ...tagInfo.methods]) {
+//             if (property.name === valueProperty) {
+//                 return {
+//                     uri: URI.file(tagInfo.file).toString(),
+//                     range: {
+//                         start: {
+//                             character: property.loc.start.column,
+//                             line: property.loc.start.line - 1,
+//                         },
+//                         end: {
+//                             character: property.loc.end.column,
+//                             line: property.loc.end.line - 1,
+//                         },
+//                     },
+//                 };
+//             }
+//         }
+//     }
+//     return null;
+// }
+// // connection.onDefinition(
+// //     async (textDocumentPosition: TextDocumentPositionParams): Promise<Location> => {
+// //         const document = documents.get(textDocumentPosition.textDocument.uri);
+// //         if (!(await context.isLWCTemplate(document))) {
+// //             return null;
+// //         }
+// //         const htmlDocument = htmlLS.parseHTMLDocument(document);
+// //         let def = htmlLS.findDefinition(document, textDocumentPosition.position, htmlDocument);
+// //         if (!def) {
+// //             def = htmlLS.getPropertyBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
+// //             if (!def) {
+// //                 const valueProperty = htmlLS.getPropertyBindingValue(document, textDocumentPosition.position, htmlDocument);
+// //                 if (valueProperty) {
+// //                     def = findJavascriptProperty(valueProperty, textDocumentPosition);
+// //                 }
+// //             }
+// //         }
+// //         return def;
+// //     },
+// // );
 
-connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
-    try {
-        const indexer: LWCIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
-        return indexer.handleWatchedFiles(context, change);
-    } catch (e) {
-        connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
-    }
-});
+// // Listen on the connection
+// connection.listen();
 
-connection.onRequest('salesforce/listComponents', () => {
-    const tags = getLwcTags();
-    return JSON.stringify([...tags]);
-});
+// connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) => {
+//     try {
+//         const indexer: LWCIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
+//         return indexer.handleWatchedFiles(context, change);
+//     } catch (e) {
+//         connection.sendNotification(ShowMessageNotification.type, { type: MessageType.Error, message: `Error re-indexing workspace: ${e.message}` });
+//     }
+// });
+
+// connection.onRequest('salesforce/listComponents', () => {
+//     const tags = getLwcTags();
+//     return JSON.stringify([...tags]);
+// });
