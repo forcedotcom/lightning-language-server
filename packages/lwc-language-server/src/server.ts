@@ -1,4 +1,4 @@
-import Server from 'lwc-server';
+import Server from './lwc-server';
 
 const server = new Server();
 
