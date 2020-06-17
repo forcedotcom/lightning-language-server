@@ -57,16 +57,20 @@ export default class ComponentIndexer {
     }
 
     loadTagsFromIndex() {
-        const indexPath: string = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
-        const shouldInit: boolean = fsExtra.existsSync(indexPath);
+        try {
+            const indexPath: string = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+            const shouldInit: boolean = fsExtra.existsSync(indexPath);
 
-        if (shouldInit) {
-            const indexJsonString: string = fsExtra.readFileSync(indexPath, 'utf8');
-            const index: object[] = JSON.parse(indexJsonString);
-            index.forEach(data => {
-                const info = new Tag(data);
-                this.tags.set(info.name, info);
-            });
+            if (shouldInit) {
+                const indexJsonString: string = fsExtra.readFileSync(indexPath, 'utf8');
+                const index: object[] = JSON.parse(indexJsonString);
+                index.forEach(data => {
+                    const info = new Tag(data);
+                    this.tags.set(info.name, info);
+                });
+            }
+        } catch (err) {
+            console.error(err);
         }
     }
 
