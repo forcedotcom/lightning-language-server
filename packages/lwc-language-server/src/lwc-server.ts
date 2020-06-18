@@ -12,22 +12,42 @@ import {
     TextDocumentPositionParams,
 } from 'vscode-languageserver';
 
-import { getLanguageService, LanguageService, IHTMLDataProvider, CompletionList, Hover } from 'vscode-html-languageservice';
-import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+import {
+    getLanguageService,
+    LanguageService,
+    IHTMLDataProvider,
+    HTMLDocument,
+    CompletionList,
+    TokenType,
+    ScannerState,
+    Hover,
+} from 'vscode-html-languageservice';
+
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
-import { LWCDataProvider } from './lwc-data-provider';
 import templateLinter from './template/linter';
 import Tag from './tag';
-
 import URI from 'vscode-uri';
+
+import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+import { LWCDataProvider } from './lwc-data-provider';
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+
+export enum Token {
+    Tag = 'tag',
+    Attribute = 'attribute',
+}
+
+type CursorInfo = {
+    name: string;
+    type: Token;
+    tag?: string;
+};
 
 export default class Server {
     readonly connection: IConnection = createConnection();
     readonly documents: TextDocuments = new TextDocuments();
-
     context: WorkspaceContext;
     workspaceFolders: WorkspaceFolder[];
     workspaceRoots: string[];
@@ -87,7 +107,7 @@ export default class Server {
         if (!(await this.context.isLWCTemplate(document))) {
             return { isIncomplete: false, items: [] };
         }
-        const htmlDocument = this.languageService.parseHTMLDocument(document);
+        const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(document);
         return this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
     }
 
@@ -120,6 +140,36 @@ export default class Server {
 
     onShutdown() {
         this.componentIndexer.persistCustomComponents();
+    }
+
+    cursorInfo({ textDocument: { uri }, position }: TextDocumentPositionParams, document?: TextDocument): CursorInfo | null {
+        const doc = document || this.documents.get(uri);
+        const htmlDoc = this.languageService.parseHTMLDocument(doc);
+        const offset = doc.offsetAt(position);
+        const node = htmlDoc.findNodeAt(offset);
+        const scanner = this.languageService.createScanner(doc.getText(), node.start);
+        let token;
+
+        do {
+            token = scanner.scan();
+        } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
+
+        switch (token) {
+            case TokenType.StartTag:
+            case TokenType.EndTag:
+                return {
+                    type: Token.Tag,
+                    name: node.tag,
+                };
+            case TokenType.AttributeName:
+                return {
+                    type: Token.Attribute,
+                    tag: node.tag,
+                    name: scanner.getTokenText(),
+                };
+        }
+
+        return null;
     }
 
     listen() {

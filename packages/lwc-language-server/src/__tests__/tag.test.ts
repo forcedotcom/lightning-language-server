@@ -1,5 +1,4 @@
 import Tag from '../tag';
-// import { ClassMember } from '@lwc/babel-plugin-component';
 
 describe('Tag', () => {
     const filepath = './src/javascript/__tests__/fixtures/metadata.js';
