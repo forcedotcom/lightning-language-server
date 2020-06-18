@@ -3,12 +3,15 @@ import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 import Typing from './typing';
 import { shared } from '@salesforce/lightning-lsp-common';
+import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 
-export default class TypingIndexer {
-    readonly workspaceRoot: string;
-    readonly sfdxPackageDirsPattern: string;
+type BaseIndexerAttributes = {
+    workspaceRoot: string;
+};
+
+export default class TypingIndexer extends BaseIndexer {
     readonly typingsBaseDir: string;
 
     static diff(items: string[], compareItems: string[]): string[] {
@@ -19,10 +22,8 @@ export default class TypingIndexer {
         });
     }
 
-    constructor(attributes: { [key: string]: any }) {
-        this.workspaceRoot = path.resolve(attributes.workspaceRoot);
-        this.sfdxPackageDirsPattern = attributes.sfdxPackageDirsPattern;
-
+    constructor(attributes: BaseIndexerAttributes) {
+        super(attributes);
         const projectType = detectWorkspaceHelper(attributes.workspaceRoot);
 
         switch (projectType) {

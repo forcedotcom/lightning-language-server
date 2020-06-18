@@ -4,7 +4,7 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import * as glob from 'glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
-import URI from 'vscode-uri';
+import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
@@ -13,20 +13,12 @@ type ComponentIndexerAttributes = {
     workspaceRoot: string;
 };
 
-function sfdxConfig(root: string) {
-    const filename: string = path.join(root, 'sfdx-project.json');
-    const data: string = fsExtra.readFileSync(filename).toString();
-
-    return JSON.parse(data);
-}
-
-export default class ComponentIndexer {
-    readonly workspaceRoot: string;
+export default class ComponentIndexer extends BaseIndexer {
     readonly workspaceType: number;
     readonly tags: Map<string, Tag> = new Map();
 
     constructor(attributes: ComponentIndexerAttributes) {
-        this.workspaceRoot = path.resolve(attributes.workspaceRoot);
+        super(attributes);
         this.workspaceType = detectWorkspaceHelper(attributes.workspaceRoot);
     }
 
@@ -34,10 +26,7 @@ export default class ComponentIndexer {
         let files: string[] = [];
         switch (this.workspaceType) {
             case WorkspaceType.SFDX:
-                const dirs = sfdxConfig(this.workspaceRoot).packageDirectories;
-                const paths: string[] = dirs.map((item: { path: string }): string => item.path);
-                const globBase: string = paths.length === 1 ? paths[0] : `{${paths.join()}}`;
-                files = glob.sync(path.join(this.workspaceRoot, globBase, '**/*/lwc/**/*.js'));
+                files = glob.sync(path.join(this.workspaceRoot, this.sfdxPackageDirsPattern, '**/*/lwc/**/*.js'));
                 return files.filter((item: string): boolean => {
                     const data = path.parse(item);
                     return data.dir.endsWith(data.name);
