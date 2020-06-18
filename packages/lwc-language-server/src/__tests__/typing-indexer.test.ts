@@ -4,7 +4,6 @@ import * as fsExtra from 'fs-extra';
 
 const typingIndexer: TypingIndexer = new TypingIndexer({
     workspaceRoot: '../../test-workspaces/sfdx-workspace',
-    sfdxPackageDirsPattern: '{force-app,utils}',
 });
 
 describe('TypingIndexer', () => {
@@ -16,7 +15,7 @@ describe('TypingIndexer', () => {
         it('initializes with the root of a workspace', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/sfdx-workspace');
             expect(typingIndexer.workspaceRoot).toEqual(expectedPath);
-            expect(typingIndexer.sfdxPackageDirsPattern).toEqual('{force-app,utils}');
+            expect(typingIndexer.sfdxPackageDirsPattern).toEqual('{force-app,utils,registered-empty-folder}');
         });
     });
 

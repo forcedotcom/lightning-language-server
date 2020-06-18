@@ -9,6 +9,8 @@ jest.mock('vscode-languageserver', () => {
             return {
                 onInitialize: () => true,
                 onCompletion: () => true,
+                onHover: () => true,
+                onShutdown: () => true,
             };
         }),
         TextDocuments: jest.fn().mockImplementation(() => {
