@@ -119,6 +119,13 @@ export default class Tag implements ITagData {
         return Location.create(this.uri, this.range);
     }
 
+    updateMetadata(meta: any) {
+        this.metadata = meta;
+        this._allAttributes = null;
+        this._methods = null;
+        this._properties = null;
+    }
+
     static async fromFile(file: string): Promise<Tag> | null {
         const filePath = path.parse(file);
         const fileName = filePath.base;
