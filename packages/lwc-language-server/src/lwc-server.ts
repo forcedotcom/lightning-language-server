@@ -12,7 +12,7 @@ import {
     TextDocumentPositionParams,
 } from 'vscode-languageserver';
 
-import { getLanguageService, LanguageService, IHTMLDataProvider, CompletionList } from 'vscode-html-languageservice';
+import { getLanguageService, LanguageService, IHTMLDataProvider, CompletionList, Hover } from 'vscode-html-languageservice';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
@@ -22,6 +22,7 @@ import Tag from './tag';
 
 import URI from 'vscode-uri';
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
+import { interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export default class Server {
     readonly connection: IConnection = createConnection();
@@ -36,8 +37,10 @@ export default class Server {
     languageService: LanguageService;
 
     constructor() {
+        interceptConsoleLogger(this.connection);
         this.connection.onInitialize(this.onInitialize.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
+        this.connection.onHover(this.onHover.bind(this));
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
@@ -55,12 +58,12 @@ export default class Server {
         });
 
         this.componentIndexer.init();
-        this.typingIndexer.init();
+        // this.typingIndexer.init();
 
         return this.capabilities;
     }
 
-    capabilities(): InitializeResult {
+    get capabilities(): InitializeResult {
         return {
             capabilities: {
                 textDocumentSync: this.documents.syncKind,
@@ -85,6 +88,15 @@ export default class Server {
         }
         const htmlDocument = this.languageService.parseHTMLDocument(document);
         return this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
+    }
+
+    async onHover(textDocumentPosition: TextDocumentPositionParams): Promise<Hover> {
+        const document = this.documents.get(textDocumentPosition.textDocument.uri);
+        if (!(await this.context.isLWCTemplate(document))) {
+            return null;
+        }
+        const htmlDocument = this.languageService.parseHTMLDocument(document);
+        return this.languageService.doHover(document, textDocumentPosition.position, htmlDocument);
     }
 
     async onDidChangeContent(changeEvent: any): Promise<void> {
