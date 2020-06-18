@@ -65,6 +65,7 @@ export default class Server {
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
+        this.documents.onDidSave(this.onDidSave.bind(this));
     }
 
     onInitialize(params: InitializeParams) {
@@ -133,7 +134,24 @@ export default class Server {
             this.connection.sendDiagnostics({ uri, diagnostics });
             if (metadata) {
                 const tag: Tag = this.componentIndexer.findTagByURI(uri);
-                if (tag) tag.metadata = metadata;
+                if (tag) tag.updateMetadata(metadata);
+            }
+        }
+    }
+
+    async onDidSave(change: TextDocumentChangeEvent) {
+        const { document } = change;
+        const { uri } = document;
+        if (await this.context.isLWCJavascript(document)) {
+            const { metadata } = await javascriptCompileDocument(document);
+            if (metadata) {
+                const tag = this.componentIndexer.findTagByURI(uri);
+                if (tag) {
+                    tag.updateMetadata(metadata);
+                } else {
+                    const newTag = new Tag(metadata);
+                    this.componentIndexer.tags.set(newTag.name, newTag);
+                }
             }
         }
     }
