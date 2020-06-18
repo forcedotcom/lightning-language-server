@@ -41,6 +41,7 @@ export default class Server {
         this.connection.onInitialize(this.onInitialize.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onHover(this.onHover.bind(this));
+        this.connection.onShutdown(this.onShutdown.bind(this));
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
@@ -115,6 +116,10 @@ export default class Server {
                 if (tag) tag.metadata = metadata;
             }
         }
+    }
+
+    onShutdown() {
+        this.componentIndexer.persistCustomComponents();
     }
 
     listen() {
