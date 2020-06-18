@@ -59,7 +59,7 @@ export default class Server {
         });
 
         this.componentIndexer.init();
-        // this.typingIndexer.init();
+        this.typingIndexer.init();
 
         return this.capabilities;
     }
