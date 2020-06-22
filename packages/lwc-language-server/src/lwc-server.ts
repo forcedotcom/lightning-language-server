@@ -21,6 +21,7 @@ import {
     TokenType,
     ScannerState,
     Hover,
+    CompletionItem,
 } from 'vscode-html-languageservice';
 
 import ComponentIndexer from './component-indexer';
@@ -60,6 +61,7 @@ export default class Server {
         interceptConsoleLogger(this.connection);
         this.connection.onInitialize(this.onInitialize.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
+        this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
         this.connection.onHover(this.onHover.bind(this));
         this.connection.onShutdown(this.onShutdown.bind(this));
 
@@ -110,6 +112,10 @@ export default class Server {
         }
         const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(document);
         return this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
+    }
+
+    onCompletionResolve(item: CompletionItem): CompletionItem {
+        return item;
     }
 
     async onHover(textDocumentPosition: TextDocumentPositionParams): Promise<Hover> {
