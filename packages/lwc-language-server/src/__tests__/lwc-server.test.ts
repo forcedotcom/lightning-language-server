@@ -44,16 +44,21 @@ describe('new', () => {
     describe('cursorInfo', () => {
         it('it knows when Im in a start tag', () => {
             const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 16, character: 23 } }, document);
-            expect(cursorInfo).toEqual({ type: Token.Tag, name: 'c-todo_item' });
+            expect(cursorInfo).toEqual({ type: Token.Tag, name: 'c-todo_item', tag: 'c-todo_item' });
         });
 
         it('knows when Im on an attribute name', () => {
             const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 17, character: 26 } }, document);
-            expect(cursorInfo).toEqual({ type: Token.Attribute, name: 'key', tag: 'c-todo_item' });
+            expect(cursorInfo).toEqual({ type: Token.AttributeKey, name: 'key', tag: 'c-todo_item' });
+        });
+
+        it('knows when Im on an attribute value', () => {
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 18, character: 33 } }, document);
+            expect(cursorInfo).toEqual({ type: Token.AttributeValue, name: '{todo}', tag: 'c-todo_item' });
         });
 
         it('returns nothing if not recognized', () => {
-            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 17, character: 33 } }, document);
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 35, character: 32 } }, document);
             expect(cursorInfo).toBeNull();
         });
     });

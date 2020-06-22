@@ -37,7 +37,8 @@ import { interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export enum Token {
     Tag = 'tag',
-    Attribute = 'attribute',
+    AttributeKey = 'attributeKey',
+    AttributeValue = 'attributeValue',
 }
 
 type CursorInfo = {
@@ -67,7 +68,7 @@ export default class Server {
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
-        this.documents.onDidSave(this.onDidSave.bind(this));
+        // this.documents.onDidSave(this.onDidSave.bind(this));
     }
 
     onInitialize(params: InitializeParams) {
@@ -173,9 +174,11 @@ export default class Server {
         const node = htmlDoc.findNodeAt(offset);
         const scanner = this.languageService.createScanner(doc.getText(), node.start);
         let token;
+        // let attribute;
 
         do {
             token = scanner.scan();
+            // if (token === TokenType.AttributeName) attribute = scanner.getTokenText();
         } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
 
         switch (token) {
@@ -184,10 +187,17 @@ export default class Server {
                 return {
                     type: Token.Tag,
                     name: node.tag,
+                    tag: node.tag,
                 };
             case TokenType.AttributeName:
                 return {
-                    type: Token.Attribute,
+                    type: Token.AttributeKey,
+                    tag: node.tag,
+                    name: scanner.getTokenText(),
+                };
+            case TokenType.AttributeValue:
+                return {
+                    type: Token.AttributeValue,
                     tag: node.tag,
                     name: scanner.getTokenText(),
                 };
