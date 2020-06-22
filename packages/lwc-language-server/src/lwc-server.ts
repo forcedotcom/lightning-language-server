@@ -39,6 +39,7 @@ export enum Token {
     Tag = 'tag',
     AttributeKey = 'attributeKey',
     AttributeValue = 'attributeValue',
+    Content = 'content',
 }
 
 type CursorInfo = {
@@ -198,6 +199,12 @@ export default class Server {
             case TokenType.AttributeValue:
                 return {
                     type: Token.AttributeValue,
+                    tag: node.tag,
+                    name: scanner.getTokenText(),
+                };
+            case TokenType.Content:
+                return {
+                    type: Token.Content,
                     tag: node.tag,
                     name: scanner.getTokenText(),
                 };

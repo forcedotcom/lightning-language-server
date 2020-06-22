@@ -57,9 +57,9 @@ describe('new', () => {
             expect(cursorInfo).toEqual({ type: Token.AttributeValue, name: '{todo}', tag: 'c-todo_item' });
         });
 
-        it('returns nothing if not recognized', () => {
-            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 35, character: 32 } }, document);
-            expect(cursorInfo).toBeNull();
+        it('knows when Im in content', () => {
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 33 } }, document);
+            expect(cursorInfo).toEqual({ type: Token.Content, name: '{countTodos}', tag: 'strong' });
         });
     });
 });
