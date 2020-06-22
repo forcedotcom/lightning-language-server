@@ -170,16 +170,14 @@ export default class Server {
 
     cursorInfo({ textDocument: { uri }, position }: TextDocumentPositionParams, document?: TextDocument): CursorInfo | null {
         const doc = document || this.documents.get(uri);
-        const htmlDoc = this.languageService.parseHTMLDocument(doc);
         const offset = doc.offsetAt(position);
-        const node = htmlDoc.findNodeAt(offset);
-        const scanner = this.languageService.createScanner(doc.getText(), node.start);
+        const scanner = this.languageService.createScanner(doc.getText());
         let token;
-        // let attribute;
+        let tag;
 
         do {
             token = scanner.scan();
-            // if (token === TokenType.AttributeName) attribute = scanner.getTokenText();
+            if (token === TokenType.StartTag) tag = scanner.getTokenText();
         } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
 
         switch (token) {
@@ -187,25 +185,25 @@ export default class Server {
             case TokenType.EndTag:
                 return {
                     type: Token.Tag,
-                    name: node.tag,
-                    tag: node.tag,
+                    name: tag,
+                    tag,
                 };
             case TokenType.AttributeName:
                 return {
                     type: Token.AttributeKey,
-                    tag: node.tag,
+                    tag,
                     name: scanner.getTokenText(),
                 };
             case TokenType.AttributeValue:
                 return {
                     type: Token.AttributeValue,
-                    tag: node.tag,
+                    tag,
                     name: scanner.getTokenText(),
                 };
             case TokenType.Content:
                 return {
                     type: Token.Content,
-                    tag: node.tag,
+                    tag,
                     name: scanner.getTokenText(),
                 };
         }
