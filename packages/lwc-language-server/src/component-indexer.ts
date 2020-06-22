@@ -97,4 +97,13 @@ export default class ComponentIndexer extends BaseIndexer {
 
         this.staleTags.forEach(tag => this.tags.delete(tag.name));
     }
+
+    async reindex() {
+        const promises = this.customComponents.map(filepath => Tag.fromFile(filepath));
+        const tags = await Promise.all(promises);
+        this.tags.clear();
+        tags.forEach(tag => {
+            this.tags.set(tag.name, tag);
+        });
+    }
 }
