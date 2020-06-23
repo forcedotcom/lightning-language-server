@@ -39,6 +39,7 @@ export enum Token {
     Tag = 'tag',
     AttributeKey = 'attributeKey',
     AttributeValue = 'attributeValue',
+    DynamicAttributeValue = 'dynamicAttributeValue',
     Content = 'content',
 }
 
@@ -66,10 +67,11 @@ export default class Server {
         this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
         this.connection.onHover(this.onHover.bind(this));
         this.connection.onShutdown(this.onShutdown.bind(this));
+        this.connection.onDefinition(this.onDefinition.bind(this));
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
-        // this.documents.onDidSave(this.onDidSave.bind(this));
+        this.documents.onDidSave(this.onDidSave.bind(this));
     }
 
     onInitialize(params: InitializeParams) {
@@ -168,6 +170,14 @@ export default class Server {
         this.componentIndexer.persistCustomComponents();
     }
 
+    onDefinition(params: TextDocumentPositionParams): Location[] | null {
+        const cursorInfo: CursorInfo = this.cursorInfo(params);
+
+        if (cursorInfo.type === Token.Tag) {
+            return [this.componentIndexer.tags.get(cursorInfo.tag).location];
+        }
+    }
+
     cursorInfo({ textDocument: { uri }, position }: TextDocumentPositionParams, document?: TextDocument): CursorInfo | null {
         const doc = document || this.documents.get(uri);
         const offset = doc.offsetAt(position);
@@ -195,11 +205,10 @@ export default class Server {
                     name: scanner.getTokenText(),
                 };
             case TokenType.AttributeValue:
-                return {
-                    type: Token.AttributeValue,
-                    tag,
-                    name: scanner.getTokenText(),
-                };
+                const tokenText: string = scanner.getTokenText();
+                const match = /\{(?<property>\w+)\.*.*\}/.exec(tokenText);
+                const [type, name]: [Token, string] = match ? [Token.DynamicAttributeValue, match.groups.property] : [Token.AttributeValue, tokenText];
+                return { type, tag, name };
             case TokenType.Content:
                 return {
                     type: Token.Content,

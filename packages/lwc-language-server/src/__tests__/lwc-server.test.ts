@@ -20,6 +20,7 @@ jest.mock('vscode-languageserver', () => {
                 onCompletion: () => true,
                 onHover: () => true,
                 onShutdown: () => true,
+                onDefinition: () => true,
             };
         }),
         TextDocuments: jest.fn().mockImplementation(() => {
@@ -27,6 +28,7 @@ jest.mock('vscode-languageserver', () => {
                 listen: () => true,
                 onDidChangeContent: () => true,
                 get: () => [document],
+                onDidSave: () => true,
             };
         }),
     };
@@ -52,9 +54,14 @@ describe('new', () => {
             expect(cursorInfo).toEqual({ type: Token.AttributeKey, name: 'key', tag: 'c-todo_item' });
         });
 
-        it('knows when Im on an attribute value', () => {
+        it('knows when Im on a dynamic attribute value (inside "{}")', () => {
             const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 18, character: 33 } }, document);
-            expect(cursorInfo).toEqual({ type: Token.AttributeValue, name: '{todo}', tag: 'c-todo_item' });
+            expect(cursorInfo).toEqual({ type: Token.DynamicAttributeValue, name: 'todo', tag: 'c-todo_item' });
+        });
+
+        it('knows when Im on an attribute value', () => {
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 7, character: 35 } }, document);
+            expect(cursorInfo).toEqual({ type: Token.AttributeValue, name: '"off"', tag: 'input' });
         });
 
         it('knows when Im in content', () => {
