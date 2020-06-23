@@ -1,6 +1,5 @@
 import Server, { Token } from '../lwc-server';
 import { TextDocuments, createConnection, TextDocument } from 'vscode-languageserver';
-// import * as definition from '../definition';
 
 import URI from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -57,7 +56,19 @@ describe('new', () => {
 
         it('knows when Im on a dynamic attribute value (inside "{}")', () => {
             const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 18, character: 33 } }, document);
-            expect(cursorInfo).toEqual({ type: Token.DynamicAttributeValue, name: 'todo', tag: 'c-todo_item' });
+            expect(cursorInfo.type).toEqual(Token.DynamicAttributeValue);
+            expect(cursorInfo.name).toEqual('todo');
+            expect(cursorInfo.tag).toEqual('c-todo_item');
+            expect(cursorInfo.range).toEqual({
+                start: {
+                    character: 60,
+                    line: 15,
+                },
+                end: {
+                    character: 66,
+                    line: 15,
+                }
+            });
         });
 
         it('knows when Im on an attribute value', () => {

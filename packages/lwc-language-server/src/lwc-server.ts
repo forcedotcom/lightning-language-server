@@ -4,7 +4,6 @@ import {
     TextDocuments,
     TextDocument,
     TextDocumentChangeEvent,
-    Event,
     Location,
     WorkspaceFolder,
     InitializeResult,
@@ -19,7 +18,6 @@ import {
     HTMLDocument,
     CompletionList,
     TokenType,
-    ScannerState,
     Hover,
     CompletionItem,
 } from 'vscode-html-languageservice';
@@ -32,10 +30,10 @@ import URI from 'vscode-uri';
 
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { LWCDataProvider } from './lwc-data-provider';
-import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
-import { interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 const propertyRegex = /\{(?<property>\w+)\.*.*\}/;
+const iteratorRegex = /iterator:(?<name>\w+)/;
 
 export enum Token {
     Tag = 'tag',
@@ -49,6 +47,7 @@ type CursorInfo = {
     name: string;
     type: Token;
     tag?: string;
+    range?: any;
 };
 
 export default class Server {
@@ -186,15 +185,39 @@ export default class Server {
         const scanner = this.languageService.createScanner(doc.getText());
         let token;
         let tag;
+        let attributeName;
+        const iterators = [];
 
         do {
             token = scanner.scan();
             if (token === TokenType.StartTag) tag = scanner.getTokenText();
+            if (token === TokenType.AttributeName) {
+                attributeName = scanner.getTokenText();
+                const iterator = iteratorRegex.exec(attributeName);
+                if(iterator) {
+                    iterators.unshift({
+                        name: iterator.groups.name,
+                        range: {
+                            start: document.positionAt(scanner.getTokenOffset() + 9),
+                            end: document.positionAt(scanner.getTokenEnd())
+                        }
+                    });
+                }
+            }
+            if (token === TokenType.AttributeValue && attributeName === 'for:item') {
+                iterators.unshift({
+                    name: scanner.getTokenText().replace(/"|'/g, ""),
+                    range: {
+                        start: document.positionAt(scanner.getTokenOffset()),
+                        end: document.positionAt(scanner.getTokenEnd())
+                    }
+                });
+            }
         } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
 
         switch (token) {
             case TokenType.StartTag:
-            case TokenType.EndTag:
+                case TokenType.EndTag:
                 return { type: Token.Tag, name: tag, tag };
 
             case TokenType.AttributeName:
@@ -202,12 +225,20 @@ export default class Server {
 
             case TokenType.AttributeValue:
                 const tokenText: string = scanner.getTokenText();
-                const match = propertyRegex.exec(tokenText);
-                if (match) {
-                    return { type: Token.DynamicAttributeValue, name: match.groups.property, tag };
-                } else {
-                    return { type: Token.AttributeValue, name: tokenText, tag };
-                }
+            const match = propertyRegex.exec(tokenText);
+            if (match) {
+                const item = iterators.find((item) => item.name === match.groups.property);
+                return {
+                    type: Token.DynamicAttributeValue,
+                    name: match.groups.property,
+                    range: item.range,
+                    tag
+
+                };
+            } else {
+                return { type: Token.AttributeValue, name: tokenText, tag };
+            }
+
             case TokenType.Content:
                 return { type: Token.Content, tag, name: scanner.getTokenText() };
         }
