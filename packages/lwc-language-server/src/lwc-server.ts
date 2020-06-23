@@ -195,17 +195,11 @@ export default class Server {
         switch (token) {
             case TokenType.StartTag:
             case TokenType.EndTag:
-                return {
-                    type: Token.Tag,
-                    name: tag,
-                    tag,
-                };
+                return { type: Token.Tag, name: tag, tag };
+
             case TokenType.AttributeName:
-                return {
-                    type: Token.AttributeKey,
-                    tag,
-                    name: scanner.getTokenText(),
-                };
+                return { type: Token.AttributeKey, tag, name: scanner.getTokenText() };
+
             case TokenType.AttributeValue:
                 const tokenText: string = scanner.getTokenText();
                 const match = propertyRegex.exec(tokenText);
@@ -215,11 +209,7 @@ export default class Server {
                     return { type: Token.AttributeValue, name: tokenText, tag };
                 }
             case TokenType.Content:
-                return {
-                    type: Token.Content,
-                    tag,
-                    name: scanner.getTokenText(),
-                };
+                return { type: Token.Content, tag, name: scanner.getTokenText() };
         }
 
         return null;
