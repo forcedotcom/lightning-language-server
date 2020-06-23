@@ -18,6 +18,7 @@ jest.mock('vscode-languageserver', () => {
             return {
                 onInitialize: () => true,
                 onCompletion: () => true,
+                onCompletionResolve: () => true,
                 onHover: () => true,
                 onShutdown: () => true,
                 onDefinition: () => true,
