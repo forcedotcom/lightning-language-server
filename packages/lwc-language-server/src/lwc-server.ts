@@ -35,6 +35,8 @@ import { LWCDataProvider } from './lwc-data-provider';
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import { interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
+const propertyRegex = /\{(?<property>\w+)\.*.*\}/;
+
 export enum Token {
     Tag = 'tag',
     AttributeKey = 'attributeKey',
@@ -206,9 +208,12 @@ export default class Server {
                 };
             case TokenType.AttributeValue:
                 const tokenText: string = scanner.getTokenText();
-                const match = /\{(?<property>\w+)\.*.*\}/.exec(tokenText);
-                const [type, name]: [Token, string] = match ? [Token.DynamicAttributeValue, match.groups.property] : [Token.AttributeValue, tokenText];
-                return { type, tag, name };
+                const match = propertyRegex.exec(tokenText);
+                if (match) {
+                    return { type: Token.DynamicAttributeValue, name: match.groups.property, tag };
+                } else {
+                    return { type: Token.AttributeValue, name: tokenText, tag };
+                }
             case TokenType.Content:
                 return {
                     type: Token.Content,
