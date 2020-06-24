@@ -172,11 +172,27 @@ export default class Server {
         this.componentIndexer.persistCustomComponents();
     }
 
-    onDefinition(params: TextDocumentPositionParams): Location[] | null {
+    onDefinition(params: TextDocumentPositionParams): Location[] | Location | null {
         const cursorInfo: CursorInfo = this.cursorInfo(params);
 
-        if (cursorInfo.type === Token.Tag) {
-            return this.componentIndexer.tags.get(cursorInfo.tag).allLocations;
+        if (!cursorInfo) return null;
+
+        const tag = this.componentIndexer.tags.get(cursorInfo.tag);
+
+        switch (cursorInfo.type) {
+            case Token.Tag:
+                return tag?.allLocations;
+
+            case Token.AttributeKey:
+                return tag?.attribute(cursorInfo.name)?.location;
+
+            case Token.DynamicContent:
+            case Token.DynamicAttributeValue:
+                if (cursorInfo.range) {
+                    return Location.create(params.textDocument.uri, cursorInfo.range);
+                } else {
+                    return this.componentIndexer.findTagByURI(params.textDocument.uri.replace('.html', '.js'))?.attribute(cursorInfo.name)?.location;
+                }
         }
     }
 
@@ -204,8 +220,8 @@ export default class Server {
                     iterators.unshift({
                         name: iterator.groups.name,
                         range: {
-                            start: document.positionAt(scanner.getTokenOffset() + 9),
-                            end: document.positionAt(scanner.getTokenEnd()),
+                            start: doc.positionAt(scanner.getTokenOffset() + 9),
+                            end: doc.positionAt(scanner.getTokenEnd()),
                         },
                     });
                 }
@@ -214,8 +230,8 @@ export default class Server {
                 iterators.unshift({
                     name: scanner.getTokenText().replace(/"|'/g, ''),
                     range: {
-                        start: document.positionAt(scanner.getTokenOffset()),
-                        end: document.positionAt(scanner.getTokenEnd()),
+                        start: doc.positionAt(scanner.getTokenOffset()),
+                        end: doc.positionAt(scanner.getTokenEnd()),
                     },
                 });
             }
@@ -234,11 +250,11 @@ export default class Server {
             case TokenType.AttributeValue: {
                 const match = propertyRegex.exec(content);
                 if (match) {
-                    const item = iterators.find(i => i.name === match.groups.property);
+                    const item = iterators.find(i => i.name === match.groups.property) || null;
                     return {
                         type: Token.DynamicAttributeValue,
                         name: match.groups.property,
-                        range: item.range,
+                        range: item?.range,
                         tag,
                     };
                 } else {
@@ -249,8 +265,22 @@ export default class Server {
                 const relativeOffset: number = offset - scanner.getTokenOffset();
                 const match = findDynamicContent(content, relativeOffset);
 
-                if (match) return { type: Token.DynamicContent, name: match, tag };
-                else return { type: Token.Content, tag, name: content };
+                if (match) {
+                    const item = iterators.find(i => i.name === match) || null;
+
+                    return {
+                        type: Token.DynamicContent,
+                        name: match,
+                        range: item?.range,
+                        tag,
+                    };
+                } else {
+                    return {
+                        type: Token.Content,
+                        tag,
+                        name: content,
+                    };
+                }
             }
         }
 
