@@ -41,6 +41,10 @@ export default class Tag implements ITagData {
         return this.publicAttributes;
     }
 
+    attribute(name: string): AttributeInfo | null {
+        return this.attributes.find(attr => attr.name === name) || null;
+    }
+
     get documentation(): string {
         return this.metadata.doc;
     }

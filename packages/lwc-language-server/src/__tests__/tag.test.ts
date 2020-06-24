@@ -108,6 +108,16 @@ describe('Tag', () => {
             });
         });
 
+        describe('#attribute', () => {
+            it('finds the attribute by name', () => {
+                expect(tag.attribute('index'))
+            })
+
+            it('returns null when not found', () => {
+                expect(tag.attribute('foo')).toBeNull();
+            })
+        });
+
         describe('#attributeDocs', () => {
             it('returns public attributes formatted in markdown', () => {
                 const attributeDocs = `### Attributes
