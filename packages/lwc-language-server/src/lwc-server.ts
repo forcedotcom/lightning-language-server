@@ -175,7 +175,7 @@ export default class Server {
         const cursorInfo: CursorInfo = this.cursorInfo(params);
 
         if (cursorInfo.type === Token.Tag) {
-            return [this.componentIndexer.tags.get(cursorInfo.tag).location];
+            return this.componentIndexer.tags.get(cursorInfo.tag).allLocations;
         }
     }
 
@@ -194,30 +194,30 @@ export default class Server {
             if (token === TokenType.AttributeName) {
                 attributeName = scanner.getTokenText();
                 const iterator = iteratorRegex.exec(attributeName);
-                if(iterator) {
+                if (iterator) {
                     iterators.unshift({
                         name: iterator.groups.name,
                         range: {
                             start: document.positionAt(scanner.getTokenOffset() + 9),
-                            end: document.positionAt(scanner.getTokenEnd())
-                        }
+                            end: document.positionAt(scanner.getTokenEnd()),
+                        },
                     });
                 }
             }
             if (token === TokenType.AttributeValue && attributeName === 'for:item') {
                 iterators.unshift({
-                    name: scanner.getTokenText().replace(/"|'/g, ""),
+                    name: scanner.getTokenText().replace(/"|'/g, ''),
                     range: {
                         start: document.positionAt(scanner.getTokenOffset()),
-                        end: document.positionAt(scanner.getTokenEnd())
-                    }
+                        end: document.positionAt(scanner.getTokenEnd()),
+                    },
                 });
             }
         } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
 
         switch (token) {
             case TokenType.StartTag:
-                case TokenType.EndTag:
+            case TokenType.EndTag:
                 return { type: Token.Tag, name: tag, tag };
 
             case TokenType.AttributeName:
@@ -225,19 +225,18 @@ export default class Server {
 
             case TokenType.AttributeValue:
                 const tokenText: string = scanner.getTokenText();
-            const match = propertyRegex.exec(tokenText);
-            if (match) {
-                const item = iterators.find((item) => item.name === match.groups.property);
-                return {
-                    type: Token.DynamicAttributeValue,
-                    name: match.groups.property,
-                    range: item.range,
-                    tag
-
-                };
-            } else {
-                return { type: Token.AttributeValue, name: tokenText, tag };
-            }
+                const match = propertyRegex.exec(tokenText);
+                if (match) {
+                    const item = iterators.find(i => i.name === match.groups.property);
+                    return {
+                        type: Token.DynamicAttributeValue,
+                        name: match.groups.property,
+                        range: item.range,
+                        tag,
+                    };
+                } else {
+                    return { type: Token.AttributeValue, name: tokenText, tag };
+                }
 
             case TokenType.Content:
                 return { type: Token.Content, tag, name: scanner.getTokenText() };
