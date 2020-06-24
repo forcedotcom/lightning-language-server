@@ -1,6 +1,7 @@
 import { compileSource, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
 import { ITagData } from 'vscode-html-languageservice';
 import * as fs from 'fs-extra';
+import * as glob from 'glob';
 import decamelize from 'decamelize';
 
 import URI from 'vscode-uri';
@@ -117,6 +118,23 @@ export default class Tag implements ITagData {
 
     get location(): Location {
         return Location.create(this.uri, this.range);
+    }
+
+    get allLocations(): Location[] {
+        const { dir, name } = path.parse(this.file);
+
+        const convertFileToLocation = (file: string) => {
+            const uri = URI.file(path.resolve(file)).toString();
+            const position = Position.create(0, 0);
+            const range = Range.create(position, position);
+            return Location.create(uri, range);
+        };
+
+        const filteredFiles = glob.sync(`${dir}/${name}.+(html|css)`);
+        const locations = filteredFiles.map(convertFileToLocation);
+        locations.unshift(this.location);
+
+        return locations;
     }
 
     updateMetadata(meta: any) {

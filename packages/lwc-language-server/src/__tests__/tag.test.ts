@@ -82,6 +82,13 @@ describe('Tag', () => {
             });
         });
 
+        describe('#allLocations', () => {
+            it('returns multiple files if present', () => {
+                const allLocations = tag.allLocations;
+                expect(allLocations.length).toEqual(3);
+            });
+        });
+
         describe('#properties', () => {
             it('returns a properties for the component', () => {
                 expect(tag.properties[0].decorator).toEqual('api');
