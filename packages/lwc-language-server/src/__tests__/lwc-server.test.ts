@@ -1,5 +1,5 @@
-import Server, { Token } from '../lwc-server';
-import { TextDocuments, createConnection, TextDocument } from 'vscode-languageserver';
+import Server, { Token, findDynamicContent } from '../lwc-server';
+import { TextDocument } from 'vscode-languageserver';
 
 import URI from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -32,6 +32,22 @@ jest.mock('vscode-languageserver', () => {
             };
         }),
     };
+});
+
+describe('findDynamicContent', () => {
+    const text: string = '{foobar}, {foo.bar} so\nmething {baz.bux}';
+
+    it('returns the dynamic match at the given offset if it exists', () => {
+        expect(findDynamicContent(text, 5)).toEqual('foobar');
+    });
+
+    it('returns the match if its not the only one in the string', () => {
+        expect(findDynamicContent(text, 12)).toEqual('foo');
+    });
+
+    it('returns null when not on dynamic content', () => {
+        expect(findDynamicContent(text, 25)).toBeNull();
+    });
 });
 
 describe('new', () => {
@@ -67,7 +83,7 @@ describe('new', () => {
                 end: {
                     character: 66,
                     line: 15,
-                }
+                },
             });
         });
 
@@ -77,8 +93,21 @@ describe('new', () => {
         });
 
         it('knows when Im in content', () => {
-            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 33 } }, document);
-            expect(cursorInfo).toEqual({ type: Token.Content, name: '{countTodos}', tag: 'strong' });
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 37, character: 24 } }, document);
+            expect(cursorInfo.type).toEqual(Token.Content);
+            expect(cursorInfo.tag).toEqual('button');
+        });
+
+        it('knows when Im in dynamic content', () => {
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 68 } }, document);
+            expect(cursorInfo.type).toEqual(Token.DynamicContent);
+            expect(cursorInfo.tag).toEqual('strong');
+        });
+
+        it('knows when Im not dynamic content', () => {
+            const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 76 } }, document);
+            expect(cursorInfo.type).toEqual(Token.Content);
+            expect(cursorInfo.tag).toEqual('strong');
         });
     });
 });

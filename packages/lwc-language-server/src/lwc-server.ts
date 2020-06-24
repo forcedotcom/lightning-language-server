@@ -32,8 +32,8 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import { LWCDataProvider } from './lwc-data-provider';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
-const propertyRegex = /\{(?<property>\w+)\.*.*\}/;
-const iteratorRegex = /iterator:(?<name>\w+)/;
+export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
+export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
 
 export enum Token {
     Tag = 'tag',
@@ -41,6 +41,7 @@ export enum Token {
     AttributeValue = 'attributeValue',
     DynamicAttributeValue = 'dynamicAttributeValue',
     Content = 'content',
+    DynamicContent = 'dynamicContent',
 }
 
 type CursorInfo = {
@@ -190,7 +191,12 @@ export default class Server {
 
         do {
             token = scanner.scan();
-            if (token === TokenType.StartTag) tag = scanner.getTokenText();
+            if (token === TokenType.StartTag) {
+                tag = scanner.getTokenText();
+            }
+            if (token === TokenType.StartTag) {
+                tag = scanner.getTokenText();
+            }
             if (token === TokenType.AttributeName) {
                 attributeName = scanner.getTokenText();
                 const iterator = iteratorRegex.exec(attributeName);
@@ -215,17 +221,18 @@ export default class Server {
             }
         } while (token !== TokenType.EOS && scanner.getTokenEnd() <= offset);
 
+        const content = scanner.getTokenText();
+
         switch (token) {
             case TokenType.StartTag:
-            case TokenType.EndTag:
+            case TokenType.EndTag: {
                 return { type: Token.Tag, name: tag, tag };
-
-            case TokenType.AttributeName:
-                return { type: Token.AttributeKey, tag, name: scanner.getTokenText() };
-
-            case TokenType.AttributeValue:
-                const tokenText: string = scanner.getTokenText();
-                const match = propertyRegex.exec(tokenText);
+            }
+            case TokenType.AttributeName: {
+                return { type: Token.AttributeKey, tag, name: content };
+            }
+            case TokenType.AttributeValue: {
+                const match = propertyRegex.exec(content);
                 if (match) {
                     const item = iterators.find(i => i.name === match.groups.property);
                     return {
@@ -235,11 +242,16 @@ export default class Server {
                         tag,
                     };
                 } else {
-                    return { type: Token.AttributeValue, name: tokenText, tag };
+                    return { type: Token.AttributeValue, name: content, tag };
                 }
+            }
+            case TokenType.Content: {
+                const relativeOffset: number = offset - scanner.getTokenOffset();
+                const match = findDynamicContent(content, relativeOffset);
 
-            case TokenType.Content:
-                return { type: Token.Content, tag, name: scanner.getTokenText() };
+                if (match) return { type: Token.DynamicContent, name: match, tag };
+                else return { type: Token.Content, tag, name: content };
+            }
         }
 
         return null;
@@ -248,4 +260,16 @@ export default class Server {
     listen() {
         this.connection.listen();
     }
+}
+
+export function findDynamicContent(text: string, offset: number) {
+    const regex: RegExp = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
+    let match = regex.exec(text);
+    while (match && offset > match.index) {
+        if (match.groups && match.groups.property && offset > match.index && regex.lastIndex > offset) {
+            return match.groups.property;
+        }
+        match = regex.exec(text);
+    }
+    return null;
 }
