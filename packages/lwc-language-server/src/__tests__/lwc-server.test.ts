@@ -29,6 +29,7 @@ jest.mock('vscode-languageserver', () => {
                 onDidChangeContent: () => true,
                 get: () => [document],
                 onDidSave: () => true,
+                syncKind: 'html',
             };
         }),
     };
@@ -57,6 +58,26 @@ describe('new', () => {
     it('creates a new instance', () => {
         expect(server.connection);
         expect(server.documents);
+    });
+
+    describe('capabilities', () => {
+        it('returns what the server can do', () => {
+            expect(server.capabilities).toEqual({
+                capabilities: {
+                    textDocumentSync: 'html',
+                    completionProvider: {
+                        resolveProvider: true,
+                    },
+                    hoverProvider: true,
+                    definitionProvider: true,
+                    workspace: {
+                        workspaceFolders: {
+                            supported: true,
+                        },
+                    },
+                },
+            });
+        });
     });
 
     describe('cursorInfo', () => {
