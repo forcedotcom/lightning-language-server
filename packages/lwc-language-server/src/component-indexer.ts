@@ -45,10 +45,13 @@ export default class ComponentIndexer extends BaseIndexer {
         return Array.from(this.tags.values());
     }
 
-    findTagByURI(uri: string): Tag {
-        return Array.from(this.tags.values()).find(tag => {
-            return tag.uri.endsWith(uri);
-        });
+    findTagByURI(uri: string): Tag | null {
+        const uriText = uri.replace('.html', '.js');
+        return (
+            Array.from(this.tags.values()).find(tag => {
+                return tag.uri.endsWith(uriText);
+            }) || null
+        );
     }
 
     loadTagsFromIndex() {

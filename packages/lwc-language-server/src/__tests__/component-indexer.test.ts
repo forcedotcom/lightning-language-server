@@ -53,9 +53,19 @@ describe('ComponentIndexer', () => {
             it('finds a Tag by matching the end of the URI', async () => {
                 await componentIndexer.init();
                 expect(componentIndexer.findTagByURI('force-app/main/default/lwc/hello_world/hello_world.js'));
-                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js'));
-                expect(componentIndexer.findTagByURI('hello_world.js'));
-                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeUndefined();
+                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js')).not.toBeNull();
+                expect(componentIndexer.findTagByURI('hello_world.js')).not.toBeNull();
+                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
+
+                componentIndexer.tags.clear();
+            });
+
+            it('finds a Tag by its matching html file', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.findTagByURI('force-app/main/default/lwc/hello_world/hello_world.html')).not.toBeNull();
+                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.html')).not.toBeNull();
+                expect(componentIndexer.findTagByURI('hello_world.html'));
+                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
 
                 componentIndexer.tags.clear();
             });
