@@ -24,7 +24,7 @@ export class LWCDataProvider implements IHTMLDataProvider {
         return this.indexer.customData;
     }
     provideAttributes(tag: string): IAttributeData[] {
-        return this.indexer.tags.get(tag).attributes;
+        return this.indexer.tags.get(tag)?.attributes || [];
     }
     provideValues(tag: string, attribute: string): IValueData[] {
         return [];
