@@ -188,10 +188,10 @@ export default class Server {
 
             case Token.DynamicContent:
             case Token.DynamicAttributeValue:
+                const { uri } = params.textDocument;
                 if (cursorInfo.range) {
-                    return Location.create(params.textDocument.uri, cursorInfo.range);
+                    return Location.create(uri, cursorInfo.range);
                 } else {
-                    const { uri } = params.textDocument;
                     const component: Tag = this.componentIndexer.findTagByURI(uri);
                     return component?.classMemberLocation(cursorInfo.name);
                 }
