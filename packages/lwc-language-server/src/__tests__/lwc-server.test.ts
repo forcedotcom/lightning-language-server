@@ -1,9 +1,10 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
-import { TextDocument } from 'vscode-languageserver';
+import { TextDocument, InitializeParams, TextDocumentPositionParams } from 'vscode-languageserver';
+import { getLanguageService } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
-import { getLanguageService } from 'vscode-html-languageservice';
+import * as path from 'path';
 
 const filename = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html';
 const uri = URI.parse(filename).fsPath;
@@ -27,7 +28,7 @@ jest.mock('vscode-languageserver', () => {
             return {
                 listen: () => true,
                 onDidChangeContent: () => true,
-                get: () => [document],
+                get: () => document,
                 onDidSave: () => true,
                 syncKind: 'html',
             };
@@ -53,7 +54,17 @@ describe('findDynamicContent', () => {
 
 describe('new', () => {
     const server: Server = new Server();
-    server.languageService = getLanguageService();
+    const initializeParams: InitializeParams = {
+        processId: 0,
+        rootUri: '',
+        capabilities: {},
+        workspaceFolders: [
+            {
+                uri: path.resolve('../../test-workspaces/sfdx-workspace/'),
+                name: path.resolve('../../test-workspaces/sfdx-workspace/'),
+            },
+        ],
+    };
 
     it('creates a new instance', () => {
         expect(server.connection);
@@ -77,6 +88,25 @@ describe('new', () => {
                     },
                 },
             });
+        });
+    });
+
+    describe('#onCompletion', () => {
+        it('returns a list of available completion items', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 16,
+                    character: 30,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toInclude('c-todo_item');
+            expect(labels).toInclude('c-todo');
+            expect(labels).toInclude('div'); // also includes normal html tags
         });
     });
 

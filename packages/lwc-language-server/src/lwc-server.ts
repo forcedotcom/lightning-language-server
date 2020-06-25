@@ -75,7 +75,7 @@ export default class Server {
         this.documents.onDidSave(this.onDidSave.bind(this));
     }
 
-    onInitialize(params: InitializeParams) {
+    async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         this.workspaceFolders = params.workspaceFolders;
         this.workspaceRoots = this.workspaceFolders.map(folder => URI.parse(folder.uri).fsPath);
         this.context = new WorkspaceContext(this.workspaceRoots);
@@ -86,7 +86,7 @@ export default class Server {
             customDataProviders: [this.dataProvider],
         });
 
-        this.componentIndexer.init();
+        await this.componentIndexer.init();
         this.typingIndexer.init();
 
         return this.capabilities;
