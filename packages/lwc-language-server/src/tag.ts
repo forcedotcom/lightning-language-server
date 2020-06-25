@@ -42,7 +42,7 @@ export default class Tag implements ITagData {
     }
 
     attribute(name: string): AttributeInfo | null {
-        return this.attributes.find(attr => attr.name === name) || null;
+        return [...this.publicAttributes, ...this.privateAttributes].find(attr => attr.name === name) || null;
     }
 
     get documentation(): string {
