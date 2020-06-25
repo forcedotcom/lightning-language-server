@@ -73,7 +73,7 @@ describe('handlers', () => {
             const labels = completions.items.map(item => item.label);
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
-            expect(labels).toInclude('div'); // also includes normal html tags
+            expect(labels).not.toInclude('div');
         });
     });
 

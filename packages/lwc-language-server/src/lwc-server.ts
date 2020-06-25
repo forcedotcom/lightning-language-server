@@ -85,6 +85,7 @@ export default class Server {
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.languageService = getLanguageService({
             customDataProviders: [this.dataProvider],
+            useDefaultDataProvider: false,
         });
 
         this.componentIndexer.init();
