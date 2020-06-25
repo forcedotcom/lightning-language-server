@@ -63,7 +63,6 @@ export default class Server {
     languageService: LanguageService;
 
     constructor() {
-        interceptConsoleLogger(this.connection);
         this.connection.onInitialize(this.onInitialize.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
@@ -288,6 +287,7 @@ export default class Server {
     }
 
     listen() {
+        interceptConsoleLogger(this.connection);
         this.connection.listen();
     }
 }
