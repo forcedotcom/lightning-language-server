@@ -28,8 +28,9 @@ import templateLinter from './template/linter';
 import Tag from './tag';
 import URI from 'vscode-uri';
 
-import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+import { compileDocument as javascriptCompileDocument, toVSCodeRange } from './javascript/compiler';
 import { LWCDataProvider } from './lwc-data-provider';
+import { ClassMember } from '@lwc/babel-plugin-component';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
@@ -171,7 +172,7 @@ export default class Server {
         this.componentIndexer.persistCustomComponents();
     }
 
-    onDefinition(params: TextDocumentPositionParams): Location[] | Location | null {
+    onDefinition(params: TextDocumentPositionParams): Location[] | null {
         const cursorInfo: CursorInfo = this.cursorInfo(params);
 
         if (!cursorInfo) return null;
@@ -183,14 +184,18 @@ export default class Server {
                 return tag?.allLocations;
 
             case Token.AttributeKey:
-                return tag?.attribute(cursorInfo.name)?.location;
+                return [tag?.attribute(cursorInfo.name)?.location];
 
             case Token.DynamicContent:
             case Token.DynamicAttributeValue:
                 if (cursorInfo.range) {
-                    return Location.create(params.textDocument.uri, cursorInfo.range);
+                    return [Location.create(params.textDocument.uri, cursorInfo.range)];
                 } else {
-                    return this.componentIndexer.findTagByURI(params.textDocument.uri.replace('.html', '.js'))?.attribute(cursorInfo.name)?.location;
+                    const uri = params.textDocument.uri.replace('.html', '.js');
+                    const component: Tag = this.componentIndexer.findTagByURI(uri);
+                    const classMember: ClassMember = component?.classMember(cursorInfo.name);
+                    const location = Location.create(tag.uri, toVSCodeRange(classMember?.loc));
+                    return [location];
                 }
         }
     }

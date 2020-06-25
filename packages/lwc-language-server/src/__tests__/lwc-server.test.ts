@@ -1,12 +1,12 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
-import { TextDocument, InitializeParams, TextDocumentPositionParams } from 'vscode-languageserver';
+import { TextDocument, InitializeParams, TextDocumentPositionParams, Location } from 'vscode-languageserver';
 import { getLanguageService } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
-const filename = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html';
+const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
 const uri = URI.parse(filename).fsPath;
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
@@ -74,6 +74,43 @@ describe('handlers', () => {
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
             expect(labels).toInclude('div'); // also includes normal html tags
+        });
+    });
+
+    describe('#onDefinition', () => {
+        it('returns the Location of the html tags corresponding .js file', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 16,
+                    character: 30,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const locations: Location[] = server.onDefinition(params);
+            const uris = locations.map(item => item.uri);
+            expect(locations.length).toEqual(2);
+            expect(uris[0]).toContain('todo_item/todo_item.js');
+            expect(uris[1]).toContain('todo_item/todo_item.html');
+        });
+
+        it('returns the Location of the property in the elements content', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 19,
+                    character: 40,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const locations: Location[] = server.onDefinition(params);
+            expect(locations.length).toEqual(1);
+            expect(locations[0].uri).toContain('todo_item/todo_item.js');
+            expect(locations[0].range.start.line).toEqual(103);
+            expect(locations[0].range.start.character).toEqual(4);
         });
     });
 });
