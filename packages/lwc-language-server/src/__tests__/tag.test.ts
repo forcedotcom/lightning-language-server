@@ -43,9 +43,21 @@ describe('Tag', () => {
 
         describe('#classMember', () => {
             it('returns a classMember of a Tag by name', () => {
-                expect(tag.classMember('todo'));
-                expect(tag.classMember('index'));
+                expect(tag.classMember('todo')).not.toBeNull();
+                expect(tag.classMember('index')).not.toBeNull();
                 expect(tag.classMember('foo')).toBeNull();
+            });
+        });
+
+        describe('#classMemberLocation', () => {
+            it('returns a classMember of a Tag by name', () => {
+                const location = tag.classMemberLocation('todo');
+                expect(location.uri).toContain('metadata.js');
+                expect(location.range.start.line).toEqual(4);
+                expect(location.range.start.character).toEqual(4);
+
+                expect(tag.classMemberLocation('index').uri).toContain('metadata.js');
+                expect(tag.classMemberLocation('foo')).toBeNull();
             });
         });
 
@@ -110,12 +122,12 @@ describe('Tag', () => {
 
         describe('#attribute', () => {
             it('finds the attribute by name', () => {
-                expect(tag.attribute('index'))
-            })
+                expect(tag.attribute('index'));
+            });
 
             it('returns null when not found', () => {
                 expect(tag.attribute('foo')).toBeNull();
-            })
+            });
         });
 
         describe('#attributeDocs', () => {

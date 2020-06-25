@@ -106,11 +106,10 @@ describe('handlers', () => {
 
             await server.onInitialize(initializeParams);
             await server.componentIndexer.init();
-            const locations: Location[] = server.onDefinition(params);
-            expect(locations.length).toEqual(1);
-            expect(locations[0].uri).toContain('todo_item/todo_item.js');
-            expect(locations[0].range.start.line).toEqual(103);
-            expect(locations[0].range.start.character).toEqual(4);
+            const location: Location = server.onDefinition(params);
+            expect(location.uri).toContain('todo/todo.js');
+            expect(location.range.start.line).toEqual(103);
+            expect(location.range.start.character).toEqual(4);
         });
     });
 });

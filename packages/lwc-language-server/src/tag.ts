@@ -66,8 +66,14 @@ export default class Tag implements ITagData {
         return this.metadata.classMembers;
     }
 
-    classMember(name: string): ClassMember {
+    classMember(name: string): ClassMember | null {
         return this.classMembers.find(item => item.name === name) || null;
+    }
+
+    classMemberLocation(name: string): Location | null {
+        const classMember = this.classMember(name);
+        if (!classMember) return null;
+        return Location.create(this.uri, toVSCodeRange(classMember?.loc));
     }
 
     get methodDocs(): string | null {

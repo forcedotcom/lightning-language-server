@@ -172,7 +172,7 @@ export default class Server {
         this.componentIndexer.persistCustomComponents();
     }
 
-    onDefinition(params: TextDocumentPositionParams): Location[] | null {
+    onDefinition(params: TextDocumentPositionParams): Location[] | Location | null {
         const cursorInfo: CursorInfo = this.cursorInfo(params);
 
         if (!cursorInfo) return null;
@@ -184,18 +184,16 @@ export default class Server {
                 return tag?.allLocations;
 
             case Token.AttributeKey:
-                return [tag?.attribute(cursorInfo.name)?.location];
+                return tag?.attribute(cursorInfo.name)?.location;
 
             case Token.DynamicContent:
             case Token.DynamicAttributeValue:
                 if (cursorInfo.range) {
-                    return [Location.create(params.textDocument.uri, cursorInfo.range)];
+                    return Location.create(params.textDocument.uri, cursorInfo.range);
                 } else {
-                    const uri = params.textDocument.uri.replace('.html', '.js');
+                    const { uri } = params.textDocument;
                     const component: Tag = this.componentIndexer.findTagByURI(uri);
-                    const classMember: ClassMember = component?.classMember(cursorInfo.name);
-                    const location = Location.create(tag.uri, toVSCodeRange(classMember?.loc));
-                    return [location];
+                    return component?.classMemberLocation(cursorInfo.name);
                 }
         }
     }
