@@ -1,7 +1,7 @@
 import { compileSource, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
 import { ITagData } from 'vscode-html-languageservice';
 import * as fs from 'fs-extra';
-import * as glob from 'glob';
+import * as glob from 'fast-glob';
 import decamelize from 'decamelize';
 
 import URI from 'vscode-uri';

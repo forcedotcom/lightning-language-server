@@ -63,7 +63,7 @@ describe('TypingIndexer', () => {
 
     describe('#metaFilePaths', () => {
         test('it returns all the paths  for meta files', () => {
-            const metaFilePaths: string[] = typingIndexer.metaFiles;
+            const metaFilePaths: string[] = typingIndexer.metaFiles.sort();
             const expectedMetaFilePaths: string[] = [
                 'force-app/main/default/contentassets/logo.asset-meta.xml',
                 'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
@@ -71,7 +71,7 @@ describe('TypingIndexer', () => {
                 'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
                 'force-app/main/default/staticresources/todocss.resource-meta.xml',
                 'utils/meta/staticresources/todoutil.resource-meta.xml',
-            ];
+            ].sort();
 
             expect(metaFilePaths).toEqual(expectedMetaFilePaths);
         });

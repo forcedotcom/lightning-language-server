@@ -1,4 +1,4 @@
-import * as glob from 'glob';
+import * as glob from 'fast-glob';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 import Typing from './typing';

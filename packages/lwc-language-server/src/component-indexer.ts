@@ -1,7 +1,7 @@
 import Tag from './tag';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
-import * as glob from 'glob';
+import * as glob from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import BaseIndexer from './base-indexer';
