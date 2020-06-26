@@ -112,6 +112,22 @@ describe('handlers', () => {
             expect(location.range.start.line).toEqual(103);
             expect(location.range.start.character).toEqual(4);
         });
+
+        it('returns the Location of an (`@api`) classMember from the html attribute', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 18,
+                    character: 27,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const [location]: Location[] = server.onDefinition(params);
+            expect(location.range.start.line).toEqual(14);
+            expect(location.range.start.character).toEqual(4);
+        });
     });
 });
 
