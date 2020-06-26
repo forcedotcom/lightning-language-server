@@ -13,6 +13,14 @@ type ComponentIndexerAttributes = {
     workspaceRoot: string;
 };
 
+export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
+    return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
+}
+
+export function unIndexedFiles(entries: Entry[], tags: Tag[]) {
+    return entries.filter(entry => !tags.some(tag => tagEqualsFile(tag, entry)));
+}
+
 export default class ComponentIndexer extends BaseIndexer {
     readonly workspaceType: number;
     readonly tags: Map<string, Tag> = new Map();
@@ -22,7 +30,7 @@ export default class ComponentIndexer extends BaseIndexer {
         this.workspaceType = detectWorkspaceHelper(attributes.workspaceRoot);
     }
 
-    get customComponents(): Entry[] {
+    get componentEntries(): Entry[] {
         let files: Entry[] = [];
         switch (this.workspaceType) {
             case WorkspaceType.SFDX:
@@ -83,20 +91,18 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     get unIndexedFiles(): Entry[] {
-        return this.customComponents.filter(entry => {
-            return !this.customData.some(tag => tag.file === entry.path);
-        });
+        return unIndexedFiles(this.componentEntries, this.customData);
     }
 
     get staleTags(): Tag[] {
         return this.customData.filter(tag => {
-            return !this.customComponents.some(entry => entry.path === tag.file);
+            return !this.componentEntries.some(entry => entry.path === tag.file);
         });
     }
 
     async init() {
         this.loadTagsFromIndex();
-        const promises = this.unIndexedFiles.map(entry => Tag.fromFile(entry.path));
+        const promises = this.unIndexedFiles.map(entry => Tag.fromFile(entry.path, entry.stats.mtime));
         const tags = await Promise.all(promises);
         tags.filter(Boolean).forEach(tag => {
             this.tags.set(tag.name, tag);
@@ -106,7 +112,7 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     async reindex() {
-        const promises = this.customComponents.map(entry => Tag.fromFile(entry.path));
+        const promises = this.componentEntries.map(entry => Tag.fromFile(entry.path));
         const tags = await Promise.all(promises);
         this.tags.clear();
         tags.forEach(tag => {

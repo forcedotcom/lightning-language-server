@@ -20,10 +20,13 @@ export default class Tag implements ITagData {
     private _properties: ClassMember[] | null = null;
     private _methods: ClassMember[] | null = null;
 
+    readonly updatedAt: Date;
+
     constructor(attributes: { [key: string]: any }) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
         this.namespace = attributes.namespace || this.namespace;
+        this.updatedAt = attributes.updatedAt;
     }
 
     get description(): string {
@@ -154,7 +157,7 @@ export default class Tag implements ITagData {
         this._properties = null;
     }
 
-    static async fromFile(file: string): Promise<Tag> | null {
+    static async fromFile(file: string, updatedAt?: Date): Promise<Tag> | null {
         const filePath = path.parse(file);
         const fileName = filePath.base;
         const data = await fs.readFile(file, 'utf-8');
@@ -166,7 +169,7 @@ export default class Tag implements ITagData {
             console.log(`Could not create Tag from ${file}.\n${diagnostics}`);
             return null;
         }
-        return new Tag({ file, metadata });
+        return new Tag({ file, metadata, updatedAt });
     }
 }
 

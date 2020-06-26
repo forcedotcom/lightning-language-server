@@ -1,7 +1,10 @@
-import ComponentIndexer from '../component-indexer';
+import ComponentIndexer, { unIndexedFiles } from '../component-indexer';
+import Tag from '../tag';
+import { Entry } from 'fast-glob';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
 import URI from 'vscode-uri';
+import { Stats, Dirent } from 'fs';
 
 const { WorkspaceType } = shared;
 const workspaceRoot: string = '../../test-workspaces/sfdx-workspace';
@@ -43,7 +46,7 @@ describe('ComponentIndexer', () => {
                     'utils/meta/lwc/todo_utils/todo_utils.js',
                 ].map(item => path.join(componentIndexer.workspaceRoot, item));
 
-                const paths = componentIndexer.customComponents.map(entry => entry.path).sort();
+                const paths = componentIndexer.componentEntries.map(entry => entry.path).sort();
 
                 expect(paths).toEqual(expectedComponents.sort());
                 expect(paths).not.toContain('force-app/main/default/lwc/import_relative/messages.js');
@@ -91,6 +94,40 @@ describe('ComponentIndexer', () => {
             it('creates Tag objects for all the component JS files', async () => {
                 await componentIndexer.init();
                 expect(componentIndexer.tags.size).toBe(8);
+            });
+        });
+    });
+
+    describe('helper functions', () => {
+        describe('unIndexedFiles', () => {
+            it('it returns entries 0 entries when they match', () => {
+                const stats = new Stats();
+                stats.mtime = new Date('2020-01-01');
+                const dirent = new Dirent();
+                const tags: Tag[] = [new Tag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
+                const entries: Entry[] = [{ path: '/foo', stats, dirent, name: 'foo' }];
+
+                expect(unIndexedFiles(entries, tags).length).toEqual(0);
+            });
+
+            it('it returns entries 1 entries when the entries date is different', () => {
+                const stats = new Stats();
+                stats.mtime = new Date('2020-02-01');
+                const dirent = new Dirent();
+                const tags: Tag[] = [new Tag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
+                const entries: Entry[] = [{ path: '/foo', stats, dirent, name: 'foo' }];
+
+                expect(unIndexedFiles(entries, tags).length).toEqual(1);
+            });
+
+            it('it returns entries 1 entries when there is no matching tag', () => {
+                const stats = new Stats();
+                stats.mtime = new Date('2020-02-01');
+                const dirent = new Dirent();
+                const tags: Tag[] = [];
+                const entries: Entry[] = [{ path: '/foo', stats, dirent, name: 'foo' }];
+
+                expect(unIndexedFiles(entries, tags).length).toEqual(1);
             });
         });
     });
