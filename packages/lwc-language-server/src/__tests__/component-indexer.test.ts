@@ -43,9 +43,11 @@ describe('ComponentIndexer', () => {
                     'utils/meta/lwc/todo_utils/todo_utils.js',
                 ].map(item => path.join(componentIndexer.workspaceRoot, item));
 
-                expect(componentIndexer.customComponents.sort()).toEqual(expectedComponents.sort());
-                expect(componentIndexer.customComponents).not.toContain('force-app/main/default/lwc/import_relative/messages.js');
-                expect(componentIndexer.customComponents).not.toContain('force-app/main/default/lwc/todo/store.js');
+                const paths = componentIndexer.customComponents.map(entry => entry.path).sort();
+
+                expect(paths).toEqual(expectedComponents.sort());
+                expect(paths).not.toContain('force-app/main/default/lwc/import_relative/messages.js');
+                expect(paths).not.toContain('force-app/main/default/lwc/todo/store.js');
             });
         });
 

@@ -1,7 +1,7 @@
 import Tag from './tag';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
-import * as glob from 'fast-glob';
+import { Entry, sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import BaseIndexer from './base-indexer';
@@ -22,20 +22,24 @@ export default class ComponentIndexer extends BaseIndexer {
         this.workspaceType = detectWorkspaceHelper(attributes.workspaceRoot);
     }
 
-    get customComponents(): string[] {
-        let files: string[] = [];
+    get customComponents(): Entry[] {
+        let files: Entry[] = [];
         switch (this.workspaceType) {
             case WorkspaceType.SFDX:
-                files = glob.sync(path.join(this.workspaceRoot, this.sfdxPackageDirsPattern, '**/*/lwc/**/*.js'));
-                return files.filter((item: string): boolean => {
-                    const data = path.parse(item);
+                files = sync(path.join(this.workspaceRoot, this.sfdxPackageDirsPattern, '**/*/lwc/**/*.js'), {
+                    stats: true,
+                });
+                return files.filter((item: Entry): boolean => {
+                    const data = path.parse(item.path);
                     return data.dir.endsWith(data.name);
                 });
             default:
                 // For CORE_ALL and CORE_PARTIAL
-                files = glob.sync(path.join(this.workspaceRoot, '**/*/modules/**/*.js'));
-                return files.filter((item: string): boolean => {
-                    const data = path.parse(item);
+                files = sync(path.join(this.workspaceRoot, '**/*/modules/**/*.js'), {
+                    stats: true,
+                });
+                return files.filter((item: Entry): boolean => {
+                    const data = path.parse(item.path);
                     return data.dir.endsWith(data.name);
                 });
         }
@@ -78,21 +82,21 @@ export default class ComponentIndexer extends BaseIndexer {
         fsExtra.writeFileSync(indexPath, indexJsonString);
     }
 
-    get unIndexedFiles(): string[] {
-        return this.customComponents.filter(filepath => {
-            return !this.customData.some(tag => tag.file === filepath);
+    get unIndexedFiles(): Entry[] {
+        return this.customComponents.filter(entry => {
+            return !this.customData.some(tag => tag.file === entry.path);
         });
     }
 
     get staleTags(): Tag[] {
         return this.customData.filter(tag => {
-            return !this.customComponents.some(filepath => filepath === tag.file);
+            return !this.customComponents.some(entry => entry.path === tag.file);
         });
     }
 
     async init() {
         this.loadTagsFromIndex();
-        const promises = this.unIndexedFiles.map(filepath => Tag.fromFile(filepath));
+        const promises = this.unIndexedFiles.map(entry => Tag.fromFile(entry.path));
         const tags = await Promise.all(promises);
         tags.filter(Boolean).forEach(tag => {
             this.tags.set(tag.name, tag);
@@ -102,7 +106,7 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     async reindex() {
-        const promises = this.customComponents.map(filepath => Tag.fromFile(filepath));
+        const promises = this.customComponents.map(entry => Tag.fromFile(entry.path));
         const tags = await Promise.all(promises);
         this.tags.clear();
         tags.forEach(tag => {
