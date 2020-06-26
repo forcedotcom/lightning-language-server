@@ -128,6 +128,23 @@ describe('handlers', () => {
             expect(location.range.start.line).toEqual(14);
             expect(location.range.start.character).toEqual(4);
         });
+
+        it('returns the Location of a parent iterator node with an iterator attribute', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 18,
+                    character: 32,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const [location]: Location[] = server.onDefinition(params);
+            expect(location.uri).toContain('todo/todo.html');
+            expect(location.range.start.line).toEqual(15);
+            expect(location.range.start.character).toEqual(60);
+        });
     });
 });
 
