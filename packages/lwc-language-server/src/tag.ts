@@ -15,18 +15,23 @@ export default class Tag implements ITagData {
     public metadata: Metadata;
     public namespace: 'lightning' | 'c' | 'interop' | null = 'c';
     public namespaceDelimiter: ':' | '-' = '-';
+    public updatedAt: Date;
 
     private _allAttributes: { publicAttributes: AttributeInfo[]; privateAttributes: AttributeInfo[] } | null = null;
     private _properties: ClassMember[] | null = null;
     private _methods: ClassMember[] | null = null;
-
-    readonly updatedAt?: Date;
 
     constructor(attributes: { [key: string]: any }) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
         this.namespace = attributes.namespace || this.namespace;
         this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
+        if (attributes.updatedAt) {
+            this.updatedAt = new Date(attributes.updatedAt);
+        } else {
+            const data = fs.statSync(this.file);
+            this.updatedAt = data.mtime;
+        }
     }
 
     get description(): string {
@@ -155,6 +160,8 @@ export default class Tag implements ITagData {
         this._allAttributes = null;
         this._methods = null;
         this._properties = null;
+        const data = fs.statSync(this.file);
+        this.updatedAt = data.mtime;
     }
 
     static async fromFile(file: string, updatedAt?: Date): Promise<Tag> | null {
