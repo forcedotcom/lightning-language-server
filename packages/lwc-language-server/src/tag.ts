@@ -20,13 +20,13 @@ export default class Tag implements ITagData {
     private _properties: ClassMember[] | null = null;
     private _methods: ClassMember[] | null = null;
 
-    readonly updatedAt: Date;
+    readonly updatedAt?: Date;
 
     constructor(attributes: { [key: string]: any }) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
         this.namespace = attributes.namespace || this.namespace;
-        this.updatedAt = attributes.updatedAt;
+        this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
     }
 
     get description(): string {
