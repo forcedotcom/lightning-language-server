@@ -113,27 +113,21 @@ export default class Server {
     }
 
     async onCompletion(params: TextDocumentPositionParams): Promise<CompletionList> {
-        const doc = this.documents.get(params.textDocument.uri);
+        const { position } = params;
+        const uri = params.textDocument.uri;
+        const doc = this.documents.get(uri);
         let prefix: string;
 
-        const isLWC = await this.context.isLWCTemplate(doc);
-        if (isLWC) prefix = 'c-';
+        if (await this.context.isLWCTemplate(doc)) prefix = 'c-';
+        if (await this.context.isAuraMarkup(doc)) prefix = 'c:';
+        if (!prefix) return { isIncomplete: false, items: [] };
 
-        const isAura = await this.context.isAuraMarkup(doc);
-        if (isAura) prefix = 'c:';
+        const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
+        const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
 
-        if (!isLWC && !isAura) return { isIncomplete: false, items: [] };
-
-        const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(doc);
-
-        const completionItems = this.languageService.doComplete(doc, params.position, htmlDocument);
-
-        function prefixItem(item: CompletionItem) {
+        completionItems.items.forEach((item: CompletionItem) => {
             item.label = prefix + item.label;
-            return item;
-        }
-
-        completionItems.items.map(prefixItem);
+        });
 
         return completionItems;
     }
