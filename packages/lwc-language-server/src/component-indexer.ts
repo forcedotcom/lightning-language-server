@@ -8,6 +8,7 @@ import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
+const componentPrefixRegex = new RegExp(/^c?(?<delimiter>[:|-]{1})?(?<name>[\w\-]+)/);
 
 type ComponentIndexerAttributes = {
     workspaceRoot: string;
@@ -55,6 +56,12 @@ export default class ComponentIndexer extends BaseIndexer {
 
     get customData(): Tag[] {
         return Array.from(this.tags.values());
+    }
+
+    findTagByName(query: string): Tag | null {
+        const matches = componentPrefixRegex.exec(query);
+        const name = matches.groups.name;
+        return this.tags.get(name) || null;
     }
 
     findTagByURI(uri: string): Tag | null {

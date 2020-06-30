@@ -30,7 +30,7 @@ import URI from 'vscode-uri';
 
 import { compileDocument as javascriptCompileDocument, toVSCodeRange } from './javascript/compiler';
 import { LWCDataProvider } from './lwc-data-provider';
-import { ClassMember } from '@lwc/babel-plugin-component';
+import { ClassMember, Metadata } from '@lwc/babel-plugin-component';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
@@ -156,13 +156,14 @@ export default class Server {
         const { document } = change;
         const { uri } = document;
         if (await this.context.isLWCJavascript(document)) {
-            const { metadata } = await javascriptCompileDocument(document);
+            const doc = await javascriptCompileDocument(document);
+            const metadata: Metadata = doc.metadata;
             if (metadata) {
                 const tag = this.componentIndexer.findTagByURI(uri);
                 if (tag) {
                     tag.updateMetadata(metadata);
                 } else {
-                    const newTag = new Tag(metadata);
+                    const newTag = new Tag({ metadata });
                     this.componentIndexer.tags.set(newTag.name, newTag);
                 }
             }

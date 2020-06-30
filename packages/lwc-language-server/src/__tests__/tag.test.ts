@@ -5,13 +5,11 @@ describe('Tag', () => {
 
     describe('.new', () => {
         const tag = new Tag({
-            file: 'file',
-            type: 'type',
-            attributes: [],
+            file: filepath,
         });
 
         it('returns a new Tag', () => {
-            expect(tag.file).toEqual('file');
+            expect(tag.file).toEqual(filepath);
         });
     });
 
@@ -115,8 +113,8 @@ describe('Tag', () => {
         });
 
         describe('#name', () => {
-            it('returns the namespace and the filename for the component', () => {
-                expect(tag.name).toEqual('c-metadata');
+            it('returns the filename for the component', () => {
+                expect(tag.name).toEqual('metadata');
             });
         });
 

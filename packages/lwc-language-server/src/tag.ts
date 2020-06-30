@@ -10,21 +10,24 @@ import { Location, Position, Range } from 'vscode-languageserver';
 import { Metadata, ClassMember } from '@lwc/babel-plugin-component';
 import { AttributeInfo } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
+export type TagAttrs = {
+    file?: string;
+    metadata?: Metadata;
+    updatedAt?: Date;
+};
+
 export default class Tag implements ITagData {
     public file: string;
     public metadata: Metadata;
-    public namespace: 'lightning' | 'c' | 'interop' | null = 'c';
-    public namespaceDelimiter: ':' | '-' = '-';
     public updatedAt: Date;
 
     private _allAttributes: { publicAttributes: AttributeInfo[]; privateAttributes: AttributeInfo[] } | null = null;
     private _properties: ClassMember[] | null = null;
     private _methods: ClassMember[] | null = null;
 
-    constructor(attributes: { [key: string]: any }) {
+    constructor(attributes: TagAttrs) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
-        this.namespace = attributes.namespace || this.namespace;
         this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
         if (attributes.updatedAt) {
             this.updatedAt = new Date(attributes.updatedAt);
@@ -35,14 +38,13 @@ export default class Tag implements ITagData {
     }
 
     get description(): string {
-        const docs: string[] = [this.documentation, this.reference, this.attributeDocs, this.methodDocs];
+        const docs: string[] = [this.documentation, this.attributeDocs, this.methodDocs];
         return docs.filter(item => item !== null).join('\n');
     }
 
     get name(): string {
         const filename = path.parse(this.file).name;
-        const basename = decamelize(filename, '-');
-        return `${this.namespace}${this.namespaceDelimiter}${basename}`;
+        return decamelize(filename, '-');
     }
 
     get attributes(): AttributeInfo[] {
@@ -55,11 +57,6 @@ export default class Tag implements ITagData {
 
     get documentation(): string {
         return this.metadata.doc;
-    }
-
-    get reference(): string | null {
-        if (this.namespace !== 'lightning') return null;
-        return `[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/${this.name})`;
     }
 
     get attributeDocs(): string | null {

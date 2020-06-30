@@ -54,6 +54,27 @@ describe('ComponentIndexer', () => {
             });
         });
 
+        describe('findTagByName', () => {
+            it('finds tag with an exact match', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.findTagByName('hello_world')).not.toBeNull();
+                expect(componentIndexer.findTagByName('foo')).toBeNull();
+            });
+
+            it('finds tag with lwc prefix', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.findTagByName('c-hello_world').name).toEqual('hello_world');
+                expect(componentIndexer.findTagByName('c-todo-foo')).toBeNull();
+            });
+
+            it('finds tag with aura prefix', async () => {
+                await componentIndexer.init();
+                expect(componentIndexer.findTagByName('c:hello_world').name).toEqual('hello_world');
+                expect(componentIndexer.findTagByName('c:todo').name).toEqual('todo');
+                expect(componentIndexer.findTagByName('c:todo-foo')).toBeNull();
+            });
+        });
+
         describe('#findTagByURI', () => {
             it('finds a Tag by matching the end of the URI', async () => {
                 await componentIndexer.init();
