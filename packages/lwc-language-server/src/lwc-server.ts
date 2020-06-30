@@ -31,6 +31,8 @@ import URI from 'vscode-uri';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { LWCDataProvider } from './lwc-data-provider';
 import { Metadata } from '@lwc/babel-plugin-component';
+import LWCStandardDataProvider from './lwc-standard-data-provider';
+import { ClassMember } from '@lwc/babel-plugin-component';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
@@ -83,8 +85,9 @@ export default class Server {
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.dataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
+
         this.languageService = getLanguageService({
-            customDataProviders: [this.dataProvider],
+            customDataProviders: [this.dataProvider, LWCStandardDataProvider],
             useDefaultDataProvider: false,
         });
 
