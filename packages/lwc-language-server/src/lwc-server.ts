@@ -114,11 +114,21 @@ export default class Server {
 
     async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
         const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await this.context.isLWCTemplate(document))) {
-            return { isIncomplete: false, items: [] };
+        if (await this.context.isLWCTemplate(document)) {
+            const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(document);
+            const completionItems = this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
+            const items: CompletionItem[] = completionItems.items.map((item: CompletionItem) => {
+                item.label = 'c-' + item.label;
+                return item;
+            });
+
+            return {
+                isIncomplete: completionItems.isIncomplete,
+                items,
+            };
         }
-        const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(document);
-        return this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
+
+        return { isIncomplete: false, items: [] };
     }
 
     onCompletionResolve(item: CompletionItem): CompletionItem {
@@ -179,7 +189,7 @@ export default class Server {
 
         if (!cursorInfo) return null;
 
-        const tag = this.componentIndexer.tags.get(cursorInfo.tag);
+        const tag = this.componentIndexer.findTagByName(cursorInfo.tag);
 
         switch (cursorInfo.type) {
             case Token.Tag:
