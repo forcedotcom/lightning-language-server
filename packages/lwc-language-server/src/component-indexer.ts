@@ -8,7 +8,7 @@ import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
-const componentPrefixRegex = new RegExp(/^c?(?<delimiter>[:|-]{1})?(?<name>[\w\-]+)/);
+const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
 
 type ComponentIndexerAttributes = {
     workspaceRoot: string;

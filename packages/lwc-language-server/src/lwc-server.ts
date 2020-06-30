@@ -28,9 +28,9 @@ import templateLinter from './template/linter';
 import Tag from './tag';
 import URI from 'vscode-uri';
 
-import { compileDocument as javascriptCompileDocument, toVSCodeRange } from './javascript/compiler';
+import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { LWCDataProvider } from './lwc-data-provider';
-import { ClassMember, Metadata } from '@lwc/babel-plugin-component';
+import { Metadata } from '@lwc/babel-plugin-component';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
@@ -112,23 +112,30 @@ export default class Server {
         };
     }
 
-    async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionList> {
-        const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        if (await this.context.isLWCTemplate(document)) {
-            const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(document);
-            const completionItems = this.languageService.doComplete(document, textDocumentPosition.position, htmlDocument);
-            const items: CompletionItem[] = completionItems.items.map((item: CompletionItem) => {
-                item.label = 'c-' + item.label;
-                return item;
-            });
+    async onCompletion(params: TextDocumentPositionParams): Promise<CompletionList> {
+        const doc = this.documents.get(params.textDocument.uri);
+        let prefix: string;
 
-            return {
-                isIncomplete: completionItems.isIncomplete,
-                items,
-            };
+        const isLWC = await this.context.isLWCTemplate(doc);
+        if (isLWC) prefix = 'c-';
+
+        const isAura = await this.context.isAuraMarkup(doc);
+        if (isAura) prefix = 'c:';
+
+        if (!isLWC && !isAura) return { isIncomplete: false, items: [] };
+
+        const htmlDocument: HTMLDocument = this.languageService.parseHTMLDocument(doc);
+
+        const completionItems = this.languageService.doComplete(doc, params.position, htmlDocument);
+
+        function prefixItem(item: CompletionItem) {
+            item.label = prefix + item.label;
+            return item;
         }
 
-        return { isIncomplete: false, items: [] };
+        completionItems.items.map(prefixItem);
+
+        return completionItems;
     }
 
     onCompletionResolve(item: CompletionItem): CompletionItem {

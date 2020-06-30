@@ -10,6 +10,10 @@ const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/ma
 const uri = URI.parse(filename).fsPath;
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
+const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
+const auraUri = URI.parse(auraFilename).fsPath;
+const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
+
 const server: Server = new Server();
 
 jest.mock('vscode-languageserver', () => {
@@ -30,7 +34,13 @@ jest.mock('vscode-languageserver', () => {
             return {
                 listen: () => true,
                 onDidChangeContent: () => true,
-                get: () => document,
+                get: (name: string) => {
+                    const docs = new Map([
+                        [uri, document],
+                        [auraUri, auraDocument],
+                    ]);
+                    return docs.get(name);
+                },
                 onDidSave: () => true,
                 syncKind: 'html',
             };
@@ -59,7 +69,7 @@ describe('handlers', () => {
     };
 
     describe('#onCompletion', () => {
-        it('returns a list of available completion items', async () => {
+        it('returns a list of available completion items in a LWC template', async () => {
             const params: TextDocumentPositionParams = {
                 textDocument: { uri: filename },
                 position: {
@@ -73,6 +83,23 @@ describe('handlers', () => {
             const labels = completions.items.map(item => item.label);
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
+            expect(labels).not.toInclude('div');
+        });
+
+        it('returns a list of available completion items in a Aura template', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: auraFilename },
+                position: {
+                    line: 2,
+                    character: 9,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toInclude('c:todo_item');
+            expect(labels).toInclude('c:todo');
             expect(labels).not.toInclude('div');
         });
     });
