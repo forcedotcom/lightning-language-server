@@ -44,7 +44,7 @@ export default class Tag implements ITagData {
 
     get name(): string {
         const filename = path.parse(this.file).name;
-        return decamelize(filename, '-');
+        return 'c-' + decamelize(filename, '-');
     }
 
     get attributes(): AttributeInfo[] {

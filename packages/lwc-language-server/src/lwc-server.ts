@@ -122,23 +122,13 @@ export default class Server {
         if (await this.context.isLWCTemplate(doc)) {
             const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
             const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
-
-            completionItems.items.forEach((item: CompletionItem) => {
-                if (item.label.startsWith('lightning')) return;
-
-                item.label = 'c-' + item.label;
-            });
             return completionItems;
         } else if (await this.context.isAuraMarkup(doc)) {
             const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
             const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
 
             completionItems.items.forEach((item: CompletionItem) => {
-                if (item.label.startsWith('lightning')) {
-                    item.label = auraLightningLabel(item.label);
-                } else {
-                    item.label = 'c:' + camelcase(item.label);
-                }
+                item.label = auraLightningLabel(item.label);
             });
             return completionItems;
         }
@@ -336,7 +326,7 @@ export function findDynamicContent(text: string, offset: number) {
 }
 
 export function auraLightningLabel(label: string): string {
-    const auraConversionRegex: RegExp = /^(lightning)(-)([\w|-]+)$/;
+    const auraConversionRegex: RegExp = /^(lightning|c)(-)([\w|-]+)$/;
     return label.replace(auraConversionRegex, (_match, group1, _group2, group3): string => {
         return group1 + ':' + camelcase(group3);
     });

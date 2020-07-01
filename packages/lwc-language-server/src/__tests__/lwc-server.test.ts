@@ -1,6 +1,6 @@
 import Server, { Token, findDynamicContent, auraLightningLabel } from '../lwc-server';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location } from 'vscode-languageserver';
 import { getLanguageService } from 'vscode-html-languageservice';
+import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkedString, MarkupContent, Hover } from 'vscode-languageserver';
 
 import URI from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -104,6 +104,25 @@ describe('handlers', () => {
             expect(labels).toInclude('lightning:textarea');
             expect(labels).toInclude('lightning:outputField');
             expect(labels).not.toInclude('div');
+        });
+    });
+
+    describe('onHover', () => {
+        it('returns the the docs for that hovered item', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: filename },
+                position: {
+                    line: 16,
+                    character: 29,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const hover: Hover = await server.onHover(params);
+            const contents = hover.contents as MarkupContent;
+
+            expect(contents.value).toContain('**todo**');
         });
     });
 

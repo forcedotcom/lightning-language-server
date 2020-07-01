@@ -4,6 +4,7 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
+import { snakeCase } from 'change-case';
 import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
@@ -13,6 +14,11 @@ const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<de
 type ComponentIndexerAttributes = {
     workspaceRoot: string;
 };
+
+export enum DelimiterType {
+    Aura = ':',
+    LWC = '-',
+}
 
 export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
     return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
@@ -60,8 +66,8 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByName(query: string): Tag | null {
         const matches = componentPrefixRegex.exec(query);
-        const name = matches.groups.name;
-        return this.tags.get(name) || null;
+        const { type, name } = matches.groups;
+        return this.tags.get(query) || this.tags.get(type + '-' + snakeCase(name)) || null;
     }
 
     findTagByURI(uri: string): Tag | null {
