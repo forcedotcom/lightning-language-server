@@ -1,4 +1,4 @@
-import Server, { Token, findDynamicContent } from '../lwc-server';
+import Server, { Token, findDynamicContent, auraLightningLabel } from '../lwc-server';
 import { TextDocument, InitializeParams, TextDocumentPositionParams, Location } from 'vscode-languageserver';
 import { getLanguageService } from 'vscode-html-languageservice';
 
@@ -83,6 +83,7 @@ describe('handlers', () => {
             const labels = completions.items.map(item => item.label);
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
+            expect(labels).toInclude('lightning-icon');
             expect(labels).not.toInclude('div');
         });
 
@@ -98,8 +99,10 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             const completions = await server.onCompletion(params);
             const labels = completions.items.map(item => item.label);
-            expect(labels).toInclude('c:todo_item');
+            expect(labels).toInclude('c:todoItem');
             expect(labels).toInclude('c:todo');
+            expect(labels).toInclude('lightning:textarea');
+            expect(labels).toInclude('lightning:outputField');
             expect(labels).not.toInclude('div');
         });
     });
@@ -262,5 +265,14 @@ describe('findDynamicContent', () => {
 
     it('returns null when not on dynamic content', () => {
         expect(findDynamicContent(text, 25)).toBeNull();
+    });
+});
+
+describe('auraLightningLabel', () => {
+    it('converts the standard lwc label to the aura-friendly syntax', () => {
+        expect(auraLightningLabel('lightning-icon')).toEqual('lightning:icon');
+        expect(auraLightningLabel('lightning-formatted-name')).toEqual('lightning:formattedName');
+        expect(auraLightningLabel('lightning-formatted-date-time')).toEqual('lightning:formattedDateTime');
+        expect(auraLightningLabel('foo-bar')).toEqual('foo-bar');
     });
 });

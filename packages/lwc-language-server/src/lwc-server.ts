@@ -22,18 +22,18 @@ import {
     CompletionItem,
 } from 'vscode-html-languageservice';
 
+import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+import { LWCDataProvider } from './lwc-data-provider';
+import { Metadata } from '@lwc/babel-plugin-component';
+import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
 import URI from 'vscode-uri';
-
-import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
-import { LWCDataProvider } from './lwc-data-provider';
-import { Metadata } from '@lwc/babel-plugin-component';
+import camelcase from 'camelcase';
 import LWCStandardDataProvider from './lwc-standard-data-provider';
-import { ClassMember } from '@lwc/babel-plugin-component';
-import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
@@ -85,7 +85,6 @@ export default class Server {
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.dataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
-
         this.languageService = getLanguageService({
             customDataProviders: [this.dataProvider, LWCStandardDataProvider],
             useDefaultDataProvider: false,
@@ -119,20 +118,30 @@ export default class Server {
         const { position } = params;
         const uri = params.textDocument.uri;
         const doc = this.documents.get(uri);
-        let prefix: string;
 
-        if (await this.context.isLWCTemplate(doc)) prefix = 'c-';
-        if (await this.context.isAuraMarkup(doc)) prefix = 'c:';
-        if (!prefix) return { isIncomplete: false, items: [] };
+        if (await this.context.isLWCTemplate(doc)) {
+            const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
+            const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
 
-        const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
-        const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
+            completionItems.items.forEach((item: CompletionItem) => {
+                if (item.label.startsWith('lightning')) return;
 
-        completionItems.items.forEach((item: CompletionItem) => {
-            item.label = prefix + item.label;
-        });
+                item.label = 'c-' + item.label;
+            });
+            return completionItems;
+        } else if (await this.context.isAuraMarkup(doc)) {
+            const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
+            const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
 
-        return completionItems;
+            completionItems.items.forEach((item: CompletionItem) => {
+                if (item.label.startsWith('lightning')) {
+                    item.label = auraLightningLabel(item.label);
+                } else {
+                    item.label = 'c:' + camelcase(item.label);
+                }
+            });
+            return completionItems;
+        }
     }
 
     onCompletionResolve(item: CompletionItem): CompletionItem {
@@ -324,4 +333,11 @@ export function findDynamicContent(text: string, offset: number) {
         match = regex.exec(text);
     }
     return null;
+}
+
+export function auraLightningLabel(label: string): string {
+    const auraConversionRegex: RegExp = /^(lightning)(-)([\w|-]+)$/;
+    return label.replace(auraConversionRegex, (_match, group1, _group2, group3): string => {
+        return group1 + ':' + camelcase(group3);
+    });
 }
