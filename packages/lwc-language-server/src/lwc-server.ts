@@ -152,7 +152,6 @@ export default class Server {
     }
 
     async onDidChangeContent(changeEvent: any): Promise<void> {
-        // TODO: when hovering on an html tag, this is called for the target .js document (bug in vscode?)
         const { document } = changeEvent;
         const { uri } = document;
         if (await this.context.isLWCTemplate(document)) {
