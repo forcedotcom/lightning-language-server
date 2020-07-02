@@ -57,21 +57,25 @@ describe('ComponentIndexer', () => {
         describe('findTagByName', () => {
             it('finds tag with an exact match', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByName('hello_world')).toBeNull();
+                expect(componentIndexer.findTagByName('hello_world').name).toEqual('hello_world');
                 expect(componentIndexer.findTagByName('foo')).toBeNull();
             });
 
             it('finds tag with lwc prefix', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByName('c-hello_world').name).toEqual('c-hello_world');
+                expect(componentIndexer.findTagByName('c-hello_world').name).toEqual('hello_world');
+                expect(componentIndexer.findTagByName('c-hello-world')).toBeNull();
+                expect(componentIndexer.findTagByName('c-helloWorld')).toBeNull();
                 expect(componentIndexer.findTagByName('c-todo-foo')).toBeNull();
             });
 
             it('finds tag with aura prefix', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByName('c:hello_world').name).toEqual('c-hello_world');
-                expect(componentIndexer.findTagByName('c:todo').name).toEqual('c-todo');
-                expect(componentIndexer.findTagByName('c:todoItem').name).toEqual('c-todo_item');
+                expect(componentIndexer.findTagByName('c:hello_world')).toBeNull();
+                expect(componentIndexer.findTagByName('c:hello-world')).toBeNull();
+                expect(componentIndexer.findTagByName('c:helloWorld').name).toEqual('hello_world');
+                expect(componentIndexer.findTagByName('c:todo').name).toEqual('todo');
+                expect(componentIndexer.findTagByName('c:todoItem').name).toEqual('todo_item');
                 expect(componentIndexer.findTagByName('c:todo-foo')).toBeNull();
             });
         });

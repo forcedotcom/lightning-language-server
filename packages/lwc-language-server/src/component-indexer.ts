@@ -66,8 +66,12 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByName(query: string): Tag | null {
         const matches = componentPrefixRegex.exec(query);
-        const { type, name } = matches.groups;
-        return this.tags.get(query) || this.tags.get(type + '-' + snakeCase(name)) || null;
+        const { delimiter, name } = matches.groups;
+        if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
+            return this.tags.get(query) || this.tags.get(snakeCase(name)) || null;
+        } else {
+            return this.tags.get(name) || null;
+        }
     }
 
     findTagByURI(uri: string): Tag | null {
