@@ -28,8 +28,16 @@ export class LWCDataProvider implements IHTMLDataProvider {
     isApplicable(): boolean {
         return this.activated;
     }
+
     provideTags(): ITagData[] {
-        return [...this._standardTags, ...this.indexer.customData];
+        const customTags = this.indexer.customData.map(tag => {
+            return {
+                name: tag.lwcName,
+                description: tag.description,
+                attributes: tag.attributes,
+            };
+        });
+        return [...this._standardTags, ...customTags];
     }
     provideAttributes(tagName: string): IAttributeData[] {
         const tag = this.provideTags().find(t => t.name === tagName);

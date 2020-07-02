@@ -3,7 +3,6 @@ import Tag from '../tag';
 import { Entry } from 'fast-glob';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
-import URI from 'vscode-uri';
 import { Stats, Dirent } from 'fs';
 
 const { WorkspaceType } = shared;

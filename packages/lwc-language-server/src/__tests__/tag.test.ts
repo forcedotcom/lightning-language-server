@@ -114,7 +114,7 @@ describe('Tag', () => {
 
         describe('#name', () => {
             it('returns the filename for the component', () => {
-                expect(tag.name).toEqual('c-metadata');
+                expect(tag.name).toEqual('metadata');
             });
         });
 

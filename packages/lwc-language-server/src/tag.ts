@@ -2,8 +2,8 @@ import { compileSource, extractAttributes, getProperties, getMethods, toVSCodeRa
 import { ITagData } from 'vscode-html-languageservice';
 import * as fs from 'fs-extra';
 import * as glob from 'fast-glob';
-import decamelize from 'decamelize';
 import camelcase from 'camelcase';
+import { paramCase } from 'change-case';
 
 import URI from 'vscode-uri';
 import * as path from 'path';
@@ -48,8 +48,15 @@ export default class Tag implements ITagData {
     }
 
     get auraName(): string {
-        const filename = path.parse(this.file).name;
-        return 'c:' + camelcase(filename);
+        return 'c:' + camelcase(this.name);
+    }
+
+    get lwcName(): string {
+        if (this.name.includes('_')) {
+            return 'c-' + this.name;
+        } else {
+            return 'c-' + paramCase(this.name);
+        }
     }
 
     get attributes(): AttributeInfo[] {
