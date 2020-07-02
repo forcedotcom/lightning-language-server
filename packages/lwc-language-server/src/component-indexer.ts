@@ -71,7 +71,7 @@ export default class ComponentIndexer extends BaseIndexer {
         if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
             return this.tags.get(name) || this.tags.get(snakeCase(name)) || null;
         } else if (delimiter === DelimiterType.LWC) {
-            return this.tags.get(name) || null;
+            return this.tags.get(name) || this.tags.get(camelcase(name)) || null;
         }
         return this.tags.get(query) || null;
     }
