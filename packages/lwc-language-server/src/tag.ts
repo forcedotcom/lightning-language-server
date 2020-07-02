@@ -3,6 +3,7 @@ import { ITagData } from 'vscode-html-languageservice';
 import * as fs from 'fs-extra';
 import * as glob from 'fast-glob';
 import decamelize from 'decamelize';
+import camelcase from 'camelcase';
 
 import URI from 'vscode-uri';
 import * as path from 'path';
@@ -45,6 +46,11 @@ export default class Tag implements ITagData {
     get name(): string {
         const filename = path.parse(this.file).name;
         return 'c-' + decamelize(filename, '-');
+    }
+
+    get auraName(): string {
+        const filename = path.parse(this.file).name;
+        return 'c:' + camelcase(filename);
     }
 
     get attributes(): AttributeInfo[] {

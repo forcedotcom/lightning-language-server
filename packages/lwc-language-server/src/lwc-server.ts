@@ -11,18 +11,10 @@ import {
     TextDocumentPositionParams,
 } from 'vscode-languageserver';
 
-import {
-    getLanguageService,
-    LanguageService,
-    IHTMLDataProvider,
-    HTMLDocument,
-    CompletionList,
-    TokenType,
-    Hover,
-    CompletionItem,
-} from 'vscode-html-languageservice';
+import { getLanguageService, LanguageService, HTMLDocument, CompletionList, TokenType, Hover, CompletionItem } from 'vscode-html-languageservice';
 
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
+import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
 import { Metadata } from '@lwc/babel-plugin-component';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
@@ -33,7 +25,6 @@ import templateLinter from './template/linter';
 import Tag from './tag';
 import URI from 'vscode-uri';
 import camelcase from 'camelcase';
-import LWCStandardDataProvider from './lwc-standard-data-provider';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
@@ -60,10 +51,11 @@ export default class Server {
     context: WorkspaceContext;
     workspaceFolders: WorkspaceFolder[];
     workspaceRoots: string[];
-    dataProvider: IHTMLDataProvider;
     componentIndexer: ComponentIndexer;
     typingIndexer: TypingIndexer;
     languageService: LanguageService;
+    auraDataProvider: AuraDataProvider;
+    lwcDataProvider: LWCDataProvider;
 
     constructor() {
         this.connection.onInitialize(this.onInitialize.bind(this));
@@ -83,10 +75,11 @@ export default class Server {
         this.workspaceRoots = this.workspaceFolders.map(folder => URI.parse(folder.uri).fsPath);
         this.context = new WorkspaceContext(this.workspaceRoots);
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
-        this.dataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
+        this.lwcDataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
+        this.auraDataProvider = new AuraDataProvider({ indexer: this.componentIndexer });
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.languageService = getLanguageService({
-            customDataProviders: [this.dataProvider, LWCStandardDataProvider],
+            customDataProviders: [this.lwcDataProvider, this.auraDataProvider],
             useDefaultDataProvider: false,
         });
 
@@ -118,20 +111,16 @@ export default class Server {
         const { position } = params;
         const uri = params.textDocument.uri;
         const doc = this.documents.get(uri);
+        const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
 
         if (await this.context.isLWCTemplate(doc)) {
-            const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
-            const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
-            return completionItems;
+            this.auraDataProvider.activated = false;
+            this.lwcDataProvider.activated = true;
         } else if (await this.context.isAuraMarkup(doc)) {
-            const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
-            const completionItems = this.languageService.doComplete(doc, position, htmlDoc);
-
-            completionItems.items.forEach((item: CompletionItem) => {
-                item.label = auraLightningLabel(item.label);
-            });
-            return completionItems;
+            this.auraDataProvider.activated = true;
+            this.lwcDataProvider.activated = false;
         }
+        return this.languageService.doComplete(doc, position, htmlDoc);
     }
 
     onCompletionResolve(item: CompletionItem): CompletionItem {
