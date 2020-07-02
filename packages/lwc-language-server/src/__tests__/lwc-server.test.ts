@@ -101,8 +101,6 @@ describe('handlers', () => {
             const labels = completions.items.map(item => item.label);
             expect(labels).toInclude('c:todoItem');
             expect(labels).toInclude('c:todo');
-            expect(labels).toInclude('lightning:textarea');
-            expect(labels).toInclude('lightning:outputField');
             expect(labels).not.toInclude('div');
         });
     });
