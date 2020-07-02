@@ -85,6 +85,7 @@ describe('handlers', () => {
             expect(labels).toInclude('c-todo');
             expect(labels).toInclude('lightning-icon');
             expect(labels).not.toInclude('div');
+            expect(labels).not.toInclude('lightning:icon'); // this is handled by the aura Lang. server
         });
 
         it('returns a list of available completion items in a Aura template', async () => {
@@ -121,6 +122,23 @@ describe('handlers', () => {
             const contents = hover.contents as MarkupContent;
 
             expect(contents.value).toContain('**todo**');
+        });
+
+        it('returns the docs for that hovered custom component in an aura template', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: auraFilename },
+                position: {
+                    line: 3,
+                    character: 9,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const hover: Hover = await server.onHover(params);
+            const contents = hover.contents as MarkupContent;
+            expect(contents.value).toContain('**info**');
+            expect(contents.value).toContain('**icon-name**');
         });
     });
 
