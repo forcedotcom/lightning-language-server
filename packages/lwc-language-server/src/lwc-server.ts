@@ -108,8 +108,10 @@ export default class Server {
     }
 
     async onCompletion(params: TextDocumentPositionParams): Promise<CompletionList> {
-        const { position } = params;
-        const uri = params.textDocument.uri;
+        const {
+            position,
+            textDocument: { uri },
+        } = params;
         const doc = this.documents.get(uri);
         const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
 
@@ -119,6 +121,8 @@ export default class Server {
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
             this.lwcDataProvider.activated = false;
+        } else {
+            return;
         }
         return this.languageService.doComplete(doc, position, htmlDoc);
     }
@@ -127,13 +131,24 @@ export default class Server {
         return item;
     }
 
-    async onHover(textDocumentPosition: TextDocumentPositionParams): Promise<Hover> {
-        const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        if (!(await this.context.isLWCTemplate(document))) {
-            return null;
+    async onHover(params: TextDocumentPositionParams): Promise<Hover> {
+        const {
+            position,
+            textDocument: { uri },
+        } = params;
+        const doc = this.documents.get(uri);
+        const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
+
+        if (await this.context.isLWCTemplate(doc)) {
+            this.auraDataProvider.activated = false;
+            this.lwcDataProvider.activated = true;
+        } else if (await this.context.isAuraMarkup(doc)) {
+            this.auraDataProvider.activated = true;
+            this.lwcDataProvider.activated = false;
+        } else {
+            return;
         }
-        const htmlDocument = this.languageService.parseHTMLDocument(document);
-        return this.languageService.doHover(document, textDocumentPosition.position, htmlDocument);
+        return this.languageService.doHover(doc, position, htmlDoc);
     }
 
     async onDidChangeContent(changeEvent: any): Promise<void> {
