@@ -24,7 +24,6 @@ import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
 import URI from 'vscode-uri';
-import camelcase from 'camelcase';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
@@ -116,7 +115,7 @@ export default class Server {
         const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
 
         if (await this.context.isLWCTemplate(doc)) {
-            this.auraDataProvider.activated = false;
+            this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
             this.lwcDataProvider.activated = true;
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
@@ -233,15 +232,12 @@ export default class Server {
             if (token === TokenType.StartTag) {
                 tag = scanner.getTokenText();
             }
-            if (token === TokenType.StartTag) {
-                tag = scanner.getTokenText();
-            }
             if (token === TokenType.AttributeName) {
                 attributeName = scanner.getTokenText();
                 const iterator = iteratorRegex.exec(attributeName);
                 if (iterator) {
                     iterators.unshift({
-                        name: iterator.groups.name,
+                        name: iterator.groups.name, // this does not account for same sibling iterators
                         range: {
                             start: doc.positionAt(scanner.getTokenOffset() + 9),
                             end: doc.positionAt(scanner.getTokenEnd()),
@@ -326,11 +322,4 @@ export function findDynamicContent(text: string, offset: number) {
         match = regex.exec(text);
     }
     return null;
-}
-
-export function auraLightningLabel(label: string): string {
-    const auraConversionRegex: RegExp = /^(lightning|c)(-)([\w|-]+)$/;
-    return label.replace(auraConversionRegex, (_match, group1, _group2, group3): string => {
-        return group1 + ':' + camelcase(group3);
-    });
 }

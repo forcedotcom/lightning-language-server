@@ -4,8 +4,8 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
-import { snakeCase, paramCase } from 'change-case';
-import camelcase from 'camelcase';
+import { snakeCase } from 'change-case';
+import  camelcase  from 'camelcase';
 import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
@@ -67,7 +67,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByName(query: string): Tag | null {
         const matches = componentPrefixRegex.exec(query);
-        const { delimiter, name } = matches.groups;
+        const { delimiter, name } = matches?.groups;
         if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
             return this.tags.get(name) || this.tags.get(snakeCase(name)) || null;
         } else if (delimiter === DelimiterType.LWC) {
