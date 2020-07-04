@@ -1,5 +1,4 @@
 import { WorkspaceContext, shared, Indexer, TagInfo, utils } from '@salesforce/lightning-lsp-common';
-import { LWCIndexer } from '@salesforce/lwc-language-server/lib/indexer';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs-extra';
@@ -18,9 +17,6 @@ export default class AuraIndexer implements Indexer {
     private context: WorkspaceContext;
     private indexingTasks: Promise<void>;
 
-    private lwcIndexer: LWCIndexer | null;
-    private listeners: Map<string, any> = new Map();
-
     private AURA_TAGS: Map<string, TagInfo> = new Map();
     private AURA_EVENTS: Map<string, TagInfo> = new Map();
     private AURA_NAMESPACES: Set<string> = new Set();
@@ -33,24 +29,6 @@ export default class AuraIndexer implements Indexer {
     public async configureAndIndex() {
         const indexingTasks: Promise<void>[] = [];
 
-        this.lwcIndexer = new LWCIndexer(this.context, false);
-        this.context.addIndexingProvider({ name: 'lwc', indexer: this.lwcIndexer });
-
-        this.addListener('delete', (tag: string) => {
-            const transformedName = this.transformLwcTagName(tag);
-            const auraName = [transformedName.namespace, transformedName.name].join(':');
-
-            this.deleteCustomTag(auraName);
-        });
-        this.addListener('set', (tagInfo: TagInfo) => {
-            const tag = tagInfo.name;
-            if (tagInfo.type === TagType.CUSTOM) {
-                const interopTagInfo = this.transformLwcTagToAura(tag, tagInfo);
-                this.setCustomTag(interopTagInfo);
-            }
-        });
-
-        indexingTasks.push(this.lwcIndexer.configureAndIndex());
         indexingTasks.push(this.loadStandardComponents());
         indexingTasks.push(this.loadSystemTags());
         indexingTasks.push(this.indexCustomComponents());
@@ -65,11 +43,6 @@ export default class AuraIndexer implements Indexer {
 
     public resetIndex() {
         this.eventEmitter.emit('clear');
-
-        if (this.lwcIndexer) {
-            this.lwcIndexer.eventEmitter.removeAllListeners();
-            this.lwcIndexer.resetIndex();
-        }
         this.AURA_TAGS.clear();
         this.AURA_EVENTS.clear();
     }
@@ -150,17 +123,6 @@ export default class AuraIndexer implements Indexer {
         return tagInfo;
     }
 
-    private addListener(event: string, listener: any) {
-        this.listeners.set(event, listener);
-        this.lwcIndexer.eventEmitter.on(event, listener);
-    }
-
-    private removeListeners() {
-        for (const [event, listener] of this.listeners.entries()) {
-            this.lwcIndexer.eventEmitter.removeListener(event, listener);
-        }
-    }
-
     private async indexCustomComponents() {
         const startTime = process.hrtime();
         const markupfiles = await this.context.findAllAuraMarkup();
@@ -209,7 +171,6 @@ export default class AuraIndexer implements Indexer {
         const data = await fs.readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
         const auraSystem = JSON.parse(data);
         for (const tag in auraSystem) {
-            // TODO need to account for LWC tags here
             if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraSystem[tag];
                 const info = new TagInfo(null, TagType.SYSTEM, false, []);
@@ -307,44 +268,5 @@ export default class AuraIndexer implements Indexer {
 
     private isAuraNamespace(namespace: string): boolean {
         return this.AURA_NAMESPACES.has(namespace);
-    }
-
-    private transformLwcTagName(tag: string) {
-        const namespace = tag.split('-')[0];
-        const name = tag
-            .split('-')
-            .slice(1)
-            .join('-');
-        return {
-            namespace,
-            name: changeCase.camelCase(name),
-        };
-    }
-    private transformLwcTagToAura(tag: string, tagInfo: any): TagInfo {
-        const interopTagInfo = JSON.parse(JSON.stringify(tagInfo));
-
-        const transformedName = this.transformLwcTagName(tag);
-        interopTagInfo.name = [transformedName.namespace, transformedName.name].join(':');
-
-        const attrs: AttributeInfo[] = [];
-        for (const attribute of interopTagInfo.attributes) {
-            const attrname = changeCase.camelCase(attribute.jsName || attribute.name);
-            attrs.push(new AttributeInfo(attrname, attribute.documentation, attribute.memberType, attribute.decorator, attribute.type, attribute.location, ''));
-        }
-
-        const info = new TagInfo(
-            interopTagInfo.file,
-            // TagType[interopTagInfo.type as string],
-            interopTagInfo.type,
-            true,
-            attrs,
-            interopTagInfo.location,
-            interopTagInfo.documentation,
-            interopTagInfo.name,
-            transformedName.namespace,
-            interopTagInfo.properties,
-            interopTagInfo.methods,
-        );
-        return info;
     }
 }

@@ -82,6 +82,7 @@ export default class Server {
             useDefaultDataProvider: false,
         });
 
+        this.context.configureProject();
         this.componentIndexer.init();
         this.typingIndexer.init();
 

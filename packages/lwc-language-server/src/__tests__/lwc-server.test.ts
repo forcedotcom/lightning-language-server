@@ -1,4 +1,4 @@
-import Server, { Token, findDynamicContent, auraLightningLabel } from '../lwc-server';
+import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
 import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkedString, MarkupContent, Hover } from 'vscode-languageserver';
 
@@ -300,14 +300,5 @@ describe('findDynamicContent', () => {
 
     it('returns null when not on dynamic content', () => {
         expect(findDynamicContent(text, 25)).toBeNull();
-    });
-});
-
-describe('auraLightningLabel', () => {
-    it('converts the standard lwc label to the aura-friendly syntax', () => {
-        expect(auraLightningLabel('lightning-icon')).toEqual('lightning:icon');
-        expect(auraLightningLabel('lightning-formatted-name')).toEqual('lightning:formattedName');
-        expect(auraLightningLabel('lightning-formatted-date-time')).toEqual('lightning:formattedDateTime');
-        expect(auraLightningLabel('foo-bar')).toEqual('foo-bar');
     });
 });
