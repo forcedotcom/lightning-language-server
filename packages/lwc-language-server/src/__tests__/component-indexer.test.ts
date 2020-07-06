@@ -80,11 +80,12 @@ describe('ComponentIndexer', () => {
         });
 
         describe('#findTagByURI', () => {
-            it('finds a Tag by matching the end of the URI', async () => {
+            it('finds a Tag by matching the URI', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByURI('force-app/main/default/lwc/hello_world/hello_world.js'));
-                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js')).not.toBeNull();
-                expect(componentIndexer.findTagByURI('hello_world.js')).not.toBeNull();
+                const query = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js';
+                expect(componentIndexer.findTagByURI(query)).not.toBeNull();
+                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js')).toBeNull();
+                expect(componentIndexer.findTagByURI('hello_world.js')).toBeNull();
                 expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
 
                 componentIndexer.tags.clear();
@@ -92,9 +93,10 @@ describe('ComponentIndexer', () => {
 
             it('finds a Tag by its matching html file', async () => {
                 await componentIndexer.init();
-                expect(componentIndexer.findTagByURI('force-app/main/default/lwc/hello_world/hello_world.html')).not.toBeNull();
-                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.html')).not.toBeNull();
-                expect(componentIndexer.findTagByURI('hello_world.html'));
+                const query = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.html';
+                expect(componentIndexer.findTagByURI(query)).not.toBeNull();
+                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.html')).toBeNull();
+                expect(componentIndexer.findTagByURI('hello_world.html')).toBeNull();
                 expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
 
                 componentIndexer.tags.clear();

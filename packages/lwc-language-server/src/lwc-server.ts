@@ -71,7 +71,7 @@ export default class Server {
 
     async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         this.workspaceFolders = params.workspaceFolders;
-        this.workspaceRoots = this.workspaceFolders.map(folder => URI.parse(folder.uri).fsPath);
+        this.workspaceRoots = this.workspaceFolders.map(folder => URI.file(folder.uri).fsPath);
         this.context = new WorkspaceContext(this.workspaceRoots);
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.lwcDataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
@@ -112,7 +112,8 @@ export default class Server {
             position,
             textDocument: { uri },
         } = params;
-        const doc = this.documents.get(uri);
+        const docUri = URI.file(uri).fsPath;
+        const doc = this.documents.get(docUri);
         const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
 
         if (await this.context.isLWCTemplate(doc)) {
@@ -136,7 +137,8 @@ export default class Server {
             position,
             textDocument: { uri },
         } = params;
-        const doc = this.documents.get(uri);
+        const docUri = URI.file(uri).fsPath;
+        const doc = this.documents.get(docUri);
         const htmlDoc: HTMLDocument = this.languageService.parseHTMLDocument(doc);
 
         if (await this.context.isLWCTemplate(doc)) {

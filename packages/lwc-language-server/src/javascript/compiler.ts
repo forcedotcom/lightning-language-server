@@ -71,7 +71,7 @@ function getClassMembers(metadata: Metadata, memberType: string, memberDecorator
  * Use to compile a live document (contents may be different from current file in disk)
  */
 export async function compileDocument(document: TextDocument): Promise<ICompilerResult> {
-    const file = URI.parse(document.uri).fsPath;
+    const file = URI.file(document.uri).fsPath;
     const filePath = path.parse(file);
     const fileName = filePath.base;
     return compileSource(document.getText(), fileName);

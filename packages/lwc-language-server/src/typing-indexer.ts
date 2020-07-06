@@ -78,11 +78,12 @@ export default class TypingIndexer extends BaseIndexer {
 
     get metaFiles(): string[] {
         const globPath = path.join(
+            this.workspaceRoot,
             this.sfdxPackageDirsPattern,
             '**/+(staticresources|contentassets|messageChannels)',
             '*.+(resource|asset|messageChannel)-meta.xml',
         );
-        return glob.sync(globPath, { cwd: this.workspaceRoot });
+        return glob.sync(globPath);
     }
 
     get metaTypings(): string[] {

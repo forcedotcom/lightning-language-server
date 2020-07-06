@@ -5,8 +5,9 @@ import { Entry, sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import { snakeCase } from 'change-case';
-import  camelcase  from 'camelcase';
+import camelcase from 'camelcase';
 import BaseIndexer from './base-indexer';
+import URI from 'vscode-uri';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
@@ -78,11 +79,8 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByURI(uri: string): Tag | null {
         const uriText = uri.replace('.html', '.js');
-        return (
-            Array.from(this.tags.values()).find(tag => {
-                return tag.uri.endsWith(uriText);
-            }) || null
-        );
+        const query = URI.file(path.resolve(uriText)).fsPath;
+        return Array.from(this.tags.values()).find(tag => tag.uri === query) || null;
     }
 
     loadTagsFromIndex() {

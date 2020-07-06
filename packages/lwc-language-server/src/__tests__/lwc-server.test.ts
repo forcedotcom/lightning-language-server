@@ -7,11 +7,11 @@ import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
 const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
-const uri = URI.parse(filename).fsPath;
+const uri = URI.file(filename).fsPath;
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
 const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
-const auraUri = URI.parse(auraFilename).fsPath;
+const auraUri = URI.file(auraFilename).fsPath;
 const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
 
 const server: Server = new Server();
@@ -71,7 +71,7 @@ describe('handlers', () => {
     describe('#onCompletion', () => {
         it('returns a list of available completion items in a LWC template', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 16,
                     character: 30,
@@ -109,7 +109,7 @@ describe('handlers', () => {
     describe('onHover', () => {
         it('returns the the docs for that hovered item', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 16,
                     character: 29,
@@ -145,7 +145,7 @@ describe('handlers', () => {
     describe('#onDefinition', () => {
         it('returns the Location of the html tags corresponding .js file', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 16,
                     character: 30,
@@ -163,7 +163,7 @@ describe('handlers', () => {
 
         it('returns the Location of the property in the elements content', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 19,
                     character: 40,
@@ -180,7 +180,7 @@ describe('handlers', () => {
 
         it('returns the Location of an (`@api`) classMember from the html attribute', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 18,
                     character: 27,
@@ -196,7 +196,7 @@ describe('handlers', () => {
 
         it('returns the Location of a parent iterator node with an iterator attribute', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: filename },
+                textDocument: { uri },
                 position: {
                     line: 18,
                     character: 32,

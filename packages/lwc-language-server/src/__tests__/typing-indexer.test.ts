@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 
 const typingIndexer: TypingIndexer = new TypingIndexer({
-    workspaceRoot: '../../test-workspaces/sfdx-workspace',
+    workspaceRoot: path.resolve('../../test-workspaces/sfdx-workspace'),
 });
 
 describe('TypingIndexer', () => {
@@ -65,13 +65,15 @@ describe('TypingIndexer', () => {
         test('it returns all the paths  for meta files', () => {
             const metaFilePaths: string[] = typingIndexer.metaFiles.sort();
             const expectedMetaFilePaths: string[] = [
-                'force-app/main/default/contentassets/logo.asset-meta.xml',
-                'force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
-                'force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
-                'force-app/main/default/staticresources/bike_assets.resource-meta.xml',
-                'force-app/main/default/staticresources/todocss.resource-meta.xml',
-                'utils/meta/staticresources/todoutil.resource-meta.xml',
-            ].sort();
+                '../../test-workspaces/sfdx-workspace/force-app/main/default/contentassets/logo.asset-meta.xml',
+                '../../test-workspaces/sfdx-workspace/force-app/main/default/messageChannels/Channel1.messageChannel-meta.xml',
+                '../../test-workspaces/sfdx-workspace/force-app/main/default/messageChannels/Channel2.messageChannel-meta.xml',
+                '../../test-workspaces/sfdx-workspace/force-app/main/default/staticresources/bike_assets.resource-meta.xml',
+                '../../test-workspaces/sfdx-workspace/force-app/main/default/staticresources/todocss.resource-meta.xml',
+                '../../test-workspaces/sfdx-workspace/utils/meta/staticresources/todoutil.resource-meta.xml',
+            ]
+                .map(filename => path.resolve(filename))
+                .sort();
 
             expect(metaFilePaths).toEqual(expectedMetaFilePaths);
         });
