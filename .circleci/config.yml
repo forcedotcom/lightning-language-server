@@ -11,8 +11,23 @@ orbs:
   # post to slack
   slack: circleci/slack@3.4.2
 
+_refs:
+  defaults: &defaults
+    working_directory: ~/lightning-language-server
+    docker:
+      - image: circleci/node:lts
+  ssh-config: &ssh-config
+    fingerprints:
+      - 'e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e'
+  gh-config: &gh-config
+    name: Configuring GitHub
+    command: |
+      git config credential.helper 'cache --timeout=120'
+      git config user.email "$GH_EMAIL"
+      git config user.name "Release Bot"
+
 parameters:
-  # Deploy the master branch to public npm
+  # Deploy the main branch to public npm
   deploy:
     type: boolean
     default: false
@@ -20,11 +35,6 @@ parameters:
   version:
     type: string
     default: "patch"
-
-defaults: &defaults
-  working_directory: ~/lightning-language-server
-  docker:
-    - image: circleci/node:lts
 
 jobs:
   # Default Job
@@ -92,15 +102,12 @@ jobs:
       - attach_workspace:
           at: ~/lightning-language-server
       # This line has to be here or it won't properly configure git access
+      - add_ssh_keys: *ssh-config
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
+      - run: *gh-config
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: echo "Bumping version '<< pipeline.parameters.version >>''"
       - run: |
-            git config user.email "nkruk@salesforce.com"
-            git config user.name "Nicolas Kruk"
             yarn bump-versions << pipeline.parameters.version >>
             yarn publish-lsp
       - slack/notify:
@@ -132,26 +139,4 @@ workflows:
           filters:
             branches:
               only:
-                - master
-
-  # Weekly scheduled build/deploy to NPM on Sundays
-  # This gives us Monday to merge in the Dependabot PR into the vscode repo
-  weekly_deploy:
-    triggers:
-      - schedule:
-          cron: "0 0 * * 0"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build-and-test-linux
-      - build-and-test-win
-      - deploy:
-          requires:
-            - build-and-test-linux
-            - build-and-test-win
-          filters:
-            branches:
-              only:
-                - master
+                - main
