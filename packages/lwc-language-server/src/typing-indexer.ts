@@ -89,7 +89,6 @@ export default class TypingIndexer extends BaseIndexer {
     get customLabelFiles(): string[] {
         const globPath = normalize(`${this.sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`);
         const result = glob.sync(globPath, { cwd: normalize(this.workspaceRoot) }).map(file => path.join(this.workspaceRoot, file));
-        console.log({ result });
         return result;
     }
 
