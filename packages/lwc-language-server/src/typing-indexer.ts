@@ -1,4 +1,5 @@
 import * as glob from 'fast-glob';
+import normalize from 'normalize-path';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 import Typing from './typing';
@@ -75,22 +76,19 @@ export default class TypingIndexer extends BaseIndexer {
     }
 
     get metaFiles(): string[] {
-        const globPath = path.join(
-            this.workspaceRoot,
-            this.sfdxPackageDirsPattern,
-            '**/+(staticresources|contentassets|messageChannels)',
-            '*.+(resource|asset|messageChannel)-meta.xml',
+        const globPath = normalize(
+            `${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/+(staticresources|contentassets|messageChannels)/*.+(resource|asset|messageChannel)-meta.xml`,
         );
         return glob.sync(globPath);
     }
 
     get metaTypings(): string[] {
-        const globPath = path.join(this.typingsBaseDir, '*.+(messageChannel|resource|asset).d.ts');
+        const globPath = normalize(`${this.typingsBaseDir}/*.+(messageChannel|resource|asset).d.ts`);
         return glob.sync(globPath);
     }
 
     get customLabelFiles(): string[] {
-        const globPath = path.join(this.sfdxPackageDirsPattern, '/**/labels/CustomLabels.labels-meta.xml');
+        const globPath = normalize(`${this.sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`);
         return glob.sync(globPath, { cwd: this.workspaceRoot });
     }
 

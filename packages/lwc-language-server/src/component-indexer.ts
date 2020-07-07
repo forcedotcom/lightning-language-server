@@ -2,6 +2,7 @@ import Tag from './tag';
 import * as path from 'path';
 import { shared } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
+import normalize from 'normalize-path';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import { snakeCase } from 'change-case';
@@ -43,7 +44,8 @@ export default class ComponentIndexer extends BaseIndexer {
         let files: Entry[] = [];
         switch (this.workspaceType) {
             case WorkspaceType.SFDX:
-                files = sync(path.join(this.workspaceRoot, this.sfdxPackageDirsPattern, '**/*/lwc/**/*.js'), {
+                const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/**/*.js`);
+                files = sync(sfdxSource, {
                     stats: true,
                 });
                 return files.filter((item: Entry): boolean => {
@@ -52,7 +54,8 @@ export default class ComponentIndexer extends BaseIndexer {
                 });
             default:
                 // For CORE_ALL and CORE_PARTIAL
-                files = sync(path.join(this.workspaceRoot, '**/*/modules/**/*.js'), {
+                const defaultSource = normalize(`${this.workspaceRoot}/**/*/modules/**/*.js`);
+                files = sync(defaultSource, {
                     stats: true,
                 });
                 return files.filter((item: Entry): boolean => {
