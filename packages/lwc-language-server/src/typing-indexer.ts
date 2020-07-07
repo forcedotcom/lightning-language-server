@@ -29,13 +29,13 @@ export default class TypingIndexer extends BaseIndexer {
 
         switch (projectType) {
             case WorkspaceType.SFDX:
-                this.typingsBaseDir = path.join(this.workspaceRoot, '.sfdx/typings/lwc');
+                this.typingsBaseDir = path.join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_PARTIAL:
-                this.typingsBaseDir = path.join(this.workspaceRoot, '../.vscode/typings/lwc');
+                this.typingsBaseDir = path.join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
             case WorkspaceType.CORE_ALL:
-                this.typingsBaseDir = path.join(this.workspaceRoot, '.vscode/typings/lwc');
+                this.typingsBaseDir = path.join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
                 break;
         }
     }
@@ -58,10 +58,7 @@ export default class TypingIndexer extends BaseIndexer {
 
     deleteStaleMetaTypings(): void {
         const staleTypings = TypingIndexer.diff(this.metaTypings, this.metaFiles);
-        staleTypings.forEach(async (filename: string) => {
-            const filePath = path.join(this.workspaceRoot, filename);
-            fsExtra.removeSync(filePath);
-        });
+        staleTypings.forEach((filename: string) => fsExtra.removeSync(filename));
     }
 
     async saveCustomLabelTypings(): Promise<void> {
@@ -88,9 +85,8 @@ export default class TypingIndexer extends BaseIndexer {
     }
 
     get metaTypings(): string[] {
-        const root = path.relative(this.workspaceRoot, this.typingsBaseDir);
-        const globPath = path.join(root, '*.+(messageChannel|resource|asset).d.ts');
-        return glob.sync(globPath, { cwd: this.workspaceRoot });
+        const globPath = path.join(this.typingsBaseDir, '*.+(messageChannel|resource|asset).d.ts');
+        return glob.sync(globPath);
     }
 
     get customLabelFiles(): string[] {

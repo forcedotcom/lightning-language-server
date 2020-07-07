@@ -6,7 +6,7 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
 
 const { WorkspaceType } = shared;
-const workspaceRoot: string = '../../test-workspaces/sfdx-workspace';
+const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
 const componentIndexer: ComponentIndexer = new ComponentIndexer({
     workspaceRoot,
 });
@@ -48,8 +48,8 @@ describe('ComponentIndexer', () => {
                 const paths = componentIndexer.componentEntries.map(entry => entry.path).sort();
 
                 expect(paths).toEqual(expectedComponents.sort());
-                expect(paths).not.toContain('force-app/main/default/lwc/import_relative/messages.js');
-                expect(paths).not.toContain('force-app/main/default/lwc/todo/store.js');
+                expect(paths).not.toContain(path.join('force-app', 'main', 'default', 'lwc', 'import_relative', 'messages.js'));
+                expect(paths).not.toContain(path.join('force-app', 'main', 'default', 'lwc', 'todo', 'store.js'));
             });
         });
 
@@ -82,22 +82,22 @@ describe('ComponentIndexer', () => {
         describe('#findTagByURI', () => {
             it('finds a Tag by matching the URI', async () => {
                 await componentIndexer.init();
-                const query = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js';
+                const query = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js');
                 expect(componentIndexer.findTagByURI(query)).not.toBeNull();
-                expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.js')).toBeNull();
+                expect(componentIndexer.findTagByURI(path.join('lwc', 'hello_world', 'hello_world.js'))).toBeNull();
                 expect(componentIndexer.findTagByURI('hello_world.js')).toBeNull();
-                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
+                expect(componentIndexer.findTagByURI(path.join('foo', 'bar', 'baz'))).toBeNull();
 
                 componentIndexer.tags.clear();
             });
 
             it('finds a Tag by its matching html file', async () => {
                 await componentIndexer.init();
-                const query = '../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.html';
+                const query = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.html');
                 expect(componentIndexer.findTagByURI(query)).not.toBeNull();
                 expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.html')).toBeNull();
                 expect(componentIndexer.findTagByURI('hello_world.html')).toBeNull();
-                expect(componentIndexer.findTagByURI('foo/bar/baz')).toBeNull();
+                expect(componentIndexer.findTagByURI(path.join('foo', 'bar', 'baz'))).toBeNull();
 
                 componentIndexer.tags.clear();
             });

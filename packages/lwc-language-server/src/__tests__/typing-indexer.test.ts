@@ -54,8 +54,7 @@ describe('TypingIndexer', () => {
 
         it('saves the custom labels xml file to 1 typings file', async () => {
             await typingIndexer.saveCustomLabelTypings();
-            const customLabelPath: string = path.join(typingIndexer.workspaceRoot, '.sfdx/typings/lwc/customlabels.d.ts');
-
+            const customLabelPath: string = path.join(typingIndexer.workspaceRoot, '.sfdx', 'typings', 'lwc', 'customlabels.d.ts');
             expect(fsExtra.pathExistsSync(customLabelPath)).toBeTrue();
             expect(fsExtra.readFileSync(customLabelPath).toString()).toInclude('declare module');
         });
@@ -90,10 +89,9 @@ describe('TypingIndexer', () => {
                 '.sfdx/typings/lwc/Channel1.messageChannel.d.ts',
                 '.sfdx/typings/lwc/bike_assets.resource.d.ts',
                 '.sfdx/typings/lwc/todocss.resource.d.ts',
-            ];
+            ].map(item => path.resolve(`${typingIndexer.workspaceRoot}/${item}`));
 
             expectedMetaFileTypingPaths.forEach((filePath: string) => {
-                filePath = path.join(typingIndexer.workspaceRoot, filePath);
                 fsExtra.writeFileSync(filePath, 'foobar');
             });
 

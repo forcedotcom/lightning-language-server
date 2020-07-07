@@ -1,4 +1,5 @@
 import Typing from '../typing';
+import * as path from 'path';
 
 describe('new Typing', () => {
     it('cannot create a Typing with an invalid type', () => {
@@ -50,7 +51,7 @@ describe('Typing.declaration', () => {
     });
 
     it('handles a full path', async () => {
-        const typing: Typing = Typing.fromMeta('./foo/bar/buz/logo.asset-meta.xml');
+        const typing: Typing = Typing.fromMeta(path.join('.', 'foo', 'bar', 'buz', 'logo.asset-meta.xml'));
         const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;

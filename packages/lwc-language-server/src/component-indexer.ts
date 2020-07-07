@@ -10,7 +10,7 @@ import BaseIndexer from './base-indexer';
 import URI from 'vscode-uri';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
-const CUSTOM_COMPONENT_INDEX_FILE = '.sfdx/indexes/lwc/custom-components.json';
+const CUSTOM_COMPONENT_INDEX_FILE = path.join('.sfdx', 'indexes', 'lwc', 'custom-components.json');
 const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
 
 type ComponentIndexerAttributes = {
