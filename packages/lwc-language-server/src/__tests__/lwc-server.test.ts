@@ -206,7 +206,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.componentIndexer.init();
             const [location]: Location[] = server.onDefinition(params);
-            expect(location.uri).toContain('todo/todo.html');
+            expect(location.uri).toContain(path.join('todo', 'todo.html'));
             expect(location.range.start.line).toEqual(15);
             expect(location.range.start.character).toEqual(60);
         });
