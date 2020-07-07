@@ -1,6 +1,8 @@
 import * as xml2js from 'xml2js';
 import * as path from 'path';
 
+const metaRegex: RegExp = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/);
+
 export default class Typing {
     private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
 
@@ -22,8 +24,7 @@ export default class Typing {
 
     static fromMeta(metaFilename: string): Typing {
         const parsedPath = path.parse(metaFilename);
-        const regex = /(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/;
-        const { name, type } = regex.exec(parsedPath.name).groups;
+        const { name, type } = metaRegex.exec(parsedPath.name).groups;
         return new Typing({ name, type });
     }
 

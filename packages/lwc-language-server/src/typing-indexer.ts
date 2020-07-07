@@ -6,6 +6,7 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
+const basenameRegex: RegExp = new RegExp(/(?<name>[\w-_]+)\.[^\/]+$/);
 
 type BaseIndexerAttributes = {
     workspaceRoot: string;
@@ -102,7 +103,7 @@ export default class TypingIndexer extends BaseIndexer {
     }
 }
 
-function pathBasename(filename: string): string {
-    const regex = /\/(?<name>[\w-_]+)\.[^\/]+$/;
-    return regex.exec(filename).groups.name;
+export function pathBasename(filename: string): string {
+    const parsedPath: string = path.parse(filename).base;
+    return basenameRegex.exec(parsedPath).groups.name;
 }

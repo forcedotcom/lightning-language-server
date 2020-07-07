@@ -1,4 +1,4 @@
-import TypingIndexer from '../typing-indexer';
+import TypingIndexer, { pathBasename } from '../typing-indexer';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 
@@ -102,6 +102,15 @@ describe('TypingIndexer', () => {
             expectedMetaFileTypingPaths.forEach(expectedPath => {
                 expect(metaFilePaths).toContain(expectedPath);
             });
+        });
+    });
+
+    describe('pathBasename', () => {
+        it('returns the basename of a path', () => {
+            expect(pathBasename('force-app/main/default/contentassets/logo.asset-meta.xml')).toEqual('logo');
+            expect(pathBasename('force-app/main/default/contentassets/logo.asset.d.ts')).toEqual('logo');
+            expect(pathBasename(`force-app\\main\\default\\contentassets\\logo.asset.d.ts-meta.xml`)).toEqual('logo');
+            expect(pathBasename(`force-app\\main\\default\\contentassets\\logo.asset.d.ts`)).toEqual('logo');
         });
     });
 
