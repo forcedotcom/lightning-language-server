@@ -45,7 +45,7 @@ describe('ComponentIndexer', () => {
                     'utils/meta/lwc/todo_utils/todo_utils.js',
                 ].map(item => path.join(componentIndexer.workspaceRoot, item));
 
-                const paths = componentIndexer.componentEntries.map(entry => entry.path).sort();
+                const paths = componentIndexer.componentEntries.map(entry => path.resolve(entry.path)).sort();
 
                 expect(paths).toEqual(expectedComponents.sort());
                 expect(paths).not.toContain(path.join('force-app', 'main', 'default', 'lwc', 'import_relative', 'messages.js'));
