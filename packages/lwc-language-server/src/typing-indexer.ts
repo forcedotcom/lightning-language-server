@@ -65,8 +65,7 @@ export default class TypingIndexer extends BaseIndexer {
     async saveCustomLabelTypings(): Promise<void> {
         fsExtra.ensureDirSync(this.typingsBaseDir);
         const typings = this.customLabelFiles.map(filename => {
-            const filePath = path.join(this.workspaceRoot, filename);
-            const data = fsExtra.readFileSync(filePath);
+            const data = fsExtra.readFileSync(filename);
             return Typing.declarationsFromCustomLabels(data);
         });
         const typingContent = await Promise.all(typings);
@@ -79,17 +78,19 @@ export default class TypingIndexer extends BaseIndexer {
         const globPath = normalize(
             `${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/+(staticresources|contentassets|messageChannels)/*.+(resource|asset|messageChannel)-meta.xml`,
         );
-        return glob.sync(globPath);
+        return glob.sync(globPath).map(file => path.resolve(file));
     }
 
     get metaTypings(): string[] {
         const globPath = normalize(`${this.typingsBaseDir}/*.+(messageChannel|resource|asset).d.ts`);
-        return glob.sync(globPath);
+        return glob.sync(globPath).map(file => path.resolve(file));
     }
 
     get customLabelFiles(): string[] {
         const globPath = normalize(`${this.sfdxPackageDirsPattern}/**/labels/CustomLabels.labels-meta.xml`);
-        return glob.sync(globPath, { cwd: this.workspaceRoot });
+        const result = glob.sync(globPath, { cwd: normalize(this.workspaceRoot) }).map(file => path.join(this.workspaceRoot, file));
+        console.log({ result });
+        return result;
     }
 
     get customLabelTypings(): string {
