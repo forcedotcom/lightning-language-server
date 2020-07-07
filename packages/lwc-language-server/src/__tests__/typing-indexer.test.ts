@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fsExtra from 'fs-extra';
 
 const typingIndexer: TypingIndexer = new TypingIndexer({
-    workspaceRoot: path.resolve('../../test-workspaces/sfdx-workspace'),
+    workspaceRoot: path.resolve('..', '..', 'test-workspaces', 'sfdx-workspace'),
 });
 
 describe('TypingIndexer', () => {
