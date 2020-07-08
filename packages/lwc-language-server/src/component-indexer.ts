@@ -82,7 +82,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByURI(uri: string): Tag | null {
         const uriText = uri.replace('.html', '.js');
-        const query = URI.file(path.resolve(uriText)).fsPath;
+        const query = URI.parse(uriText).fsPath;
         return Array.from(this.tags.values()).find(tag => tag.uri === query) || null;
     }
 
