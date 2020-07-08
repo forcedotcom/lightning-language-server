@@ -32,7 +32,6 @@ import URI from 'vscode-uri';
 import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
-import { LWCIndexer } from '@salesforce/lwc-language-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
@@ -251,8 +250,6 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
     const changes = change.changes;
 
     try {
-        const lwcIndexer = context.getIndexingProvider('lwc') as LWCIndexer;
-        lwcIndexer.handleWatchedFiles(context, change);
         if (utils.isAuraRootDirectoryCreated(context, changes)) {
             await context.getIndexingProvider('aura').resetIndex();
             await context.getIndexingProvider('aura').configureAndIndex();
