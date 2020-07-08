@@ -62,7 +62,7 @@ describe('handlers', () => {
         capabilities: {},
         workspaceFolders: [
             {
-                uri: path.resolve('../../test-workspaces/sfdx-workspace/'),
+                uri: URI.file(path.resolve('../../test-workspaces/sfdx-workspace/')).toString(),
                 name: path.resolve('../../test-workspaces/sfdx-workspace/'),
             },
         ],
