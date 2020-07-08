@@ -7,11 +7,11 @@ import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
 const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
-const uri = URI.file(filename).fsPath;
+const uri = URI.file(filename).toString();
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
 const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
-const auraUri = URI.file(auraFilename).fsPath;
+const auraUri = URI.file(auraFilename).toString();
 const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
 
 const server: Server = new Server();
@@ -90,7 +90,7 @@ describe('handlers', () => {
 
         it('returns a list of available completion items in a Aura template', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: auraFilename },
+                textDocument: { uri: auraUri },
                 position: {
                     line: 2,
                     character: 9,
@@ -126,7 +126,7 @@ describe('handlers', () => {
 
         it('returns the docs for that hovered custom component in an aura template', async () => {
             const params: TextDocumentPositionParams = {
-                textDocument: { uri: auraFilename },
+                textDocument: { uri: auraUri },
                 position: {
                     line: 3,
                     character: 9,
