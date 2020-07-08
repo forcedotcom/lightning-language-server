@@ -173,7 +173,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.componentIndexer.init();
             const [location] = server.onDefinition(params);
-            expect(location.uri).toContain(path.join('todo', 'todo.js'));
+            expect(location.uri).toContain('todo/todo.js');
             expect(location.range.start.line).toEqual(103);
             expect(location.range.start.character).toEqual(4);
         });
