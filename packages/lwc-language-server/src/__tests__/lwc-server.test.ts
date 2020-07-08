@@ -157,8 +157,8 @@ describe('handlers', () => {
             const locations: Location[] = server.onDefinition(params);
             const uris = locations.map(item => item.uri);
             expect(locations.length).toEqual(2);
-            expect(uris[0]).toContain(path.join('todo_item', 'todo_item.js'));
-            expect(uris[1]).toContain(path.join('todo_item', 'todo_item.html'));
+            expect(uris[0]).toContain('todo_item/todo_item.js');
+            expect(uris[1]).toContain('todo_item/todo_item.html');
         });
 
         it('returns the Location of the property in the elements content', async () => {

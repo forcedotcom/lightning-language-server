@@ -2,6 +2,7 @@ import ComponentIndexer, { unIndexedFiles } from '../component-indexer';
 import Tag from '../tag';
 import { Entry } from 'fast-glob';
 import * as path from 'path';
+import URI from 'vscode-uri';
 import { shared } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
 
@@ -9,6 +10,15 @@ const { WorkspaceType } = shared;
 const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
 const componentIndexer: ComponentIndexer = new ComponentIndexer({
     workspaceRoot,
+});
+
+beforeEach(async done => {
+    await componentIndexer.init();
+    done();
+});
+
+afterEach(() => {
+    componentIndexer.tags.clear();
 });
 
 describe('ComponentIndexer', () => {
@@ -23,10 +33,8 @@ describe('ComponentIndexer', () => {
     describe('instance methods', () => {
         describe('#init', () => {
             it('adds a Tag to `tags` for each custom component', async () => {
-                await componentIndexer.init();
                 expect(componentIndexer.tags.size).toEqual(8);
                 expect(componentIndexer.tags.get('c-hello_world'));
-                componentIndexer.tags.clear();
             });
         });
 
@@ -55,13 +63,11 @@ describe('ComponentIndexer', () => {
 
         describe('findTagByName', () => {
             it('finds tag with an exact match', async () => {
-                await componentIndexer.init();
                 expect(componentIndexer.findTagByName('hello_world').name).toEqual('hello_world');
                 expect(componentIndexer.findTagByName('foo')).toBeNull();
             });
 
             it('finds tag with lwc prefix', async () => {
-                await componentIndexer.init();
                 expect(componentIndexer.findTagByName('c-hello_world').name).toEqual('hello_world');
                 expect(componentIndexer.findTagByName('c-hello-world')).toBeNull();
                 expect(componentIndexer.findTagByName('c-helloWorld')).toBeNull();
@@ -69,7 +75,6 @@ describe('ComponentIndexer', () => {
             });
 
             it('finds tag with aura prefix', async () => {
-                await componentIndexer.init();
                 expect(componentIndexer.findTagByName('c:hello_world')).toBeNull();
                 expect(componentIndexer.findTagByName('c:hello-world')).toBeNull();
                 expect(componentIndexer.findTagByName('c:helloWorld').name).toEqual('hello_world');
@@ -81,30 +86,25 @@ describe('ComponentIndexer', () => {
 
         describe('#findTagByURI', () => {
             it('finds a Tag by matching the URI', async () => {
-                await componentIndexer.init();
-                const query = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js');
+                const query = URI.file(path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.js')).toString();
                 expect(componentIndexer.findTagByURI(query)).not.toBeNull();
                 expect(componentIndexer.findTagByURI(path.join('lwc', 'hello_world', 'hello_world.js'))).toBeNull();
                 expect(componentIndexer.findTagByURI('hello_world.js')).toBeNull();
                 expect(componentIndexer.findTagByURI(path.join('foo', 'bar', 'baz'))).toBeNull();
-
-                componentIndexer.tags.clear();
             });
 
             it('finds a Tag by its matching html file', async () => {
-                await componentIndexer.init();
-                const query = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.html');
+                const query = URI.file(path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/hello_world/hello_world.html')).toString();
                 expect(componentIndexer.findTagByURI(query)).not.toBeNull();
                 expect(componentIndexer.findTagByURI('lwc/hello_world/hello_world.html')).toBeNull();
                 expect(componentIndexer.findTagByURI('hello_world.html')).toBeNull();
                 expect(componentIndexer.findTagByURI(path.join('foo', 'bar', 'baz'))).toBeNull();
-
-                componentIndexer.tags.clear();
             });
         });
 
         describe('#unIndexedFiles', () => {
             it('returns a list of files not yet indexed', () => {
+                componentIndexer.tags.clear();
                 const unIndexed = componentIndexer.unIndexedFiles;
                 expect(unIndexed.length).toBe(10);
             });
@@ -119,7 +119,6 @@ describe('ComponentIndexer', () => {
 
         describe('#generateIndex()', () => {
             it('creates Tag objects for all the component JS files', async () => {
-                await componentIndexer.init();
                 expect(componentIndexer.tags.size).toBe(8);
             });
         });
