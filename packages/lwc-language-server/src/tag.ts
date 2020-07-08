@@ -102,7 +102,7 @@ export default class Tag implements ITagData {
     }
 
     get uri() {
-        return URI.parse(path.resolve(this.file)).fsPath;
+        return URI.file(path.resolve(this.file)).toString();
     }
 
     get allAttributes() {
