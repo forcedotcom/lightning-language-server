@@ -151,7 +151,7 @@ export default class Tag implements ITagData {
         const { dir, name } = path.parse(this.file);
 
         const convertFileToLocation = (file: string) => {
-            const uri = URI.file(path.resolve(file)).fsPath;
+            const uri = URI.file(path.resolve(file)).toString();
             const position = Position.create(0, 0);
             const range = Range.create(position, position);
             return Location.create(uri, range);
