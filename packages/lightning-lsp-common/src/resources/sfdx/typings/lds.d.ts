@@ -77,6 +77,13 @@ declare module 'lightning/uiObjectInfoApi' {
     export function getObjectInfo(objectApiName: string | ObjectId): void;
 
     /**
+     * Wire adapter for multiple object metadatas.
+     *
+     * @param objectApiNames The API names of the objects to retrieve.
+     */
+    export function getObjectInfos(objectApiNames: Array<string | ObjectId>): void;
+
+    /**
      * Wire adapter for values for a picklist field.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_picklist_values.htm
