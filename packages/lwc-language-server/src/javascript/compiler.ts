@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
 import URI from 'vscode-uri';
-import { DIAGNOSTIC_SOURCE } from '../constants';
+import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import { ClassMember } from '@lwc/babel-plugin-component';
@@ -136,7 +136,9 @@ function toDiagnostic(err: any): Diagnostic {
     }
     const startLine: number = location.line - 1;
     const startCharacter: number = location.column;
-    const range = Range.create(startLine, startCharacter, startLine, Number.MAX_VALUE);
+    // https://github.com/forcedotcom/salesforcedx-vscode/issues/2074
+    // Limit the end character to max 32 bit integer so that it doesn't overflow other language servers
+    const range = Range.create(startLine, startCharacter, startLine, MAX_32BIT_INTEGER);
     return {
         range,
         severity: DiagnosticSeverity.Error,

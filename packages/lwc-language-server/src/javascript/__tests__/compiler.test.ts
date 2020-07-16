@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
-import { DIAGNOSTIC_SOURCE } from '../../constants';
+import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../../constants';
 import { compile } from '@lwc/compiler';
 import { transform } from '@lwc/compiler';
 import { Metadata } from '@lwc/babel-plugin-component';
@@ -172,7 +172,7 @@ it('compileDocument returns list of javascript syntax errors', async () => {
     expect(diagnostics[0].message).toMatch('Unexpected token (4:17)');
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 17 },
-        end: { character: Number.MAX_VALUE },
+        end: { character: MAX_32BIT_INTEGER },
     });
     expect(diagnostics[0].source).toBe(DIAGNOSTIC_SOURCE);
 });
@@ -185,7 +185,7 @@ it('compileDocument returns list of javascript regular errors', async () => {
     expect(diagnostics[0].message).toMatch('Boolean public property must default to false.');
     expect(diagnostics[0].range).toMatchObject({
         start: { character: 4 },
-        end: { character: Number.MAX_VALUE },
+        end: { character: MAX_32BIT_INTEGER },
     });
     expect(diagnostics[0].source).toBe(DIAGNOSTIC_SOURCE);
 });
