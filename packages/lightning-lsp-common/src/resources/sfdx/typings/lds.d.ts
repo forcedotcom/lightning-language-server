@@ -18,20 +18,23 @@ declare module 'lightning/uiListApi' {
     }
 
     /**
-     * Wire adapter for list view records and metadata.
+     * Use this wire adapter to get the records and metadata for a list view.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_list_views_records_md.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_get_list_ui
      *
      * @param objectApiName API name of the list view's object (must be specified along with listViewApiName).
      * @param listViewApiName API name of the list view (must be specified with objectApiName).
      * @param listViewId ID of the list view (may be specified without objectApiName or listViewApiName).
-     * @param pageToken Page ID of records to retrieve.
-     * @param pageSize Number of records to retrieve at once. The default value is 50. Value can be 1–2000.
-     * @param sortBy Object-qualified field API name on which to sort.
-     * @param fields Object-qualified field API names to retrieve. These fields don’t create visible columns.
-     *               If a field isn’t accessible to the context user, it causes an error.
-     * @param optionalFields Object-qualified field API names to retrieve. These fields don’t create visible columns.
-     *                       If an optional field isn’t accessible to the context user, it isn’t included in the response, but it doesn’t cause an error.
+     * @param pageToken A token that represents the page offset. To indicate where the page starts, use this value with the pageSize parameter.
+     *                The maximum offset is 2000 and the default is 0.
+     * @param pageSize The number of list records viewed at one time. The default value is 50. Value can be 1–2000.
+     * @param sortBy The API name of the field the list view is sorted by. If the name is preceded with `-`, the sort order is descending.
+     *                For example, Name sorts by name in ascending order. `-CreatedDate` sorts by created date in descending order.
+     *                Accepts only one value per request.
+     * @param fields Additional fields queried for the records returned. These fields don’t create visible columns.
+     *                If the field is not available to the user, an error occurs.
+     * @param optionalFields Additional fields queried for the records returned. These fields don’t create visible columns.
+     *                       If the field is not available to the user, no error occurs and the field isn’t included in the records.
      * @param q Query string to filter list views (only for a list of lists).
      * @returns {Observable} See description.
      */
@@ -119,24 +122,41 @@ declare module 'lightning/uiRecordApi' {
         objectApiName: string;
     }
 
-    export type FieldValueRepresentationValue = null | boolean | number | string | RecordRepresentation;
+    /**
+     * Contains both the raw and displayable field values for a field in a Record.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface FieldValueRepresentation {
         displayValue: string | null;
-        value: FieldValueRepresentationValue;
+        value: RecordRepresentation | boolean | number | string | null;
     }
+    export type FieldValueRepresentationValue = FieldValueRepresentation['value'];
 
+    /**
+     * Record Collection Representation.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface RecordCollectionRepresentation {
-        eTag?: string;
         count: number;
-        currentPageToken: string;
+        currentPageToken: string | null;
         currentPageUrl: string;
-        nextPageToken: string;
-        nextPageUrl: string;
-        previousPageToken: string;
-        previousPageUrl: string;
-        records: RecordRepresentation[];
+        nextPageToken: string | null;
+        nextPageUrl: string | null;
+        previousPageToken: string | null;
+        previousPageUrl: string | null;
+        records: Array<RecordRepresentation>;
     }
 
+    /**
+     * Record type.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface RecordTypeInfoRepresentation {
         available: boolean;
         defaultRecordTypeMapping: boolean;
@@ -145,49 +165,86 @@ declare module 'lightning/uiRecordApi' {
         recordTypeId: string;
     }
 
+    /**
+     * Record.
+     *
+     * Keys:
+     *    recordId (string): id
+     */
     export interface RecordRepresentation {
         apiName: string;
-        childRelationships?: { [key: string]: RecordCollectionRepresentation };
-        fields: { [key: string]: FieldValueRepresentation };
+        childRelationships: {
+            [key: string]: RecordCollectionRepresentation;
+        };
+        eTag: string;
+        fields: {
+            [key: string]: FieldValueRepresentation;
+        };
         id: string;
-        lastModifiedById: string;
-        lastModifiedDate: string;
-        recordTypeInfo?: RecordTypeInfoRepresentation;
-        systemModstamp: string;
+        lastModifiedById: string | null;
+        lastModifiedDate: string | null;
+        recordTypeId: string | null;
+        recordTypeInfo: RecordTypeInfoRepresentation | null;
+        systemModstamp: string | null;
+        weakEtag: number;
     }
 
-    export interface RecordInput {
-        apiName?: string;
-        fields: { [key: string]: string | null };
+    /**
+     * Description of a record input.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecordInputRepresentation {
         allowSaveOnDuplicate?: boolean;
-        recordTypeInfo?: RecordTypeInfoRepresentation;
-        LastModifiedDate?: string;
+        apiName?: string;
+        fields: {
+            [key: string]: string | number | null | boolean;
+        };
     }
 
     export interface ClientOptions {
-        eTagToCheck?: string;
         ifUnmodifiedSince?: string;
     }
 
+    /**
+     * Child Relationship.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface ChildRelationshipRepresentation {
         childObjectApiName: string;
         fieldName: string;
-        junctionIdListNames: string[];
-        junctionReferenceTo: string[];
+        junctionIdListNames: Array<string>;
+        junctionReferenceTo: Array<string>;
         relationshipName: string;
     }
 
+    /**
+     * Information about a reference field's referenced types and the name field names of those types.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface ReferenceToInfoRepresentation {
         apiName: string;
-        nameFields: string[];
+        nameFields: Array<string>;
     }
 
+    /**
+     * Filtered lookup info.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface FilteredLookupInfoRepresentation {
-        controllingFields: string[];
+        controllingFields: Array<string>;
         dependent: boolean;
         optionalFilter: boolean;
     }
 
+    // TODO: this comes from api.raml
     export const enum ExtraTypeInfo {
         ExternalLookup = 'ExternalLookup',
         ImageUrl = 'ImageUrl',
@@ -198,6 +255,7 @@ declare module 'lightning/uiRecordApi' {
         SwitchablePersonName = 'SwitchablePersonName',
     }
 
+    // TODO: this comes from api.raml
     export const enum RecordFieldDataType {
         Address = 'Address',
         Base64 = 'Base64',
@@ -223,32 +281,38 @@ declare module 'lightning/uiRecordApi' {
         Url = 'Url',
     }
 
+    /**
+     * Field metadata.
+     *
+     * Keys:
+     *    (none)
+     */
     export interface FieldRepresentation {
         apiName: string;
         calculated: boolean;
         compound: boolean;
-        compoundComponentName: string;
-        compoundFieldName: string;
-        controllerName: string;
-        controllingFields: string[];
+        compoundComponentName: string | null;
+        compoundFieldName: string | null;
+        controllerName: string | null;
+        controllingFields: Array<string>;
         createable: boolean;
         custom: boolean;
-        dataType: RecordFieldDataType;
-        extraTypeInfo: ExtraTypeInfo;
+        dataType: string;
+        extraTypeInfo: string | null;
         filterable: boolean;
-        filteredLookupInfo: FilteredLookupInfoRepresentation;
+        filteredLookupInfo: FilteredLookupInfoRepresentation | null;
         highScaleNumber: boolean;
         htmlFormatted: boolean;
-        inlineHelpText: string;
+        inlineHelpText: string | null;
         label: string;
         length: number;
         nameField: boolean;
         polymorphicForeignKey: boolean;
         precision: number;
         reference: boolean;
-        referenceTargetField: string;
-        referenceToInfos: ReferenceToInfoRepresentation[];
-        relationshipName: string;
+        referenceTargetField: string | null;
+        referenceToInfos: Array<ReferenceToInfoRepresentation>;
+        relationshipName: string | null;
         required: boolean;
         scale: number;
         searchPrefilterable: boolean;
@@ -257,33 +321,52 @@ declare module 'lightning/uiRecordApi' {
         updateable: boolean;
     }
 
-    interface ThemeInfoRepresentation {
+    /**
+     * Theme info.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ThemeInfoRepresentation {
         color: string;
-        iconUrl: string;
+        iconUrl: string | null;
     }
 
+    /**
+     * Object metadata.
+     *
+     * Keys:
+     *    apiName (string): apiName
+     */
     export interface ObjectInfoRepresentation {
         apiName: string;
-        childRelationships: ChildRelationshipRepresentation[];
+        associateEntityType: string | null;
+        associateParentEntity: string | null;
+        childRelationships: Array<ChildRelationshipRepresentation>;
         createable: boolean;
         custom: boolean;
-        defaultRecordTypeId: string;
+        defaultRecordTypeId: string | null;
         deletable: boolean;
-        deleteable: boolean;
-        dependentFields: { [key: string]: any };
+        dependentFields: {
+            [key: string]: {};
+        };
         eTag: string;
         feedEnabled: boolean;
-        fields: { [key: string]: FieldRepresentation };
-        keyPrefix: string;
+        fields: {
+            [key: string]: FieldRepresentation;
+        };
+        keyPrefix: string | null;
         label: string;
         labelPlural: string;
         layoutable: boolean;
         mruEnabled: boolean;
-        nameFields: string[];
+        nameFields: Array<string>;
         queryable: boolean;
-        recordTypeInfos: { [key: string]: RecordTypeInfoRepresentation };
+        recordTypeInfos: {
+            [key: string]: RecordTypeInfoRepresentation;
+        };
         searchable: boolean;
-        themeInfo: ThemeInfoRepresentation;
+        themeInfo: ThemeInfoRepresentation | null;
         updateable: boolean;
     }
 
@@ -351,14 +434,14 @@ declare module 'lightning/uiRecordApi' {
      * @param clientOptions Controls the update behavior. Specify ifUnmodifiedSince to fail the save if the record has changed since the provided value.
      * @returns A promise that will resolve with the patched record.
      */
-    export function updateRecord(recordInput: RecordInput, clientOptions?: ClientOptions): Promise<RecordRepresentation>;
+    export function updateRecord(recordInput: RecordInputRepresentation, clientOptions?: ClientOptions): Promise<RecordRepresentation>;
 
     /**
      * Creates a new record using the properties in recordInput.
      * @param recordInput The RecordInput object to use to create the record.
      * @returns A promise that will resolve with the newly created record.
      */
-    export function createRecord(recordInput: RecordInput): Promise<RecordRepresentation>;
+    export function createRecord(recordInput: RecordInputRepresentation): Promise<RecordRepresentation>;
 
     /**
      * Deletes a record with the specified recordId.
@@ -375,7 +458,7 @@ declare module 'lightning/uiRecordApi' {
      *        (excluding Id) are assigned to the object return value.
      * @returns RecordInput
      */
-    export function generateRecordInputForCreate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInput;
+    export function generateRecordInputForCreate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInputRepresentation;
 
     /**
      * Returns an object with its data populated from the given record. All fields with values that aren't nested records will be assigned.
@@ -385,7 +468,7 @@ declare module 'lightning/uiRecordApi' {
      *        If provided, only fields that are updateable=true (excluding Id) are assigned to the object return value.
      * @returns RecordInput.
      */
-    export function generateRecordInputForUpdate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInput;
+    export function generateRecordInputForUpdate(record: RecordRepresentation, objectInfo?: ObjectInfoRepresentation): RecordInputRepresentation;
 
     /**
      * Returns a new RecordInput containing a list of fields that have been edited from their original values. (Also contains the Id
@@ -394,7 +477,10 @@ declare module 'lightning/uiRecordApi' {
      * @param originalRecord The Record object that contains the original field values.
      * @returns RecordInput.
      */
-    export function createRecordInputFilteredByEditedFields(recordInput: RecordInput, originalRecord: RecordRepresentation): RecordInput;
+    export function createRecordInputFilteredByEditedFields(
+        recordInput: RecordInputRepresentation,
+        originalRecord: RecordRepresentation,
+    ): RecordInputRepresentation;
 
     /**
      * Gets a field's value from a record.
