@@ -71,7 +71,7 @@ declare module 'lightning/uiObjectInfoApi' {
     /**
      * Wire adapter for object metadata.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_object_info.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_object_info
      *
      * @param objectApiName The API name of the object to retrieve.
      */
@@ -80,7 +80,7 @@ declare module 'lightning/uiObjectInfoApi' {
     /**
      * Wire adapter for values for a picklist field.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_picklist_values.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_picklist_values
      *
      * @param fieldApiName The picklist field's object-qualified API name.
      * @param recordTypeId The record type ID. Pass '012000000000000AAA' for the master record type.
@@ -90,7 +90,7 @@ declare module 'lightning/uiObjectInfoApi' {
     /**
      * Wire adapter for values for all picklist fields of a record type.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_picklist_values_collection.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_picklist_values_record
      *
      * @param objectApiName API name of the object.
      * @param recordTypeId Record type ID. Pass '012000000000000AAA' for the master record type.
@@ -369,7 +369,7 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Wire adapter for a record.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_record_get.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_record
      *
      * @param recordId ID of the record to retrieve.
      * @param fields Object-qualified field API names to retrieve. If a field isn’t accessible to the context user, it causes an error.
@@ -391,7 +391,7 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Wire adapter for default field values to create a record.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_record_defaults_create.htm#ui_api_resources_record_defaults_create
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_create_record_values
      *
      * @param objectApiName API name of the object.
      * @param formFactor Form factor. Possible values are 'Small', 'Medium', 'Large'. Large is default.
@@ -409,7 +409,7 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Wire adapter for record data, object metadata and layout metadata
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_resources_record_ui.htm
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_record_ui
      *
      * @param recordIds ID of the records to retrieve.
      * @param layoutTypes Layouts defining the fields to retrieve.
@@ -426,6 +426,9 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Updates a record using the properties in recordInput. recordInput.fields.Id must be specified.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_update_record
+     *
      * @param recordInput The record input representation to use to update the record.
      * @param clientOptions Controls the update behavior. Specify ifUnmodifiedSince to fail the save if the record has changed since the provided value.
      * @returns A promise that will resolve with the patched record.
@@ -434,6 +437,9 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Creates a new record using the properties in recordInput.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_create_record
+     *
      * @param recordInput The RecordInput object to use to create the record.
      * @returns A promise that will resolve with the newly created record.
      */
@@ -441,6 +447,9 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Deletes a record with the specified recordId.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_delete_record
+     *
      * @param recordId ID of the record to delete.
      * @returns A promise that will resolve to undefined.
      */
@@ -449,6 +458,9 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Returns an object with its data populated from the given record. All fields with values that aren't nested records will be assigned.
      * This object can be used to create a record with createRecord().
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_generate_record_input_create
+     *
      * @param record The record that contains the source data.
      * @param objectInfo The ObjectInfo corresponding to the apiName on the record. If provided, only fields that are createable=true
      *        (excluding Id) are assigned to the object return value.
@@ -459,6 +471,9 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Returns an object with its data populated from the given record. All fields with values that aren't nested records will be assigned.
      * This object can be used to update a record.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_generate_record_input_update
+     *
      * @param record The record that contains the source data.
      * @param objectInfo The ObjectInfo corresponding to the apiName on the record.
      *        If provided, only fields that are updateable=true (excluding Id) are assigned to the object return value.
@@ -469,6 +484,9 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Returns a new RecordInput containing a list of fields that have been edited from their original values. (Also contains the Id
      * field, which is always copied over.)
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_create_record_input_update
+     *
      * @param recordInput The RecordInput object to filter.
      * @param originalRecord The Record object that contains the original field values.
      * @returns RecordInput.
@@ -480,6 +498,9 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Gets a field's value from a record.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_get_field_value
+     *
      * @param record The record.
      * @param field Object-qualified API name of the field to return.
      * @returns The field's value (which may be a record in the case of spanning fields), or undefined if the field isn't found.
@@ -488,6 +509,9 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Gets a field's display value from a record.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_get_field_display_value
+     *
      * @param record The record.
      * @param field Object-qualified API name of the field to return.
      * @returns The field's display value, or undefined if the field isn't found.
