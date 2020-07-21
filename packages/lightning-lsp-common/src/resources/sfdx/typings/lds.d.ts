@@ -35,7 +35,6 @@ declare module 'lightning/uiListApi' {
      *                If the field is not available to the user, an error occurs.
      * @param optionalFields Additional fields queried for the records returned. These fields don’t create visible columns.
      *                       If the field is not available to the user, no error occurs and the field isn’t included in the records.
-     * @param q Query string to filter list views (only for a list of lists).
      * @returns {Observable} See description.
      */
     export function getListUi(
@@ -47,7 +46,6 @@ declare module 'lightning/uiListApi' {
         sortBy?: string | FieldId,
         fields?: Array<string | FieldId>,
         optionalFields?: Array<string | FieldId>,
-        q?: string,
     ): void;
 }
 
@@ -244,7 +242,6 @@ declare module 'lightning/uiRecordApi' {
         optionalFilter: boolean;
     }
 
-    // TODO: this comes from api.raml
     export const enum ExtraTypeInfo {
         ExternalLookup = 'ExternalLookup',
         ImageUrl = 'ImageUrl',
@@ -255,7 +252,6 @@ declare module 'lightning/uiRecordApi' {
         SwitchablePersonName = 'SwitchablePersonName',
     }
 
-    // TODO: this comes from api.raml
     export const enum RecordFieldDataType {
         Address = 'Address',
         Base64 = 'Base64',
