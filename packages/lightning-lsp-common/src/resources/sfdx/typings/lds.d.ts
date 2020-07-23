@@ -18,7 +18,7 @@ declare module 'lightning/uiListApi' {
     }
 
     /**
-     * Use this wire adapter to get the records and metadata for a list view.
+     * Gets the records and metadata for a list view.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_get_list_ui
      *
@@ -69,7 +69,7 @@ declare module 'lightning/uiObjectInfoApi' {
     }
 
     /**
-     * Wire adapter for object metadata.
+     * Gets the metadata for a specific object.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_object_info
      *
@@ -123,6 +123,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Contains both the raw and displayable field values for a field in a Record.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_field_value.htm
+     *
      * Keys:
      *    (none)
      */
@@ -134,6 +136,8 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Record Collection Representation.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_record_collection.htm
      *
      * Keys:
      *    (none)
@@ -152,6 +156,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Record type.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_record_type_info.htm
+     *
      * Keys:
      *    (none)
      */
@@ -165,6 +171,8 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Record.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_record.htm
      *
      * Keys:
      *    recordId (string): id
@@ -190,6 +198,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Description of a record input.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_requests_record_input.htm
+     *
      * Keys:
      *    (none)
      */
@@ -208,6 +218,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Child Relationship.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_child_relationship.htm
+     *
      * Keys:
      *    (none)
      */
@@ -222,6 +234,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Information about a reference field's referenced types and the name field names of those types.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_reference_to_info.htm
+     *
      * Keys:
      *    (none)
      */
@@ -232,6 +246,8 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Filtered lookup info.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_filtered_lookup_info.htm
      *
      * Keys:
      *    (none)
@@ -280,6 +296,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Field metadata.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_field.htm
+     *
      * Keys:
      *    (none)
      */
@@ -320,6 +338,8 @@ declare module 'lightning/uiRecordApi' {
     /**
      * Theme info.
      *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_theme_info.htm
+     *
      * Keys:
      *    (none)
      */
@@ -330,6 +350,8 @@ declare module 'lightning/uiRecordApi' {
 
     /**
      * Object metadata.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.uiapi.meta/uiapi/ui_api_responses_object_info.htm
      *
      * Keys:
      *    apiName (string): apiName
