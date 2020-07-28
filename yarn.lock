@@ -1937,11 +1937,6 @@
     jest-diff "^25.1.0"
     pretty-format "^25.1.0"
 
-"@types/lazy.js@^0.3.32":
-  version "0.3.32"
-  resolved "https://registry.yarnpkg.com/@types/lazy.js/-/lazy.js-0.3.32.tgz#193d438a7d1929727ac0066a3744fc16fc46ce26"
-  integrity sha512-IaZfzi3DbG748JiuiasdOHfvSC+57j3VGbWLq2U/WIOi2nUcs3VeCyBiZumXbuZV5RIBnJqEmW9YHEqEgvu2cQ==
-
 "@types/lodash.template@^4.4.4":
   version "4.4.6"
   resolved "https://registry.yarnpkg.com/@types/lodash.template/-/lodash.template-4.4.6.tgz#d28a380a0cd152e6846324bf8f68b93318f09bc0"
@@ -6220,11 +6215,6 @@ kleur@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
-
-lazy.js@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/lazy.js/-/lazy.js-0.5.1.tgz#9f05c27f42c66ae7f41814c9674d105efcbc432f"
-  integrity sha512-p9v24vaKrzS2mEx3yuzva/3M6I3+HwvXd0pB1Xf/IvsFIMdhQgmym7JBO0e7c0OZmKTo07sCuiCIm6jazSWFNw==
 
 lerna@^3.10.6:
   version "3.20.2"
