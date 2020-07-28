@@ -3,6 +3,7 @@
 /.vscode
 /coverage
 /jest
+/scripts
 /src
 /test-workspaces
 /typings
@@ -12,9 +13,8 @@
 .eslintrc.json
 .huskyrc
 .lintstagedrc
-.prettierignore
 .prettierrc
-CONTRIBUTING.md
+copy-static-assets.ts
 jest.config.js
 tsconfig.json
 tslint.json

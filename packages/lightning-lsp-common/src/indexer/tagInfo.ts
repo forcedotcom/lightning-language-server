@@ -1,5 +1,5 @@
 import { Location } from 'vscode-languageserver';
-import { AttributeInfo, Decorator } from './attributeInfo';
+import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '@lwc/babel-plugin-component';
 
 export enum TagType {

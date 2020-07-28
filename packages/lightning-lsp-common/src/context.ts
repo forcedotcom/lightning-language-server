@@ -1,10 +1,9 @@
 import * as fs from 'fs-extra';
-
 import { homedir } from 'os';
 import * as path from 'path';
 import { join } from 'path';
 import { lt } from 'semver';
-import { TextDocument, Files } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver';
 // @ts-ignore
 import templateSettings from 'lodash.templatesettings';
 // @ts-ignore
@@ -12,7 +11,7 @@ import template from 'lodash.template';
 // @ts-ignore
 import { parse } from 'properties';
 
-import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile, isLWC } from './shared';
+import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
 import { componentUtil } from './index';
 
