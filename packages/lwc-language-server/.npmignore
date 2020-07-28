@@ -1,12 +1,23 @@
+# Dev config folders
+/.circleci
+/.vscode
+/coverage
+/jest
 /src
 /test-workspaces
-**/__tests__
-.vscode
+/typings
+**/__tests__/**
+
+# Configuration files
+.eslintrc.json
+.huskyrc
+.lintstagedrc
+.prettierignore
+.prettierrc
+CONTRIBUTING.md
+jest.config.js
 tsconfig.json
 tslint.json
-CONTRIBUTING.md
-Jenkinsfile
-jest
-/typings
-/coverage
-.circleci
+
+# Ignore artifacts
+*.tgz

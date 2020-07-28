@@ -1,6 +1,7 @@
 # Dev config folders
 /.circleci
 /.vscode
+/coverage
 /jest
 /scripts
 /src
@@ -14,10 +15,9 @@
 .lintstagedrc
 .prettierrc
 copy-static-assets.ts
-jest.config.ts
+jest.config.js
 tsconfig.json
 tslint.json
-
 
 # Ignore artifacts
 *.tgz
