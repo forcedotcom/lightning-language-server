@@ -8,7 +8,6 @@ import { join } from 'path';
 import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
 import BaseIndexer from './base-indexer';
-import URI from 'vscode-uri';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_FILE = path.join('.sfdx', 'indexes', 'lwc', 'custom-components.json');
