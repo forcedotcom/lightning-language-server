@@ -18,7 +18,7 @@ _refs:
       - image: circleci/node:lts
   ssh-config: &ssh-config
     fingerprints:
-      - 'e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e'
+      - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
   gh-config: &gh-config
     name: Configuring GitHub
     command: |
@@ -27,8 +27,7 @@ _refs:
       git config user.name "Release Bot"
 
 parameters:
-  # Deploy the main branch to public npm
-  deploy:
+  publish:
     type: boolean
     default: false
   # Version bump for upgrade: [major | minor | patch | premajor | preminor | prepatch | prerelease]
@@ -88,14 +87,14 @@ jobs:
           command: yarn windowsCopySymlinks
       - run:
           name: Run tests on windows (Without coverage)
-          command: yarn test    
+          command: yarn test
       - save_cache:
           key: dependency-cache-win-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
 
   # Publish to NPM
-  deploy:
+  publish:
     <<: *defaults
     description: "Publish package to npmjs.org"
     steps:
@@ -108,35 +107,32 @@ jobs:
       - run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
       - run: echo "Bumping version '<< pipeline.parameters.version >>''"
       - run: |
-            yarn bump-versions << pipeline.parameters.version >>
-            yarn publish-lsp
+          yarn bump-versions << pipeline.parameters.version >>
+          yarn publish-lsp
       - slack/notify:
-          channel: "lightning-tools-bots"
+          channel: "pdt_releases"
           color: "#42e2f4"
           message: "Lightning Language Servers have been published to NPM"
 
 workflows:
   version: 2.1
-  # Commit workflow - build and test on windows/linux
-  build_and_test:
-    # If deploy param is specified, the build_test_deploy sequence will run below
-    unless: << pipeline.parameters.deploy >>
+
+  commit-workflow:
+    unless: << pipeline.parameters.publish >>
     jobs:
       - build-and-test-linux
       - build-and-test-win
 
-  # Run build/test and then deploy if deploy param is specified
-  # Provides a way to do on demand deploys to NPM
-  build_test_deploy:
-    when: << pipeline.parameters.deploy >>
+  publish-workflow:
+    when: << pipeline.parameters.publish >>
     jobs:
       - build-and-test-linux
       - build-and-test-win
-      - deploy:
-          requires:
-            - build-and-test-linux
-            - build-and-test-win
+      - publish:
           filters:
             branches:
               only:
                 - main
+          requires:
+            - build-and-test-linux
+            - build-and-test-win
