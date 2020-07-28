@@ -112,8 +112,8 @@ jobs:
             export RELEASE_TAG="$(node -pe "require('./packages/lightning-lsp-common/package.json').version")"
             git commit -m "Updated version $RELEASE_TAG"
       - run:
-          name: Set npm token
-          command: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
+          name: Set .npmrc
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_PUBLISH_TOKEN}" > ~/.npmrc
       - run: yarn publish-lsp
       - run: git push origin main
       - run:
