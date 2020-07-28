@@ -1,0 +1,23 @@
+# Dev config folders
+/.circleci
+/.vscode
+/jest
+/scripts
+/src
+/test-workspaces
+/typings
+**/__tests__/**
+
+# Configuration files
+.eslintrc.json
+.huskyrc
+.lintstagedrc
+.prettierrc
+copy-static-assets.ts
+jest.config.ts
+tsconfig.json
+tslint.json
+
+
+# Ignore artifacts
+*.tgz
