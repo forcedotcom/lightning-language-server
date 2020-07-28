@@ -3,7 +3,6 @@
 /.vscode
 /coverage
 /patches
-/resources
 /src
 /test-workspaces
 /typings
