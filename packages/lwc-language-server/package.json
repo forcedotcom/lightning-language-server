@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "BSD-3-Clause",
@@ -31,7 +31,7 @@
     "@lwc/template-compiler": "0.34.8",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.12",
-    "@salesforce/lightning-lsp-common": "3.0.0",
+    "@salesforce/lightning-lsp-common": "3.0.1",
     "@salesforce/resourceurl": "0.0.12",
     "@salesforce/schema": "0.0.12",
     "@salesforce/user": "0.0.12",
