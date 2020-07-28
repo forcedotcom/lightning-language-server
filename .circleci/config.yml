@@ -18,7 +18,7 @@ _refs:
       - image: circleci/node:lts
   ssh-config: &ssh-config
     fingerprints:
-      - "e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e"
+      - 'e4:06:a5:d3:f8:cf:25:5d:7b:e9:7a:4b:71:93:f9:6e'
   gh-config: &gh-config
     name: Configuring GitHub
     command: |
@@ -33,13 +33,13 @@ parameters:
   # Version bump for upgrade: [major | minor | patch | premajor | preminor | prepatch | prerelease]
   version:
     type: string
-    default: "patch"
+    default: 'patch'
 
 jobs:
   # Default Job
   build-and-test-linux:
     <<: *defaults
-    description: "Lint, Build, Test with Coverage"
+    description: 'Lint, Build, Test with Coverage'
     steps:
       - checkout
       - restore_cache:
@@ -73,7 +73,7 @@ jobs:
           flags: frontend,common
 
   build-and-test-win:
-    description: "Run tests on windows"
+    description: 'Run tests on windows'
     executor: win/default
     steps:
       - checkout
@@ -96,7 +96,7 @@ jobs:
   # Publish to NPM
   publish:
     <<: *defaults
-    description: "Publish package to npmjs.org"
+    description: 'Publish package to npmjs.org'
     steps:
       - attach_workspace:
           at: ~/lightning-language-server
@@ -112,8 +112,8 @@ jobs:
             export RELEASE_TAG="$(node -pe "require('./packages/lightning-lsp-common/package.json').version")"
             git commit -m "Updated version $RELEASE_TAG"
       - run:
-          name: Set npm token
-          command: npm config set '//registry.npmjs.org/:_authToken' "${NPM_PUBLISH_TOKEN}"
+          name: Set .npmrc
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_PUBLISH_TOKEN}" > ~/.npmrc
       - run: yarn publish-lsp
       - run: git push origin main
       - run:
@@ -123,9 +123,9 @@ jobs:
             git tag v${RELEASE_TAG}
             git push --tags
       - slack/notify:
-          channel: "pdt_releases"
-          color: "#42e2f4"
-          message: "Lightning Language Servers have been published to NPM"
+          channel: 'pdt_releases'
+          color: '#42e2f4'
+          message: 'Lightning Language Servers have been published to NPM'
 
 workflows:
   version: 2.1
