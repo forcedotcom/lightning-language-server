@@ -21,8 +21,6 @@
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/*",
     "lint": "eslint -c .eslintrc.json --ext .ts ./src",
     "format": "prettier --write \"src/**/*.ts\"",
-    "precommit": "lint-staged",
-    "prepush": "yarn prepare && yarn lint && yarn test",
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
