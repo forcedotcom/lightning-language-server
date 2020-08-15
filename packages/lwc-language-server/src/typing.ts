@@ -1,7 +1,7 @@
 import * as xml2js from 'xml2js';
 import * as path from 'path';
 
-const metaRegex: RegExp = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/);
+const metaRegex: RegExp = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/, 'g');
 
 export default class Typing {
     private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
