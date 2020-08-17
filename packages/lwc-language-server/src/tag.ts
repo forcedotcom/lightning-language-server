@@ -29,7 +29,6 @@ export default class Tag implements ITagData {
     constructor(attributes: TagAttrs) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
-        this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
         if (attributes.updatedAt) {
             this.updatedAt = new Date(attributes.updatedAt);
         } else if (this.file) {
