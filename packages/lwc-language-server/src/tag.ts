@@ -29,10 +29,9 @@ export default class Tag implements ITagData {
     constructor(attributes: TagAttrs) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
-        this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
         if (attributes.updatedAt) {
             this.updatedAt = new Date(attributes.updatedAt);
-        } else {
+        } else if (this.file) {
             const data = fs.statSync(this.file);
             this.updatedAt = data.mtime;
         }
@@ -56,6 +55,14 @@ export default class Tag implements ITagData {
             return 'c-' + this.name;
         } else {
             return 'c-' + paramCase(this.name);
+        }
+    }
+
+    get lwcTypingsName(): string {
+        if (this.name.includes('_')) {
+            return 'c/' + this.name;
+        } else {
+            return 'c/' + paramCase(this.name);
         }
     }
 
@@ -174,6 +181,9 @@ export default class Tag implements ITagData {
     }
 
     static async fromFile(file: string, updatedAt?: Date): Promise<Tag> | null {
+        if (file === '' || file.length === 0) {
+            return null;
+        }
         const filePath = path.parse(file);
         const fileName = filePath.base;
         const data = await fs.readFile(file, 'utf-8');
