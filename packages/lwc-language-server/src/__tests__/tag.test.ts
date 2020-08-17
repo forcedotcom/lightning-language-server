@@ -118,6 +118,24 @@ describe('Tag', () => {
             });
         });
 
+        describe('#lwcTypingsName', () => {
+            it('returns the lwc import name for the component', () => {
+                expect(tag.lwcTypingsName).toEqual('c/metadata');
+            });
+        });
+
+        describe('#auraName', () => {
+            it('returns the name for the lwc component when referenced in an aura component', () => {
+                expect(tag.auraName).toEqual('c:metadata');
+            });
+        });
+
+        describe('#lwcName', () => {
+            it('returns the name for the component when referenced in another lwc component', () => {
+                expect(tag.lwcName).toEqual('c-metadata');
+            });
+        });
+
         describe('#attribute', () => {
             it('finds the attribute by name', () => {
                 expect(tag.attribute('index'));

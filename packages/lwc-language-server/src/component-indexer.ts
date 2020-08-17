@@ -4,13 +4,14 @@ import { shared } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fsExtra from 'fs-extra';
-import { join } from 'path';
+import * as fs from 'fs';
 import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
 import BaseIndexer from './base-indexer';
 
 const { detectWorkspaceHelper, WorkspaceType } = shared;
-const CUSTOM_COMPONENT_INDEX_FILE = path.join('.sfdx', 'indexes', 'lwc', 'custom-components.json');
+const CUSTOM_COMPONENT_INDEX_PATH = path.join('.sfdx', 'indexes', 'lwc');
+const CUSTOM_COMPONENT_INDEX_FILE = path.join(CUSTOM_COMPONENT_INDEX_PATH, 'custom-components.json');
 const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
 
 type ComponentIndexerAttributes = {
@@ -28,6 +29,14 @@ export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
 
 export function unIndexedFiles(entries: Entry[], tags: Tag[]) {
     return entries.filter(entry => !tags.some(tag => tagEqualsFile(tag, entry)));
+}
+
+export function ensureDirectoryExists(filePath: string): void {
+    if (fs.existsSync(filePath)) {
+        return;
+    }
+    ensureDirectoryExists(path.dirname(filePath));
+    fs.mkdirSync(filePath);
 }
 
 export default class ComponentIndexer extends BaseIndexer {
@@ -86,7 +95,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     loadTagsFromIndex() {
         try {
-            const indexPath: string = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+            const indexPath: string = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
             const shouldInit: boolean = fsExtra.existsSync(indexPath);
 
             if (shouldInit) {
@@ -103,7 +112,8 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     persistCustomComponents() {
-        const indexPath = join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+        const indexPath = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
+        ensureDirectoryExists(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
         const indexJsonString = JSON.stringify(this.customData);
         fsExtra.writeFileSync(indexPath, indexJsonString);
     }
@@ -127,6 +137,7 @@ export default class ComponentIndexer extends BaseIndexer {
         });
 
         this.staleTags.forEach(tag => this.tags.delete(tag.name));
+        this.persistCustomComponents();
     }
 
     async reindex() {
