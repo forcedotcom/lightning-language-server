@@ -109,7 +109,7 @@ jobs:
           command: |
             yarn bump-versions << pipeline.parameters.version >>
             git add .
-            export RELEASE_TAG="$(node -pe "require('./packages/lightning-lsp-common/package.json').version")"
+            export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
             git commit -m "Updated version $RELEASE_TAG"
       - run:
           name: Set .npmrc
@@ -119,7 +119,7 @@ jobs:
       - run:
           name: Tag the release and push to repo
           command: |
-            export RELEASE_TAG="$(node -pe "require('./packages/lightning-lsp-common/package.json').version")"
+            export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
             git tag v${RELEASE_TAG}
             git push --tags
       - slack/notify:
