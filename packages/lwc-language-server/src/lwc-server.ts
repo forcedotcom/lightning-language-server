@@ -131,7 +131,7 @@ export default class Server {
             const customTags = this.componentIndexer.customData.map(tag => {
                 return {
                     label: tag.lwcTypingsName,
-                    kind: CompletionItemKind.Module,
+                    kind: CompletionItemKind.Folder,
                 };
             });
 
