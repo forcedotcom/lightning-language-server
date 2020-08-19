@@ -9,6 +9,7 @@ import glob from 'glob';
 
 const checkedPackagePatterns: RegExp[] = [/^@salesforce/i, /^@lwc/i];
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function readJsonFile(jsonFilePath: string) {
     try {
         return JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
@@ -51,10 +52,10 @@ describe(`package.json dependencies for ${packageJson.name}`, () => {
         checkedPackagePatterns.forEach(pattern => {
             if (pattern.test(name)) {
                 it(`should use a strict version for dependency ${name}`, () => {
-                    expect(versionRange.trim()).not.toStartWith('^');
-                    expect(versionRange.trim()).not.toStartWith('~');
-                    expect(versionRange.trim()).not.toStartWith('>');
-                    expect(versionRange.trim()).not.toStartWith('<');
+                    expect(versionRange.trim().startsWith('^')).toEqual(false);
+                    expect(versionRange.trim().startsWith('~')).toEqual(false);
+                    expect(versionRange.trim().startsWith('>')).toEqual(false);
+                    expect(versionRange.trim().startsWith('<')).toEqual(false);
                 });
                 testMatchFound = true;
             }
@@ -65,10 +66,10 @@ describe(`package.json dependencies for ${packageJson.name}`, () => {
         checkedPackagePatterns.forEach(pattern => {
             if (pattern.test(name)) {
                 it(`should use a strict version for devDependency ${name}`, () => {
-                    expect(versionRange.trim()).not.toStartWith('^');
-                    expect(versionRange.trim()).not.toStartWith('~');
-                    expect(versionRange.trim()).not.toStartWith('>');
-                    expect(versionRange.trim()).not.toStartWith('<');
+                    expect(versionRange.trim().startsWith('^')).toEqual(false);
+                    expect(versionRange.trim().startsWith('~')).toEqual(false);
+                    expect(versionRange.trim().startsWith('>')).toEqual(false);
+                    expect(versionRange.trim().startsWith('<')).toEqual(false);
                 });
                 testMatchFound = true;
             }
