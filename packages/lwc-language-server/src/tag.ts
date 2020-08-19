@@ -59,11 +59,7 @@ export default class Tag implements ITagData {
     }
 
     get lwcTypingsName(): string {
-        if (this.name.includes('_')) {
-            return 'c/' + this.name;
-        } else {
-            return 'c/' + paramCase(this.name);
-        }
+        return 'c/' + this.name;
     }
 
     get attributes(): AttributeInfo[] {
