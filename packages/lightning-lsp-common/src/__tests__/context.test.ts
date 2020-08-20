@@ -14,8 +14,12 @@ import {
     CORE_MULTI_ROOT,
 } from './test-utils';
 
+// This is used to distinguish the environment of the OS, otherwise we're going to have problems with windows os routes
+const SFDX_WORKSPACE = process.env.OS.toLowerCase().includes("windows") ? '../../test-workspaces/sfdx-workspace' : 'test-workspaces/sfdx-workspace';
+const STANDARD_WORKSPACE = process.env.OS.toLowerCase().includes("windows") ? '../../test-workspaces/standard-workspace' : 'test-workspaces/standard-workspace';
+
 it('WorkspaceContext', async () => {
-    let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    let context = new WorkspaceContext(SFDX_WORKSPACE);
     expect(context.type).toBe(WorkspaceType.SFDX);
     expect(context.workspaceRoots[0]).toBeAbsolutePath();
     let roots = await context.getNamespaceRoots();
@@ -30,7 +34,7 @@ it('WorkspaceContext', async () => {
     expect(modules.length).toBe(10);
     expect((await context.getModulesDirs()).length).toBe(3);
 
-    context = new WorkspaceContext('test-workspaces/standard-workspace');
+    context = new WorkspaceContext(STANDARD_WORKSPACE);
     roots = await context.getNamespaceRoots();
     expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
     expect(roots.lwc[0]).toEndWith(join(STANDARDS_ROOT, 'example'));
@@ -88,7 +92,7 @@ it('WorkspaceContext', async () => {
 });
 
 it('isInsideModulesRoots()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_WORKSPACE);
 
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
     expect(await context.isInsideModulesRoots(document)).toBeTruthy();
@@ -101,7 +105,7 @@ it('isInsideModulesRoots()', async () => {
 });
 
 it('isLWCTemplate()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_WORKSPACE);
 
     // .js is not a template
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -125,7 +129,7 @@ it('isLWCTemplate()', async () => {
 });
 
 it('isLWCJavascript()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_WORKSPACE);
 
     // lwc .js
     let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
@@ -149,7 +153,7 @@ it('isLWCJavascript()', async () => {
 });
 
 it('configureSfdxProject()', async () => {
-    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const context = new WorkspaceContext(SFDX_WORKSPACE);
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
     const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
     const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
