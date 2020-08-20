@@ -1,6 +1,6 @@
 import { extname, join, resolve } from 'path';
 import { TextDocument } from 'vscode-languageserver';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import * as fs from 'fs-extra';
 
 export const FORCE_APP_ROOT = join('test-workspaces', 'sfdx-workspace', 'force-app', 'main', 'default');
