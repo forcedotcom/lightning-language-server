@@ -2,7 +2,7 @@ import { SourceLocation, Decorator } from 'babel-types';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
