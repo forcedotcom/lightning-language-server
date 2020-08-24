@@ -32,7 +32,7 @@ import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
