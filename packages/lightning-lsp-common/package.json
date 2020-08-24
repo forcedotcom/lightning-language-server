@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
     "test:debugWindows": "node --inspect-brk ../../node_modules/jest/bin/jest.js --passWithNoTests --runInBand",
     "test_with_coverage": "jest --runInBand --coverage --collectCoverageFrom=src/**/*.ts --collectCoverageFrom=!src/**/*.d.ts --collectCoverageFrom=!src/**/__tests__/**/*",
-    "lint": "eslint -c .eslintrc.json --ext .ts ./src",
+    "lint": "tslint 'src/**/*.ts'",
     "format": "prettier --write \"src/**/*.ts\"",
     "precommit": "lint-staged",
     "prepush": "yarn prepare && yarn lint && yarn test",
@@ -63,6 +63,8 @@
     "tmp": "^0.0.33",
     "ts-jest": "^24.3.0",
     "ts-node": "^7.0.1",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.1.6"
   }
 }

@@ -1,0 +1,30 @@
+{
+    "extends": [
+        "tslint:recommended",
+        "tslint-config-prettier"
+    ],
+    "rules": {
+        "arrow-parens": false,
+        "no-console": [false],
+        "quotemark": [true, "single"],
+        "ordered-imports": [false],
+        "object-literal-sort-keys": false,
+        "max-line-length": [true, 160],
+	"eofline": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "src/resources/**",
+            "src/html-language-service/htmlLanguageService.ts",
+            "src/html-language-service/parser/htmlParser.ts",
+            "src/html-language-service/parser/htmlScanner.ts",
+            "src/html-language-service/parser/htmlTags.ts",
+            "src/html-language-service/services/htmlCompletion.ts",
+            "src/html-language-service/services/htmlHover.ts",
+            "src/html-language-service/utils/strings.ts",
+            "src/html-language-service/utils/paths.ts",
+            "src/html-language-service/utils/arrays.ts",
+            "typings/**"
+        ]
+    }
+}
