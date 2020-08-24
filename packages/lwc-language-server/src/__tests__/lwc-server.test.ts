@@ -2,7 +2,7 @@ import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
 import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkedString, MarkupContent, Hover } from 'vscode-languageserver';
 
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
