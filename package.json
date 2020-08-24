@@ -36,6 +36,8 @@
     "test_with_coverage": "lerna run test_with_coverage --stream",
     "lint": "lerna run lint --stream --parallel",
     "format": "lerna run format --stream --parallel",
+    "precommit": "lerna run precommit --stream",
+    "prepush": "lerna prepush --stream",
     "link-lsp": "lerna exec yarn link --no-bail",
     "unlink-lsp": "lerna exec yarn unlink --no-bail",
     "publish-lsp": "lerna publish from-package --force-publish --exact --yes",

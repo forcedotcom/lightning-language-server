@@ -1,0 +1,6 @@
+{
+    "hooks": {
+        "pre-commit": "node_modules/.bin/lerna exec lint-staged",
+        "pre-push": "node_modules/.bin/lerna exec 'yarn test'"
+    }
+}
