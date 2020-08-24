@@ -35,8 +35,7 @@
     "properties": "^1.2.1",
     "semver": "^5.6.0",
     "vscode-languageserver": "^5.2.1",
-    "vscode-uri": "1.0.6",
-    "vscode-nls": "^4.1.2"
+    "vscode-uri": "1.0.6"
   },
   "devDependencies": {
     "@lwc/engine": "0.34.8",
@@ -54,7 +53,6 @@
     "findup-sync": "^3.0.0",
     "husky": "^4.2.3",
     "jest": "^25.1.0",
-    "jest-extended": "^0.11.5",
     "lint-staged": "^8.1.0",
     "mock-fs": "^4.11.0",
     "prettier": "^1.19.1",
