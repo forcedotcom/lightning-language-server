@@ -46,7 +46,7 @@
     "vscode-html-languageservice": "^3.1.0",
     "vscode-languageserver": "^5.2.1",
     "vscode-nls": "^4.1.2",
-    "vscode-uri": "1.0.6",
+    "vscode-uri": "^2.1.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
