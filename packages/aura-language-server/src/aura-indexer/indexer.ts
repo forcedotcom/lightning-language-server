@@ -4,7 +4,7 @@ import * as auraUtils from '../aura-utils';
 import * as fs from 'fs-extra';
 import { AttributeInfo, componentUtil, parse, Node } from '@salesforce/lightning-lsp-common';
 import LineColumnFinder from 'line-column';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import changeCase from 'change-case';
 import EventsEmitter from 'events';
 import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
