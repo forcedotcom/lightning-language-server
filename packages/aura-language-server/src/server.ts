@@ -28,7 +28,7 @@ import {
 } from 'vscode-languageserver';
 
 import * as auraUtils from './aura-utils';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
