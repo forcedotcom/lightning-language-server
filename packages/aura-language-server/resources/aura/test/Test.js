@@ -2308,19 +2308,19 @@ TestInstance.prototype.createHttpRequest = function() {
 
 /**
  * Performs a check if global namespace is polluted with new
- * variables apart from whitelisted ones
+ * variables apart from allowlisted ones
  *
  * @export
  * @function Test#checkGlobalNamespacePollution
  */
-TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollutants) {
+TestInstance.prototype.checkGlobalNamespacePollution = function(allowlistedPollutants) {
     var that = this,
         pollutants = [],
         initialGlobalState = that.getInitialGlobalState();
     if(!window || !initialGlobalState.length) {
         return pollutants;
     }
-    var knownPollutants = initialGlobalState.concat(whitelistedPollutants);
+    var knownPollutants = initialGlobalState.concat(allowlistedPollutants);
     var currentGlobalState = Object.keys(window);
     for (var i = currentGlobalState.length - 1; i >= 0; i--) {
         var key = currentGlobalState[i];
