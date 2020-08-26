@@ -2140,7 +2140,7 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
     //
     // NOTE: AuraClientService.js' "$AuraClientService.token$" goes directly to the adapter, bypassing
     // the isolation key, so will never be returned by storage.getAll().
-    var actionsBlackList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
+    var actionsBlockList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
         "aura://ComponentController/ACTION$getApplication"];    /* AuraClientService.js */
 
     var promises = [];
@@ -2161,8 +2161,8 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
         }
 
         var actionKeys = Object.keys(actionEntries).filter(function (a) {
-            for (var i = 0; i < actionsBlackList.length; i++) {
-                if (a.key.indexOf(actionsBlackList[i]) === 0) {
+            for (var i = 0; i < actionsBlockList.length; i++) {
+                if (a.key.indexOf(actionsBlockList[i]) === 0) {
                     return false;
                 }
             }

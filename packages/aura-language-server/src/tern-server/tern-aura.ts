@@ -46,7 +46,7 @@ async function readFile(filename) {
         normalized = getFilename(normalized);
     }
 
-    if (isBlacklisted(normalized)) {
+    if (isBlocklisted(normalized)) {
         return '';
     }
 
@@ -124,7 +124,7 @@ async function getLibraryIncludes(file, library) {
     // @ts-ignore
     inc.forEach(function(name) {
         var fname = bn + name + '.js';
-        if (!isBlacklisted(fname)) {
+        if (!isBlocklisted(fname)) {
             includes.push(fname);
         }
     });
@@ -384,7 +384,7 @@ function _debug(log) {
     //console.log(log);
 }
 async function connectModule(file, out) {
-    if (isBlacklisted(file.name)) {
+    if (isBlocklisted(file.name)) {
         return;
     }
 
@@ -638,7 +638,7 @@ function unloadDefs() {
     server.deleteDefs('Aura');
 }
 
-function isBlacklisted(filename) {
+function isBlocklisted(filename) {
     var ret = filename.endsWith('/scrollerLib/bootstrap.js');
     ret = ret || filename.endsWith('ExportSymbolsHelper.js');
     return ret;
