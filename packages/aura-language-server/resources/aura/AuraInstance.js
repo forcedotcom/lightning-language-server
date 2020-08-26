@@ -642,13 +642,13 @@ AuraInstance.prototype.defaultRedirectHandler=function(evt) {
     var url = evt.getParam('url');
     if (url != null) {
         // XSS protection: don't allow javascript or data url
-        var protocolBlacklist = ['javascript', 'data'];
+        var protocolBlocklist = ['javascript', 'data'];
         var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', null);
         var testXSSLink = doc.createElement('a');
         testXSSLink.setAttribute('href', url);
         if (testXSSLink.protocol != null){
-            for(var i = 0; i < protocolBlacklist.length; i++){
-                if(testXSSLink.protocol.indexOf(protocolBlacklist[i]) === 0){
+            for(var i = 0; i < protocolBlocklist.length; i++){
+                if(testXSSLink.protocol.indexOf(protocolBlocklist[i]) === 0){
                     url = encodeURIComponent(url);
                     break;
                 }

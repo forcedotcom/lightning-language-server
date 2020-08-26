@@ -32,7 +32,7 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 
 DomHandlersPlugin.NAME = "domHandlers";
 DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "user";
-DomHandlersPlugin.WHITELISTEVENTS = { 
+DomHandlersPlugin.ALLOWLISTEVENTS = { 
     "click"  : true,
     "change" : true
 };
@@ -81,14 +81,14 @@ DomHandlersPlugin.prototype.stringifyLocator = function (locator) {
 */
 
 /**
- * Logs LightningInteraction transactions if the html event handled is in the whitelist
+ * Logs LightningInteraction transactions if the html event handled is in the allowlist
  * 
  * @param action - This is unused
  * @param event - The DOM Event
  * @param root - The aura:html component that is handling the event
  */
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) {
-    if (!(event.type in DomHandlersPlugin.WHITELISTEVENTS)) {
+    if (!(event.type in DomHandlersPlugin.ALLOWLISTEVENTS)) {
         return;
     }
     

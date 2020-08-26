@@ -9767,7 +9767,7 @@
           "required": false
         }
       ],
-      "description": "Displays rich text that's formatted with whitelisted tags and attributes. Other tags and attributes are removed and only their text content is displayed. This component requires API version 41.0 and later."
+      "description": "Displays rich text that's formatted with allowlisted tags and attributes. Other tags and attributes are removed and only their text content is displayed. This component requires API version 41.0 and later."
     },
     "lightning:conversationAgentSend": {
       "type": "event",
