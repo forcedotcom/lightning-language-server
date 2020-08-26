@@ -11034,7 +11034,7 @@
       "!type": "fn(st: SecureIFrameElement.!ret|SecureDocument.!ret, el: ?, key: SecureAura.!1, selector: ?) -> SecureIFrameElement.!ret",
       "!span": "11704[406:14]-11723[406:33]"
     },
-    "elementSpecificAttributeWhitelists": {
+    "elementSpecificAttributeAllowlists": {
       "A": {
         "!type": "[string]",
         "!span": "12389[428:1]-12392[428:4]"
@@ -11126,7 +11126,7 @@
       "META": {
         "!type": "[string]",
         "!span": "14108[455:1]-14114[455:7]",
-        "!doc": "DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values\nfor http-equiv/httpEquiv"
+        "!doc": "DCHASMAN TODO Fix SecureElement.setAttribute() hole and allowlist values\nfor http-equiv/httpEquiv"
       },
       "METER": {
         "!type": "[string]",
@@ -11202,7 +11202,7 @@
       },
       "!span": "12349[427:14]-12383[427:48]"
     },
-    "elementSpecificMethodWhitelists": {
+    "elementSpecificMethodAllowlists": {
       "AUDIO": {
         "!type": "[string]",
         "!span": "15323[479:1]-15330[479:8]"
@@ -11314,7 +11314,7 @@
     "!doc": "jslint sub: true"
   },
   "SecureWindow": {
-    "!type": "fn(win: <top>, key: SecureAura.!1, globalAttributeWhitelist: [string]) -> SecureWindow.!ret",
+    "!type": "fn(win: <top>, key: SecureAura.!1, globalAttributeAllowlist: [string]) -> SecureWindow.!ret",
     "!span": "856[30:9]-868[30:21]",
     "!doc": "Construct a SecureWindow.\n\n@public\n@class\n@constructor\n\n@param {Object}\n           win - the DOM window\n@param {Object}\n           key - the key to apply to the secure window"
   },
@@ -11564,7 +11564,7 @@
       "!type": "string",
       "!span": "1109[33:18]-1113[33:22]"
     },
-    "WHITELISTEVENTS": {
+    "ALLOWLISTEVENTS": {
       "click": {
         "!type": "bool",
         "!span": "1174[35:4]-1181[35:11]"

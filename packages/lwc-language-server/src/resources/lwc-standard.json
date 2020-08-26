@@ -710,7 +710,7 @@
       {
         "name": "formats",
         "type": "LIST",
-        "description": "A whitelist of formats. By default, the list is computed based on enabled categories.\nThe 'table' format is always enabled to support copying and pasting of tables if formats are not provided.",
+        "description": "A allowlist of formats. By default, the list is computed based on enabled categories.\nThe 'table' format is always enabled to support copying and pasting of tables if formats are not provided.",
         "access": "global",
         "parent": "lightning-input-rich-text",
         "required": false
@@ -863,7 +863,7 @@
       {
         "name": "formats",
         "type": "LIST",
-        "description": "A whitelist of formats. By default, the list is computed based on enabled categories.\nThe 'table' format is always enabled to support copying and pasting of tables if formats are not provided.",
+        "description": "A allowlist of formats. By default, the list is computed based on enabled categories.\nThe 'table' format is always enabled to support copying and pasting of tables if formats are not provided.",
         "access": "global",
         "parent": "lightning-input-rich-text",
         "required": false
@@ -3551,7 +3551,7 @@
         "required": false
       }
     ],
-    "description": "Displays rich text that's formatted with whitelisted tags and attributes.\nOther tags and attributes are removed and only their text content is displayed."
+    "description": "Displays rich text that's formatted with allowlisted tags and attributes.\nOther tags and attributes are removed and only their text content is displayed."
   },
   "lightning-tree": {
     "type": "module",

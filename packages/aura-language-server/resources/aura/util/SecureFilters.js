@@ -34,22 +34,22 @@ Aura.Utils.SecureFilters = (function () {
 
     // Matches alphanum plus ",._-" & unicode.
     // ESAPI doesn't consider "-" safe, but we do. It's both URI and HTML safe.
-    var JS_NOT_WHITELISTED = /[^,\-\.0-9A-Z_a-z]/g;
+    var JS_NOT_ALLOWLISTED = /[^,\-\.0-9A-Z_a-z]/g;
 
     // add on '":\[]{}', which are necessary JSON metacharacters
-    var JSON_NOT_WHITELISTED = /[^\x22,\-\.0-9:A-Z\[\x5C\]_a-z{}]/g;
+    var JSON_NOT_ALLOWLISTED = /[^\x22,\-\.0-9:A-Z\[\x5C\]_a-z{}]/g;
 
     // Control characters that get converted to spaces.
     var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 
     // Matches alphanum plus allowable whitespace, ",._-", and unicode.
     // NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
-    var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
+    var HTML_NOT_ALLOWLISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 
     // Matches alphanum and UTF-16 surrogate pairs (i.e. U+10000 and higher). The
     // rest of Unicode is deliberately absent in order to prevent charset encoding
     // issues.
-    var CSS_NOT_WHITELISTED = /[^a-zA-Z0-9\uD800-\uDFFF]/g;
+    var CSS_NOT_ALLOWLISTED = /[^a-zA-Z0-9\uD800-\uDFFF]/g;
 
     /**
      * Encodes values for safe embedding in HTML tags and attributes.
@@ -63,7 +63,7 @@ Aura.Utils.SecureFilters = (function () {
     secureFilters.html = function(val) {
       var str = String(val);
       str = str.replace(HTML_CONTROL, ' ');
-      return str.replace(HTML_NOT_WHITELISTED, function(match) {
+      return str.replace(HTML_NOT_ALLOWLISTED, function(match) {
         var code = match.charCodeAt(0);
         switch(code) {
         // folks expect these "nice" entities:
@@ -84,8 +84,8 @@ Aura.Utils.SecureFilters = (function () {
           } else {
             // XXX: this doesn't produce strictly valid entities for code-points
             // requiring a UTF-16 surrogate pair. However, browsers are generally
-            // tolerant of this. Surrogate pairs are currently in the whitelist
-            // defined via HTML_NOT_WHITELISTED.
+            // tolerant of this. Surrogate pairs are currently in the allowlist
+            // defined via HTML_NOT_ALLOWLISTED.
             var hex = code.toString(16).toUpperCase();
             return '&#x'+hex+';';
           }
@@ -137,7 +137,7 @@ Aura.Utils.SecureFilters = (function () {
      */
     secureFilters.js = function(val) {
       var str = String(val);
-      return str.replace(JS_NOT_WHITELISTED, jsSlashEncoder);
+      return str.replace(JS_NOT_ALLOWLISTED, jsSlashEncoder);
     };
 
     /**
@@ -193,7 +193,7 @@ Aura.Utils.SecureFilters = (function () {
      */
     secureFilters.jsObj = function(val) {
       return JSON.stringify(val)
-        .replace(JSON_NOT_WHITELISTED, jsSlashEncoder)
+        .replace(JSON_NOT_ALLOWLISTED, jsSlashEncoder)
         // prevent breaking out of CDATA context.  Escaping < below is sufficient
         // to prevent opening a CDATA context.
         .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E');
@@ -210,7 +210,7 @@ Aura.Utils.SecureFilters = (function () {
      */
     secureFilters.css = function(val) {
       var str = String(val);
-      return str.replace(CSS_NOT_WHITELISTED, function(match) {
+      return str.replace(CSS_NOT_ALLOWLISTED, function(match) {
         var code = match.charCodeAt(0);
         if (code === 0) {
           return '\\fffd '; // REPLACEMENT CHARACTER U+FFFD
