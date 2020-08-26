@@ -1,7 +1,7 @@
 import { utils, WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import AuraIndexer from '../indexer';
 import * as path from 'path';
-import { URI } from 'vscode-uri';
+import URI from 'vscode-uri';
 
 function normalize(start: string, p: string) {
     // Fix relative paths on windows
