@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 6,
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "jsdoc", "eslint-plugin-header"],
@@ -10,10 +10,6 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
-  },
   "rules": {
     "ban-ts-ignore": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
@@ -47,8 +43,6 @@
     ], // non-complete list of globals that are easy to access unintentionally
     "no-var": "error",
     "jsdoc/no-types": "warn",
-    "@typescript-eslint/semi": "warn",
-    "@typescript-eslint/class-name-casing": "warn"
-  },
-  "ignorePatterns": ["*.js"]
+    "@typescript-eslint/semi": "warn"
+  }
 }
