@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import { extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { WorkspaceContext } from './context';
 import { WorkspaceType } from './shared';

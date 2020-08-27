@@ -21,7 +21,7 @@ import { isEmptyElement } from '../parser/htmlTags';
 import { getTagProviders } from './tagProviders';
 import { CompletionConfiguration, ICompletionParticipant, ScannerState, TokenType } from '../htmlLanguageTypes';
 import { entities } from '../parser/htmlEntities';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import * as componentUtil from '../../component-util';
 
 import * as nls from 'vscode-nls';

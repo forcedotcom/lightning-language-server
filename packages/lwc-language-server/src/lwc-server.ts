@@ -11,7 +11,16 @@ import {
     TextDocumentPositionParams,
 } from 'vscode-languageserver';
 
-import { getLanguageService, LanguageService, HTMLDocument, CompletionList, TokenType, Hover, CompletionItem } from 'vscode-html-languageservice';
+import {
+    getLanguageService,
+    LanguageService,
+    HTMLDocument,
+    CompletionList,
+    TokenType,
+    Hover,
+    CompletionItem,
+    CompletionItemKind,
+} from 'vscode-html-languageservice';
 
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
@@ -23,7 +32,7 @@ import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 
 export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
@@ -118,6 +127,18 @@ export default class Server {
         if (await this.context.isLWCTemplate(doc)) {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
             this.lwcDataProvider.activated = true;
+        } else if (await this.context.isLWCJavascript(doc)) {
+            const customTags = this.componentIndexer.customData.map(tag => {
+                return {
+                    label: tag.lwcTypingsName,
+                    kind: CompletionItemKind.Folder,
+                };
+            });
+
+            return {
+                isIncomplete: false,
+                items: customTags,
+            };
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
             this.lwcDataProvider.activated = false;
@@ -178,15 +199,16 @@ export default class Server {
                 const tag = this.componentIndexer.findTagByURI(uri);
                 if (tag) {
                     tag.updateMetadata(metadata);
-                } else {
-                    const newTag = new Tag({ metadata });
-                    this.componentIndexer.tags.set(newTag.name, newTag);
                 }
             }
         }
     }
 
     onShutdown() {
+        this.componentIndexer.persistCustomComponents();
+    }
+
+    onExit() {
         this.componentIndexer.persistCustomComponents();
     }
 

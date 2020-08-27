@@ -317,7 +317,7 @@
       "!url": "http://underscorejs.org/#object"
     },
     "omit": {
-      "!doc": "Return a copy of the object without the blacklisted properties.",
+      "!doc": "Return a copy of the object without the blocklisted properties.",
       "!type": "fn(obj: ?, keys?: string) -> !0",
       "!url": "http://underscorejs.org/#omit"
     },
@@ -337,7 +337,7 @@
       "!url": "http://underscorejs.org/#partial"
     },
     "pick": {
-      "!doc": "Return a copy of the object only containing the whitelisted properties.",
+      "!doc": "Return a copy of the object only containing the allowlisted properties.",
       "!type": "fn(obj: ?, keys?: string) -> !0",
       "!url": "http://underscorejs.org/#pick"
     },

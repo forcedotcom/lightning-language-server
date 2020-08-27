@@ -135,7 +135,7 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, collecto
         } else {
             var serRefId = config[Json.ApplicationKey.SERIAL_REFID];
             if (serRefId !== undefined) {
-                // TODO: @dval @kvenkiteswaran find a better way to whitelist componentDefs
+                // TODO: @dval @kvenkiteswaran find a better way to allowlist componentDefs
                 if (cache[serRefId]["descriptor"] &&
                     !cache[serRefId]["members"] && // models
                     !cache[serRefId]["actionDefs"] && // actions

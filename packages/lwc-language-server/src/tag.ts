@@ -5,7 +5,7 @@ import * as glob from 'fast-glob';
 import camelcase from 'camelcase';
 import { paramCase } from 'change-case';
 
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import * as path from 'path';
 import { Location, Position, Range } from 'vscode-languageserver';
 import { Metadata, ClassMember } from '@lwc/babel-plugin-component';
@@ -29,10 +29,9 @@ export default class Tag implements ITagData {
     constructor(attributes: TagAttrs) {
         this.file = attributes.file;
         this.metadata = attributes.metadata;
-        this.updatedAt = attributes.updatedAt ? new Date(attributes.updatedAt) : null;
         if (attributes.updatedAt) {
             this.updatedAt = new Date(attributes.updatedAt);
-        } else {
+        } else if (this.file) {
             const data = fs.statSync(this.file);
             this.updatedAt = data.mtime;
         }
@@ -57,6 +56,10 @@ export default class Tag implements ITagData {
         } else {
             return 'c-' + paramCase(this.name);
         }
+    }
+
+    get lwcTypingsName(): string {
+        return 'c/' + this.name;
     }
 
     get attributes(): AttributeInfo[] {
@@ -174,6 +177,9 @@ export default class Tag implements ITagData {
     }
 
     static async fromFile(file: string, updatedAt?: Date): Promise<Tag> | null {
+        if (file === '' || file.length === 0) {
+            return null;
+        }
         const filePath = path.parse(file);
         const fileName = filePath.base;
         const data = await fs.readFile(file, 'utf-8');

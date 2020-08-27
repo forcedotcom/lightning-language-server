@@ -260,14 +260,14 @@ function AuraClientService (util) {
  * TODO W-2531907 - Get/set done directly against the adapter because pre-200 non-Aura clients modified this value
  * direclty in SSA prior to Aura booting. Instead Aura should handle CSRF/invalid session issues, then this key/value
  * can operate against AuraStorage.
- * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blacklists
+ * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blocklists
  * in every adapter.
  */
 AuraClientService.TOKEN_KEY = "$AuraClientService.token$";
 
 /**
  * Storage key for bootstrap.js
- * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blacklists
+ * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blocklists
  * in every adapter.
  */
 AuraClientService.BOOTSTRAP_KEY = "$AuraClientService.bootstrap$";

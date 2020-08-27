@@ -7,7 +7,7 @@
 import { createScanner } from '../parser/htmlScanner';
 import { TextDocument, Range, DocumentLink } from 'vscode-languageserver-types';
 import * as strings from '../utils/strings';
-import Uri from 'vscode-uri';
+import { URI } from 'vscode-uri';
 
 import { TokenType, DocumentContext } from '../htmlLanguageTypes';
 
@@ -34,7 +34,7 @@ function validateRef(url: string, languageId: string): boolean {
         return false;
     }
     try {
-        return !!Uri.parse(url);
+        return !!URI.parse(url);
     } catch (e) {
         return false;
     }
@@ -90,7 +90,7 @@ function createLink(
 
 function isValidURI(uri: string) {
     try {
-        Uri.parse(uri);
+        URI.parse(uri);
         return true;
     } catch (e) {
         return false;
@@ -100,7 +100,7 @@ function isValidURI(uri: string) {
 export function findDocumentLinks(document: TextDocument, documentContext: DocumentContext): DocumentLink[] {
     let newLinks: DocumentLink[] = [];
 
-    let rootAbsoluteUrl: Uri | null = null;
+    let rootAbsoluteUrl: URI | null = null;
 
     let scanner = createScanner(document.getText(), 0);
     let token = scanner.scan();
