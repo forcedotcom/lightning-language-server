@@ -36,7 +36,7 @@
     "line-column": "^1.0.2",
     "minimatch": "^3.0.4",
     "properties": "^1.2.1",
-    "resolve-from": "^5.0.0",
+    "resolve-from": "^2.0.0",
     "vscode-languageserver": "^5.2.1",
     "vscode-languageserver-types": "3.14.0",
     "vscode-nls": "^4.1.2",
