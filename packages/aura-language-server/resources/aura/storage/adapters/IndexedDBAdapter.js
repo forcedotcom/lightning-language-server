@@ -734,8 +734,8 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
     }
 
     // TODO W-2481519 - ensure aura framework-required data is never evicted without having a
-    // blacklist in every adapter.
-    var actionsBlackList = ["globalValueProviders",           /* GlobalValueProviders.js */
+    // blocklist in every adapter.
+    var actionsBlockList = ["globalValueProviders",           /* GlobalValueProviders.js */
                             "$AuraClientService.token$",      /* AuraClientService.js */
                             "$AuraClientService.bootstrap$"]; /* AuraClientService.js */
 
@@ -770,10 +770,10 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                         shouldEvict = true;
 
                         // TODO W-2481519 - ensure aura framework-required data is never evicted without having a
-                        // blacklist in every adapter.
+                        // blocklist in every adapter.
                         if (that.instanceName === "actions") {
-                            for (var i = 0; i < actionsBlackList.length; i++) {
-                                if (icursor.primaryKey.indexOf(actionsBlackList[i]) > -1) {
+                            for (var i = 0; i < actionsBlockList.length; i++) {
+                                if (icursor.primaryKey.indexOf(actionsBlockList[i]) > -1) {
                                     shouldEvict = false;
                                     break;
                                 }
