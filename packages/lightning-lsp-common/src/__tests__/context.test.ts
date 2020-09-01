@@ -231,6 +231,7 @@ function verifyCoreSettings(settings: any) {
     expect(settings['perforce.port']).toBe('ssl:host:port');
 }
 
+/*
 function verifyCodeWorkspace(path: string) {
     const content = fs.readFileSync(path, 'utf8');
     const workspace = JSON.parse(content);
@@ -244,6 +245,7 @@ function verifyCodeWorkspace(path: string) {
     expect(settings['extensions.ignoreRecommendations']).toBeTruthy();
     verifyCoreSettings(settings);
 }
+*/
 
 it('configureCoreProject()', async () => {
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
