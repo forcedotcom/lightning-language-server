@@ -249,19 +249,16 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
             return;
         } else {
-            let files = 0;
             for (const event of changes) {
                 if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(context, event.uri)) {
                     const dir = toResolvedPath(event.uri);
                     const indexer = context.getIndexingProvider('aura') as AuraIndexer;
                     indexer.clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
-                    files++;
                 } else {
                     const file = toResolvedPath(event.uri);
                     if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
                         const indexer = context.getIndexingProvider('aura') as AuraIndexer;
                         await indexer.indexFile(file, context.type === WorkspaceType.SFDX);
-                        files++;
                     }
                 }
             }

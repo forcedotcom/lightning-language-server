@@ -71,7 +71,7 @@ function getFilename(filename) {
 
 function parent(path) {
     const splits = path.split('/');
-    if (splits.size == 1) {
+    if (splits.size === 1) {
         return '';
     }
     return splits[splits.length - 3];
@@ -79,7 +79,7 @@ function parent(path) {
 
 function dirName(path) {
     const lastSlash = path.lastIndexOf('/');
-    if (lastSlash == -1) {
+    if (lastSlash === -1) {
         return '';
     }
     return path.slice(0, lastSlash + 1);
@@ -87,7 +87,7 @@ function dirName(path) {
 
 function baseName(path) {
     const lastSlash = path.lastIndexOf('/');
-    if (lastSlash == -1) {
+    if (lastSlash === -1) {
         return path;
     } else {
         return path.slice(lastSlash + 1);
@@ -96,7 +96,7 @@ function baseName(path) {
 
 function trimExt(path) {
     const lastDot = path.lastIndexOf('.');
-    if (lastDot == -1) {
+    if (lastDot === -1) {
         return path;
     } else {
         return path.slice(0, lastDot);
@@ -215,12 +215,9 @@ async function processIfLibrary(file, modules) {
             // @ts-ignore
             infer.withContext(server.cx, function() {
                 for (let i = 0; i < libfilesResolved.length; i++) {
-                    const imf = imfs[i];
                     const importedModule = importedModules[i];
                     const lib = libfilesResolved[i];
 
-                    const bno = trimExt(baseName(imf));
-                    const lno = trimExt(baseName(imf));
                     const pm = state.fnType.args[i];
                     if (!pm || pm.getType(false)) {
                         continue;
@@ -235,7 +232,7 @@ async function processIfLibrary(file, modules) {
                             );
                         } catch (zzz) {}
                     } else {
-                        var pname = importedModule;
+                        const pname = importedModule;
                         // so, in effect this isn't really used, since (at least tern.ide)
                         // calls content assist frequently that by the time this called back,
                         // the file will be reindex, and the other lib file would have already
@@ -243,7 +240,7 @@ async function processIfLibrary(file, modules) {
                         lib.getType().on(
                             'addProp',
                             function(pmType, prop, val) {
-                                if (pname == prop) {
+                                if (pname === prop) {
                                     pmType.addType(val);
                                 }
                             }.bind(this, pm),
@@ -311,10 +308,6 @@ async function processIfComponent(file, modules) {
         for (let i = 0; i < ins.length; i++) {
             const an_import = ins[i];
             const library = an_import.library;
-            const property = an_import.property;
-            //console.log("Library: "+library);
-            //console.log("property: "+property);
-            //console.log(libsi[library]);
             const libfile = await getLibFile(file.name, library);
             libs.push(libfile);
         }
@@ -503,9 +496,6 @@ async function connectModule(file, out) {
                 const grand = infer.parentNode(parent, file.ast);
                 if (grand.type == 'Program') {
                     for (let i = 0; i < node.properties.length; ++i) {
-                        const prop = node.properties[i],
-                            // @ts-ignore
-                            name = infer.propName(prop);
                         if (node.properties[i].value.type == 'FunctionExpression') {
                             const val = node.properties[i].value;
                             const fn = val && val.scope && val.scope.fnType;
@@ -515,8 +505,8 @@ async function connectModule(file, out) {
 
                             if (/Renderer.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
-                                var hlp = fn.args[1];
+                                const cmp = fn.args[0];
+                                const hlp = fn.args[1];
                                 if (cmp) {
                                     findAndBindComponent(cmp, server, cx, infer);
                                 }
@@ -525,15 +515,15 @@ async function connectModule(file, out) {
                                 }
                             } else if (/Helper.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
+                                const cmp = fn.args[0];
                                 if (cmp) {
                                     findAndBindComponent(cmp, server, cx, infer);
                                 }
                             } else if (/Controller.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
+                                const cmp = fn.args[0];
                                 const evt = fn.args[1];
-                                var hlp = fn.args[2];
+                                const hlp = fn.args[2];
                                 if (evt) {
                                     findAndBindEvent(evt, server, cx, infer);
                                 }
@@ -674,20 +664,6 @@ function loadDefs() {
     defs = JSON.parse(defs);
     // @ts-ignore
     server.addDefs(defs);
-}
-
-function safeFunction(fn) {
-    return function() {
-        try {
-            fn.apply(this, arguments);
-        } catch (e) {
-            // @ts-ignore
-            if (e instanceof infer.TimedOut) {
-                throw e;
-            }
-            console.error(e);
-        }
-    };
 }
 
 tern.registerPlugin('aura', function(s, options) {
