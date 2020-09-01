@@ -7,7 +7,6 @@ import {
     HtmlContentContext,
     HtmlAttributeValueContext,
 } from '@salesforce/lightning-lsp-common';
-import { Decorator } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 let indexer: AuraIndexer;
 
@@ -30,10 +29,10 @@ export function setIndexer(idx: AuraIndexer) {
 
 export function getAuraCompletionParticipant(): ICompletionParticipant {
     return {
-        onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
+        onHtmlAttributeValue: (): void => {
             return;
         },
-        onHtmlContent: (context: HtmlContentContext): void => {
+        onHtmlContent: (): void => {
             return;
         },
     };

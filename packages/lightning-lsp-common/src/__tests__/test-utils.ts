@@ -28,7 +28,6 @@ function languageId(path: string): string {
     throw new Error('todo: ' + path);
 }
 
-
 export function readAsTextDocument(path: string): TextDocument {
     const uri = URI.file(resolve(path)).toString();
     const content = fs.readFileSync(path, 'utf-8');

@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
-import * as utils from '../utils';
 import {
     CORE_ALL_ROOT,
     CORE_PROJECT_ROOT,
@@ -229,20 +228,6 @@ function verifyCoreSettings(settings: any) {
     expect(settings['perforce.client']).toBe('username-localhost-blt');
     expect(settings['perforce.user']).toBe('username');
     expect(settings['perforce.port']).toBe('ssl:host:port');
-}
-
-function verifyCodeWorkspace(path: string) {
-    const content = fs.readFileSync(path, 'utf8');
-    const workspace = JSON.parse(content);
-    const folders = workspace.folders;
-    expect(folders.length).toBe(1);
-    const folderPath = folders[0].path;
-    expect(folderPath).toBeAbsolutePath();
-    expect(folderPath).toEndWith(utils.unixify(CORE_ALL_ROOT));
-    const settings = workspace.settings;
-    expect(settings['java.home']).toBe('path_to_java_home');
-    expect(settings['extensions.ignoreRecommendations']).toBeTruthy();
-    verifyCoreSettings(settings);
 }
 
 it('configureCoreProject()', async () => {
