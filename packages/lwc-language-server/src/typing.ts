@@ -1,7 +1,32 @@
 import * as xml2js from 'xml2js';
 import * as path from 'path';
 
-const metaRegex: RegExp = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/);
+const metaRegex = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/);
+
+function declaration(type: string, name: string): string {
+    let modulePath: string;
+    switch (type) {
+        case 'asset':
+            modulePath = `@salesforce/contentAssetUrl/${name}`;
+            break;
+        case 'resource':
+            modulePath = `@salesforce/resourceUrl/${name}`;
+            break;
+        case 'messageChannel':
+            modulePath = `@salesforce/messageChannel/${name}__c`;
+            break;
+        case 'customLabel':
+            modulePath = `@salesforce/label/c.${name}`;
+            break;
+        default:
+            throw new Error(`${type} not supported`);
+    }
+
+    return `declare module "${modulePath}" {
+    var ${name}: string;
+    export default ${name};
+}`;
+}
 
 export default class Typing {
     private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
@@ -40,29 +65,4 @@ export default class Typing {
     get declaration() {
         return declaration(this.type, this.name);
     }
-}
-
-function declaration(type: string, name: string): string {
-    let modulePath: string;
-    switch (type) {
-        case 'asset':
-            modulePath = `@salesforce/contentAssetUrl/${name}`;
-            break;
-        case 'resource':
-            modulePath = `@salesforce/resourceUrl/${name}`;
-            break;
-        case 'messageChannel':
-            modulePath = `@salesforce/messageChannel/${name}__c`;
-            break;
-        case 'customLabel':
-            modulePath = `@salesforce/label/c.${name}`;
-            break;
-        default:
-            throw new Error(`${type} not supported`);
-    }
-
-    return `declare module "${modulePath}" {
-    var ${name}: string;
-    export default ${name};
-}`;
 }

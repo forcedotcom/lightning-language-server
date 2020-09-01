@@ -39,6 +39,22 @@ const ForAllProps_Purgeable = infer.constraint({
     },
 });
 
+function getFilename(filename) {
+    // @ts-ignore
+    if (server.options.projectDir.endsWith('/')) {
+        // @ts-ignore
+        return server.options.projectDir + filename;
+    }
+    // @ts-ignore
+    return server.options.projectDir + '/' + filename;
+}
+
+function isBlocklisted(filename) {
+    let ret = filename.endsWith('/scrollerLib/bootstrap.js');
+    ret = ret || filename.endsWith('ExportSymbolsHelper.js');
+    return ret;
+}
+
 async function readFile(filename) {
     let normalized = filename;
     if (!normalized.startsWith('/')) {
@@ -57,16 +73,6 @@ async function readFile(filename) {
         }
         throw e;
     }
-}
-
-function getFilename(filename) {
-    // @ts-ignore
-    if (server.options.projectDir.endsWith('/')) {
-        // @ts-ignore
-        return server.options.projectDir + filename;
-    }
-    // @ts-ignore
-    return server.options.projectDir + '/' + filename;
 }
 
 function parent(path) {
@@ -137,6 +143,50 @@ async function newObj() {
         });
     });
 }
+
+function _debug(log) {
+    console.log(log);
+}
+
+function getName(name, type) {
+    const newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
+    return newname;
+}
+
+function getController(name) {
+    return getName(name, 'Controller.js');
+}
+
+function getHelper(name) {
+    return getName(name, 'Helper.js');
+}
+
+function getRenderer(name) {
+    return getName(name, 'Renderer.js');
+}
+
+function resolver(file, parent) {
+    return file;
+}
+
+function unloadDefs() {
+    // @ts-ignore
+    server.deleteDefs('Aura');
+}
+
+function readFileAsync(filename, c) {
+    readFile(filename).then(function(contents) {
+        c(null, contents);
+    });
+}
+
+function loadDefs() {
+    let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
+    defs = JSON.parse(defs);
+    // @ts-ignore
+    server.addDefs(defs);
+}
+
 async function processIfLibrary(file, modules) {
     let lib = await getLibraryForJS(file.name);
     // @ts-ignore
@@ -380,188 +430,6 @@ async function processIfComponent(file, modules) {
     }
 }
 
-function _debug(log) {
-    console.log(log);
-}
-async function connectModule(file, out) {
-    if (isBlocklisted(file.name)) {
-        return;
-    }
-
-    // @ts-ignore
-    server.startAsyncAction();
-    // @ts-ignore
-    const modules = infer.cx().parent.mod.modules;
-    const cx = infer.cx();
-    _debug('Starting... ' + file.name);
-    await processIfLibrary(file, modules);
-    await processIfComponent(file, modules);
-    if (/Helper.js$/.test(file.name)) {
-        // need to reestablish server context after awaits
-        // @ts-ignore
-        infer.withContext(server.cx, function() {
-            _debug('Process helper exports ' + file.name);
-            let outObj;
-            if (!out.getType()) {
-                const type = baseName(file.name).replace(/.js$/, '');
-                outObj = new infer.Obj(true);
-                outObj.origin = file.name;
-                outObj.originNode = file.ast;
-                outObj.name = type;
-                out.addType(outObj);
-            } else {
-                outObj = out.getType();
-            }
-            try {
-                walk.simple(
-                    file.ast,
-                    {
-                        ObjectExpression: function(node, state) {
-                            // @ts-ignore
-                            const parent = infer.parentNode(node, file.ast);
-                            // @ts-ignore
-                            const grand = infer.parentNode(parent, file.ast);
-                            if (grand.type == 'Program') {
-                                // add some jsdoc
-                                if (node.objType) {
-                                    node.objType.doc =
-                                        'A helper resource contains functions that can be reused by your JavaScript code in the component bundle. ';
-                                }
-                                //  node.objType.forAllProps( function(prop, val, local) {
-                                //    val.propagate(outObj.defProp(prop));
-                                //    });
-                                // -- would have worked, but didnt'
-                                // delete all types, and re-add...
-                                const target = outObj.defProp(baseName(file.name).replace(/.js$/, ''));
-                                const types = target.types;
-                                while (types.length) {
-                                    types.pop();
-                                }
-                                //note: propogate calls addType on the target
-                                // todo: this could be made more efficient with a custom propogation strategy
-                                // similar to ForAllProps_Purgeable
-                                if (node.objType) {
-                                    try {
-                                        node.objType.propagate(target);
-                                    } catch (err) {
-                                        console.error(err);
-                                    }
-                                }
-                                //outObj.defProp(baseName(file.name).replace(/.js$/, ''))
-                                throw 'stop';
-                            }
-                        },
-                    },
-                    // @ts-ignore
-                    infer.searchVisitor,
-                );
-            } catch (stop) {
-                if (stop !== 'stop') {
-                    console.error(stop);
-                    throw stop;
-                }
-            }
-        });
-        // We should also make sure that the controller is all up to date too...
-        const controller = getController(file.name);
-        try {
-            var text = await readFile(controller);
-            // @ts-ignore
-            var sfile = server.findFile(controller);
-            if (!sfile || sfile.text !== text) {
-                // @ts-ignore
-                server.addFile(controller, text);
-            }
-        } catch (ignore) {}
-        const renderer = getRenderer(file.name);
-        try {
-            var text = await readFile(renderer);
-            // @ts-ignore
-            var sfile = server.findFile(renderer);
-            if (!sfile || sfile.text !== text) {
-                // @ts-ignore
-                server.addFile(renderer, text);
-            }
-        } catch (ignore) {}
-    }
-    // reestablish scope after awaits
-    // @ts-ignore
-    infer.withContext(server.cx, function() {
-        _debug('Fixing scopes...' + file.name);
-        walk.simple(file.ast, {
-            ObjectExpression: function(node, state) {
-                // @ts-ignore
-                const parent = infer.parentNode(node, file.ast);
-                // @ts-ignore
-                const grand = infer.parentNode(parent, file.ast);
-                if (grand.type == 'Program') {
-                    for (let i = 0; i < node.properties.length; ++i) {
-                        if (node.properties[i].value.type == 'FunctionExpression') {
-                            const val = node.properties[i].value;
-                            const fn = val && val.scope && val.scope.fnType;
-                            if (!fn || !fn.name) {
-                                continue;
-                            }
-
-                            if (/Renderer.js$/.test(file.name)) {
-                                //step 2, assign exported type to params
-                                const cmp = fn.args[0];
-                                const hlp = fn.args[1];
-                                if (cmp) {
-                                    findAndBindComponent(cmp, server, cx, infer);
-                                }
-                                if (hlp) {
-                                    findAndBindHelper(hlp, server, modules, file);
-                                }
-                            } else if (/Helper.js$/.test(file.name)) {
-                                //step 2, assign exported type to params
-                                const cmp = fn.args[0];
-                                if (cmp) {
-                                    findAndBindComponent(cmp, server, cx, infer);
-                                }
-                            } else if (/Controller.js$/.test(file.name)) {
-                                //step 2, assign exported type to params
-                                const cmp = fn.args[0];
-                                const evt = fn.args[1];
-                                const hlp = fn.args[2];
-                                if (evt) {
-                                    findAndBindEvent(evt, server, cx, infer);
-                                }
-                                if (cmp) {
-                                    findAndBindComponent(cmp, server, cx, infer);
-                                }
-                                if (hlp) {
-                                    findAndBindHelper(hlp, server, modules, file);
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-        });
-        _debug('All done ' + file.name);
-    });
-
-    // @ts-ignore
-    server.finishAsyncAction();
-}
-
-function findAndBindEvent(type, server, cx, infer) {
-    // this is slightly hacky, but have no idea how to get the event Otherwise
-    const evs = cx.props['Event'];
-    if (!evs) {
-        return;
-    }
-    for (let z = 0; z < evs.length; z++) {
-        const y = evs[z];
-        if (y.name === 'Aura.Event') {
-            const obj = y.props['Event'].types[0].props['prototype'].getObjType();
-            const int = infer.getInstance(obj);
-            int.propagate(type);
-        }
-    }
-}
-
 function findAndBindComponent(type, server, cx, infer) {
     const evs = cx.props['Component'];
     if (!evs) {
@@ -613,57 +481,183 @@ function findAndBindHelper(type, server, modules, file) {
     }
 }
 
-function getController(name) {
-    return getName(name, 'Controller.js');
+function findAndBindEvent(type, server, cx, infer) {
+    // this is slightly hacky, but have no idea how to get the event Otherwise
+    const evs = cx.props['Event'];
+    if (!evs) {
+        return;
+    }
+    for (let z = 0; z < evs.length; z++) {
+        const y = evs[z];
+        if (y.name === 'Aura.Event') {
+            const obj = y.props['Event'].types[0].props['prototype'].getObjType();
+            const int = infer.getInstance(obj);
+            int.propagate(type);
+        }
+    }
 }
 
-function getHelper(name) {
-    return getName(name, 'Helper.js');
-}
+async function connectModule(file, out) {
+    if (isBlocklisted(file.name)) {
+        return;
+    }
 
-function getRenderer(name) {
-    return getName(name, 'Renderer.js');
-}
-
-function getTest(name) {
-    return getName(name, 'Test.js');
-}
-
-function getName(name, type) {
-    const newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
-    return newname;
-}
-
-function resolver(file, parent) {
-    return file;
-}
-
-function unloadDefs() {
     // @ts-ignore
-    server.deleteDefs('Aura');
-}
+    server.startAsyncAction();
+    // @ts-ignore
+    const modules = infer.cx().parent.mod.modules;
+    const cx = infer.cx();
+    _debug('Starting... ' + file.name);
+    await processIfLibrary(file, modules);
+    await processIfComponent(file, modules);
+    if (/Helper.js$/.test(file.name)) {
+        // need to reestablish server context after awaits
+        // @ts-ignore
+        infer.withContext(server.cx, function() {
+            _debug('Process helper exports ' + file.name);
+            let outObj;
+            if (!out.getType()) {
+                const type = baseName(file.name).replace(/.js$/, '');
+                outObj = new infer.Obj(true);
+                outObj.origin = file.name;
+                outObj.originNode = file.ast;
+                outObj.name = type;
+                out.addType(outObj);
+            } else {
+                outObj = out.getType();
+            }
+            try {
+                walk.simple(
+                    file.ast,
+                    {
+                        ObjectExpression: function(node, state) {
+                            // @ts-ignore
+                            const parent = infer.parentNode(node, file.ast);
+                            // @ts-ignore
+                            const grand = infer.parentNode(parent, file.ast);
+                            if (grand.type === 'Program') {
+                                // add some jsdoc
+                                if (node.objType) {
+                                    node.objType.doc =
+                                        'A helper resource contains functions that can be reused by your JavaScript code in the component bundle. ';
+                                }
+                                //  node.objType.forAllProps( function(prop, val, local) {
+                                //    val.propagate(outObj.defProp(prop));
+                                //    });
+                                // -- would have worked, but didnt'
+                                // delete all types, and re-add...
+                                const target = outObj.defProp(baseName(file.name).replace(/.js$/, ''));
+                                const types = target.types;
+                                while (types.length) {
+                                    types.pop();
+                                }
+                                //note: propogate calls addType on the target
+                                // todo: this could be made more efficient with a custom propogation strategy
+                                // similar to ForAllProps_Purgeable
+                                if (node.objType) {
+                                    try {
+                                        node.objType.propagate(target);
+                                    } catch (err) {
+                                        console.error(err);
+                                    }
+                                }
+                                //outObj.defProp(baseName(file.name).replace(/.js$/, ''))
+                                throw 'stop';
+                            }
+                        },
+                    },
+                    // @ts-ignore
+                    infer.searchVisitor,
+                );
+            } catch (stop) {
+                if (stop !== 'stop') {
+                    console.error(stop);
+                    throw stop;
+                }
+            }
+        });
+        // We should also make sure that the controller is all up to date too...
+        const controller = getController(file.name);
+        try {
+            const text = await readFile(controller);
+            // @ts-ignore
+            const sfile = server.findFile(controller);
+            if (!sfile || sfile.text !== text) {
+                // @ts-ignore
+                server.addFile(controller, text);
+            }
+        } catch (ignore) {}
+        const renderer = getRenderer(file.name);
+        try {
+            const text = await readFile(renderer);
+            // @ts-ignore
+            const sfile = server.findFile(renderer);
+            if (!sfile || sfile.text !== text) {
+                // @ts-ignore
+                server.addFile(renderer, text);
+            }
+        } catch (ignore) {}
+    }
+    // reestablish scope after awaits
+    // @ts-ignore
+    infer.withContext(server.cx, function() {
+        _debug('Fixing scopes...' + file.name);
+        walk.simple(file.ast, {
+            ObjectExpression: function(node, state) {
+                // @ts-ignore
+                const parent = infer.parentNode(node, file.ast);
+                // @ts-ignore
+                const grand = infer.parentNode(parent, file.ast);
+                if (grand.type === 'Program') {
+                    for (let i = 0; i < node.properties.length; ++i) {
+                        if (node.properties[i].value.type === 'FunctionExpression') {
+                            const val = node.properties[i].value;
+                            const fn = val && val.scope && val.scope.fnType;
+                            if (!fn || !fn.name) {
+                                continue;
+                            }
 
-function isBlocklisted(filename) {
-    let ret = filename.endsWith('/scrollerLib/bootstrap.js');
-    ret = ret || filename.endsWith('ExportSymbolsHelper.js');
-    return ret;
-}
-
-function readFileAsync(filename, c) {
-    readFile(filename).then(function(contents) {
-        c(null, contents);
+                            if (/Renderer.js$/.test(file.name)) {
+                                //step 2, assign exported type to params
+                                const cmp = fn.args[0];
+                                const hlp = fn.args[1];
+                                if (cmp) {
+                                    findAndBindComponent(cmp, server, cx, infer);
+                                }
+                                if (hlp) {
+                                    findAndBindHelper(hlp, server, modules, file);
+                                }
+                            } else if (/Helper.js$/.test(file.name)) {
+                                //step 2, assign exported type to params
+                                const cmp = fn.args[0];
+                                if (cmp) {
+                                    findAndBindComponent(cmp, server, cx, infer);
+                                }
+                            } else if (/Controller.js$/.test(file.name)) {
+                                //step 2, assign exported type to params
+                                const cmp = fn.args[0];
+                                const evt = fn.args[1];
+                                const hlp = fn.args[2];
+                                if (evt) {
+                                    findAndBindEvent(evt, server, cx, infer);
+                                }
+                                if (cmp) {
+                                    findAndBindComponent(cmp, server, cx, infer);
+                                }
+                                if (hlp) {
+                                    findAndBindHelper(hlp, server, modules, file);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        });
+        _debug('All done ' + file.name);
     });
-}
 
-function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
-
-function loadDefs() {
-    let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
-    defs = JSON.parse(defs);
     // @ts-ignore
-    server.addDefs(defs);
+    server.finishAsyncAction();
 }
 
 tern.registerPlugin('aura', function(s, options) {

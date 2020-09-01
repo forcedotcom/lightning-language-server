@@ -24,6 +24,16 @@ import { LightningElement } from 'lwc';
 export default class Foo extends LightningElement {}
 `;
 
+function pretify(str: string) {
+    return str
+        .toString()
+        .replace(/^\s+|\s+$/, '')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length)
+        .join('\n');
+}
+
 it('can use transform from lwc-compiler', async () => {
     const expected = `
         import _tmpl from "./foo.html";
@@ -290,13 +300,3 @@ it('use compileFile()', async () => {
     const publicProperties = getPublicReactiveProperties(metadata);
     expect(publicProperties).toMatchObject([{ name: 'index' }]);
 });
-
-function pretify(str: string) {
-    return str
-        .toString()
-        .replace(/^\s+|\s+$/, '')
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length)
-        .join('\n');
-}

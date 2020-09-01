@@ -17,6 +17,36 @@ export type TagAttrs = {
     updatedAt?: Date;
 };
 
+function attributeDoc(attribute: AttributeInfo): string {
+    const { name, type, documentation } = attribute;
+
+    if (name && type && documentation) {
+        return `- **${name}**: *${type}* ${documentation}`;
+    }
+
+    if (name && type) {
+        return `- **${name}**: *${type}*`;
+    }
+
+    if (name) {
+        return `- **${name}**`;
+    }
+
+    return '';
+}
+
+function methodDoc(method: ClassMember): string {
+    const { name, doc } = method;
+
+    if (name && doc) {
+        return `- **${name}()** *: ${doc}`;
+    }
+    if (name) {
+        return `- **${name}()**`;
+    }
+    return '';
+}
+
 export default class Tag implements ITagData {
     public file: string;
     public metadata: Metadata;
@@ -92,7 +122,9 @@ export default class Tag implements ITagData {
 
     classMemberLocation(name: string): Location | null {
         const classMember = this.classMember(name);
-        if (!classMember) return null;
+        if (!classMember) {
+            return null;
+        }
         return Location.create(this.uri, toVSCodeRange(classMember?.loc));
     }
 
@@ -109,7 +141,9 @@ export default class Tag implements ITagData {
     }
 
     get allAttributes() {
-        if (this._allAttributes) return this._allAttributes;
+        if (this._allAttributes) {
+            return this._allAttributes;
+        }
         this._allAttributes = extractAttributes(this.metadata, this.uri);
         return this._allAttributes;
     }
@@ -123,13 +157,17 @@ export default class Tag implements ITagData {
     }
 
     get properties() {
-        if (this._properties) return this._properties;
+        if (this._properties) {
+            return this._properties;
+        }
         this._properties = getProperties(this.metadata);
         return this._properties;
     }
 
     get methods() {
-        if (this._methods) return this._methods;
+        if (this._methods) {
+            return this._methods;
+        }
         this._methods = getMethods(this.metadata);
         return this._methods;
     }
@@ -193,34 +231,4 @@ export default class Tag implements ITagData {
         }
         return new Tag({ file, metadata, updatedAt });
     }
-}
-
-function methodDoc(method: ClassMember): string {
-    const { name, doc } = method;
-
-    if (name && doc) {
-        return `- **${name}()** *: ${doc}`;
-    }
-    if (name) {
-        return `- **${name}()**`;
-    }
-    return '';
-}
-
-function attributeDoc(attribute: AttributeInfo): string {
-    const { name, type, documentation } = attribute;
-
-    if (name && type && documentation) {
-        return `- **${name}**: *${type}* ${documentation}`;
-    }
-
-    if (name && type) {
-        return `- **${name}**: *${type}*`;
-    }
-
-    if (name) {
-        return `- **${name}**`;
-    }
-
-    return '';
 }

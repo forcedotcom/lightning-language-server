@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
-import * as utils from '../utils';
 import {
     CORE_ALL_ROOT,
     CORE_PROJECT_ROOT,

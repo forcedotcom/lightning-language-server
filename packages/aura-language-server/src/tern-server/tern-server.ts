@@ -101,26 +101,6 @@ function findDefs(libs) {
     return defs;
 }
 
-async function loadPlugins(plugins, rootPath) {
-    const options = {};
-    for (const plugin of Object.keys(plugins)) {
-        const val = plugins[plugin];
-        if (!val) {
-            continue;
-        }
-
-        if (!(await loadLocal(plugin, rootPath))) {
-            if (!(await loadBuiltIn(plugin, rootPath))) {
-                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
-            }
-        }
-
-        options[path.basename(plugin)] = true;
-    }
-
-    return options;
-}
-
 async function loadLocal(plugin, rootPath) {
     let found;
     try {
@@ -159,6 +139,68 @@ async function loadBuiltIn(plugin: string, rootPath: string) {
     return true;
 }
 
+async function loadPlugins(plugins, rootPath) {
+    const options = {};
+    for (const plugin of Object.keys(plugins)) {
+        const val = plugins[plugin];
+        if (!val) {
+            continue;
+        }
+
+        if (!(await loadLocal(plugin, rootPath))) {
+            if (!(await loadBuiltIn(plugin, rootPath))) {
+                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+            }
+        }
+
+        options[path.basename(plugin)] = true;
+    }
+
+    return options;
+}
+
+function* walkSync(dir: string) {
+    const files = readdirSync(dir);
+
+    for (const file of files) {
+        const pathToFile = path.join(dir, file);
+        const isDirectory = statSync(pathToFile).isDirectory();
+        if (isDirectory) {
+            yield* walkSync(pathToFile);
+        } else {
+            yield pathToFile;
+        }
+    }
+}
+
+async function ternInit() {
+    await asyncTernRequest({
+        query: {
+            type: 'ideInit',
+            unloadDefs: true,
+            // shouldFilter: true,
+        },
+    });
+    const resources = path.join(__dirname, '..', '..', 'resources', 'aura');
+    const found = [...walkSync(resources)];
+    let [lastFile, lastText] = [undefined, undefined];
+    for (const file of found) {
+        if (file.endsWith('.js')) {
+            const data = readFileSync(file, 'utf-8');
+            // HACK HACK HACK - glue it all together baby!
+            if (file.endsWith('AuraInstance.js')) {
+                lastFile = file;
+                lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
+            } else {
+                ternServer.addFile(file, data);
+            }
+        }
+    }
+    ternServer.addFile(lastFile, lastText);
+}
+
+const init = memoize(ternInit);
+
 export async function startServer(rootPath: string, wsroot: string) {
     const defs = findDefs(defaultLibs);
     const plugins = await loadPlugins(defaultPlugins, rootPath);
@@ -191,11 +233,12 @@ function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
     return { line, character: ch };
 }
 
-function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
-    return {
-        uri: fileToUri(file),
-        range: tern2lspRange({ start, end }),
-    };
+function fileToUri(file: string): string {
+    if (path.isAbsolute(file)) {
+        return URI.file(file).toString();
+    } else {
+        return URI.file(path.join(theRootPath, file)).toString();
+    }
 }
 
 function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
@@ -205,16 +248,15 @@ function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Positio
     };
 }
 
-function uriToFile(uri: string): string {
-    return URI.parse(uri).fsPath;
+function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
+    return {
+        uri: fileToUri(file),
+        range: tern2lspRange({ start, end }),
+    };
 }
 
-function fileToUri(file: string): string {
-    if (path.isAbsolute(file)) {
-        return URI.file(file).toString();
-    } else {
-        return URI.file(path.join(theRootPath, file)).toString();
-    }
+function uriToFile(uri: string): string {
+    return URI.parse(uri).fsPath;
 }
 
 async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
@@ -228,47 +270,6 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
         },
     });
 }
-
-function* walkSync(dir: string) {
-    const files = readdirSync(dir);
-
-    for (const file of files) {
-        const pathToFile = path.join(dir, file);
-        const isDirectory = statSync(pathToFile).isDirectory();
-        if (isDirectory) {
-            yield* walkSync(pathToFile);
-        } else {
-            yield pathToFile;
-        }
-    }
-}
-async function ternInit() {
-    await asyncTernRequest({
-        query: {
-            type: 'ideInit',
-            unloadDefs: true,
-            // shouldFilter: true,
-        },
-    });
-    const resources = path.join(__dirname, '..', '..', 'resources', 'aura');
-    const found = [...walkSync(resources)];
-    let [lastFile, lastText] = [undefined, undefined];
-    for (const file of found) {
-        if (file.endsWith('.js')) {
-            const data = readFileSync(file, 'utf-8');
-            // HACK HACK HACK - glue it all together baby!
-            if (file.endsWith('AuraInstance.js')) {
-                lastFile = file;
-                lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
-            } else {
-                ternServer.addFile(file, data);
-            }
-        }
-    }
-    ternServer.addFile(lastFile, lastText);
-}
-
-const init = memoize(ternInit);
 
 export const addFile = (event: TextDocumentChangeEvent) => {
     const { document } = event;
@@ -370,7 +371,7 @@ export const onDefinition = async (textDocumentPosition: TextDocumentPositionPar
     try {
         await init();
         await asyncFlush();
-        const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
+        const { file, start, end } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
             const responseURI = fileToUri(file);
             // check to see if the request position is inside the response object
@@ -419,7 +420,6 @@ export const onSignatureHelp = async (signatureParams: TextDocumentPositionParam
     try {
         await init();
         await asyncFlush();
-        const sp = signatureParams;
         const files = ternServer.files;
         const fileName = ternServer.normalizeFilename(uriToFile(uri));
         const file = files.find(f => f.name === fileName);

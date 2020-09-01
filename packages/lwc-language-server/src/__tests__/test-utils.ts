@@ -10,12 +10,6 @@ export const CORE_ALL_ROOT = join('test-workspaces', 'core-like-workspace', 'app
 export const CORE_PROJECT_ROOT = join(CORE_ALL_ROOT, 'ui-global-components');
 export const STANDARDS_ROOT = join('test-workspaces', 'standard-workspace', 'src', 'modules');
 
-export function readAsTextDocument(path: string): TextDocument {
-    const uri = URI.file(resolve(path)).toString();
-    const content = fs.readFileSync(path, 'utf8');
-    return TextDocument.create(uri, languageId(path), 0, content);
-}
-
 function languageId(path: string): string {
     const suffix = extname(path);
     if (!suffix) {
@@ -31,4 +25,10 @@ function languageId(path: string): string {
             return 'html'; // aura cmps
     }
     throw new Error('todo: ' + path);
+}
+
+export function readAsTextDocument(path: string): TextDocument {
+    const uri = URI.file(resolve(path)).toString();
+    const content = fs.readFileSync(path, 'utf8');
+    return TextDocument.create(uri, languageId(path), 0, content);
 }

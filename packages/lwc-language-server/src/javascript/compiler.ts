@@ -15,6 +15,37 @@ export interface ICompilerResult {
     metadata?: Metadata;
 }
 
+function getClassMembers(metadata: Metadata, memberType: string, memberDecorator?: string): ClassMember[] {
+    const members: ClassMember[] = [];
+    if (metadata.classMembers) {
+        for (const member of metadata.classMembers) {
+            if (member.type === memberType) {
+                if (!memberDecorator || member.decorator === memberDecorator) {
+                    members.push(member);
+                }
+            }
+        }
+    }
+    return members;
+}
+
+function getDecoratorsTargets(metadata: Metadata, elementType: string, targetType: string): ClassMember[] {
+    const props: ClassMember[] = [];
+    if (metadata.decorators) {
+        for (const element of metadata.decorators) {
+            if (element.type === elementType) {
+                for (const target of element.targets) {
+                    if (target.type === targetType) {
+                        props.push(target);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return props;
+}
+
 export function getPublicReactiveProperties(metadata: Metadata): ClassMember[] {
     return getClassMembers(metadata, 'property', 'api');
 }
@@ -35,35 +66,75 @@ export function getMethods(metadata: Metadata): ClassMember[] {
     return getClassMembers(metadata, 'method');
 }
 
-function getDecoratorsTargets(metadata: Metadata, elementType: string, targetType: string): ClassMember[] {
-    const props: ClassMember[] = [];
-    if (metadata.decorators) {
-        for (const element of metadata.decorators) {
-            if (element.type === elementType) {
-                for (const target of element.targets) {
-                    if (target.type === targetType) {
-                        props.push(target);
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return props;
+function sanitizeComment(comment: string): string {
+    const parsed = commentParser('/*' + comment + '*/');
+    return parsed && parsed.length > 0 ? parsed[0].source : null;
 }
 
-function getClassMembers(metadata: Metadata, memberType: string, memberDecorator?: string): ClassMember[] {
-    const members: ClassMember[] = [];
-    if (metadata.classMembers) {
-        for (const member of metadata.classMembers) {
-            if (member.type === memberType) {
-                if (!memberDecorator || member.decorator === memberDecorator) {
-                    members.push(member);
-                }
+function patchComments(metadata: Metadata): void {
+    if (metadata.doc) {
+        metadata.doc = sanitizeComment(metadata.doc);
+        for (const classMember of metadata.classMembers) {
+            if (classMember.doc) {
+                classMember.doc = sanitizeComment(classMember.doc);
             }
         }
     }
-    return members;
+}
+
+export function extractLocationFromBabelError(message: string): any {
+    const m = message.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+    const startLine = m.indexOf('\n> ') + 3;
+    const line = parseInt(m.substring(startLine, m.indexOf(' | ', startLine)), 10);
+    const startColumn = m.indexOf('    | ', startLine);
+    const mark = m.indexOf('^', startColumn);
+    const column = mark - startColumn - 6;
+    const location = { line, column };
+    return location;
+}
+
+export function extractMessageFromBabelError(message: string): string {
+    const start = message.indexOf(': ') + 2;
+    const end = message.indexOf('\n', start);
+    return message.substring(start, end);
+}
+
+// TODO: proper type for 'err' (i.e. SyntaxError)
+function toDiagnostic(err: any): Diagnostic {
+    // TODO: 'err' doesn't have end loc, squiggling until the end of the line until babel 7 is released
+    const message = err.message;
+    let location = err.location;
+    if (!location) {
+        location = extractLocationFromBabelError(message);
+    }
+    const startLine: number = location.line - 1;
+    const startCharacter: number = location.column;
+    // https://github.com/forcedotcom/salesforcedx-vscode/issues/2074
+    // Limit the end character to max 32 bit integer so that it doesn't overflow other language servers
+    const range = Range.create(startLine, startCharacter, startLine, MAX_32BIT_INTEGER);
+    return {
+        range,
+        severity: DiagnosticSeverity.Error,
+        source: DIAGNOSTIC_SOURCE,
+        message: extractMessageFromBabelError(message),
+    };
+}
+
+export async function compileSource(source: string, fileName = 'foo.js'): Promise<ICompilerResult> {
+    try {
+        const name = fileName.substring(0, fileName.lastIndexOf('.'));
+        const options: CompilerOptions = {
+            name,
+            namespace: 'x',
+            files: {},
+        };
+        const transformerResult = await transform(source, fileName, options);
+        const metadata = transformerResult.metadata as Metadata;
+        patchComments(metadata);
+        return { metadata, diagnostics: [] };
+    } catch (err) {
+        return { diagnostics: [toDiagnostic(err)] };
+    }
 }
 
 /**
@@ -83,21 +154,9 @@ export async function compileFile(file: string): Promise<ICompilerResult> {
     return compileSource(data, fileName);
 }
 
-export async function compileSource(source: string, fileName = 'foo.js'): Promise<ICompilerResult> {
-    try {
-        const name = fileName.substring(0, fileName.lastIndexOf('.'));
-        const options: CompilerOptions = {
-            name,
-            namespace: 'x',
-            files: {},
-        };
-        const transformerResult = await transform(source, fileName, options);
-        const metadata = transformerResult.metadata as Metadata;
-        patchComments(metadata);
-        return { metadata, diagnostics: [] };
-    } catch (err) {
-        return { diagnostics: [toDiagnostic(err)] };
-    }
+export function toVSCodeRange(babelRange: SourceLocation): Range {
+    // babel (column:0-based line:1-based) => vscode (character:0-based line:0-based)
+    return Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
 }
 
 export function extractAttributes(metadata: Metadata, uri: string): { privateAttributes: AttributeInfo[]; publicAttributes: AttributeInfo[] } {
@@ -123,63 +182,4 @@ export function extractAttributes(metadata: Metadata, uri: string): { privateAtt
         publicAttributes,
         privateAttributes,
     };
-}
-
-// TODO: proper type for 'err' (i.e. SyntaxError)
-function toDiagnostic(err: any): Diagnostic {
-    // TODO: 'err' doesn't have end loc, squiggling until the end of the line until babel 7 is released
-    const message = err.message;
-    let location = err.location;
-    if (!location) {
-        location = extractLocationFromBabelError(message);
-    }
-    const startLine: number = location.line - 1;
-    const startCharacter: number = location.column;
-    // https://github.com/forcedotcom/salesforcedx-vscode/issues/2074
-    // Limit the end character to max 32 bit integer so that it doesn't overflow other language servers
-    const range = Range.create(startLine, startCharacter, startLine, MAX_32BIT_INTEGER);
-    return {
-        range,
-        severity: DiagnosticSeverity.Error,
-        source: DIAGNOSTIC_SOURCE,
-        message: extractMessageFromBabelError(message),
-    };
-}
-
-export function toVSCodeRange(babelRange: SourceLocation): Range {
-    // babel (column:0-based line:1-based) => vscode (character:0-based line:0-based)
-    return Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
-}
-
-export function extractLocationFromBabelError(message: string): any {
-    const m = message.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-    const startLine = m.indexOf('\n> ') + 3;
-    const line = parseInt(m.substring(startLine, m.indexOf(' | ', startLine)), 10);
-    const startColumn = m.indexOf('    | ', startLine);
-    const mark = m.indexOf('^', startColumn);
-    const column = mark - startColumn - 6;
-    const location = { line, column };
-    return location;
-}
-
-export function extractMessageFromBabelError(message: string): string {
-    const start = message.indexOf(': ') + 2;
-    const end = message.indexOf('\n', start);
-    return message.substring(start, end);
-}
-
-function patchComments(metadata: Metadata): void {
-    if (metadata.doc) {
-        metadata.doc = sanitizeComment(metadata.doc);
-        for (const classMember of metadata.classMembers) {
-            if (classMember.doc) {
-                classMember.doc = sanitizeComment(classMember.doc);
-            }
-        }
-    }
-}
-
-function sanitizeComment(comment: string): string {
-    const parsed = commentParser('/*' + comment + '*/');
-    return parsed && parsed.length > 0 ? parsed[0].source : null;
 }
