@@ -14,24 +14,15 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
-    TextDocumentChangeEvent,
     CompletionParams,
-    Position,
-    Range,
-    ReferenceParams,
-    SignatureHelp,
-    SignatureInformation,
-    ParameterInformation,
     FileChangeType,
     NotificationType,
     Definition,
 } from 'vscode-languageserver';
 
-import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
-import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
+import { getLanguageService, LanguageService, WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
-import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';

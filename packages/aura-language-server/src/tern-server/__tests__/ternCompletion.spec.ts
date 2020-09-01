@@ -5,7 +5,6 @@ it('tern completions', async () => {
     const ws = 'test-workspaces/sfdx-workspace';
     const context = new WorkspaceContext(ws);
     await context.configureProject();
-    const { aura } = await context.getNamespaceRoots();
 
     await startServer(ws, ws);
     const completions = await onCompletion({

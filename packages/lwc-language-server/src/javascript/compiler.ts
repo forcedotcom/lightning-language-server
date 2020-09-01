@@ -1,4 +1,4 @@
-import { SourceLocation, Decorator } from 'babel-types';
+import { SourceLocation } from 'babel-types';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
@@ -6,9 +6,8 @@ import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
-import { ClassMember } from '@lwc/babel-plugin-component';
+import { ClassMember, Metadata } from '@lwc/babel-plugin-component';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
-import { Metadata } from '@lwc/babel-plugin-component';
 import commentParser from 'comment-parser';
 
 export interface ICompilerResult {
@@ -84,7 +83,7 @@ export async function compileFile(file: string): Promise<ICompilerResult> {
     return compileSource(data, fileName);
 }
 
-export async function compileSource(source: string, fileName: string = 'foo.js'): Promise<ICompilerResult> {
+export async function compileSource(source: string, fileName = 'foo.js'): Promise<ICompilerResult> {
     try {
         const name = fileName.substring(0, fileName.lastIndexOf('.'));
         const options: CompilerOptions = {

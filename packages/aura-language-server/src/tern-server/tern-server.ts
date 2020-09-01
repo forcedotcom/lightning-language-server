@@ -1,11 +1,10 @@
-import fs from 'fs';
+import fs, { readFileSync, readdirSync, statSync } from 'fs';
 import * as tern from '../tern/lib/tern';
 import path from 'path';
 import * as util from 'util';
 import * as infer from '../tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { readFileSync, readdirSync, statSync } from 'fs';
 import URI from 'vscode-uri';
 
 import { memoize } from '@salesforce/lightning-lsp-common/lib/utils';
