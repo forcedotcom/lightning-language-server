@@ -28,11 +28,11 @@ import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 
-interface ITagParams {
+interface TagParams {
     taginfo: TagInfo;
 }
 
-const tagAdded: NotificationType<ITagParams, void> = new NotificationType<ITagParams, void>('salesforce/tagAdded');
+const tagAdded: NotificationType<TagParams, void> = new NotificationType<TagParams, void>('salesforce/tagAdded');
 const tagDeleted: NotificationType<string, void> = new NotificationType<string, void>('salesforce/tagDeleted');
 const tagsCleared: NotificationType<void, void> = new NotificationType<void, void>('salesforce/tagsCleared');
 

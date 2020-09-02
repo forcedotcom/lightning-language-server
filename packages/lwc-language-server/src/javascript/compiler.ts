@@ -10,7 +10,7 @@ import { ClassMember, Metadata } from '@lwc/babel-plugin-component';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
 
-export interface ICompilerResult {
+export interface CompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic
     metadata?: Metadata;
 }
@@ -120,7 +120,7 @@ function toDiagnostic(err: any): Diagnostic {
     };
 }
 
-export async function compileSource(source: string, fileName = 'foo.js'): Promise<ICompilerResult> {
+export async function compileSource(source: string, fileName = 'foo.js'): Promise<CompilerResult> {
     try {
         const name = fileName.substring(0, fileName.lastIndexOf('.'));
         const options: CompilerOptions = {
@@ -140,14 +140,14 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
 /**
  * Use to compile a live document (contents may be different from current file in disk)
  */
-export async function compileDocument(document: TextDocument): Promise<ICompilerResult> {
+export async function compileDocument(document: TextDocument): Promise<CompilerResult> {
     const file = URI.file(document.uri).fsPath;
     const filePath = path.parse(file);
     const fileName = filePath.base;
     return compileSource(document.getText(), fileName);
 }
 
-export async function compileFile(file: string): Promise<ICompilerResult> {
+export async function compileFile(file: string): Promise<CompilerResult> {
     const filePath = path.parse(file);
     const fileName = filePath.base;
     const data = await fs.readFile(file, 'utf-8');

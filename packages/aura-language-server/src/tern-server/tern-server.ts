@@ -25,8 +25,8 @@ import {
 } from 'vscode-languageserver';
 
 // tslint:disable-next-line:no-namespace
-interface ITernServer extends tern.Server {
-    files: ITernFile[];
+interface TernServer extends tern.Server {
+    files: TernFile[];
     cx: any;
     normalizeFilename(file: string): string;
     /**
@@ -48,13 +48,13 @@ interface ITernServer extends tern.Server {
      */
     request(doc: any, callback: any): void;
 }
-interface ITernFile {
+interface TernFile {
     name: string;
     text: string;
 }
 
 let theRootPath: string;
-let ternServer: ITernServer;
+let ternServer: TernServer;
 let asyncTernRequest;
 let asyncFlush;
 
@@ -216,7 +216,7 @@ export async function startServer(rootPath: string, wsroot: string) {
         },
     };
     theRootPath = wsroot;
-    ternServer = new tern.Server(config) as ITernServer;
+    ternServer = new tern.Server(config) as TernServer;
     asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
     asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
 
