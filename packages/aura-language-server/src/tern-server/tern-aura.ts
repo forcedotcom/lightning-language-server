@@ -1,5 +1,7 @@
 import * as infer from '../tern/lib/infer';
 import * as tern from '../tern/lib/tern';
+// eslint-disable-next-line no-duplicate-imports
+import { ternError } from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -562,6 +564,7 @@ async function connectModule(file, out) {
                                     }
                                 }
                                 //outObj.defProp(baseName(file.name).replace(/.js$/, ''))
+                                // eslint-disable-next-line no-throw-literal
                                 throw 'stop';
                             }
                         },
