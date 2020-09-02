@@ -45,20 +45,21 @@ function isAuraDirectory(context: WorkspaceContext, uri: string): boolean {
 
 export async function isLWCWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
     const file = toResolvedPath(uri);
-    return file.indexOf('.') === -1 && (await context.isFileInsideModulesRoots(file));
+    return await context.isFileInsideModulesRoots(file);
 }
 
 export async function isAuraWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
     const file = toResolvedPath(uri);
-    return file.indexOf('.') === -1 && (await context.isFileInsideAuraRoots(file));
+    return await context.isFileInsideAuraRoots(file);
 }
 
 /**
  * @return true if changes include a directory delete
  */
+// TODO This is not waiting for the response of the promise isLWCWatchedDirectory, maybe we have the same problem on includesDeletedAuraWatchedDirectory
 export function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
-        if (event.type === FileChangeType.Deleted && isLWCWatchedDirectory(context, event.uri)) {
+        if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && isLWCWatchedDirectory(context, event.uri)) {
             return true;
         }
     }
@@ -66,7 +67,7 @@ export function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, ch
 }
 export function includesDeletedAuraWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
-        if (event.type === FileChangeType.Deleted && isAuraWatchedDirectory(context, event.uri)) {
+        if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && isAuraWatchedDirectory(context, event.uri)) {
             return true;
         }
     }
