@@ -1,7 +1,5 @@
 import * as infer from '../tern/lib/infer';
 import * as tern from '../tern/lib/tern';
-// eslint-disable-next-line no-duplicate-imports
-import { ternError } from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -146,8 +144,10 @@ async function newObj() {
     });
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _debug(log) {
-    console.log(log);
+    //console.log(log);
 }
 
 function getName(name, type) {
@@ -497,6 +497,12 @@ function findAndBindEvent(type, server, cx, infer) {
             int.propagate(type);
         }
     }
+}
+
+function ternError(msg) {
+    const err = new Error(msg);
+    err.name = 'TernError';
+    return err;
 }
 
 async function connectModule(file, out) {
