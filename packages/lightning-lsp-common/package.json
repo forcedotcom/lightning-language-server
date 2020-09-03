@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lightning-lsp-common",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Common components for lwc-language-server and aura-language-server.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -37,8 +37,8 @@
     "properties": "^1.2.1",
     "semver": "^5.6.0",
     "vscode-languageserver": "^5.2.1",
-    "vscode-uri": "^2.1.2",
-    "vscode-nls": "^4.1.2"
+    "vscode-nls": "^4.1.2",
+    "vscode-uri": "^2.1.2"
   },
   "devDependencies": {
     "@lwc/engine": "0.34.8",
