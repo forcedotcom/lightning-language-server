@@ -22,7 +22,7 @@ WorkspaceContext.mockImplementation(() => {
     return realWS;
 });
 
-it('includesWatchedDirectory', () => {
+it('includesWatchedDirectory', async () => {
     const directoryDeletedEvent: FileEvent = {
         type: FileChangeType.Deleted,
         uri: 'file:///Users/user/test/dir',
@@ -36,12 +36,12 @@ it('includesWatchedDirectory', () => {
         uri: 'file:///Users/user/test/dir/file.html',
     };
     const ctxt = new WorkspaceContext('');
-    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
-    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent])).toBeFalsy();
-    expect(utils.includesDeletedLwcWatchedDirectory(ctxt, [htmlFileDeletedEvent])).toBeFalsy();
+    expect(await utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
+    expect(await utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent])).toBeFalsy();
+    expect(await utils.includesDeletedLwcWatchedDirectory(ctxt, [htmlFileDeletedEvent])).toBeFalsy();
 });
 
-it('isLWCRootDirectoryChange', () => {
+it('isLWCRootDirectoryChange', async () => {
     const noLwcFolderCreated: FileEvent = {
         type: FileChangeType.Created,
         uri: 'file:///Users/user/test/dir',
@@ -59,10 +59,10 @@ it('isLWCRootDirectoryChange', () => {
         uri: 'file:///Users/user/test/dir/lwc',
     };
     const ctxt = new WorkspaceContext('');
-    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
-    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated])).toBeFalsy();
-    expect(utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();
-    expect(utils.isLWCRootDirectoryCreated(ctxt, [lwcFolderCreated, lwcFolderDeleted])).toBeTruthy();
+    expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
+    expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated])).toBeFalsy();
+    expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();
+    expect(await utils.isLWCRootDirectoryCreated(ctxt, [lwcFolderCreated, lwcFolderDeleted])).toBeTruthy();
 });
 
 it('getExtension()', () => {
