@@ -35,11 +35,11 @@ export default class AuraIndexer implements Indexer {
         return this.indexingTasks;
     }
 
-    public async waitForIndexing() {
+    public async waitForIndexing(): Promise<void> {
         return this.indexingTasks;
     }
 
-    public resetIndex() {
+    public resetIndex(): void {
         this.eventEmitter.emit('clear');
         this.AURA_TAGS.clear();
         this.AURA_EVENTS.clear();
@@ -57,7 +57,7 @@ export default class AuraIndexer implements Indexer {
         return this.getAuraTags().get(tag);
     }
 
-    public clearTagsforDirectory(directory: string, sfdxProject: boolean) {
+    public clearTagsforDirectory(directory: string, sfdxProject: boolean): void {
         const name = componentUtil.componentFromDirectory(directory, sfdxProject);
         this.deleteCustomTag(name);
     }
@@ -135,31 +135,31 @@ export default class AuraIndexer implements Indexer {
         console.info(`Indexed ${markupfiles.length} files in ${utils.elapsedMillis(startTime)} ms`);
     }
 
-    private clearTagsforFile(file: string, sfdxProject: boolean) {
+    private clearTagsforFile(file: string, sfdxProject: boolean): void {
         const name = componentUtil.componentFromFile(file, sfdxProject);
         this.deleteCustomTag(name);
     }
 
-    private deleteCustomTag(tag: string) {
+    private deleteCustomTag(tag: string): void {
         this.AURA_TAGS.delete(tag);
         this.AURA_EVENTS.delete(tag);
 
         this.eventEmitter.emit('delete', tag);
     }
-    private setAuraNamespaceTag(namespace: string) {
+    private setAuraNamespaceTag(namespace: string): void {
         if (!this.AURA_NAMESPACES.has(namespace)) {
             this.AURA_NAMESPACES.add(namespace);
             this.eventEmitter.emit('set-namespace', namespace);
         }
     }
 
-    private setCustomEventTag(info: TagInfo) {
+    private setCustomEventTag(info: TagInfo): void {
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_EVENTS.set(info.name, info);
         this.eventEmitter.emit('set', info);
     }
 
-    private setCustomTag(info: TagInfo) {
+    private setCustomTag(info: TagInfo): void {
         this.setAuraNamespaceTag(info.namespace);
         this.AURA_TAGS.set(info.name, info);
         this.eventEmitter.emit('set', info);
@@ -229,7 +229,7 @@ export default class AuraIndexer implements Indexer {
         return results;
     }
 
-    private trimQuotes(str: string) {
+    private trimQuotes(str: string): string {
         if (!str) {
             return '';
         }
