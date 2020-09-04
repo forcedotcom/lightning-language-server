@@ -79,7 +79,7 @@ describe('TypingIndexer', () => {
     });
 
     describe('#metaTypings', () => {
-        test('it returns all the paths for meta files\' typings', () => {
+        test("it returns all the paths for meta files' typings", () => {
             fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'staticresources'), { recursive: true });
             fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'messageChannels'), { recursive: true });
             fsExtra.mkdirSync(path.join(typingIndexer.typingsBaseDir, 'contentassets'), { recursive: true });

@@ -12,7 +12,7 @@ describe('new Typing', () => {
     });
 
     it('cannot create a Typing with an invalid meta file', () => {
-        const filename: string = 'asset.foobar-meta.xml';
+        const filename = 'asset.foobar-meta.xml';
         expect(() => {
             Typing.fromMeta(filename);
         }).toThrow();
@@ -22,7 +22,7 @@ describe('new Typing', () => {
 describe('Typing.declaration', () => {
     it('generates the typing declaration for a content asset file.', () => {
         const typing: Typing = Typing.fromMeta('logo.asset-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+        const expectedDeclaration = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;
 }`;
@@ -32,7 +32,7 @@ describe('Typing.declaration', () => {
 
     it('generate the typing declaration for a static resource file', () => {
         const typing: Typing = Typing.fromMeta('d3.resource-meta.xml');
-        const expectedDeclaration: string = `declare module "@salesforce/resourceUrl/d3" {
+        const expectedDeclaration = `declare module "@salesforce/resourceUrl/d3" {
     var d3: string;
     export default d3;
 }`;
@@ -52,7 +52,7 @@ describe('Typing.declaration', () => {
 
     it('handles a full path', async () => {
         const typing: Typing = Typing.fromMeta(path.join('.', 'foo', 'bar', 'buz', 'logo.asset-meta.xml'));
-        const expectedDeclaration: string = `declare module "@salesforce/contentAssetUrl/logo" {
+        const expectedDeclaration = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;
 }`;
@@ -62,7 +62,7 @@ describe('Typing.declaration', () => {
 
 describe('Typing.fromCustomLabels', () => {
     it('Generates declarations from parsed xml document', async () => {
-        const xmlDocument: string = `
+        const xmlDocument = `
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
@@ -82,12 +82,12 @@ describe('Typing.fromCustomLabels', () => {
 </CustomLabels>
 `;
 
-        const expectedDeclaration1: string = `declare module "@salesforce/label/c.greeting" {
+        const expectedDeclaration1 = `declare module "@salesforce/label/c.greeting" {
     var greeting: string;
     export default greeting;
 }`;
 
-        const expectedDeclaration2: string = `declare module "@salesforce/label/c.other_greeting" {
+        const expectedDeclaration2 = `declare module "@salesforce/label/c.other_greeting" {
     var other_greeting: string;
     export default other_greeting;
 }`;

@@ -8,13 +8,13 @@ export function interceptConsoleLogger(connection: IConnection) {
     const intercept = (method: string) => {
         const original = console[method];
         // tslint:disable-next-line: only-arrow-functions
-        console[method] = function() {
+        console[method] = function(...args: any) {
             if (connection) {
                 const remote: any = connection.console;
-                remote[method].apply(connection.console, arguments);
+                remote[method].apply(connection.console, args);
             }
 
-            original.apply(console, arguments);
+            original.apply(console, args);
         };
     };
     const methods = ['log', 'info', 'warn', 'error'];

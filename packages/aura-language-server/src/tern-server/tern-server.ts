@@ -1,11 +1,10 @@
-import fs from 'fs';
+import fs, { readFileSync, readdirSync, statSync } from 'fs';
 import * as tern from '../tern/lib/tern';
 import path from 'path';
 import * as util from 'util';
 import * as infer from '../tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
-import { readFileSync, readdirSync, statSync } from 'fs';
 import URI from 'vscode-uri';
 
 import { memoize } from '@salesforce/lightning-lsp-common/lib/utils';
@@ -26,8 +25,8 @@ import {
 } from 'vscode-languageserver';
 
 // tslint:disable-next-line:no-namespace
-interface ITernServer extends tern.Server {
-    files: ITernFile[];
+interface TernServer extends tern.Server {
+    files: TernFile[];
     cx: any;
     normalizeFilename(file: string): string;
     /**
@@ -49,13 +48,13 @@ interface ITernServer extends tern.Server {
      */
     request(doc: any, callback: any): void;
 }
-interface ITernFile {
+interface TernFile {
     name: string;
     text: string;
 }
 
 let theRootPath: string;
-let ternServer: ITernServer;
+let ternServer: TernServer;
 let asyncTernRequest;
 let asyncFlush;
 
@@ -102,26 +101,6 @@ function findDefs(libs) {
     return defs;
 }
 
-async function loadPlugins(plugins, rootPath) {
-    const options = {};
-    for (const plugin of Object.keys(plugins)) {
-        const val = plugins[plugin];
-        if (!val) {
-            continue;
-        }
-
-        if (!(await loadLocal(plugin, rootPath))) {
-            if (!(await loadBuiltIn(plugin, rootPath))) {
-                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
-            }
-        }
-
-        options[path.basename(plugin)] = true;
-    }
-
-    return options;
-}
-
 async function loadLocal(plugin, rootPath) {
     let found;
     try {
@@ -160,74 +139,24 @@ async function loadBuiltIn(plugin: string, rootPath: string) {
     return true;
 }
 
-export async function startServer(rootPath: string, wsroot: string) {
-    const defs = findDefs(defaultLibs);
-    const plugins = await loadPlugins(defaultPlugins, rootPath);
-    const config: tern.ConstructorOptions = {
-        ...defaultConfig,
-        defs,
-        plugins,
-        // @ts-ignore 2345
-        projectDir: rootPath,
-        getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
-            // note: this isn't invoked
-            fs.readFile(path.resolve(rootPath, filename), 'utf8', callback);
-        },
-    };
-    theRootPath = wsroot;
-    ternServer = new tern.Server(config) as ITernServer;
-    asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
-    asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
+async function loadPlugins(plugins, rootPath) {
+    const options = {};
+    for (const plugin of Object.keys(plugins)) {
+        const val = plugins[plugin];
+        if (!val) {
+            continue;
+        }
 
-    init();
+        if (!(await loadLocal(plugin, rootPath))) {
+            if (!(await loadBuiltIn(plugin, rootPath))) {
+                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
+            }
+        }
 
-    return ternServer;
-}
-
-function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
-    return { line, ch: character };
-}
-
-function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
-    return { line, character: ch };
-}
-
-function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
-    return {
-        uri: fileToUri(file),
-        range: tern2lspRange({ start, end }),
-    };
-}
-
-function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
-    return {
-        start: tern2lspPos(start),
-        end: tern2lspPos(end),
-    };
-}
-
-function uriToFile(uri: string): string {
-    return URI.parse(uri).fsPath;
-}
-
-function fileToUri(file: string): string {
-    if (path.isAbsolute(file)) {
-        return URI.file(file).toString();
-    } else {
-        return URI.file(path.join(theRootPath, file)).toString();
+        options[path.basename(plugin)] = true;
     }
-}
 
-async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
-    return await asyncTernRequest({
-        query: {
-            type,
-            file: uriToFile(event.textDocument.uri),
-            end: lsp2ternPos(event.position),
-            lineCharPositions: true,
-            ...options,
-        },
-    });
+    return options;
 }
 
 function* walkSync(dir: string) {
@@ -243,6 +172,7 @@ function* walkSync(dir: string) {
         }
     }
 }
+
 async function ternInit() {
     await asyncTernRequest({
         query: {
@@ -270,6 +200,76 @@ async function ternInit() {
 }
 
 const init = memoize(ternInit);
+
+export async function startServer(rootPath: string, wsroot: string) {
+    const defs = findDefs(defaultLibs);
+    const plugins = await loadPlugins(defaultPlugins, rootPath);
+    const config: tern.ConstructorOptions = {
+        ...defaultConfig,
+        defs,
+        plugins,
+        // @ts-ignore 2345
+        projectDir: rootPath,
+        getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
+            // note: this isn't invoked
+            fs.readFile(path.resolve(rootPath, filename), 'utf8', callback);
+        },
+    };
+    theRootPath = wsroot;
+    ternServer = new tern.Server(config) as TernServer;
+    asyncTernRequest = util.promisify(ternServer.request.bind(ternServer));
+    asyncFlush = util.promisify(ternServer.flush.bind(ternServer));
+
+    init();
+
+    return ternServer;
+}
+
+function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
+    return { line, ch: character };
+}
+
+function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
+    return { line, character: ch };
+}
+
+function fileToUri(file: string): string {
+    if (path.isAbsolute(file)) {
+        return URI.file(file).toString();
+    } else {
+        return URI.file(path.join(theRootPath, file)).toString();
+    }
+}
+
+function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
+    return {
+        start: tern2lspPos(start),
+        end: tern2lspPos(end),
+    };
+}
+
+function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
+    return {
+        uri: fileToUri(file),
+        range: tern2lspRange({ start, end }),
+    };
+}
+
+function uriToFile(uri: string): string {
+    return URI.parse(uri).fsPath;
+}
+
+async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
+    return await asyncTernRequest({
+        query: {
+            type,
+            file: uriToFile(event.textDocument.uri),
+            end: lsp2ternPos(event.position),
+            lineCharPositions: true,
+            ...options,
+        },
+    });
+}
 
 export const addFile = (event: TextDocumentChangeEvent) => {
     const { document } = event;
@@ -371,7 +371,7 @@ export const onDefinition = async (textDocumentPosition: TextDocumentPositionPar
     try {
         await init();
         await asyncFlush();
-        const { file, start, end, origin } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
+        const { file, start, end } = await ternRequest(textDocumentPosition, 'definition', { preferFunction: false, doc: false });
         if (file) {
             const responseURI = fileToUri(file);
             // check to see if the request position is inside the response object
@@ -420,7 +420,6 @@ export const onSignatureHelp = async (signatureParams: TextDocumentPositionParam
     try {
         await init();
         await asyncFlush();
-        const sp = signatureParams;
         const files = ternServer.files;
         const fileName = ternServer.normalizeFilename(uriToFile(uri));
         const file = files.find(f => f.name === fileName);

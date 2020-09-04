@@ -1,6 +1,6 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkedString, MarkupContent, Hover } from 'vscode-languageserver';
+import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover } from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -288,7 +288,7 @@ describe('#cursorInfo', () => {
 });
 
 describe('findDynamicContent', () => {
-    const text: string = '{foobar}, {foo.bar} so\nmething {baz.bux}';
+    const text = '{foobar}, {foo.bar} so\nmething {baz.bux}';
 
     it('returns the dynamic match at the given offset if it exists', () => {
         expect(findDynamicContent(text, 5)).toEqual('foobar');
