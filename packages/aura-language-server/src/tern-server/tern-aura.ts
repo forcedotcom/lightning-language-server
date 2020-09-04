@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './tern-indexer';
 
-const WG_IMPORT_DEFAULT_FALLBACK = 80;
 const WG_DEFAULT_EXPORT = 95;
 let server: any = {};
 
@@ -27,7 +26,7 @@ const ForAllProps_Purgeable = infer.constraint({
     },
     purge: function(test) {
         if (this.sources) {
-            for (var i = 0; i < this.sources.length; i++) {
+            for (let i = 0; i < this.sources.length; i++) {
                 this.sources[i].purge(test);
             }
         }
@@ -39,6 +38,22 @@ const ForAllProps_Purgeable = infer.constraint({
         this.sources.push(source);
     },
 });
+
+function getFilename(filename) {
+    // @ts-ignore
+    if (server.options.projectDir.endsWith('/')) {
+        // @ts-ignore
+        return server.options.projectDir + filename;
+    }
+    // @ts-ignore
+    return server.options.projectDir + '/' + filename;
+}
+
+function isBlocklisted(filename) {
+    let ret = filename.endsWith('/scrollerLib/bootstrap.js');
+    ret = ret || filename.endsWith('ExportSymbolsHelper.js');
+    return ret;
+}
 
 async function readFile(filename) {
     let normalized = filename;
@@ -60,35 +75,25 @@ async function readFile(filename) {
     }
 }
 
-function getFilename(filename) {
-    // @ts-ignore
-    if (server.options.projectDir.endsWith('/')) {
-        // @ts-ignore
-        return server.options.projectDir + filename;
-    }
-    // @ts-ignore
-    return server.options.projectDir + '/' + filename;
-}
-
 function parent(path) {
-    var splits = path.split('/');
-    if (splits.size == 1) {
+    const splits = path.split('/');
+    if (splits.size === 1) {
         return '';
     }
     return splits[splits.length - 3];
 }
 
 function dirName(path) {
-    var lastSlash = path.lastIndexOf('/');
-    if (lastSlash == -1) {
+    const lastSlash = path.lastIndexOf('/');
+    if (lastSlash === -1) {
         return '';
     }
     return path.slice(0, lastSlash + 1);
 }
 
 function baseName(path) {
-    var lastSlash = path.lastIndexOf('/');
-    if (lastSlash == -1) {
+    const lastSlash = path.lastIndexOf('/');
+    if (lastSlash === -1) {
         return path;
     } else {
         return path.slice(lastSlash + 1);
@@ -96,8 +101,8 @@ function baseName(path) {
 }
 
 function trimExt(path) {
-    var lastDot = path.lastIndexOf('.');
-    if (lastDot == -1) {
+    const lastDot = path.lastIndexOf('.');
+    if (lastDot === -1) {
         return path;
     } else {
         return path.slice(0, lastDot);
@@ -106,24 +111,24 @@ function trimExt(path) {
 
 function initScope(scope) {
     // @ts-ignore
-    var module = new infer.Obj();
+    const module = new infer.Obj();
     module.propagate(scope.defProp('module'));
-    var exports = new infer.Obj(true);
+    const exports = new infer.Obj(true);
     module.origin = exports.origin = scope.origin;
     module.originNode = exports.originNode = scope.originNode;
     exports.propagate(scope.defProp('exports'));
-    var moduleExports = (scope.exports = module.defProp('exports'));
+    const moduleExports = (scope.exports = module.defProp('exports'));
     // @ts-ignore
     exports.propagate(moduleExports, WG_DEFAULT_EXPORT);
 }
 async function getLibraryIncludes(file, library) {
-    var libFile = await getLibFile(file, library);
-    var inc = await getLibIncludes(getFilename(libFile));
-    var includes = [];
-    var bn = dirName(libFile);
+    const libFile = await getLibFile(file, library);
+    const inc = await getLibIncludes(getFilename(libFile));
+    const includes = [];
+    const bn = dirName(libFile);
     // @ts-ignore
     inc.forEach(function(name) {
-        var fname = bn + name + '.js';
+        const fname = bn + name + '.js';
         if (!isBlocklisted(fname)) {
             includes.push(fname);
         }
@@ -138,22 +143,68 @@ async function newObj() {
         });
     });
 }
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _debug(log) {
+    //console.log(log);
+}
+
+function getName(name, type) {
+    const newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
+    return newname;
+}
+
+function getController(name) {
+    return getName(name, 'Controller.js');
+}
+
+function getHelper(name) {
+    return getName(name, 'Helper.js');
+}
+
+function getRenderer(name) {
+    return getName(name, 'Renderer.js');
+}
+
+function resolver(file, parent) {
+    return file;
+}
+
+function unloadDefs() {
+    // @ts-ignore
+    server.deleteDefs('Aura');
+}
+
+function readFileAsync(filename, c) {
+    readFile(filename).then(function(contents) {
+        c(null, contents);
+    });
+}
+
+function loadDefs() {
+    let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
+    defs = JSON.parse(defs);
+    // @ts-ignore
+    server.addDefs(defs);
+}
+
 async function processIfLibrary(file, modules) {
     let lib = await getLibraryForJS(file.name);
     // @ts-ignore
-    let libs = lib ? [lib] : [];
+    const libs = lib ? [lib] : [];
 
     if (libs.length > 0) {
         _debug('Process libs of: ' + file.name);
-        var bn = trimExt(baseName(file.name));
-        var ln = trimExt(baseName(libs[0]));
-        var libName = getFilename(libs[0]);
-        var imps = await getLibImports(libName, bn);
+        const bn = trimExt(baseName(file.name));
+        const ln = trimExt(baseName(libs[0]));
+        const libName = getFilename(libs[0]);
+        const imps = await getLibImports(libName, bn);
 
         // use alternate module for libs
-        var ns = parent(dirName(file.name));
-        var l = modules.resolveModule('mod:' + ns + ':' + ln, file.name);
-        var outObj;
+        const ns = parent(dirName(file.name));
+        const l = modules.resolveModule('mod:' + ns + ':' + ln, file.name);
+        let outObj;
         //console.log("__ the basename "+baseName(libs[0]) );
         if (!l.getType()) {
             //console.log("Created main entry for library");
@@ -169,32 +220,34 @@ async function processIfLibrary(file, modules) {
         if (imps) {
             _debug('Process imported libs of: ' + file.name);
             // get fn decl
-            var fn = file.ast.body[0];
-            var state = fn.scope;
+            const fn = file.ast.body[0];
+            const state = fn.scope;
             // bind included imports to library function....
             // @ts-ignore
-            var imports = imps.split(',');
+            const imports = imps.split(',');
 
-            var libfilesResolved = [];
-            var imfs = [];
-            var importedModules = [];
-            for (var i = 0; i < imports.length; i++) {
+            const libfilesResolved = [];
+            const imfs = [];
+            const importedModules = [];
+            for (let i = 0; i < imports.length; i++) {
                 // resolve....
-                var importedModule = imports[i].trim();
+                let importedModule = imports[i].trim();
                 if (!importedModule) {
                     continue;
                 }
                 if (importedModule.indexOf(':') > -1) {
-                    var splits = importedModule.split(':');
-                    var qn = splits[0] + ':' + splits[1];
-                    var libfile = await getLibFile(file.name, qn);
+                    const splits = importedModule.split(':');
+                    const qn = splits[0] + ':' + splits[1];
+                    const libfile = await getLibFile(file.name, qn);
                     // @ts-ignore
-                    if (!libfile) continue;
+                    if (!libfile) {
+                        continue;
+                    }
 
                     lib = modules.resolveModule('mod:' + qn);
                     // @ts-ignore
                     if (!lib.getType()) {
-                        var zz = await newObj();
+                        const zz = await newObj();
                         // @ts-ignore
                         zz.origin = libfile;
                         // @ts-ignore
@@ -213,15 +266,14 @@ async function processIfLibrary(file, modules) {
             // re-establsh context after awaits
             // @ts-ignore
             infer.withContext(server.cx, function() {
-                for (var i = 0; i < libfilesResolved.length; i++) {
-                    let imf = imfs[i];
-                    let importedModule = importedModules[i];
-                    let lib = libfilesResolved[i];
+                for (let i = 0; i < libfilesResolved.length; i++) {
+                    const importedModule = importedModules[i];
+                    const lib = libfilesResolved[i];
 
-                    var bno = trimExt(baseName(imf));
-                    var lno = trimExt(baseName(imf));
-                    var pm = state.fnType.args[i];
-                    if (!pm || pm.getType(false)) continue;
+                    const pm = state.fnType.args[i];
+                    if (!pm || pm.getType(false)) {
+                        continue;
+                    }
                     if (lib.getType().hasProp(importedModule)) {
                         try {
                             pm.addType(
@@ -232,7 +284,7 @@ async function processIfLibrary(file, modules) {
                             );
                         } catch (zzz) {}
                     } else {
-                        var pname = importedModule;
+                        const pname = importedModule;
                         // so, in effect this isn't really used, since (at least tern.ide)
                         // calls content assist frequently that by the time this called back,
                         // the file will be reindex, and the other lib file would have already
@@ -240,7 +292,7 @@ async function processIfLibrary(file, modules) {
                         lib.getType().on(
                             'addProp',
                             function(pmType, prop, val) {
-                                if (pname == prop) {
+                                if (pname === prop) {
                                     pmType.addType(val);
                                 }
                             }.bind(this, pm),
@@ -259,17 +311,17 @@ async function processIfLibrary(file, modules) {
                     ReturnStatement: function(node, state) {
                         try {
                             // @ts-ignore
-                            var parent = infer.parentNode(node, file.ast);
+                            const parent = infer.parentNode(node, file.ast);
                             // @ts-ignore
-                            var grand = infer.parentNode(parent, file.ast);
+                            const grand = infer.parentNode(parent, file.ast);
                             // @ts-ignore
-                            var great = infer.parentNode(grand, file.ast);
+                            const great = infer.parentNode(grand, file.ast);
                             if (great && great['type'] === 'Program') {
                                 if (node.argument) {
                                     if (node.argument['type'] === 'Identifier') {
-                                        var t = state.getProp(node.argument.name);
+                                        const t = state.getProp(node.argument.name);
                                         if (t) {
-                                            var exported = t.getObjType();
+                                            const exported = t.getObjType();
                                             outObj.defProp(bn, node.argument).addType(exported);
                                         }
                                     } else if (node.argument['type'] === 'ObjectExpression') {
@@ -296,35 +348,33 @@ async function processIfComponent(file, modules) {
     //        console.log("file " + file.name);
     //        console.log("cmp " + jsToCmp[file.name]);
 
-    let cmp = await getComponentForJS(file.name);
+    const cmp = await getComponentForJS(file.name);
     // @ts-ignore
-    let cmps = cmp ? [cmp] : [];
+    const cmps = cmp ? [cmp] : [];
 
     if (cmps.length > 0) {
         _debug('Discover libs of: ' + cmps[0]);
-        let ins = await getCmpImports(getFilename(cmps[0]));
-        let libs = [];
+        const ins = await getCmpImports(getFilename(cmps[0]));
+        const libs = [];
         // @ts-ignore
         for (let i = 0; i < ins.length; i++) {
-            let an_import = ins[i];
-            let library = an_import.library;
-            let property = an_import.property;
-            //console.log("Library: "+library);
-            //console.log("property: "+property);
-            //console.log(libsi[library]);
-            let libfile = await getLibFile(file.name, library);
+            const an_import = ins[i];
+            const library = an_import.library;
+            const libfile = await getLibFile(file.name, library);
             libs.push(libfile);
         }
         for (let i = 0; i < libs.length; i++) {
-            let library = ins[i].library;
-            let libfile = libs[i];
-            if (!libfile) continue;
-            let lib = modules.resolveModule('mod:' + library, libfile);
+            const library = ins[i].library;
+            const libfile = libs[i];
+            if (!libfile) {
+                continue;
+            }
+            const lib = modules.resolveModule('mod:' + library, libfile);
             //console.log("Ensure lib added...")
             //console.log("Resolved: "+lib);
             if (!lib.getType()) {
                 // console.log("no type")
-                let zz = await newObj();
+                const zz = await newObj();
                 // @ts-ignore
                 zz.origin = libfile;
                 // @ts-ignore
@@ -333,7 +383,7 @@ async function processIfComponent(file, modules) {
                     // recheck, after awaits
                     lib.addType(zz);
                 }
-                let inc = await getLibraryIncludes(file.name, library);
+                const inc = await getLibraryIncludes(file.name, library);
                 for (let j = 0; j < inc.length; j++) {
                     // @ts-ignore
                     if (!server.findFile(inc[j])) {
@@ -351,19 +401,21 @@ async function processIfComponent(file, modules) {
         // @ts-ignore
         infer.withContext(server.cx, function() {
             for (let m = 0; m < libs.length; m++) {
-                let library = ins[m].library;
-                let libfile = libs[m];
-                if (!libfile) continue;
-                let property = ins[m].property;
-                let lib = modules.resolveModule('mod:' + library, libfile);
+                const library = ins[m].library;
+                const libfile = libs[m];
+                if (!libfile) {
+                    continue;
+                }
+                const property = ins[m].property;
+                const lib = modules.resolveModule('mod:' + library, libfile);
                 try {
                     walk.simple(
                         file.ast,
                         {
                             FunctionExpression: function(node, state) {
                                 //console.log("Bound to this...");
-                                var ss = node.scope;
-                                var con = ss && ss.fnType && ss.fnType.self.getType();
+                                const ss = node.scope;
+                                const con = ss && ss.fnType && ss.fnType.self.getType();
                                 if (con) {
                                     lib.getType().propagate(con.defProp(property));
                                 }
@@ -380,9 +432,79 @@ async function processIfComponent(file, modules) {
     }
 }
 
-function _debug(log) {
-    //console.log(log);
+function findAndBindComponent(type, server, cx, infer) {
+    const evs = cx.props['Component'];
+    if (!evs) {
+        return;
+    }
+    for (let z = 0; z < evs.length; z++) {
+        const y = evs[z];
+        if (y.name === 'Aura.Component') {
+            const obj = y.props['Component'].types[0].props['prototype'].getObjType();
+            const int = infer.getInstance(obj);
+            int.propagate(type);
+        }
+    }
 }
+
+function findAndBindHelper(type, server, modules, file) {
+    const helperFile = getHelper(file.name);
+
+    const bn = trimExt(baseName(helperFile));
+    const r = server.findFile(helperFile);
+    if (!r) {
+        server.addFile(helperFile);
+    }
+    const helper = modules.resolveModule(helperFile);
+    //  console.log("Resolved module" + helperFile);
+    //  console.dir(helper);
+    const hp = helper.getProp(bn);
+    if (!hp.getType()) {
+        // this handles new props added to the helper...
+        helper.on('addType', function(helperType, val) {
+            const p = new ForAllProps_Purgeable(function(prop, val, local) {
+                if (bn === prop) {
+                    val.propagate(type);
+                }
+            });
+            p.addSource(type);
+            helperType.propagate(p);
+        });
+    } else {
+        // now we need to handle there were changes to the .cmp,
+        // but not the helper,
+        const p = new ForAllProps_Purgeable(function(prop, val, local) {
+            if (bn === prop) {
+                val.propagate(type);
+            }
+        });
+        p.addSource(type);
+        helper.propagate(p);
+    }
+}
+
+function findAndBindEvent(type, server, cx, infer) {
+    // this is slightly hacky, but have no idea how to get the event Otherwise
+    const evs = cx.props['Event'];
+    if (!evs) {
+        return;
+    }
+    for (let z = 0; z < evs.length; z++) {
+        const y = evs[z];
+        if (y.name === 'Aura.Event') {
+            const obj = y.props['Event'].types[0].props['prototype'].getObjType();
+            const int = infer.getInstance(obj);
+            int.propagate(type);
+        }
+    }
+}
+
+function ternError(msg) {
+    const err = new Error(msg);
+    err.name = 'TernError';
+    return err;
+}
+
 async function connectModule(file, out) {
     if (isBlocklisted(file.name)) {
         return;
@@ -391,8 +513,8 @@ async function connectModule(file, out) {
     // @ts-ignore
     server.startAsyncAction();
     // @ts-ignore
-    var modules = infer.cx().parent.mod.modules;
-    var cx = infer.cx();
+    const modules = infer.cx().parent.mod.modules;
+    const cx = infer.cx();
     _debug('Starting... ' + file.name);
     await processIfLibrary(file, modules);
     await processIfComponent(file, modules);
@@ -401,9 +523,9 @@ async function connectModule(file, out) {
         // @ts-ignore
         infer.withContext(server.cx, function() {
             _debug('Process helper exports ' + file.name);
-            var outObj;
+            let outObj;
             if (!out.getType()) {
-                var type = baseName(file.name).replace(/.js$/, '');
+                const type = baseName(file.name).replace(/.js$/, '');
                 outObj = new infer.Obj(true);
                 outObj.origin = file.name;
                 outObj.originNode = file.ast;
@@ -418,10 +540,10 @@ async function connectModule(file, out) {
                     {
                         ObjectExpression: function(node, state) {
                             // @ts-ignore
-                            var parent = infer.parentNode(node, file.ast);
+                            const parent = infer.parentNode(node, file.ast);
                             // @ts-ignore
-                            var grand = infer.parentNode(parent, file.ast);
-                            if (grand.type == 'Program') {
+                            const grand = infer.parentNode(parent, file.ast);
+                            if (grand.type === 'Program') {
                                 // add some jsdoc
                                 if (node.objType) {
                                     node.objType.doc =
@@ -432,9 +554,11 @@ async function connectModule(file, out) {
                                 //    });
                                 // -- would have worked, but didnt'
                                 // delete all types, and re-add...
-                                var target = outObj.defProp(baseName(file.name).replace(/.js$/, ''));
-                                var types = target.types;
-                                while (types.length) types.pop();
+                                const target = outObj.defProp(baseName(file.name).replace(/.js$/, ''));
+                                const types = target.types;
+                                while (types.length) {
+                                    types.pop();
+                                }
                                 //note: propogate calls addType on the target
                                 // todo: this could be made more efficient with a custom propogation strategy
                                 // similar to ForAllProps_Purgeable
@@ -446,6 +570,7 @@ async function connectModule(file, out) {
                                     }
                                 }
                                 //outObj.defProp(baseName(file.name).replace(/.js$/, ''))
+                                // eslint-disable-next-line no-throw-literal
                                 throw 'stop';
                             }
                         },
@@ -461,21 +586,21 @@ async function connectModule(file, out) {
             }
         });
         // We should also make sure that the controller is all up to date too...
-        var controller = getController(file.name);
+        const controller = getController(file.name);
         try {
-            var text = await readFile(controller);
+            const text = await readFile(controller);
             // @ts-ignore
-            var sfile = server.findFile(controller);
+            const sfile = server.findFile(controller);
             if (!sfile || sfile.text !== text) {
                 // @ts-ignore
                 server.addFile(controller, text);
             }
         } catch (ignore) {}
-        var renderer = getRenderer(file.name);
+        const renderer = getRenderer(file.name);
         try {
-            var text = await readFile(renderer);
+            const text = await readFile(renderer);
             // @ts-ignore
-            var sfile = server.findFile(renderer);
+            const sfile = server.findFile(renderer);
             if (!sfile || sfile.text !== text) {
                 // @ts-ignore
                 server.addFile(renderer, text);
@@ -489,25 +614,22 @@ async function connectModule(file, out) {
         walk.simple(file.ast, {
             ObjectExpression: function(node, state) {
                 // @ts-ignore
-                var parent = infer.parentNode(node, file.ast);
+                const parent = infer.parentNode(node, file.ast);
                 // @ts-ignore
-                var grand = infer.parentNode(parent, file.ast);
-                if (grand.type == 'Program') {
-                    for (var i = 0; i < node.properties.length; ++i) {
-                        var prop = node.properties[i],
-                            // @ts-ignore
-                            name = infer.propName(prop);
-                        if (node.properties[i].value.type == 'FunctionExpression') {
-                            var val = node.properties[i].value;
-                            var fn = val && val.scope && val.scope.fnType;
+                const grand = infer.parentNode(parent, file.ast);
+                if (grand.type === 'Program') {
+                    for (let i = 0; i < node.properties.length; ++i) {
+                        if (node.properties[i].value.type === 'FunctionExpression') {
+                            const val = node.properties[i].value;
+                            const fn = val && val.scope && val.scope.fnType;
                             if (!fn || !fn.name) {
                                 continue;
                             }
 
                             if (/Renderer.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
-                                var hlp = fn.args[1];
+                                const cmp = fn.args[0];
+                                const hlp = fn.args[1];
                                 if (cmp) {
                                     findAndBindComponent(cmp, server, cx, infer);
                                 }
@@ -516,15 +638,15 @@ async function connectModule(file, out) {
                                 }
                             } else if (/Helper.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
+                                const cmp = fn.args[0];
                                 if (cmp) {
                                     findAndBindComponent(cmp, server, cx, infer);
                                 }
                             } else if (/Controller.js$/.test(file.name)) {
                                 //step 2, assign exported type to params
-                                var cmp = fn.args[0];
-                                var evt = fn.args[1];
-                                var hlp = fn.args[2];
+                                const cmp = fn.args[0];
+                                const evt = fn.args[1];
+                                const hlp = fn.args[2];
                                 if (evt) {
                                     findAndBindEvent(evt, server, cx, infer);
                                 }
@@ -547,132 +669,6 @@ async function connectModule(file, out) {
     server.finishAsyncAction();
 }
 
-function findAndBindEvent(type, server, cx, infer) {
-    // this is slightly hacky, but have no idea how to get the event Otherwise
-    var evs = cx.props['Event'];
-    if (!evs) return;
-    for (var z = 0; z < evs.length; z++) {
-        var y = evs[z];
-        if (y.name === 'Aura.Event') {
-            var obj = y.props['Event'].types[0].props['prototype'].getObjType();
-            var int = infer.getInstance(obj);
-            int.propagate(type);
-        }
-    }
-}
-
-function findAndBindComponent(type, server, cx, infer) {
-    var evs = cx.props['Component'];
-    if (!evs) return;
-    for (var z = 0; z < evs.length; z++) {
-        var y = evs[z];
-        if (y.name === 'Aura.Component') {
-            var obj = y.props['Component'].types[0].props['prototype'].getObjType();
-            var int = infer.getInstance(obj);
-            int.propagate(type);
-        }
-    }
-}
-
-function findAndBindHelper(type, server, modules, file) {
-    var helperFile = getHelper(file.name);
-
-    var bn = trimExt(baseName(helperFile));
-    var r = server.findFile(helperFile);
-    if (!r) server.addFile(helperFile);
-    var helper = modules.resolveModule(helperFile);
-    //  console.log("Resolved module" + helperFile);
-    //  console.dir(helper);
-    var hp = helper.getProp(bn);
-    if (!hp.getType()) {
-        // this handles new props added to the helper...
-        helper.on('addType', function(helperType, val) {
-            var p = new ForAllProps_Purgeable(function(prop, val, local) {
-                if (bn === prop) {
-                    val.propagate(type);
-                }
-            });
-            p.addSource(type);
-            helperType.propagate(p);
-        });
-    } else {
-        // now we need to handle there were changes to the .cmp,
-        // but not the helper,
-        var p = new ForAllProps_Purgeable(function(prop, val, local) {
-            if (bn === prop) {
-                val.propagate(type);
-            }
-        });
-        p.addSource(type);
-        helper.propagate(p);
-    }
-}
-
-function getController(name) {
-    return getName(name, 'Controller.js');
-}
-
-function getHelper(name) {
-    return getName(name, 'Helper.js');
-}
-
-function getRenderer(name) {
-    return getName(name, 'Renderer.js');
-}
-
-function getTest(name) {
-    return getName(name, 'Test.js');
-}
-
-function getName(name, type) {
-    var newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
-    return newname;
-}
-
-function resolver(file, parent) {
-    return file;
-}
-
-function unloadDefs() {
-    // @ts-ignore
-    server.deleteDefs('Aura');
-}
-
-function isBlocklisted(filename) {
-    var ret = filename.endsWith('/scrollerLib/bootstrap.js');
-    ret = ret || filename.endsWith('ExportSymbolsHelper.js');
-    return ret;
-}
-
-function readFileAsync(filename, c) {
-    readFile(filename).then(function(contents) {
-        c(null, contents);
-    });
-}
-
-function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
-
-function loadDefs() {
-    var defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
-    defs = JSON.parse(defs);
-    // @ts-ignore
-    server.addDefs(defs);
-}
-
-function safeFunction(fn) {
-    return function() {
-        try {
-            fn.apply(this, arguments);
-        } catch (e) {
-            // @ts-ignore
-            if (e instanceof infer.TimedOut) throw e;
-            console.error(e);
-        }
-    };
-}
-
 tern.registerPlugin('aura', function(s, options) {
     server = s;
     // @ts-ignore
@@ -690,7 +686,7 @@ tern.registerPlugin('aura', function(s, options) {
     server.mod.modules.on('getExports', connectModule);
     // @ts-ignore
     server.mod.modules.resolvers.push(resolver);
-    var currentQuery;
+    let currentQuery;
     // @ts-ignore
     server.on('completion', function(file, query) {
         // don't hijack the request to retrieve the standard completions
@@ -699,7 +695,7 @@ tern.registerPlugin('aura', function(s, options) {
         }
         currentQuery = query;
         // request the standard completions
-        var filteredResult;
+        let filteredResult;
         query.docFormat = 'full';
         // @ts-ignore
         server.request(
@@ -712,7 +708,7 @@ tern.registerPlugin('aura', function(s, options) {
                 }
                 if (shouldFilter) {
                     result.completions = result.completions.filter(function(completion, index, array) {
-                        var accepted =
+                        const accepted =
                             (completion.doc && completion.doc.indexOf('@platform') !== -1 && completion.origin === 'Aura') || completion.origin !== 'Aura';
                         if (accepted && completion.doc) {
                             completion.doc = completion.doc.split('\n@')[0];
@@ -752,13 +748,13 @@ tern.defineQueryType('ideInit', {
 // @ts-ignore
 tern.defineQueryType('cleanup-file', {
     run: function(server, query) {
-        var files = query.files;
+        const files = query.files;
         files.forEach(function(f) {
-            var ff = f;
+            let ff = f;
             if (ff.startsWith('/')) {
                 ff = ff.slice(1);
             }
-            var m = server.mod.modules.modules[ff];
+            const m = server.mod.modules.modules[ff];
             if (m) {
                 m.purge(function(type) {
                     if (type instanceof ForAllProps_Purgeable) {
@@ -781,17 +777,21 @@ tern.defineQueryType('guess-types', {
     takesFile: true,
     run: function(server, query, file) {
         // @ts-ignore
-        if (!query.end) throw ternError('missing .query.end field');
+        if (!query.end) {
+            throw ternError('missing .query.end field');
+        }
         // @ts-ignore
-        if (!query.property) throw ternError('missing .query.property field');
+        if (!query.property) {
+            throw ternError('missing .query.property field');
+        }
         // @ts-ignore
-        var start = tern.resolvePos(file, query.end);
-        var types = [];
+        const start = tern.resolvePos(file, query.end);
+        const types = [];
 
         function gather(prop, obj, depth) {
-            var val = obj.props[prop];
+            const val = obj.props[prop];
             // @ts-ignore
-            var type = infer.toString(val.getType());
+            const type = infer.toString(val.getType());
             types.push({
                 property: prop,
                 type: type,

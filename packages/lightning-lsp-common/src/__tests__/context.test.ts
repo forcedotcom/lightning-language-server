@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
-import * as utils from '../utils';
 import {
     CORE_ALL_ROOT,
     CORE_PROJECT_ROOT,
@@ -205,6 +204,48 @@ it('configureSfdxProject()', async () => {
     expect(apexContents).not.toContain('declare type');
 });
 
+function verifyJsconfigCore(jsconfigPath: string) {
+    const jsconfigContent = fs.readFileSync(jsconfigPath, 'utf8');
+    expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
+    const jsconfig = JSON.parse(jsconfigContent);
+    expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
+    expect(jsconfig.include[0]).toBe('**/*');
+    expect(jsconfig.include[1]).toBe('../../.vscode/typings/lwc/**/*.d.ts');
+    expect(jsconfig.typeAcquisition).toEqual({ include: ['jest'] });
+    fs.removeSync(jsconfigPath);
+}
+
+function verifyTypingsCore() {
+    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
+    expect(typingsPath + '/engine.d.ts').toExist();
+    expect(typingsPath + '/lds.d.ts').toExist();
+    fs.removeSync(typingsPath);
+}
+
+function verifyCoreSettings(settings: any) {
+    expect(settings['files.watcherExclude']).toBeDefined();
+    expect(settings['eslint.nodePath']).toBeDefined();
+    expect(settings['perforce.client']).toBe('username-localhost-blt');
+    expect(settings['perforce.user']).toBe('username');
+    expect(settings['perforce.port']).toBe('ssl:host:port');
+}
+
+/*
+function verifyCodeWorkspace(path: string) {
+    const content = fs.readFileSync(path, 'utf8');
+    const workspace = JSON.parse(content);
+    const folders = workspace.folders;
+    expect(folders.length).toBe(1);
+    const folderPath = folders[0].path;
+    expect(folderPath).toBeAbsolutePath();
+    expect(folderPath).toEndWith(utils.unixify(CORE_ALL_ROOT));
+    const settings = workspace.settings;
+    expect(settings['java.home']).toBe('path_to_java_home');
+    expect(settings['extensions.ignoreRecommendations']).toBeTruthy();
+    verifyCoreSettings(settings);
+}
+*/
+
 it('configureCoreProject()', async () => {
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
     const jsconfigPath = CORE_PROJECT_ROOT + '/modules/jsconfig.json';
@@ -278,43 +319,3 @@ it('configureCoreAll()', async () => {
     // const launchContent = fs.readFileSync(launchPath, 'utf8');
     // expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
-
-function verifyJsconfigCore(jsconfigPath: string) {
-    const jsconfigContent = fs.readFileSync(jsconfigPath, 'utf8');
-    expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
-    const jsconfig = JSON.parse(jsconfigContent);
-    expect(jsconfig.compilerOptions.experimentalDecorators).toBe(true);
-    expect(jsconfig.include[0]).toBe('**/*');
-    expect(jsconfig.include[1]).toBe('../../.vscode/typings/lwc/**/*.d.ts');
-    expect(jsconfig.typeAcquisition).toEqual({ include: ['jest'] });
-    fs.removeSync(jsconfigPath);
-}
-
-function verifyTypingsCore() {
-    const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
-    expect(typingsPath + '/engine.d.ts').toExist();
-    expect(typingsPath + '/lds.d.ts').toExist();
-    fs.removeSync(typingsPath);
-}
-
-function verifyCodeWorkspace(path: string) {
-    const content = fs.readFileSync(path, 'utf8');
-    const workspace = JSON.parse(content);
-    const folders = workspace.folders;
-    expect(folders.length).toBe(1);
-    const folderPath = folders[0].path;
-    expect(folderPath).toBeAbsolutePath();
-    expect(folderPath).toEndWith(utils.unixify(CORE_ALL_ROOT));
-    const settings = workspace.settings;
-    expect(settings['java.home']).toBe('path_to_java_home');
-    expect(settings['extensions.ignoreRecommendations']).toBeTruthy();
-    verifyCoreSettings(settings);
-}
-
-function verifyCoreSettings(settings: any) {
-    expect(settings['files.watcherExclude']).toBeDefined();
-    expect(settings['eslint.nodePath']).toBeDefined();
-    expect(settings['perforce.client']).toBe('username-localhost-blt');
-    expect(settings['perforce.user']).toBe('username');
-    expect(settings['perforce.port']).toBe('ssl:host:port');
-}

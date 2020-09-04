@@ -34,8 +34,8 @@ import templateLinter from './template/linter';
 import Tag from './tag';
 import { URI } from 'vscode-uri';
 
-export const propertyRegex: RegExp = new RegExp(/\{(?<property>\w+)\.*.*\}/);
-export const iteratorRegex: RegExp = new RegExp(/iterator:(?<name>\w+)/);
+export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
+export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
 export enum Token {
     Tag = 'tag',
@@ -52,6 +52,18 @@ type CursorInfo = {
     tag?: string;
     range?: any;
 };
+
+export function findDynamicContent(text: string, offset: number) {
+    const regex = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
+    let match = regex.exec(text);
+    while (match && offset > match.index) {
+        if (match.groups && match.groups.property && offset > match.index && regex.lastIndex > offset) {
+            return match.groups.property;
+        }
+        match = regex.exec(text);
+    }
+    return null;
+}
 
 export default class Server {
     readonly connection: IConnection = createConnection();
@@ -184,7 +196,9 @@ export default class Server {
             this.connection.sendDiagnostics({ uri, diagnostics });
             if (metadata) {
                 const tag: Tag = this.componentIndexer.findTagByURI(uri);
-                if (tag) tag.updateMetadata(metadata);
+                if (tag) {
+                    tag.updateMetadata(metadata);
+                }
             }
         }
     }
@@ -215,7 +229,9 @@ export default class Server {
     onDefinition(params: TextDocumentPositionParams): Location[] {
         const cursorInfo: CursorInfo = this.cursorInfo(params);
 
-        if (!cursorInfo) return null;
+        if (!cursorInfo) {
+            return null;
+        }
 
         const tag = this.componentIndexer.findTagByName(cursorInfo.tag);
 
@@ -225,7 +241,9 @@ export default class Server {
 
             case Token.AttributeKey:
                 const attr = tag?.attribute(cursorInfo.name);
-                if (attr) return [attr.location];
+                if (attr) {
+                    return [attr.location];
+                }
 
             case Token.DynamicContent:
             case Token.DynamicAttributeValue:
@@ -235,7 +253,9 @@ export default class Server {
                 } else {
                     const component: Tag = this.componentIndexer.findTagByURI(uri);
                     const location = component?.classMemberLocation(cursorInfo.name);
-                    if (location) return [location];
+                    if (location) {
+                        return [location];
+                    }
                 }
         }
         return [];
@@ -333,16 +353,4 @@ export default class Server {
         interceptConsoleLogger(this.connection);
         this.connection.listen();
     }
-}
-
-export function findDynamicContent(text: string, offset: number) {
-    const regex: RegExp = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
-    let match = regex.exec(text);
-    while (match && offset > match.index) {
-        if (match.groups && match.groups.property && offset > match.index && regex.lastIndex > offset) {
-            return match.groups.property;
-        }
-        match = regex.exec(text);
-    }
-    return null;
 }

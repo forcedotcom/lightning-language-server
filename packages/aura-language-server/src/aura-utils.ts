@@ -2,8 +2,8 @@ import { TextDocument } from 'vscode-languageserver';
 import { utils } from '@salesforce/lightning-lsp-common';
 import { join } from 'path';
 
-const AURA_STANDARD: string = 'aura-standard.json';
-const AURA_SYSTEM: string = 'aura-system.json';
+const AURA_STANDARD = 'aura-standard.json';
+const AURA_SYSTEM = 'aura-system.json';
 const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 const RESOURCES_DIR = 'resources';
