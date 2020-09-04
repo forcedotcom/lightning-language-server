@@ -14,34 +14,25 @@ import {
     Location,
     ShowMessageNotification,
     MessageType,
-    TextDocumentChangeEvent,
     CompletionParams,
-    Position,
-    Range,
-    ReferenceParams,
-    SignatureHelp,
-    SignatureInformation,
-    ParameterInformation,
     FileChangeType,
     NotificationType,
     Definition,
 } from 'vscode-languageserver';
 
-import * as auraUtils from './aura-utils';
 import URI from 'vscode-uri';
-import { getLanguageService, LanguageService } from '@salesforce/lightning-lsp-common';
+import { getLanguageService, LanguageService, WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
-import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 
-interface ITagParams {
+interface TagParams {
     taginfo: TagInfo;
 }
 
-const tagAdded: NotificationType<ITagParams, void> = new NotificationType<ITagParams, void>('salesforce/tagAdded');
+const tagAdded: NotificationType<TagParams, void> = new NotificationType<TagParams, void>('salesforce/tagAdded');
 const tagDeleted: NotificationType<string, void> = new NotificationType<string, void>('salesforce/tagDeleted');
 const tagsCleared: NotificationType<void, void> = new NotificationType<void, void>('salesforce/tagsCleared');
 
@@ -258,19 +249,16 @@ connection.onDidChangeWatchedFiles(async (change: DidChangeWatchedFilesParams) =
             console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
             return;
         } else {
-            let files = 0;
             for (const event of changes) {
                 if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(context, event.uri)) {
                     const dir = toResolvedPath(event.uri);
                     const indexer = context.getIndexingProvider('aura') as AuraIndexer;
                     indexer.clearTagsforDirectory(dir, context.type === WorkspaceType.SFDX);
-                    files++;
                 } else {
                     const file = toResolvedPath(event.uri);
                     if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
                         const indexer = context.getIndexingProvider('aura') as AuraIndexer;
                         await indexer.indexFile(file, context.type === WorkspaceType.SFDX);
-                        files++;
                     }
                 }
             }

@@ -13,27 +13,68 @@ export const glob = promisify(Glob);
 
 const RESOURCES_DIR = 'resources';
 
-/**
- * @return true if changes include a directory delete
- */
-export function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
-    for (const event of changes) {
-        if (event.type === FileChangeType.Deleted && isLWCWatchedDirectory(context, event.uri)) {
-            return true;
-        }
-    }
-    return false;
-}
-export function includesDeletedAuraWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): boolean {
-    for (const event of changes) {
-        if (event.type === FileChangeType.Deleted && isAuraWatchedDirectory(context, event.uri)) {
+async function fileContainsLine(file: string, expectLine: string): Promise<boolean> {
+    const trimmed = expectLine.trim();
+    for (const line of (await fs.readFile(file, 'utf8')).split('\n')) {
+        if (line.trim() === trimmed) {
             return true;
         }
     }
     return false;
 }
 
-export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]) {
+export function toResolvedPath(uri: string): string {
+    return resolve(URI.parse(uri).fsPath);
+}
+
+function isLWCRootDirectory(context: WorkspaceContext, uri: string): boolean {
+    if (context.type === WorkspaceType.SFDX) {
+        const file = toResolvedPath(uri);
+        return file.endsWith('lwc');
+    }
+    return false;
+}
+
+function isAuraDirectory(context: WorkspaceContext, uri: string): boolean {
+    if (context.type === WorkspaceType.SFDX) {
+        const file = toResolvedPath(uri);
+        return file.endsWith('aura');
+    }
+    return false;
+}
+
+export async function isLWCWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
+    const file = toResolvedPath(uri);
+    return await context.isFileInsideModulesRoots(file);
+}
+
+export async function isAuraWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
+    const file = toResolvedPath(uri);
+    return await context.isFileInsideAuraRoots(file);
+}
+
+/**
+ * @return true if changes include a directory delete
+ */
+// TODO This is not waiting for the response of the promise isLWCWatchedDirectory, maybe we have the same problem on includesDeletedAuraWatchedDirectory
+export async function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && (await isLWCWatchedDirectory(context, event.uri))) {
+            return true;
+        }
+    }
+    return false;
+}
+export async function includesDeletedAuraWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+    for (const event of changes) {
+        if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && (await isAuraWatchedDirectory(context, event.uri))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
         if (event.type === FileChangeType.Created && isLWCRootDirectory(context, event.uri)) {
             return true;
@@ -42,7 +83,7 @@ export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: Fi
     return false;
 }
 
-export function isAuraRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]) {
+export function isAuraRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
         if (event.type === FileChangeType.Created && isAuraDirectory(context, event.uri)) {
             return true;
@@ -51,49 +92,19 @@ export function isAuraRootDirectoryCreated(context: WorkspaceContext, changes: F
     return false;
 }
 
-function isLWCRootDirectory(context: WorkspaceContext, uri: string) {
-    if (context.type === WorkspaceType.SFDX) {
-        const file = toResolvedPath(uri);
-        return file.endsWith('lwc');
-    }
-    return false;
-}
-
-function isAuraDirectory(context: WorkspaceContext, uri: string) {
-    if (context.type === WorkspaceType.SFDX) {
-        const file = toResolvedPath(uri);
-        return file.endsWith('aura');
-    }
-    return false;
-}
-
-export function isLWCWatchedDirectory(context: WorkspaceContext, uri: string) {
-    const file = toResolvedPath(uri);
-    return file.indexOf('.') === -1 && context.isFileInsideModulesRoots(file);
-}
-
-export function isAuraWatchedDirectory(context: WorkspaceContext, uri: string) {
-    const file = toResolvedPath(uri);
-    return file.indexOf('.') === -1 && context.isFileInsideAuraRoots(file);
+export function unixify(filePath: string): string {
+    return filePath.replace(/\\/g, '/');
 }
 
 export function relativePath(from: string, to: string): string {
     return unixify(relative(from, to));
 }
 
-export function unixify(filePath: string): string {
-    return filePath.replace(/\\/g, '/');
-}
-
-export function pathStartsWith(path: string, root: string) {
+export function pathStartsWith(path: string, root: string): boolean {
     if (process.platform === 'win32') {
         return path.toLowerCase().startsWith(root.toLowerCase());
     }
     return path.startsWith(root);
-}
-
-export function toResolvedPath(uri: string): string {
-    return resolve(URI.parse(uri).fsPath);
 }
 
 export function getExtension(textDocument: TextDocument): string {
@@ -101,15 +112,15 @@ export function getExtension(textDocument: TextDocument): string {
     return filePath ? extname(filePath) : '';
 }
 
-export function getResourcePath(resourceName: string) {
+export function getResourcePath(resourceName: string): string {
     return join(__dirname, RESOURCES_DIR, resourceName);
 }
 
-export function getSfdxResource(resourceName: string) {
+export function getSfdxResource(resourceName: string): string {
     return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
 }
 
-export function getCoreResource(resourceName: string) {
+export function getCoreResource(resourceName: string): string {
     return join(__dirname, RESOURCES_DIR, 'core', resourceName);
 }
 
@@ -119,16 +130,6 @@ export async function appendLineIfMissing(file: string, line: string): Promise<v
     } else if (!(await fileContainsLine(file, line))) {
         return fs.appendFile(file, '\n' + line + '\n');
     }
-}
-
-async function fileContainsLine(file: string, expectLine: string): Promise<boolean> {
-    const trimmed = expectLine.trim();
-    for (const line of (await fs.readFile(file, 'utf8')).split('\n')) {
-        if (line.trim() === trimmed) {
-            return true;
-        }
-    }
-    return false;
 }
 
 /**
@@ -160,7 +161,7 @@ export function deepMerge(to: object, from: object): boolean {
                 toVal.push(fromVal);
                 modified = true;
             }
-        } else if (fromVal != null && typeof fromVal === 'object') {
+        } else if (fromVal !== null && typeof fromVal === 'object') {
             // merge object values
             if (deepMerge(toVal, fromVal)) {
                 modified = true;

@@ -7,7 +7,7 @@ type DataProviderAttributes = {
 
 export class AuraDataProvider implements IHTMLDataProvider {
     indexer?: ComponentIndexer;
-    activated: boolean = false;
+    activated = false;
 
     constructor(attributes?: DataProviderAttributes) {
         this.indexer = attributes.indexer;

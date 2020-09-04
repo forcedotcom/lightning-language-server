@@ -8,7 +8,7 @@ type DataProviderAttributes = {
 };
 
 export class LWCDataProvider implements IHTMLDataProvider {
-    activated: boolean = false;
+    activated = false;
     indexer?: ComponentIndexer;
     private readonly _standardTags: ITagData[];
     private readonly _globalAttributes: IAttributeData[];

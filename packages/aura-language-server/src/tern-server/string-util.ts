@@ -15,8 +15,8 @@ function isAlphaNumberic(code: number) {
 }
 
 export function findWord(str: string, offset: number) {
-    let start: number = -1;
-    let end: number = -1;
+    let start = -1;
+    let end = -1;
 
     let pos: number = offset;
     let c: number;
@@ -57,7 +57,7 @@ export function findWord(str: string, offset: number) {
     }
 }
 export function countPreviousCommas(str: string, offset: number) {
-    let commas: number = 0;
+    let commas = 0;
     let pos: number = offset;
     let c: number;
     while (pos >= 0) {
@@ -74,7 +74,7 @@ export function countPreviousCommas(str: string, offset: number) {
     return commas;
 }
 export function findPreviousLeftParan(str: string, offset: number) {
-    let start: number = -1;
+    let start = -1;
     let pos: number = offset;
     let c: number;
     while (pos >= 0) {
@@ -92,11 +92,11 @@ export function findPreviousLeftParan(str: string, offset: number) {
 }
 
 export function findPreviousWord(str: string, offset: number) {
-    let start: number = -1;
-    let end: number = -1;
+    let start = -1;
+    let end = -1;
 
-    let seenWordBoundary: boolean = false;
-    let boundaryOffset: number = 0;
+    let seenWordBoundary = false;
+    let boundaryOffset = 0;
 
     let pos: number = offset;
     let c: number;

@@ -96,7 +96,8 @@ export class TagInfo {
         return '';
     }
 
-    static createFromJSON(json: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static createFromJSON(json: any): TagInfo {
         return new TagInfo(
             json.file,
             json.type,

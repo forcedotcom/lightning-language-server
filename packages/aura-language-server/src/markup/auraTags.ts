@@ -7,7 +7,6 @@ import {
     HtmlContentContext,
     HtmlAttributeValueContext,
 } from '@salesforce/lightning-lsp-common';
-import { Decorator } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 let indexer: AuraIndexer;
 

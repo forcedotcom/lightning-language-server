@@ -169,7 +169,7 @@ describe('Tag', () => {
         });
 
         describe('#description', () => {
-            it('return markdown of component\'s documentation', () => {
+            it("return markdown of component's documentation", () => {
                 const description = `Foo doc
 ### Attributes
 - **todo**

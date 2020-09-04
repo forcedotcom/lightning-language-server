@@ -12,24 +12,8 @@ const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
 
 const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
 
-export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
-    const source = document.getText();
-    const { warnings } = templateCompiler(source, {});
-
-    let warningsLwc: Diagnostic[] = warnings.map(warning => {
-        const { start = 0, length = 0 } = warning.location || { start: 0, length: 0 };
-
-        return {
-            range: toRange(document, start, length),
-            message: warning.message,
-            severity: LEVEL_MAPPING.get(warning.level),
-            source: DIAGNOSTIC_SOURCE,
-        };
-    });
-
-    const warningsTypos: Diagnostic[] = lintTypos(document);
-    warningsLwc = warningsLwc.concat(warningsTypos);
-    return warningsLwc;
+function toRange(textDocument: TextDocument, start: number, length: number): Range {
+    return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
 }
 
 function lintTypos(document: TextDocument): Diagnostic[] {
@@ -58,6 +42,22 @@ function lintTypos(document: TextDocument): Diagnostic[] {
     return errors;
 }
 
-function toRange(textDocument: TextDocument, start: number, length: number): Range {
-    return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
+export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
+    const source = document.getText();
+    const { warnings } = templateCompiler(source, {});
+
+    let warningsLwc: Diagnostic[] = warnings.map(warning => {
+        const { start = 0, length = 0 } = warning.location || { start: 0, length: 0 };
+
+        return {
+            range: toRange(document, start, length),
+            message: warning.message,
+            severity: LEVEL_MAPPING.get(warning.level),
+            source: DIAGNOSTIC_SOURCE,
+        };
+    });
+
+    const warningsTypos: Diagnostic[] = lintTypos(document);
+    warningsLwc = warningsLwc.concat(warningsTypos);
+    return warningsLwc;
 }
