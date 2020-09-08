@@ -1,12 +1,5 @@
 import AuraIndexer from '../aura-indexer/indexer';
-import {
-    TagInfo,
-    AttributeInfo,
-    IHTMLTagProvider,
-    ICompletionParticipant,
-    HtmlContentContext,
-    HtmlAttributeValueContext,
-} from '@salesforce/lightning-lsp-common';
+import { TagInfo, AttributeInfo, IHTMLTagProvider } from '@salesforce/lightning-lsp-common';
 
 let indexer: AuraIndexer;
 
@@ -25,17 +18,6 @@ function getAuraByTag(tag: string): TagInfo {
 
 export function setIndexer(idx: AuraIndexer) {
     indexer = idx;
-}
-
-export function getAuraCompletionParticipant(): ICompletionParticipant {
-    return {
-        onHtmlAttributeValue: (context: HtmlAttributeValueContext): void => {
-            return;
-        },
-        onHtmlContent: (context: HtmlContentContext): void => {
-            return;
-        },
-    };
 }
 
 export function getAuraTagProvider(): IHTMLTagProvider {
