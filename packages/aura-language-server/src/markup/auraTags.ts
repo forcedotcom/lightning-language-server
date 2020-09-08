@@ -16,18 +16,18 @@ function getAuraByTag(tag: string): TagInfo {
     return undefined;
 }
 
-export function setIndexer(idx: AuraIndexer) {
+export function setIndexer(idx: AuraIndexer): void {
     indexer = idx;
 }
 
 export function getAuraTagProvider(): IHTMLTagProvider {
-    function addTags(collector: (tag: string, label: string, info: TagInfo) => void) {
+    function addTags(collector: (tag: string, label: string, info: TagInfo) => void): void {
         for (const [tag, tagInfo] of getAuraTags()) {
             collector(tag, tagInfo.getHover(), tagInfo);
         }
     }
 
-    function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) {
+    function addAttributes(tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void {
         const cTag = getAuraByTag(tag);
         if (cTag) {
             for (const info of cTag.attributes) {
@@ -36,7 +36,7 @@ export function getAuraTagProvider(): IHTMLTagProvider {
         }
     }
 
-    function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void) {
+    function addExpressions(templateTag: string, collector: (attribute: string, info: AttributeInfo, type: string) => void): void {
         const cTag = getAuraByTag(templateTag);
         if (cTag) {
             cTag.attributes.forEach(attribute => {
@@ -49,17 +49,17 @@ export function getAuraTagProvider(): IHTMLTagProvider {
     }
 
     return {
-        getId: () => 'aura',
-        isApplicable: languageId => languageId === 'html',
-        collectTags: (collector: (tag: string, label: string, info: TagInfo) => void) => {
+        getId: (): string => 'aura',
+        isApplicable: (languageId): boolean => languageId === 'html',
+        collectTags: (collector: (tag: string, label: string, info: TagInfo) => void): void => {
             addTags(collector);
         },
-        collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void) => {
+        collectAttributes: (tag: string, collector: (attribute: string, info: AttributeInfo, type?: string) => void): void => {
             if (tag) {
                 addAttributes(tag, collector);
             }
         },
-        collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/) => {
+        collectValues: (/*tag: string, attribute: string, collector: (value: string) => void*/): void => {
             // TODO provide suggestions by consulting shapeService
         },
 
@@ -67,7 +67,7 @@ export function getAuraTagProvider(): IHTMLTagProvider {
         collectExpressionValues: (templateTag: string, collector: (value: string) => void): void => {
             addExpressions(templateTag, collector);
         },
-        getTagInfo: (tag: string) => getAuraByTag(tag),
-        getGlobalAttributes: () => [],
+        getTagInfo: (tag: string): TagInfo => getAuraByTag(tag),
+        getGlobalAttributes: (): [] => [],
     };
 }

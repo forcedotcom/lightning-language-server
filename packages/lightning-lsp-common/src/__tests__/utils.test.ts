@@ -9,10 +9,10 @@ import mockFs from 'mock-fs';
 
 jest.mock('../context');
 const real = jest.requireActual('../context');
-real.WorkspaceContext.prototype.isFileInsideModulesRoots = () => {
+real.WorkspaceContext.prototype.isFileInsideModulesRoots = (): boolean => {
     return true;
 };
-real.WorkspaceContext.prototype.isLWC = () => {
+real.WorkspaceContext.prototype.isLWC = (): boolean => {
     return true;
 };
 const realWS = new real.WorkspaceContext('');

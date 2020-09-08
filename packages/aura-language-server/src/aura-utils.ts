@@ -13,10 +13,10 @@ export function isAuraMarkup(textDocument: TextDocument): boolean {
     return AURA_EXTENSIONS.includes(fileExt);
 }
 
-export function getAuraStandardResourcePath() {
+export function getAuraStandardResourcePath(): string {
     return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
 }
 
-export function getAuraSystemResourcePath() {
+export function getAuraSystemResourcePath(): string {
     return join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
 }

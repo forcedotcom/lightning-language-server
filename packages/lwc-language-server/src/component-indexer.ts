@@ -27,7 +27,7 @@ export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
     return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
 }
 
-export function unIndexedFiles(entries: Entry[], tags: Tag[]) {
+export function unIndexedFiles(entries: Entry[], tags: Tag[]): Entry[] {
     return entries.filter(entry => !tags.some(tag => tagEqualsFile(tag, entry)));
 }
 
@@ -93,7 +93,7 @@ export default class ComponentIndexer extends BaseIndexer {
         return Array.from(this.tags.values()).find(tag => tag.uri === uriText) || null;
     }
 
-    loadTagsFromIndex() {
+    loadTagsFromIndex(): void {
         try {
             const indexPath: string = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
             const shouldInit: boolean = fsExtra.existsSync(indexPath);
@@ -111,7 +111,7 @@ export default class ComponentIndexer extends BaseIndexer {
         }
     }
 
-    persistCustomComponents() {
+    persistCustomComponents(): void {
         const indexPath = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
         ensureDirectoryExists(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
         const indexJsonString = JSON.stringify(this.customData);
@@ -128,7 +128,7 @@ export default class ComponentIndexer extends BaseIndexer {
         });
     }
 
-    async init() {
+    async init(): Promise<void> {
         this.loadTagsFromIndex();
         const promises = this.unIndexedFiles.map(entry => Tag.fromFile(entry.path, entry.stats.mtime));
         const tags = await Promise.all(promises);
@@ -140,7 +140,7 @@ export default class ComponentIndexer extends BaseIndexer {
         this.persistCustomComponents();
     }
 
-    async reindex() {
+    async reindex(): Promise<void> {
         const promises = this.componentEntries.map(entry => Tag.fromFile(entry.path));
         const tags = await Promise.all(promises);
         this.tags.clear();

@@ -204,7 +204,7 @@ it('configureSfdxProject()', async () => {
     expect(apexContents).not.toContain('declare type');
 });
 
-function verifyJsconfigCore(jsconfigPath: string) {
+function verifyJsconfigCore(jsconfigPath: string): void {
     const jsconfigContent = fs.readFileSync(jsconfigPath, 'utf8');
     expect(jsconfigContent).toContain('    "compilerOptions": {'); // check formatting
     const jsconfig = JSON.parse(jsconfigContent);
@@ -215,14 +215,14 @@ function verifyJsconfigCore(jsconfigPath: string) {
     fs.removeSync(jsconfigPath);
 }
 
-function verifyTypingsCore() {
+function verifyTypingsCore(): void {
     const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
     expect(typingsPath + '/engine.d.ts').toExist();
     expect(typingsPath + '/lds.d.ts').toExist();
     fs.removeSync(typingsPath);
 }
 
-function verifyCoreSettings(settings: any) {
+function verifyCoreSettings(settings: any): void {
     expect(settings['files.watcherExclude']).toBeDefined();
     expect(settings['eslint.nodePath']).toBeDefined();
     expect(settings['perforce.client']).toBe('username-localhost-blt');

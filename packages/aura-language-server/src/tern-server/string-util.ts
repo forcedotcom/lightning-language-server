@@ -1,4 +1,4 @@
-function isAlphaNumberic(code: number) {
+function isAlphaNumberic(code: number): boolean {
     if (code > 47 && code < 58) {
         // numeric
         return true;
@@ -14,7 +14,7 @@ function isAlphaNumberic(code: number) {
     return false;
 }
 
-export function findWord(str: string, offset: number) {
+export function findWord(str: string, offset: number): { start: number; end: number } {
     let start = -1;
     let end = -1;
 
@@ -56,7 +56,7 @@ export function findWord(str: string, offset: number) {
         };
     }
 }
-export function countPreviousCommas(str: string, offset: number) {
+export function countPreviousCommas(str: string, offset: number): number {
     let commas = 0;
     let pos: number = offset;
     let c: number;
@@ -73,7 +73,7 @@ export function countPreviousCommas(str: string, offset: number) {
     }
     return commas;
 }
-export function findPreviousLeftParan(str: string, offset: number) {
+export function findPreviousLeftParan(str: string, offset: number): number {
     let start = -1;
     let pos: number = offset;
     let c: number;
@@ -91,7 +91,7 @@ export function findPreviousLeftParan(str: string, offset: number) {
     return start;
 }
 
-export function findPreviousWord(str: string, offset: number) {
+export function findPreviousWord(str: string, offset: number): { start: number; end: number } {
     let start = -1;
     let end = -1;
 

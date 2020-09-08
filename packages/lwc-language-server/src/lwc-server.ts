@@ -53,7 +53,7 @@ type CursorInfo = {
     range?: any;
 };
 
-export function findDynamicContent(text: string, offset: number) {
+export function findDynamicContent(text: string, offset: number): any {
     const regex = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
     let match = regex.exec(text);
     while (match && offset > match.index) {
@@ -203,7 +203,7 @@ export default class Server {
         }
     }
 
-    async onDidSave(change: TextDocumentChangeEvent) {
+    async onDidSave(change: TextDocumentChangeEvent): Promise<void> {
         const { document } = change;
         const { uri } = document;
         if (await this.context.isLWCJavascript(document)) {
@@ -218,11 +218,11 @@ export default class Server {
         }
     }
 
-    onShutdown() {
+    onShutdown(): void {
         this.componentIndexer.persistCustomComponents();
     }
 
-    onExit() {
+    onExit(): void {
         this.componentIndexer.persistCustomComponents();
     }
 
@@ -349,7 +349,7 @@ export default class Server {
         return null;
     }
 
-    listen() {
+    listen(): void {
         interceptConsoleLogger(this.connection);
         this.connection.listen();
     }
