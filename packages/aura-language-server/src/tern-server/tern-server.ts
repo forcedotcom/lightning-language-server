@@ -71,7 +71,7 @@ const defaultConfig = {
     dependencyBudget: 20000,
 };
 
-function readJSON(fileName) {
+function readJSON(fileName): any {
     const file = fs.readFileSync(fileName, 'utf-8');
     try {
         return JSON.parse(file);
@@ -80,7 +80,7 @@ function readJSON(fileName) {
     }
 }
 
-function findDefs(libs) {
+function findDefs(libs): any[] {
     const ternlibpath = require.resolve('../tern/lib/tern');
     const ternbasedir = path.join(ternlibpath, '..', '..');
 
@@ -101,7 +101,7 @@ function findDefs(libs) {
     return defs;
 }
 
-async function loadLocal(plugin, rootPath) {
+async function loadLocal(plugin, rootPath): Promise<boolean> {
     let found;
     try {
         // local resolution only here
@@ -117,7 +117,7 @@ async function loadLocal(plugin, rootPath) {
     return true;
 }
 
-async function loadBuiltIn(plugin: string, rootPath: string) {
+async function loadBuiltIn(plugin: string, rootPath: string): Promise<boolean> {
     const ternlibpath = require.resolve('../tern/lib/tern');
     const ternbasedir = path.join(ternlibpath, '..', '..');
 
@@ -139,7 +139,7 @@ async function loadBuiltIn(plugin: string, rootPath: string) {
     return true;
 }
 
-async function loadPlugins(plugins, rootPath) {
+async function loadPlugins(plugins, rootPath): Promise<{}> {
     const options = {};
     for (const plugin of Object.keys(plugins)) {
         const val = plugins[plugin];
@@ -159,7 +159,7 @@ async function loadPlugins(plugins, rootPath) {
     return options;
 }
 
-function* walkSync(dir: string) {
+function* walkSync(dir: string): any {
     const files = readdirSync(dir);
 
     for (const file of files) {
@@ -173,7 +173,7 @@ function* walkSync(dir: string) {
     }
 }
 
-async function ternInit() {
+async function ternInit(): Promise<void> {
     await asyncTernRequest({
         query: {
             type: 'ideInit',
@@ -201,7 +201,7 @@ async function ternInit() {
 
 const init = memoize(ternInit);
 
-export async function startServer(rootPath: string, wsroot: string) {
+export async function startServer(rootPath: string, wsroot: string): tern.Server {
     const defs = findDefs(defaultLibs);
     const plugins = await loadPlugins(defaultPlugins, rootPath);
     const config: tern.ConstructorOptions = {
@@ -259,7 +259,7 @@ function uriToFile(uri: string): string {
     return URI.parse(uri).fsPath;
 }
 
-async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}) {
+async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> {
     return await asyncTernRequest({
         query: {
             type,
@@ -271,12 +271,12 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
     });
 }
 
-export const addFile = (event: TextDocumentChangeEvent) => {
+export const addFile = (event: TextDocumentChangeEvent): void => {
     const { document } = event;
     ternServer.addFile(uriToFile(document.uri), document.getText());
 };
 
-export const delFile = (close: TextDocumentChangeEvent) => {
+export const delFile = (close: TextDocumentChangeEvent): void => {
     const { document } = close;
     ternServer.delFile(uriToFile(document.uri));
 };

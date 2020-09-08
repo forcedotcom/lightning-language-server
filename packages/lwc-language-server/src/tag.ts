@@ -136,11 +136,11 @@ export default class Tag implements ITagData {
         return ['### Methods', ...this.apiMethods.map(methodDoc)].join('\n');
     }
 
-    get uri() {
+    get uri(): string {
         return URI.file(path.resolve(this.file)).toString();
     }
 
-    get allAttributes() {
+    get allAttributes(): { publicAttributes: AttributeInfo[]; privateAttributes: AttributeInfo[] } {
         if (this._allAttributes) {
             return this._allAttributes;
         }
@@ -156,7 +156,7 @@ export default class Tag implements ITagData {
         return this.allAttributes.privateAttributes;
     }
 
-    get properties() {
+    get properties(): ClassMember[] {
         if (this._properties) {
             return this._properties;
         }
@@ -164,7 +164,7 @@ export default class Tag implements ITagData {
         return this._properties;
     }
 
-    get methods() {
+    get methods(): ClassMember[] {
         if (this._methods) {
             return this._methods;
         }
@@ -172,7 +172,7 @@ export default class Tag implements ITagData {
         return this._methods;
     }
 
-    get apiMethods() {
+    get apiMethods(): ClassMember[] {
         return this.methods.filter(method => method.decorator === 'api');
     }
 
@@ -191,7 +191,7 @@ export default class Tag implements ITagData {
     get allLocations(): Location[] {
         const { dir, name } = path.parse(this.file);
 
-        const convertFileToLocation = (file: string) => {
+        const convertFileToLocation = (file: string): Location => {
             const uri = URI.file(path.resolve(file)).toString();
             const position = Position.create(0, 0);
             const range = Range.create(position, position);
@@ -205,7 +205,7 @@ export default class Tag implements ITagData {
         return locations;
     }
 
-    updateMetadata(meta: any) {
+    updateMetadata(meta: any): void {
         this.metadata = meta;
         this._allAttributes = null;
         this._methods = null;

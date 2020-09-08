@@ -9,7 +9,7 @@ import glob from 'glob';
 
 const checkedPackagePatterns: RegExp[] = [/^@salesforce/i, /^@lwc/i];
 
-function readJsonFile(jsonFilePath: string) {
+function readJsonFile(jsonFilePath: string): any {
     try {
         return JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     } catch (e) {

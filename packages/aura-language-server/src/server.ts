@@ -48,7 +48,7 @@ documents.listen(connection);
 let htmlLS: LanguageService;
 let context: WorkspaceContext;
 
-function startIndexing() {
+function startIndexing(): void {
     setTimeout(async () => {
         const indexer = context.getIndexingProvider('aura') as AuraIndexer;
         connection.sendNotification('salesforce/indexingStarted');
@@ -282,6 +282,7 @@ connection.onRequest('salesforce/listNamespaces', () => {
     return result;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 connection.onRequest((method: string, ...params: any[]) => {
     // debugger
     console.log(method);

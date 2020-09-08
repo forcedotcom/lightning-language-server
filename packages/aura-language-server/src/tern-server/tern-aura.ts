@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as infer from '../tern/lib/infer';
 import * as tern from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
@@ -38,7 +39,7 @@ const ForAllProps_Purgeable = infer.constraint({
     },
 });
 
-function getFilename(filename) {
+function getFilename(filename): string {
     // @ts-ignore
     if (server.options.projectDir.endsWith('/')) {
         // @ts-ignore
@@ -48,13 +49,13 @@ function getFilename(filename) {
     return server.options.projectDir + '/' + filename;
 }
 
-function isBlocklisted(filename) {
+function isBlocklisted(filename): any {
     let ret = filename.endsWith('/scrollerLib/bootstrap.js');
     ret = ret || filename.endsWith('ExportSymbolsHelper.js');
     return ret;
 }
 
-async function readFile(filename) {
+async function readFile(filename): Promise<string> {
     let normalized = filename;
     if (!normalized.startsWith('/')) {
         normalized = getFilename(normalized);
@@ -74,7 +75,7 @@ async function readFile(filename) {
     }
 }
 
-function baseName(path) {
+function baseName(path): any {
     const lastSlash = path.lastIndexOf('/');
     if (lastSlash === -1) {
         return path;
@@ -83,7 +84,7 @@ function baseName(path) {
     }
 }
 
-function trimExt(path) {
+function trimExt(path): any {
     const lastDot = path.lastIndexOf('.');
     if (lastDot === -1) {
         return path;
@@ -92,7 +93,7 @@ function trimExt(path) {
     }
 }
 
-function initScope(scope) {
+function initScope(scope): void {
     // @ts-ignore
     const module = new infer.Obj();
     module.propagate(scope.defProp('module'));
@@ -107,50 +108,50 @@ function initScope(scope) {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _debug(log) {
+function _debug(log): void {
     //console.log(log);
 }
 
-function getName(name, type) {
+function getName(name, type): string {
     const newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
     return newname;
 }
 
-function getController(name) {
+function getController(name): string {
     return getName(name, 'Controller.js');
 }
 
-function getHelper(name) {
+function getHelper(name): string {
     return getName(name, 'Helper.js');
 }
 
-function getRenderer(name) {
+function getRenderer(name): string {
     return getName(name, 'Renderer.js');
 }
 
-function resolver(file, parent) {
+function resolver(file, parent): any {
     return file;
 }
 
-function unloadDefs() {
+function unloadDefs(): void {
     // @ts-ignore
     server.deleteDefs('Aura');
 }
 
-function readFileAsync(filename, c) {
+function readFileAsync(filename, c): void {
     readFile(filename).then(function(contents) {
         c(null, contents);
     });
 }
 
-function loadDefs() {
+function loadDefs(): void {
     let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
     defs = JSON.parse(defs);
     // @ts-ignore
     server.addDefs(defs);
 }
 
-function findAndBindComponent(type, server, cx, infer) {
+function findAndBindComponent(type, server, cx, infer): void {
     const evs = cx.props['Component'];
     if (!evs) {
         return;
@@ -165,7 +166,7 @@ function findAndBindComponent(type, server, cx, infer) {
     }
 }
 
-function findAndBindHelper(type, server, modules, file) {
+function findAndBindHelper(type, server, modules, file): void {
     const helperFile = getHelper(file.name);
 
     const bn = trimExt(baseName(helperFile));
@@ -201,7 +202,7 @@ function findAndBindHelper(type, server, modules, file) {
     }
 }
 
-function findAndBindEvent(type, server, cx, infer) {
+function findAndBindEvent(type, server, cx, infer): void {
     // this is slightly hacky, but have no idea how to get the event Otherwise
     const evs = cx.props['Event'];
     if (!evs) {
@@ -217,13 +218,13 @@ function findAndBindEvent(type, server, cx, infer) {
     }
 }
 
-function ternError(msg) {
+function ternError(msg): Error {
     const err = new Error(msg);
     err.name = 'TernError';
     return err;
 }
 
-async function connectModule(file, out) {
+async function connectModule(file, out): Promise<void> {
     if (isBlocklisted(file.name)) {
         return;
     }
@@ -504,7 +505,7 @@ tern.defineQueryType('guess-types', {
         const start = tern.resolvePos(file, query.end);
         const types = [];
 
-        function gather(prop, obj, depth) {
+        function gather(prop, obj, depth): void {
             const val = obj.props[prop];
             // @ts-ignore
             const type = infer.toString(val.getType());

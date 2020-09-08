@@ -24,7 +24,7 @@ export default class AuraIndexer implements Indexer {
         this.context.addIndexingProvider({ name: 'aura', indexer: this });
     }
 
-    public async configureAndIndex() {
+    public async configureAndIndex(): Promise<any> {
         const indexingTasks: Promise<void>[] = [];
 
         indexingTasks.push(this.loadStandardComponents());
@@ -121,7 +121,7 @@ export default class AuraIndexer implements Indexer {
         return tagInfo;
     }
 
-    private async indexCustomComponents() {
+    private async indexCustomComponents(): Promise<void> {
         const startTime = process.hrtime();
         const markupfiles = await this.context.findAllAuraMarkup();
 

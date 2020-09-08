@@ -7,7 +7,6 @@ export function interceptConsoleLogger(connection: IConnection): void {
     }
     const intercept = (method: string): void => {
         const original = console[method];
-        // tslint:disable-next-line: only-arrow-functions
         console[method] = function(...args: any): void {
             if (connection) {
                 const remote: any = connection.console;

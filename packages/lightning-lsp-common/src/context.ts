@@ -478,7 +478,7 @@ export class WorkspaceContext {
         this.updateConfigFile('core.code-workspace', templateContent);
     }
 
-    private async readConfigBlt() {
+    private async readConfigBlt(): Promise<any> {
         const isMain = this.workspaceRoots[0].indexOf(path.join('main', 'core')) !== -1;
         let relativeBltDir = isMain ? path.join('..', '..', '..') : path.join('..', '..', '..', '..');
         if (this.type === WorkspaceType.CORE_PARTIAL) {
