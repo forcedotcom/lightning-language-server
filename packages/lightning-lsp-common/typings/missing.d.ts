@@ -1,1 +1,1 @@
-declare module 'properties'
+declare module 'properties';

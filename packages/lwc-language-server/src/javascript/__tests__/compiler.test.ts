@@ -24,7 +24,7 @@ import { LightningElement } from 'lwc';
 export default class Foo extends LightningElement {}
 `;
 
-function pretify(str: string) {
+function pretify(str: string): string {
     return str
         .toString()
         .replace(/^\s+|\s+$/, '')

@@ -180,9 +180,9 @@ export function elapsedMillis(start: [number, number]): string {
     return (elapsed[0] * 1000 + elapsed[1] / 1e6).toFixed(2) + ' ms';
 }
 
-export const memoize = (fn: any) => {
+export const memoize = (fn: any): any => {
     let cache: any;
-    return () => {
+    return (): any => {
         if (cache) {
             return cache;
         }
