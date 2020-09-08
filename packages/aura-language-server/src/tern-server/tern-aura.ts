@@ -3,7 +3,6 @@ import * as tern from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getComponentForJS, getLibFile, getLibraryForJS, getCmpImports, getLibImports, getLibIncludes } from './tern-indexer';
 
 const WG_DEFAULT_EXPORT = 95;
 let server: any = {};
@@ -75,22 +74,6 @@ async function readFile(filename) {
     }
 }
 
-function parent(path) {
-    const splits = path.split('/');
-    if (splits.size === 1) {
-        return '';
-    }
-    return splits[splits.length - 3];
-}
-
-function dirName(path) {
-    const lastSlash = path.lastIndexOf('/');
-    if (lastSlash === -1) {
-        return '';
-    }
-    return path.slice(0, lastSlash + 1);
-}
-
 function baseName(path) {
     const lastSlash = path.lastIndexOf('/');
     if (lastSlash === -1) {
@@ -120,28 +103,6 @@ function initScope(scope) {
     const moduleExports = (scope.exports = module.defProp('exports'));
     // @ts-ignore
     exports.propagate(moduleExports, WG_DEFAULT_EXPORT);
-}
-async function getLibraryIncludes(file, library) {
-    const libFile = await getLibFile(file, library);
-    const inc = await getLibIncludes(getFilename(libFile));
-    const includes = [];
-    const bn = dirName(libFile);
-    // @ts-ignore
-    inc.forEach(function(name) {
-        const fname = bn + name + '.js';
-        if (!isBlocklisted(fname)) {
-            includes.push(fname);
-        }
-    });
-    return includes;
-}
-async function newObj() {
-    return new Promise((resolve, reject) => {
-        // @ts-ignore
-        infer.withContext(server.cx, function() {
-            resolve(new infer.Obj(true));
-        });
-    });
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -187,249 +148,6 @@ function loadDefs() {
     defs = JSON.parse(defs);
     // @ts-ignore
     server.addDefs(defs);
-}
-
-async function processIfLibrary(file, modules) {
-    let lib = await getLibraryForJS(file.name);
-    // @ts-ignore
-    const libs = lib ? [lib] : [];
-
-    if (libs.length > 0) {
-        _debug('Process libs of: ' + file.name);
-        const bn = trimExt(baseName(file.name));
-        const ln = trimExt(baseName(libs[0]));
-        const libName = getFilename(libs[0]);
-        const imps = await getLibImports(libName, bn);
-
-        // use alternate module for libs
-        const ns = parent(dirName(file.name));
-        const l = modules.resolveModule('mod:' + ns + ':' + ln, file.name);
-        let outObj;
-        //console.log("__ the basename "+baseName(libs[0]) );
-        if (!l.getType()) {
-            //console.log("Created main entry for library");
-            outObj = await newObj();
-            outObj.origin = 'Aura';
-            outObj.name = baseName(libs[0]);
-            l.addType(outObj);
-        } else {
-            //console.log("Found main entry for library: "+l.getType() + " "+l.getType().name + " " + l.getType().origin);
-            outObj = l.getType();
-        }
-        // @ts-ignore
-        if (imps) {
-            _debug('Process imported libs of: ' + file.name);
-            // get fn decl
-            const fn = file.ast.body[0];
-            const state = fn.scope;
-            // bind included imports to library function....
-            // @ts-ignore
-            const imports = imps.split(',');
-
-            const libfilesResolved = [];
-            const imfs = [];
-            const importedModules = [];
-            for (let i = 0; i < imports.length; i++) {
-                // resolve....
-                let importedModule = imports[i].trim();
-                if (!importedModule) {
-                    continue;
-                }
-                if (importedModule.indexOf(':') > -1) {
-                    const splits = importedModule.split(':');
-                    const qn = splits[0] + ':' + splits[1];
-                    const libfile = await getLibFile(file.name, qn);
-                    // @ts-ignore
-                    if (!libfile) {
-                        continue;
-                    }
-
-                    lib = modules.resolveModule('mod:' + qn);
-                    // @ts-ignore
-                    if (!lib.getType()) {
-                        const zz = await newObj();
-                        // @ts-ignore
-                        zz.origin = libfile;
-                        // @ts-ignore
-                        zz.name = baseName(libfile);
-                        // @ts-ignore
-                        lib.addType(zz);
-                    }
-                    libfilesResolved.push(modules.resolveModule('mod:' + qn));
-                    importedModule = splits[2];
-                    imfs.push(dirName(libfile) + importedModule + '.js');
-                } else {
-                    imfs.push(dirName(file.name) + importedModule + '.js');
-                }
-                importedModules.push(importedModule);
-            }
-            // re-establsh context after awaits
-            // @ts-ignore
-            infer.withContext(server.cx, function() {
-                for (let i = 0; i < libfilesResolved.length; i++) {
-                    const importedModule = importedModules[i];
-                    const lib = libfilesResolved[i];
-
-                    const pm = state.fnType.args[i];
-                    if (!pm || pm.getType(false)) {
-                        continue;
-                    }
-                    if (lib.getType().hasProp(importedModule)) {
-                        try {
-                            pm.addType(
-                                lib
-                                    .getType()
-                                    .getProp(importedModule)
-                                    .getType(),
-                            );
-                        } catch (zzz) {}
-                    } else {
-                        const pname = importedModule;
-                        // so, in effect this isn't really used, since (at least tern.ide)
-                        // calls content assist frequently that by the time this called back,
-                        // the file will be reindex, and the other lib file would have already
-                        /// been loaded.
-                        lib.getType().on(
-                            'addProp',
-                            function(pmType, prop, val) {
-                                if (pname === prop) {
-                                    pmType.addType(val);
-                                }
-                            }.bind(this, pm),
-                        );
-                    }
-                }
-            });
-        }
-        // re-establsh context after awaits
-        // @ts-ignore
-        infer.withContext(server.cx, function() {
-            _debug('Process exported libs of: ' + file.name);
-            walk.simple(
-                file.ast,
-                {
-                    ReturnStatement: function(node, state) {
-                        try {
-                            // @ts-ignore
-                            const parent = infer.parentNode(node, file.ast);
-                            // @ts-ignore
-                            const grand = infer.parentNode(parent, file.ast);
-                            // @ts-ignore
-                            const great = infer.parentNode(grand, file.ast);
-                            if (great && great['type'] === 'Program') {
-                                if (node.argument) {
-                                    if (node.argument['type'] === 'Identifier') {
-                                        const t = state.getProp(node.argument.name);
-                                        if (t) {
-                                            const exported = t.getObjType();
-                                            outObj.defProp(bn, node.argument).addType(exported);
-                                        }
-                                    } else if (node.argument['type'] === 'ObjectExpression') {
-                                        outObj.defProp(bn, node.argument).addType(node.argument.objType);
-                                    } else if (node.argument['type'] === 'FunctionExpression') {
-                                        outObj.defProp(bn, node.argument).addType(state.fnType.getType());
-                                    } else if (node.argument['type'] === 'CallExpression') {
-                                        outObj.defProp(bn, node.argument).addType(state.getType());
-                                    }
-                                }
-                            }
-                        } catch (ignore) {
-                            console.error(ignore);
-                        }
-                    },
-                },
-                // @ts-ignore
-                infer.searchVisitor,
-            );
-        });
-    }
-}
-async function processIfComponent(file, modules) {
-    //        console.log("file " + file.name);
-    //        console.log("cmp " + jsToCmp[file.name]);
-
-    const cmp = await getComponentForJS(file.name);
-    // @ts-ignore
-    const cmps = cmp ? [cmp] : [];
-
-    if (cmps.length > 0) {
-        _debug('Discover libs of: ' + cmps[0]);
-        const ins = await getCmpImports(getFilename(cmps[0]));
-        const libs = [];
-        // @ts-ignore
-        for (let i = 0; i < ins.length; i++) {
-            const an_import = ins[i];
-            const library = an_import.library;
-            const libfile = await getLibFile(file.name, library);
-            libs.push(libfile);
-        }
-        for (let i = 0; i < libs.length; i++) {
-            const library = ins[i].library;
-            const libfile = libs[i];
-            if (!libfile) {
-                continue;
-            }
-            const lib = modules.resolveModule('mod:' + library, libfile);
-            //console.log("Ensure lib added...")
-            //console.log("Resolved: "+lib);
-            if (!lib.getType()) {
-                // console.log("no type")
-                const zz = await newObj();
-                // @ts-ignore
-                zz.origin = libfile;
-                // @ts-ignore
-                zz.name = baseName(libfile);
-                if (!lib.getType()) {
-                    // recheck, after awaits
-                    lib.addType(zz);
-                }
-                const inc = await getLibraryIncludes(file.name, library);
-                for (let j = 0; j < inc.length; j++) {
-                    // @ts-ignore
-                    if (!server.findFile(inc[j])) {
-                        // @ts-ignore
-                        server.addFile(inc[j]);
-                        // console.log("Added lib dep: "+inc[i]);
-                    } else {
-                        // console.log("File found");
-                    }
-                }
-            }
-        }
-
-        // reestablish-context after awaits
-        // @ts-ignore
-        infer.withContext(server.cx, function() {
-            for (let m = 0; m < libs.length; m++) {
-                const library = ins[m].library;
-                const libfile = libs[m];
-                if (!libfile) {
-                    continue;
-                }
-                const property = ins[m].property;
-                const lib = modules.resolveModule('mod:' + library, libfile);
-                try {
-                    walk.simple(
-                        file.ast,
-                        {
-                            FunctionExpression: function(node, state) {
-                                //console.log("Bound to this...");
-                                const ss = node.scope;
-                                const con = ss && ss.fnType && ss.fnType.self.getType();
-                                if (con) {
-                                    lib.getType().propagate(con.defProp(property));
-                                }
-                            },
-                        },
-                        // @ts-ignore
-                        infer.searchVisitor,
-                    );
-                } catch (ignore) {
-                    console.error(ignore);
-                }
-            }
-        });
-    }
 }
 
 function findAndBindComponent(type, server, cx, infer) {
@@ -516,8 +234,6 @@ async function connectModule(file, out) {
     const modules = infer.cx().parent.mod.modules;
     const cx = infer.cx();
     _debug('Starting... ' + file.name);
-    await processIfLibrary(file, modules);
-    await processIfComponent(file, modules);
     if (/Helper.js$/.test(file.name)) {
         // need to reestablish server context after awaits
         // @ts-ignore
