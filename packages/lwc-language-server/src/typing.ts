@@ -62,7 +62,7 @@ export default class Typing {
         return declarations.join('\n');
     }
 
-    get declaration() {
+    get declaration(): string {
         return declaration(this.type, this.name);
     }
 }

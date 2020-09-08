@@ -21,7 +21,7 @@ export enum WorkspaceType {
     CORE_PARTIAL,
     UNKNOWN,
 }
-export function isUnknown(type: WorkspaceType) {
+export function isUnknown(type: WorkspaceType): boolean {
     // what about core all or core single?
     switch (type) {
         case WorkspaceType.STANDARD:
@@ -36,7 +36,7 @@ export function isLWC(type: WorkspaceType): boolean {
     return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
 }
 
-export function getSfdxProjectFile(root: string) {
+export function getSfdxProjectFile(root: string): string {
     return path.join(root, SFDX_PROJECT);
 }
 

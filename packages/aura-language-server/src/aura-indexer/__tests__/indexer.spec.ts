@@ -3,7 +3,7 @@ import AuraIndexer from '../indexer';
 import * as path from 'path';
 import URI from 'vscode-uri';
 
-function normalize(start: string, p: string) {
+function normalize(start: string, p: string): string {
     // Fix relative paths on windows
     if (start.indexOf('\\') !== -1) {
         start = start.replace(/\\/g, '/');

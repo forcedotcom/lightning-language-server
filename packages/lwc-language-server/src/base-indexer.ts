@@ -6,14 +6,14 @@ export default class BaseIndexer {
         this.workspaceRoot = path.resolve(attributes.workspaceRoot);
     }
 
-    sfdxConfig(root: string) {
+    sfdxConfig(root: string): any {
         const filename: string = path.join(root, 'sfdx-project.json');
         const data: string = fsExtra.readFileSync(filename).toString();
 
         return JSON.parse(data);
     }
 
-    get sfdxPackageDirsPattern() {
+    get sfdxPackageDirsPattern(): string {
         const dirs = this.sfdxConfig(this.workspaceRoot).packageDirectories;
         const paths: string[] = dirs.map((item: { path: string }): string => item.path);
         return paths.length === 1 ? paths[0] : `{${paths.join()}}`;

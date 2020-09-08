@@ -22,26 +22,26 @@ jest.mock('vscode-languageserver', () => {
         ...actual,
         createConnection: jest.fn().mockImplementation(() => {
             return {
-                onInitialize: () => true,
-                onCompletion: () => true,
-                onCompletionResolve: () => true,
-                onHover: () => true,
-                onShutdown: () => true,
-                onDefinition: () => true,
+                onInitialize: (): boolean => true,
+                onCompletion: (): boolean => true,
+                onCompletionResolve: (): boolean => true,
+                onHover: (): boolean => true,
+                onShutdown: (): boolean => true,
+                onDefinition: (): boolean => true,
             };
         }),
         TextDocuments: jest.fn().mockImplementation(() => {
             return {
-                listen: () => true,
-                onDidChangeContent: () => true,
-                get: (name: string) => {
+                listen: (): boolean => true,
+                onDidChangeContent: (): boolean => true,
+                get: (name: string): TextDocument => {
                     const docs = new Map([
                         [uri, document],
                         [auraUri, auraDocument],
                     ]);
                     return docs.get(name);
                 },
-                onDidSave: () => true,
+                onDidSave: (): boolean => true,
                 syncKind: 'html',
             };
         }),

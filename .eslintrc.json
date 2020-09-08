@@ -43,6 +43,7 @@
     ], // non-complete list of globals that are easy to access unintentionally
     "no-var": "error",
     "jsdoc/no-types": "warn",
-    "@typescript-eslint/semi": "warn"
+    "@typescript-eslint/semi": "warn",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }
