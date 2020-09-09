@@ -24,7 +24,7 @@
   "dependencies": {
     "@lwc/engine": "0.34.8",
     "@lwc/babel-plugin-component": "0.34.8",
-    "@lwc/compiler": "0.34.8",
+    "@lwc/compiler": "1.7.12",
     "@lwc/errors": "0.34.8",
     "@lwc/template-compiler": "0.34.8",
     "@salesforce/apex": "0.0.12",
