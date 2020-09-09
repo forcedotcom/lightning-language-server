@@ -14,7 +14,6 @@
     "cleanTestData": "node ../../scripts/removeTestData.js",
     "build": "tsc -p . && node ./scripts/build.js",
     "watch": "tsc -w  | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
-    "copy-static-assets": "ts-node copy-static-assets.ts",
     "test": "jest --runInBand",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
     "test:debugWindows": "node --inspect-brk ../../node_modules/jest/bin/jest.js --passWithNoTests --runInBand",
@@ -63,7 +62,6 @@
     "shelljs": "^0.8.3",
     "tmp": "^0.0.33",
     "ts-jest": "^26.2.0",
-    "ts-node": "^8.10.2",
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "3.7.5"
