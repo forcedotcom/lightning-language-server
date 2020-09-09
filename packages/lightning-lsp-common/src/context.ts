@@ -5,9 +5,7 @@ import { lt } from 'semver';
 import { TextDocument } from 'vscode-languageserver';
 // @ts-ignore
 import templateSettings from 'lodash.templatesettings';
-// @ts-ignore
 import template from 'lodash.template';
-// @ts-ignore
 import { parse } from 'properties';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
