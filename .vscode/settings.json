@@ -13,7 +13,6 @@
   },
   "eslint.packageManager": "yarn",
   "npm.packageManager": "yarn",
-  "tslint.packageManager": "yarn",
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.format.enable": true

@@ -9,11 +9,8 @@ const WG_DEFAULT_EXPORT = 95;
 let server: any = {};
 
 let shouldFilter = false;
-/* tslint:disable */
-
 /* this is necessary to inform the parameter types of the controller when
     the helper method is deleted */
-// @ts-ignore
 const ForAllProps_Purgeable = infer.constraint({
     construct: function(c) {
         this.c = c;
@@ -40,12 +37,9 @@ const ForAllProps_Purgeable = infer.constraint({
 });
 
 function getFilename(filename): string {
-    // @ts-ignore
     if (server.options.projectDir.endsWith('/')) {
-        // @ts-ignore
         return server.options.projectDir + filename;
     }
-    // @ts-ignore
     return server.options.projectDir + '/' + filename;
 }
 
@@ -94,7 +88,6 @@ function trimExt(path): any {
 }
 
 function initScope(scope): void {
-    // @ts-ignore
     const module = new infer.Obj();
     module.propagate(scope.defProp('module'));
     const exports = new infer.Obj(true);
@@ -102,7 +95,6 @@ function initScope(scope): void {
     module.originNode = exports.originNode = scope.originNode;
     exports.propagate(scope.defProp('exports'));
     const moduleExports = (scope.exports = module.defProp('exports'));
-    // @ts-ignore
     exports.propagate(moduleExports, WG_DEFAULT_EXPORT);
 }
 
@@ -134,7 +126,6 @@ function resolver(file, parent): any {
 }
 
 function unloadDefs(): void {
-    // @ts-ignore
     server.deleteDefs('Aura');
 }
 
@@ -147,7 +138,6 @@ function readFileAsync(filename, c): void {
 function loadDefs(): void {
     let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
     defs = JSON.parse(defs);
-    // @ts-ignore
     server.addDefs(defs);
 }
 
@@ -229,15 +219,12 @@ async function connectModule(file, out): Promise<void> {
         return;
     }
 
-    // @ts-ignore
     server.startAsyncAction();
-    // @ts-ignore
     const modules = infer.cx().parent.mod.modules;
     const cx = infer.cx();
     _debug('Starting... ' + file.name);
     if (/Helper.js$/.test(file.name)) {
         // need to reestablish server context after awaits
-        // @ts-ignore
         infer.withContext(server.cx, function() {
             _debug('Process helper exports ' + file.name);
             let outObj;
@@ -256,9 +243,7 @@ async function connectModule(file, out): Promise<void> {
                     file.ast,
                     {
                         ObjectExpression: function(node, state) {
-                            // @ts-ignore
                             const parent = infer.parentNode(node, file.ast);
-                            // @ts-ignore
                             const grand = infer.parentNode(parent, file.ast);
                             if (grand.type === 'Program') {
                                 // add some jsdoc
@@ -292,7 +277,6 @@ async function connectModule(file, out): Promise<void> {
                             }
                         },
                     },
-                    // @ts-ignore
                     infer.searchVisitor,
                 );
             } catch (stop) {
@@ -306,33 +290,26 @@ async function connectModule(file, out): Promise<void> {
         const controller = getController(file.name);
         try {
             const text = await readFile(controller);
-            // @ts-ignore
             const sfile = server.findFile(controller);
             if (!sfile || sfile.text !== text) {
-                // @ts-ignore
                 server.addFile(controller, text);
             }
         } catch (ignore) {}
         const renderer = getRenderer(file.name);
         try {
             const text = await readFile(renderer);
-            // @ts-ignore
             const sfile = server.findFile(renderer);
             if (!sfile || sfile.text !== text) {
-                // @ts-ignore
                 server.addFile(renderer, text);
             }
         } catch (ignore) {}
     }
     // reestablish scope after awaits
-    // @ts-ignore
     infer.withContext(server.cx, function() {
         _debug('Fixing scopes...' + file.name);
         walk.simple(file.ast, {
             ObjectExpression: function(node, state) {
-                // @ts-ignore
                 const parent = infer.parentNode(node, file.ast);
-                // @ts-ignore
                 const grand = infer.parentNode(parent, file.ast);
                 if (grand.type === 'Program') {
                     for (let i = 0; i < node.properties.length; ++i) {
@@ -382,29 +359,21 @@ async function connectModule(file, out): Promise<void> {
         _debug('All done ' + file.name);
     });
 
-    // @ts-ignore
     server.finishAsyncAction();
 }
 
 tern.registerPlugin('aura', function(s, options) {
     server = s;
-    // @ts-ignore
     if (!server.options.async) {
         throw Error('Server must be async');
     }
-    // @ts-ignore
     server.options.getFile = readFileAsync;
-
-    // @ts-ignore
     server.loadPlugin('modules');
-    // @ts-ignore
     server.mod.modules.on('wrapScope', initScope);
-    // @ts-ignore
     server.mod.modules.on('getExports', connectModule);
-    // @ts-ignore
     server.mod.modules.resolvers.push(resolver);
     let currentQuery;
-    // @ts-ignore
+
     server.on('completion', function(file, query) {
         // don't hijack the request to retrieve the standard completions
         if (currentQuery === query) {
@@ -414,7 +383,6 @@ tern.registerPlugin('aura', function(s, options) {
         // request the standard completions
         let filteredResult;
         query.docFormat = 'full';
-        // @ts-ignore
         server.request(
             {
                 query: query,
@@ -447,7 +415,7 @@ tern.registerPlugin('aura', function(s, options) {
 
     _debug(new Date().toISOString() + ' Done loading!');
 });
-// @ts-ignore
+
 tern.defineQueryType('ideInit', {
     run: function(server, query) {
         if (query.unloadDefs) {
@@ -456,13 +424,12 @@ tern.defineQueryType('ideInit', {
         }
 
         if (query.shouldFilter === true || query.shouldFilter === false) {
-            // @ts-ignore
             shouldFilter = query.shouldFilter;
         }
         return 'OK';
     },
 });
-// @ts-ignore
+
 tern.defineQueryType('cleanup-file', {
     run: function(server, query) {
         const files = query.files;
@@ -489,25 +456,23 @@ tern.defineQueryType('cleanup-file', {
         return 'OK';
     },
 });
-// @ts-ignore
+
 tern.defineQueryType('guess-types', {
     takesFile: true,
     run: function(server, query, file) {
-        // @ts-ignore
         if (!query.end) {
             throw ternError('missing .query.end field');
         }
-        // @ts-ignore
+
         if (!query.property) {
             throw ternError('missing .query.property field');
         }
-        // @ts-ignore
+
         const start = tern.resolvePos(file, query.end);
         const types = [];
 
         function gather(prop, obj, depth): void {
             const val = obj.props[prop];
-            // @ts-ignore
             const type = infer.toString(val.getType());
             types.push({
                 property: prop,
@@ -517,14 +482,14 @@ tern.defineQueryType('guess-types', {
                 depth: depth,
             });
         }
-        // @ts-ignore
+
         infer.forAllLocalsAt(file.ast, start, file.scope, gather);
         return {
             locals: types,
         };
     },
 });
-// @ts-ignore
+
 tern.defineQueryType('reset', {
     takesFile: false,
     run: function(server, query, file) {

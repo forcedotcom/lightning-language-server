@@ -58,8 +58,6 @@
     "shelljs": "^0.8.4",
     "ts-jest": "^26.2.0",
     "tsc-transpile-only": "0.0.3",
-    "tslint": "^6.0.0",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "3.7.5"
   }
 }
