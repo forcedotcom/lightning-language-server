@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs-extra');
 const { join, resolve } = require('path');
-var findNodeModules = require('find-node-modules');
+const findNodeModules = require('find-node-modules');
 // the copied files are added to the user's .sfdx/typings
 
 // copy engine.d.ts file from node_modules
