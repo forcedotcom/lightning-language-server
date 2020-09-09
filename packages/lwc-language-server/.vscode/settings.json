@@ -1,19 +1,20 @@
 {
-    "tslint.exclude": [
-        "**/src/html-language-service/htmlLanguageService.ts",
-        "**/src/html-language-service/parser/htmlParser.ts",
-        "**/src/html-language-service/parser/htmlScanner.ts",
-        "**/src/html-language-service/parser/htmlTags.ts",
-        "**/src/html-language-service/services/htmlCompletion.ts",
-        "**/src/html-language-service/utils/strings.ts",
-        "**/src/html-language-service/utils/paths.ts",
-        "**/src/html-language-service/utils/arrays.ts"
-    ],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true
+    },
     "search.exclude": {
-        "**/node_modules": true,
-        "lib": true
+      "**/lib": true,
+      "**/node_modules": true,
+      "**/bin": true
     },
     "eslint.packageManager": "yarn",
     "npm.packageManager": "yarn",
-    "tslint.packageManager": "yarn"
-}
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "eslint.format.enable": true
+  }
+  
