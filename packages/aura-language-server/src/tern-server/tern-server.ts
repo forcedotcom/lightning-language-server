@@ -24,7 +24,6 @@ import {
     Definition,
 } from 'vscode-languageserver';
 
-// tslint:disable-next-line:no-namespace
 interface TernServer extends tern.Server {
     files: TernFile[];
     cx: any;
@@ -208,7 +207,6 @@ export async function startServer(rootPath: string, wsroot: string): tern.Server
         ...defaultConfig,
         defs,
         plugins,
-        // @ts-ignore 2345
         projectDir: rootPath,
         getFile(filename: string, callback: (error: Error | undefined, content?: string) => void): void {
             // note: this isn't invoked
@@ -444,7 +442,6 @@ export const onSignatureHelp = async (signatureParams: TextDocumentPositionParam
         const cx = ternServer.cx;
         let parsed;
         infer.withContext(cx, () => {
-            // @ts-ignore
             const parser = new infer.def.TypeParser(info.type);
             parsed = parser.parseType(true);
         });
