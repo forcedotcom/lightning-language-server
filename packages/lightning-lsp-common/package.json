@@ -24,7 +24,7 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
-    "@lwc/babel-plugin-component": "0.34.8",
+    "@lwc/babel-plugin-component": "1.7.12",
     "decamelize": "^2.0.0",
     "deep-equal": "^1.0.1",
     "fs-extra": "^5.0.0",
