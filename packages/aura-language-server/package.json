@@ -12,7 +12,7 @@
   "scripts": {
     "clean": "rm -rf lib",
     "cleanTestData": "node ../../scripts/removeTestData.js",
-    "build": "tsc -p . && node scripts/build.js",
+    "build": "tsc -p . && scripts/build.js",
     "watch": "tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "test": "jest --runInBand",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
