@@ -1,5 +1,8 @@
-import * as shell from 'shelljs';
+#!/usr/bin/env node
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const shell = require('shelljs');
 
+// Copy static assets
 shell.cp('-R', 'src/tern-server/*.json', 'lib/tern-server/');
 shell.mkdir('-p', 'lib/resources/');
 shell.cp('-R', 'src/resources/*.json', 'lib/resources/');
