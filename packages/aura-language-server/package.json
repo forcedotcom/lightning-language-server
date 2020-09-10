@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/aura-language-server",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
@@ -24,7 +24,7 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
-    "@salesforce/lightning-lsp-common": "3.0.5",
+    "@salesforce/lightning-lsp-common": "3.0.6",
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
