@@ -38,7 +38,7 @@
     "vscode-nls": "^4.1.2"
   },
   "devDependencies": {
-    "@lwc/engine": "0.34.8",
+    "@lwc/engine": "1.7.14",
     "@salesforce/apex": "0.0.12",
     "@types/decamelize": "^1.2.0",
     "@types/deep-equal": "^1.0.1",
