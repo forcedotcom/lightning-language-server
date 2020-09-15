@@ -2,7 +2,7 @@ import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../../constants';
 import { compile, transform } from '@lwc/compiler';
-import { Metadata } from '@lwc/babel-plugin-component';
+import { Metadata } from '../../decorators';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
 import * as fs from 'fs-extra';
 

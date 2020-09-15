@@ -7,7 +7,9 @@ const findNodeModules = require('find-node-modules');
 
 // copy engine.d.ts file from node_modules
 const destDir = resolve(join(__dirname, '..', 'src', 'resources', 'sfdx', 'typings', 'copied'));
-fs.copySync(join(require.resolve('@lwc/engine'), '../../../..', 'types', 'engine.d.ts'), join(destDir, 'engine.d.ts'));
+
+//Copying the engine.d.ts from new npm package, letting the same name
+fs.copySync(join(require.resolve('lwc'), '..', 'types.d.ts'), join(destDir, 'engine.d.ts'));
 
 const modules = findNodeModules();
 // copy @salesforce typings from node_modules
