@@ -6,7 +6,7 @@ import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { transform } from '@lwc/compiler';
 import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
-import { ClassMember, Metadata } from '@lwc/babel-plugin-component';
+import { ClassMember, Metadata } from '../decorators';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
 
