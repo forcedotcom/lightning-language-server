@@ -25,7 +25,7 @@ import {
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { Metadata } from '@lwc/babel-plugin-component';
+import { Metadata } from './decorators';
 import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
 
 import ComponentIndexer from './component-indexer';

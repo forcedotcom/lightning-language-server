@@ -1,6 +1,6 @@
 import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
-import { ClassMember } from '@lwc/babel-plugin-component';
+import { ClassMember } from '../decorators';
 
 export enum TagType {
     STANDARD,
