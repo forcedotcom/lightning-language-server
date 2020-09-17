@@ -22,7 +22,7 @@
     "windowsCopySymlinks": "rm ./test-workspaces && cp -r ../../test-workspaces ./test-workspaces"
   },
   "dependencies": {
-    "@lwc/compiler": "0.34.8",
+    "@lwc/compiler": "1.7.14",
     "@lwc/engine": "1.7.14",
     "@lwc/errors": "1.7.14",
     "@lwc/template-compiler": "1.7.14",
