@@ -15,6 +15,5 @@
   "npm.packageManager": "yarn",
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "eslint.format.enable": true,
-  "debug.javascript.usePreview": true
+  "eslint.format.enable": true
 }
