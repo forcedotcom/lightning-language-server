@@ -57,6 +57,7 @@ it('aura indexer', async () => {
     const sortedTags = new Map([...tags.entries()].sort());
     //TODO Delete this comment
     // This is a change so the  PR can be uploaded and compared
+    // This other  comment should not break the flow
     expect(sortedTags).toMatchSnapshot();
 
     const namespaces = auraIndexer.getAuraNamespaces().sort();
