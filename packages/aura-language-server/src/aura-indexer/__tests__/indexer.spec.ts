@@ -29,14 +29,15 @@ it('aura indexer', async () => {
     const context = new WorkspaceContext(ws);
     await context.configureProject();
     const auraIndexer = new AuraIndexer(context);
-    await auraIndexer.configureAndIndex();
+    const test = await auraIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
 
     let markup = await context.findAllAuraMarkup();
     markup = markup.map(p => normalize(full, p));
     markup = markup.sort();
     expect(markup).toMatchSnapshot();
-
+    console.log('ESTOY ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    console.log(test);
     const tags = auraIndexer.getAuraTags();
     tags.forEach(taginfo => {
         if (taginfo.file) {
