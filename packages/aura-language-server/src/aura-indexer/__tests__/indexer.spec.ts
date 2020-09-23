@@ -29,16 +29,13 @@ it('aura indexer', async () => {
     const context = new WorkspaceContext(ws);
     await context.configureProject();
     const auraIndexer = new AuraIndexer(context);
-    const test = await auraIndexer.configureAndIndex();
+    await auraIndexer.configureAndIndex();
     context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
 
     let markup = await context.findAllAuraMarkup();
     markup = markup.map(p => normalize(full, p));
     markup = markup.sort();
     expect(markup).toMatchSnapshot();
-    console.log('TESTING UPPER');
-    console.log('TESTING PROMISES', test);
-    console.log('TESTING FOOTER');
     const tags = auraIndexer.getAuraTags();
     tags.forEach(taginfo => {
         if (taginfo.file) {
@@ -57,6 +54,9 @@ it('aura indexer', async () => {
         }
     });
     const sortedTags = new Map([...tags.entries()].sort());
+    console.log('TESTING UPPER');
+    console.log('TESTING PROMISES', sortedTags.get('aura:component'));
+    console.log('TESTING FOOTER');
     expect(sortedTags).toMatchSnapshot();
 
     const namespaces = auraIndexer.getAuraNamespaces().sort();
