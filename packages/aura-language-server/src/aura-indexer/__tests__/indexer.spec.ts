@@ -36,8 +36,9 @@ it('aura indexer', async () => {
     markup = markup.map(p => normalize(full, p));
     markup = markup.sort();
     expect(markup).toMatchSnapshot();
-    console.log('ESTOY ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-    console.log(test);
+    console.log('TESTING UPPER');
+    console.log('TESTING PROMISES', test);
+    console.log('TESTING FOOTER');
     const tags = auraIndexer.getAuraTags();
     tags.forEach(taginfo => {
         if (taginfo.file) {
