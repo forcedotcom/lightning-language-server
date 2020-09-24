@@ -212,6 +212,12 @@ export default class AuraIndexer implements Indexer {
 
                 // Update our in memory maps
                 // TODO should we move interfaces/apps/etc to a separate map also?
+                if (tag === 'aura:component') {
+                    console.log('tag IS EQUALS');
+                    console.log('tagObj.type', tagObj.type);
+                    console.log('INFO TAG =========', info);
+                }
+
                 if (tagObj.type === 'event') {
                     this.setCustomEventTag(info);
                 } else {
