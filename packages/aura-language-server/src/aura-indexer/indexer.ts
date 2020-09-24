@@ -168,6 +168,9 @@ export default class AuraIndexer implements Indexer {
     private async loadSystemTags(): Promise<void> {
         const data = await fs.readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
         const auraSystem = JSON.parse(data);
+        console.log('TESTING0 INIT');
+        console.log('TESTING0 auraStandard', this.AURA_TAGS.get('aura:component'));
+        console.log('TESTING0 END');
         for (const tag in auraSystem) {
             if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraSystem[tag];
@@ -190,9 +193,6 @@ export default class AuraIndexer implements Indexer {
     private async loadStandardComponents(): Promise<void> {
         const data = await fs.readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
         const auraStandard = JSON.parse(data);
-        console.log('TESTING0 INIT');
-        console.log('TESTING0 auraStandard', auraStandard['aura:component']);
-        console.log('TESTING0 END');
         for (const tag in auraStandard) {
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraStandard[tag];
@@ -212,12 +212,6 @@ export default class AuraIndexer implements Indexer {
 
                 // Update our in memory maps
                 // TODO should we move interfaces/apps/etc to a separate map also?
-                if (tag === 'aura:component') {
-                    console.log('tag IS EQUALS');
-                    console.log('tagObj.type', tagObj.type);
-                    console.log('INFO TAG =========', info);
-                }
-
                 if (tagObj.type === 'event') {
                     this.setCustomEventTag(info);
                 } else {
