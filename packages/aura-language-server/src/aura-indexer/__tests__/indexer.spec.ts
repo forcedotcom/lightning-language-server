@@ -37,9 +37,9 @@ it('aura indexer', async () => {
     markup = markup.sort();
     expect(markup).toMatchSnapshot();
     const tags = auraIndexer.getAuraTags();
-    console.log('TESTING1 UPPER');
+    console.log('TESTING1 INIT');
     console.log('TESTING1 PROMISES', tags.get('aura:component'));
-    console.log('TESTING1 FOOTER');
+    console.log('TESTING1 END');
     tags.forEach(taginfo => {
         if (taginfo.file) {
             taginfo.file = normalize(full, taginfo.file);
@@ -57,9 +57,6 @@ it('aura indexer', async () => {
         }
     });
     const sortedTags = new Map([...tags.entries()].sort());
-    console.log('TESTING2 UPPER');
-    console.log('TESTING2 PROMISES', sortedTags.get('aura:component'));
-    console.log('TESTING2 FOOTER');
     expect(sortedTags).toMatchSnapshot();
 
     const namespaces = auraIndexer.getAuraNamespaces().sort();

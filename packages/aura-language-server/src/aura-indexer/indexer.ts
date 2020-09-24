@@ -190,6 +190,9 @@ export default class AuraIndexer implements Indexer {
     private async loadStandardComponents(): Promise<void> {
         const data = await fs.readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
         const auraStandard = JSON.parse(data);
+        console.log('TESTING0 INIT');
+        console.log('TESTING0 auraStandard', auraStandard['aura:component']);
+        console.log('TESTING0 END');
         for (const tag in auraStandard) {
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraStandard[tag];
