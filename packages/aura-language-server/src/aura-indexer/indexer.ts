@@ -24,15 +24,10 @@ export default class AuraIndexer implements Indexer {
         this.context.addIndexingProvider({ name: 'aura', indexer: this });
     }
 
-    public async configureAndIndex(): Promise<any> {
-        const indexingTasks: Promise<void>[] = [];
-
-        indexingTasks.push(this.loadStandardComponents());
-        indexingTasks.push(this.loadSystemTags());
-        indexingTasks.push(this.indexCustomComponents());
-
-        this.indexingTasks = Promise.all(indexingTasks).then(() => undefined);
-        return this.indexingTasks;
+    public async configureAndIndex(): Promise<void> {
+        await this.loadSystemTags();
+        await this.loadStandardComponents();
+        await this.indexCustomComponents();
     }
 
     public async waitForIndexing(): Promise<void> {
