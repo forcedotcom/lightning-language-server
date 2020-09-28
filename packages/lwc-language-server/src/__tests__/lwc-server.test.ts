@@ -302,3 +302,39 @@ describe('findDynamicContent', () => {
         expect(findDynamicContent(text, 25)).toBeNull();
     });
 });
+
+describe('Core All Workspace', () => {
+    const initializeParams: InitializeParams = {
+        processId: 0,
+        rootUri: '',
+        capabilities: {},
+        workspaceFolders: [
+            {
+                uri: URI.file(path.resolve('../../test-workspaces/core-like-workspace/app/main/core')).toString(),
+                name: path.resolve('../../test-workspaces/sfdx-workspace/'),
+            },
+        ],
+    };
+
+    it('Should not throw during intialization', async () => {
+        await server.onInitialize(initializeParams);
+    });
+});
+
+describe('Core Partial Workspace', () => {
+    const initializeParams: InitializeParams = {
+        processId: 0,
+        rootUri: '',
+        capabilities: {},
+        workspaceFolders: [
+            {
+                uri: URI.file(path.resolve('../../test-workspaces/core-like-workspace/app/main/core/ui-global-components')).toString(),
+                name: path.resolve('../../test-workspaces/sfdx-workspace/'),
+            },
+        ],
+    };
+
+    it('Should not throw during intialization', async () => {
+        await server.onInitialize(initializeParams);
+    });
+});
