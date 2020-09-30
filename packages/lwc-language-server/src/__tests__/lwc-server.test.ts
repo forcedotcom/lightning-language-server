@@ -220,7 +220,7 @@ describe('#capabilities', () => {
                 textDocumentSync: 'html',
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['-', '_', '<', '"', '=', '/', '>'],
+                    triggerCharacters: ['{', '.', '-', '_', '<', '"', '=', '/', '>'],
                 },
                 hoverProvider: true,
                 definitionProvider: true,
