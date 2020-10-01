@@ -1,4 +1,4 @@
-import {countPreviousCommas, findWord} from '../string-util'
+import {countPreviousCommas, findPreviousLeftParan, findWord} from '../string-util'
 
 describe('string-util', () => {
   describe('findWord', () => {
@@ -42,6 +42,26 @@ describe('string-util', () => {
 
       expect(result).toBeDefined();
       expect(result).toEqual(3);
+    });
+  });
+
+  describe('findPreviousLeftParan', () => {
+    it('should find index of preceding left bracket', () => {
+      const testWord = 'test';
+      const testString: string = `(${testWord})`;
+      const result = findPreviousLeftParan(testString, testString.length / 2);
+
+      expect(result).toBeDefined();
+      expect(result).toEqual(testString.indexOf('('));
+    });
+
+    it('should find index of preceding left bracket with chars between', () => {
+      const testWord = 'test';
+      const testString: string = `func(anotherParameter, ${testWord})`;
+      const result = findPreviousLeftParan(testString, testString.length / 2);
+
+      expect(result).toBeDefined();
+      expect(result).toEqual(testString.indexOf('('));
     });
   });
 });
