@@ -1,4 +1,4 @@
-import {countPreviousCommas, findPreviousLeftParan, findWord} from '../string-util'
+import {countPreviousCommas, findPreviousLeftParan, findPreviousWord, findWord} from '../string-util'
 
 describe('string-util', () => {
   describe('findWord', () => {
@@ -62,6 +62,19 @@ describe('string-util', () => {
 
       expect(result).toBeDefined();
       expect(result).toEqual(testString.indexOf('('));
+    });
+  });
+
+  describe('findPreviousWord', () => {
+    it('should find start and end of preceding word before "."', () => {
+      const testWord = 'test';
+      const perviousWord = 'word';
+      const testString: string = `   ${perviousWord}.${testWord}   `;
+      const result = findPreviousWord(testString, testString.indexOf(testWord) + 2);
+
+      expect(result).toBeDefined();
+      expect(result.start).toEqual(testString.indexOf(perviousWord));
+      expect(result.end).toEqual(testString.indexOf(perviousWord) + perviousWord.length + 1);
     });
   });
 });
