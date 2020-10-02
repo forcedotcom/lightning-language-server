@@ -1,4 +1,4 @@
-import { startsWith, endsWith, commonPrefixLength, repeat } from '../strings'
+import { startsWith, endsWith, commonPrefixLength, repeat, isLetterOrDigit } from '../strings'
 
 describe('strings', () => {
   describe('startsWith', () => {
@@ -54,6 +54,32 @@ describe('strings', () => {
       const stringA = `${commonPrefix}`;
       const stringB = `${commonPrefix}xyz`;
       expect(commonPrefixLength(stringA, stringB)).toEqual(commonPrefix.length);
+    });
+  });
+
+  describe('repeat', () => {
+    it('should return repeated string', () => {
+      const initialString = 'abc';
+      const tripledString = `${initialString}${initialString}${initialString}`;
+      expect(repeat(initialString, 3)).toEqual(tripledString);
+    });
+    
+    it('should return original string when count is 1', () => {
+      const initialString = 'abc';
+      expect(repeat(initialString, 1)).toEqual(initialString);
+    });
+  });
+
+  describe('isLetterOrDigit', () => {
+    const testString = 'a1.';
+
+    it('should return true for letters and digits', () => {
+      expect(isLetterOrDigit(testString, 0)).toBe(true);
+      expect(isLetterOrDigit(testString, 1)).toBe(true);
+    });
+
+    it('should return false for special characters', () => {
+      expect(isLetterOrDigit(testString, 2)).toBe(false);
     });
   });
 });
