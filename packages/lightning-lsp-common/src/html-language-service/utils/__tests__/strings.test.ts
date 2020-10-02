@@ -1,4 +1,4 @@
-import { startsWith, endsWith, commonPrefixLength } from '../strings'
+import { startsWith, endsWith, commonPrefixLength, repeat } from '../strings'
 
 describe('strings', () => {
   describe('startsWith', () => {
@@ -48,10 +48,8 @@ describe('strings', () => {
       const stringB = `${commonPrefix}xyz`;
       expect(commonPrefixLength(stringA, stringB)).toEqual(commonPrefix.length);
     });
-  });
-
-  describe('commonPrefixLength', () => {
-    it('should return length of entire string if strings match', () => {
+    
+    it('should return length of smaller string if strings match', () => {
       const commonPrefix = 'abc';
       const stringA = `${commonPrefix}`;
       const stringB = `${commonPrefix}xyz`;
