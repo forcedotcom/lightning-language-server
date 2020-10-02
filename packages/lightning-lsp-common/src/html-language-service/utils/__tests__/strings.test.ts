@@ -8,6 +8,11 @@ describe('strings', () => {
       expect(startsWith(testString, testPrefix)).toBe(true);
     });
 
+    it('should return true if strings are identical', () => {
+      const testString = 'teststring';
+      expect(startsWith(testString, testString)).toBe(true);
+    });
+
     it('should return false if string does not start with prefix string', () => {
       const testString = 'teststring';
       const testPrefix = 'string';
@@ -26,6 +31,11 @@ describe('strings', () => {
       const testString = 'teststring';
       const testSuffix = 'string';
       expect(endsWith(testString, testSuffix)).toBe(true);
+    });
+
+    it('should return true if strings are identical', () => {
+      const testString = 'teststring';
+      expect(endsWith(testString, testString)).toBe(true);
     });
     
     it('should return false if string does not start with suffix string', () => {
