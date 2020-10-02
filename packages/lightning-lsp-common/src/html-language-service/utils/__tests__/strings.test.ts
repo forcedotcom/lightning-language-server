@@ -1,4 +1,4 @@
-import { startsWith } from '../strings'
+import { startsWith, endsWith, commonPrefixLength } from '../strings'
 
 describe('strings', () => {
   describe('startsWith', () => {
@@ -18,6 +18,44 @@ describe('strings', () => {
       const testString = 'test';
       const testPrefix = 'tests';
       expect(startsWith(testString, testPrefix)).toBe(false);
+    });
+  });
+
+  describe('endsWith', () => {
+    it('should return true if string starts with suffix string', () => {
+      const testString = 'teststring';
+      const testSuffix = 'string';
+      expect(endsWith(testString, testSuffix)).toBe(true);
+    });
+    
+    it('should return false if string does not start with suffix string', () => {
+      const testString = 'teststring';
+      const testSuffix = 'test';
+      expect(endsWith(testString, testSuffix)).toBe(false);
+    });
+
+    it('should return false if suffix string is longer than search string', () => {
+      const testString = 'test';
+      const testSuffix = 'tests';
+      expect(endsWith(testString, testSuffix)).toBe(false);
+    });
+  });
+
+  describe('commonPrefixLength', () => {
+    it('should return length of common prefix', () => {
+      const commonPrefix = 'abc';
+      const stringA = `${commonPrefix}123`;
+      const stringB = `${commonPrefix}xyz`;
+      expect(commonPrefixLength(stringA, stringB)).toEqual(commonPrefix.length);
+    });
+  });
+
+  describe('commonPrefixLength', () => {
+    it('should return length of entire string if strings match', () => {
+      const commonPrefix = 'abc';
+      const stringA = `${commonPrefix}`;
+      const stringB = `${commonPrefix}xyz`;
+      expect(commonPrefixLength(stringA, stringB)).toEqual(commonPrefix.length);
     });
   });
 });
