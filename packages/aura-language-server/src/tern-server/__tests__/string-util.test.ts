@@ -120,7 +120,7 @@ describe('string-util', () => {
         it('should return index of start char without "."', () => {
             const testWord = 'test';
             const perviousWord = 'word';
-            const testString = `   ${perviousWord} ${testWord}   `;
+            const testString = `   ${perviousWord} .${testWord}   `;
             const offset = testString.indexOf(testWord) + 2;
             const result = findPreviousWord(testString, offset);
 
