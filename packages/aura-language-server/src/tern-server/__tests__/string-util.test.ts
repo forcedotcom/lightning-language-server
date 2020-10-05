@@ -97,19 +97,19 @@ describe('string-util', () => {
     describe('findPreviousWord', () => {
         it('should find start and end of preceding word before "."', () => {
             const testWord = 'test';
-            const perviousWord = 'word';
-            const testString = `   ${perviousWord}.${testWord}   `;
+            const previousWord = 'word';
+            const testString = `   ${previousWord}.${testWord}   `;
             const result = findPreviousWord(testString, testString.indexOf(testWord) + 2);
 
             expect(result).toBeDefined();
-            expect(result.start).toEqual(testString.indexOf(perviousWord));
-            expect(result.end).toEqual(testString.indexOf(perviousWord) + perviousWord.length + 1);
+            expect(result.start).toEqual(testString.indexOf(previousWord));
+            expect(result.end).toEqual(testString.indexOf(previousWord) + previousWord.length + 1);
         });
 
         it('should find new line char before "." with new line', () => {
             const testWord = 'test';
-            const perviousWord = 'word';
-            const testString = `   ${perviousWord}\n.${testWord}   `;
+            const previousWord = 'word';
+            const testString = `   ${previousWord}\n.${testWord}   `;
             const result = findPreviousWord(testString, testString.indexOf(testWord) + 2);
 
             expect(result).toBeDefined();
@@ -117,10 +117,10 @@ describe('string-util', () => {
             expect(result.end).toEqual(testString.indexOf(testWord));
         });
 
-        it('should return index of start char without "."', () => {
+        it('should return index of start char for testWord', () => {
             const testWord = 'test';
-            const perviousWord = 'word';
-            const testString = `   ${perviousWord} .${testWord}   `;
+            const previousWord = 'word';
+            const testString = `   ${previousWord} ${testWord}   `;
             const offset = testString.indexOf(testWord) + 2;
             const result = findPreviousWord(testString, offset);
 
@@ -131,13 +131,13 @@ describe('string-util', () => {
 
         it('should return index previous word after ","', () => {
             const testWord = 'test';
-            const perviousWord = 'word';
-            const testString = `   ,${perviousWord}.${testWord}\n   `;
+            const previousWord = 'word';
+            const testString = `   ,${previousWord}.${testWord}\n   `;
             const offset = testString.indexOf(testWord) + 2;
             const result = findPreviousWord(testString, offset);
 
             expect(result).toBeDefined();
-            expect(result.start).toEqual(testString.indexOf(perviousWord));
+            expect(result.start).toEqual(testString.indexOf(previousWord));
             expect(result.end).toEqual(testString.indexOf(testWord));
         });
     });
