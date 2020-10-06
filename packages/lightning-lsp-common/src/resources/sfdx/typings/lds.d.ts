@@ -78,6 +78,13 @@ declare module 'lightning/uiObjectInfoApi' {
     export function getObjectInfo(objectApiName: string | ObjectId): void;
 
     /**
+     * Wire adapter for multiple object metadatas.
+     *
+     * @param objectApiNames The API names of the objects to retrieve.
+     */
+    export function getObjectInfos(objectApiNames: Array<string | ObjectId>): void;
+
+    /**
      * Wire adapter for values for a picklist field.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_picklist_values
