@@ -55,6 +55,9 @@ export default class Typing {
 
     static async declarationsFromCustomLabels(xmlDocument: string | Buffer): Promise<string> {
         const doc = await new xml2js.Parser().parseStringPromise(xmlDocument);
+        if (doc.CustomLabels === undefined || doc.CustomLabels.labels === undefined) {
+            return '';
+        }
         const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => {
             return declaration('customLabel', label.fullName[0]);
         });

@@ -77,8 +77,9 @@ export default class TypingIndexer extends BaseIndexer {
         });
         const typingContent = await Promise.all(typings);
         const fileContent = typingContent.join('\n');
-
-        fsExtra.writeFileSync(this.customLabelTypings, fileContent);
+        if (fileContent.length !== 0) {
+            fsExtra.writeFileSync(this.customLabelTypings, fileContent);
+        }
     }
 
     get metaFiles(): string[] {
