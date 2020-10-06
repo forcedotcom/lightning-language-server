@@ -6,13 +6,31 @@
       "command": "./scripts/publish-workflow.sh",
       "type": "shell",
       "args": ["${input:circleCiId}"]
-    }
+    },
+    {
+      "label": "Launch Pre-Publish Steps",
+      "command": "./scripts/port-changes.js",
+      "type": "shell",
+      "args": ["${input:verboseOutput}", "-r", "${input:releaseBranch}"]
+    },
   ],
   "inputs": [
     {
       "id": "circleCiId",
       "type": "promptString",
       "description": "CircleCi Token"
+    },
+    {
+      "id": "releaseBranch",
+      "type": "promptString",
+      "description": "Provide the release version (Ex 1.1.0)"
+    },
+    {
+      "id": "verboseOutput",
+      "type": "pickString",
+      "description": "Output verbose logging? Select -v for verbose, and blank for quiet.",
+      "options": ["", "-v"],
+      "default": "-v"
     }
   ]
 }
