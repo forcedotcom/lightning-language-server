@@ -8,10 +8,10 @@
       "args": ["${input:circleCiId}"]
     },
     {
-      "label": "Launch Pre-Publish Steps",
+      "label": "Create Port PR for Publishing",
       "command": "./scripts/port-changes.js",
       "type": "shell",
-      "args": ["${input:verboseOutput}", "-r", "${input:releaseBranch}"]
+      "args": ["${input:verboseOutput}", "-r", "${input:publishType}"]
     },
   ],
   "inputs": [
@@ -19,11 +19,6 @@
       "id": "circleCiId",
       "type": "promptString",
       "description": "CircleCi Token"
-    },
-    {
-      "id": "releaseBranch",
-      "type": "promptString",
-      "description": "Provide the release version (Ex 1.1.0)"
     },
     {
       "id": "verboseOutput",
