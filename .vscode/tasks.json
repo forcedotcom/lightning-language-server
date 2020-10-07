@@ -12,13 +12,20 @@
       "command": "./scripts/port-changes.js",
       "type": "shell",
       "args": ["${input:verboseOutput}", "-r", "${input:publishType}"]
-    },
+    }
   ],
   "inputs": [
     {
       "id": "circleCiId",
       "type": "promptString",
       "description": "CircleCi Token"
+    },
+    {
+      "id": "publishType",
+      "type": "pickString",
+      "description": "Type of version to publish",
+      "options": ["minor", "patch", "major"],
+      "default": "patch"
     },
     {
       "id": "verboseOutput",
