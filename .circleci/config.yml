@@ -142,6 +142,7 @@ workflows:
       - build-and-test-linux
       - build-and-test-win
       - publish:
+          context: pdt-publish-restricted-context
           filters:
             branches:
               only:
