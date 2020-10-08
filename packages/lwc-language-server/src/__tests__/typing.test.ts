@@ -97,4 +97,14 @@ describe('Typing.fromCustomLabels', () => {
 
         expect(typings).toEqual(expectedDeclarations);
     });
+
+    it('should not generate declarations when parsing an empty labels xml document', async () => {
+        const xmlDocument = `
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
+`;
+
+        const typings: string = await Typing.declarationsFromCustomLabels(xmlDocument);
+        expect(typings).toEqual('');
+    });
 });
