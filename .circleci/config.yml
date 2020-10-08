@@ -139,8 +139,14 @@ workflows:
   publish-workflow:
     when: << pipeline.parameters.publish >>
     jobs:
+      - slack/approval-notification:
+          message: Pending Approval for Publish of Lightning Language Server
+          channel: 'pdt_releases'
+          color: '#0E1111'
       - build-and-test-linux
       - build-and-test-win
+      - hold: # Requires manual approval in Circle Ci
+          type: approval
       - publish:
           context: pdt-publish-restricted-context
           filters:
@@ -150,3 +156,4 @@ workflows:
           requires:
             - build-and-test-linux
             - build-and-test-win
+            - hold
