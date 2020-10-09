@@ -50,6 +50,7 @@ describe('TypingIndexer', () => {
     describe('#saveCustomLabelTypings', () => {
         afterEach(() => {
             fsExtra.removeSync(typingIndexer.typingsBaseDir);
+            jest.restoreAllMocks();
         });
 
         it('saves the custom labels xml file to 1 typings file', async () => {
@@ -57,6 +58,17 @@ describe('TypingIndexer', () => {
             const customLabelPath: string = path.join(typingIndexer.workspaceRoot, '.sfdx', 'typings', 'lwc', 'customlabels.d.ts');
             expect(fsExtra.pathExistsSync(customLabelPath)).toBeTrue();
             expect(fsExtra.readFileSync(customLabelPath).toString()).toInclude('declare module');
+        });
+
+        it('should not create a customlabels typing file when a project has no custom labels', async () => {
+            const xmlDocument = `
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
+`;
+            jest.spyOn(fsExtra, 'readFileSync').mockReturnValue(Buffer.from(xmlDocument));
+            const fileWriter = jest.spyOn(fsExtra, 'writeFileSync');
+            await typingIndexer.saveCustomLabelTypings();
+            expect(fileWriter).toBeCalledTimes(0);
         });
     });
 
