@@ -7,6 +7,10 @@
     "url": "https://github.com/forcedotcom/lightning-language-server.git"
   },
   "devDependencies": {
+    "@commitlint/cli": "^7",
+    "@commitlint/config-conventional": "^7",
+    "commitizen": "^3.0.5",
+    "cz-conventional-changelog": "^2.1.0",
     "@types/node": "^10.12.18",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
@@ -27,6 +31,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --force-local",
     "bump-versions": "lerna version --force-publish --no-git-tag-version --exact --yes",
+    "commit-init": "commitizen init cz-conventional-changelog --save-dev --save-exact --force",
+    "commit": "git-cz",
     "clean": "lerna run clean --stream",
     "cleanTestData": "lerna run cleanTestData --stream",
     "build": "lerna run build --stream",
@@ -43,6 +49,17 @@
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail",
     "package": "lerna run package"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "./{src,test}/**/*.{ts,js}": [
+      "eslint -c .eslintrc.json --fix"
+    ]
+  },
   "private": true,
   "workspaces": {
     "packages": [
@@ -56,5 +73,10 @@
   "volta": {
     "node": "12.4.0",
     "yarn": "1.22.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
