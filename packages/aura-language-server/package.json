@@ -29,7 +29,7 @@
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
     "change-case": "^3.1.0",
-    "enhanced-resolve": "^2.2.2",
+    "enhanced-resolve": "^5.2.0",
     "fs-extra": "^5.0.0",
     "line-column": "^1.0.2",
     "minimatch": "^3.0.4",
