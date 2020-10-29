@@ -107,7 +107,7 @@ connection.onInitialize(
                     textDocumentSync: documents.syncKind,
                     completionProvider: {
                         resolveProvider: true,
-                        triggerCharacters: ['{', '.', ':', '<', '"', '=', '/', '>'],
+                        triggerCharacters: ['.', ':', '<', '"', '=', '/', '>'],
                     },
                     workspace: {
                         workspaceFolders: {
