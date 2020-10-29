@@ -116,7 +116,7 @@ export default class Server {
                 textDocumentSync: this.documents.syncKind,
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['{', '.', '-', '_', '<', '"', '=', '/', '>'],
+                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>'],
                 },
                 hoverProvider: true,
                 definitionProvider: true,
