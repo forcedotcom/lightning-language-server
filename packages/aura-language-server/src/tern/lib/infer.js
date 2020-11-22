@@ -544,6 +544,9 @@
   });
 
   function isInteger(str) {
+    if (!str) {
+      return false;
+    }
     var c0 = str.charCodeAt(0);
     if (c0 >= 48 && c0 <= 57) return !/\D/.test(str);
     else return false;
