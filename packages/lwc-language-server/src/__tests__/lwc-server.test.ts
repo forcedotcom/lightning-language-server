@@ -14,6 +14,10 @@ const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-ap
 const auraUri = URI.file(auraFilename).toString();
 const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
 
+const hoverFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.html');
+const hoverUri = URI.file(hoverFilename).toString();
+const hoverDocument: TextDocument = TextDocument.create(hoverFilename, 'html', 0, fsExtra.readFileSync(hoverFilename).toString());
+
 const server: Server = new Server();
 
 jest.mock('vscode-languageserver', () => {
@@ -38,6 +42,7 @@ jest.mock('vscode-languageserver', () => {
                     const docs = new Map([
                         [uri, document],
                         [auraUri, auraDocument],
+                        [hoverUri, hoverDocument],
                     ]);
                     return docs.get(name);
                 },
@@ -107,7 +112,7 @@ describe('handlers', () => {
     });
 
     describe('onHover', () => {
-        it('returns the the docs for that hovered item', async () => {
+        it('returns the docs for that hovered item', async () => {
             const params: TextDocumentPositionParams = {
                 textDocument: { uri },
                 position: {
@@ -139,6 +144,22 @@ describe('handlers', () => {
             const contents = hover.contents as MarkupContent;
             expect(contents.value).toContain('**info**');
             expect(contents.value).toContain('**icon-name**');
+        });
+
+        it('should return the component library link for a standard component', async () => {
+            const params: TextDocumentPositionParams = {
+                textDocument: { uri: hoverUri },
+                position: {
+                    line: 1,
+                    character: 11,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+            const hover: Hover = await server.onHover(params);
+            const contents = hover.contents as MarkupContent;
+            expect(contents.value).toContain('https://developer.salesforce.com/docs/component-library/bundle/lightning-tree');
         });
     });
 
