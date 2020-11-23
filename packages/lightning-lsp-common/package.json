@@ -52,7 +52,7 @@
     "@types/shelljs": "^0.8.1",
     "@types/tmp": "^0.1.0",
     "find-node-modules": "^1.0.4",
-    "findup-sync": "^3.0.0",
+    "findup-sync": "^4.0.0",
     "husky": "^4.2.5",
     "jest": "^26.4.1",
     "jest-extended": "^0.11.5",
