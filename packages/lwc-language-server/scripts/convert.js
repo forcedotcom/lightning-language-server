@@ -1,11 +1,12 @@
 const fs = require('fs');
+const path = require('path');
 
 function getComponentLibraryLink(name) {
     return '[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/' + name + ')';
 }
 
-function getHover(tag) {
-    let retVal = tag.description + '\n' + getComponentLibraryLink(tag.name) + '\n### Attributes\n';
+function getHover(tag, name) {
+    let retVal = tag.description + '\n' + getComponentLibraryLink(name) + '\n### Attributes\n';
 
     for (const info of tag.attributes) {
         retVal += getAttributeMarkdown(info);
@@ -32,7 +33,8 @@ function getAttributeMarkdown(attribute) {
 }
 
 // read old file
-const f = fs.readFileSync('lwc-standard.json', { encoding: 'utf-8' });
+const lwcStandard = path.join(__dirname, '..', 'src', 'resources', 'lwc-standard.json');
+const f = fs.readFileSync(lwcStandard, { encoding: 'utf-8' });
 const data = JSON.parse(f.toString());
 
 // create tags from old file
@@ -40,7 +42,7 @@ const tags = Object.keys(data).map(key => {
     const tag = data[key];
     return {
         name: key,
-        description: getHover(tag),
+        description: getHover(tag, key),
         attributes: tag.attributes.map(({ name, description }) => ({
             name,
             description,
@@ -77,6 +79,7 @@ const newJson = {
     globalAttributes,
 };
 
-fs.writeFileSync('standard-lwc.json', JSON.stringify(newJson, null, 2));
+const standardLWC = path.join(__dirname, '..', 'src', 'resources', 'standard-lwc.json');
+fs.writeFileSync(standardLWC, JSON.stringify(newJson, null, 2));
 
-console.log('done');
+console.log('done building standard-lwc.json');
