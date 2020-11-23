@@ -78,14 +78,18 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     findTagByName(query: string): Tag | null {
-        const matches = componentPrefixRegex.exec(query);
-        const { delimiter, name } = matches?.groups;
-        if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
-            return this.tags.get(name) || this.tags.get(snakeCase(name)) || null;
-        } else if (delimiter === DelimiterType.LWC) {
-            return this.tags.get(name) || this.tags.get(camelcase(name)) || null;
+        try {
+            const matches = componentPrefixRegex.exec(query);
+            const { delimiter, name } = matches?.groups;
+            if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
+                return this.tags.get(name) || this.tags.get(snakeCase(name)) || null;
+            } else if (delimiter === DelimiterType.LWC) {
+                return this.tags.get(name) || this.tags.get(camelcase(name)) || null;
+            }
+            return this.tags.get(query) || null;
+        } catch (err) {
+            return null;
         }
-        return this.tags.get(query) || null;
     }
 
     findTagByURI(uri: string): Tag | null {
