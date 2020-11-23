@@ -82,6 +82,10 @@ describe('ComponentIndexer', () => {
                 expect(componentIndexer.findTagByName('c:todoItem').name).toEqual('todo_item');
                 expect(componentIndexer.findTagByName('c:todo-foo')).toBeNull();
             });
+
+            it('should return null when query provided cannot be mapped', () => {
+                expect(componentIndexer.findTagByName('response.data.length')).toBeNull();
+            });
         });
 
         describe('#findTagByURI', () => {
