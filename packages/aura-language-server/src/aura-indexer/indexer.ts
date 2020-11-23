@@ -215,7 +215,7 @@ export default class AuraIndexer implements Indexer {
 
     private searchAura(node: Node): Node[] {
         const results = [];
-        if (node.tag.indexOf(':') !== -1) {
+        if (node.tag && node.tag.indexOf(':') !== -1) {
             results.push(node);
         }
         for (const child of node.children) {
@@ -257,9 +257,5 @@ export default class AuraIndexer implements Indexer {
         const name = componentUtil.componentFromFile(file, sfdxProject);
         const info = new TagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
         return info;
-    }
-
-    private isAuraNamespace(namespace: string): boolean {
-        return this.AURA_NAMESPACES.has(namespace);
     }
 }
