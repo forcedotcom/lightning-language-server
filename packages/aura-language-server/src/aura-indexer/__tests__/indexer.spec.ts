@@ -1,6 +1,7 @@
 import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
 import AuraIndexer from '../indexer';
 import * as path from 'path';
+import mockFs from 'mock-fs';
 import URI from 'vscode-uri';
 
 function normalize(start: string, p: string): string {
@@ -22,40 +23,83 @@ function uriToFile(uri: string): string {
     return URI.parse(uri).fsPath;
 }
 
-it('aura indexer', async () => {
-    const ws = 'test-workspaces/sfdx-workspace';
-    const full = path.resolve(ws);
+describe('indexer parsing content', () => {
+    afterEach(() => {
+        mockFs.restore();
+    });
 
-    const context = new WorkspaceContext(ws);
-    await context.configureProject();
-    const auraIndexer = new AuraIndexer(context);
-    await auraIndexer.configureAndIndex();
-    context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
+    it('aura indexer', async () => {
+        const ws = 'test-workspaces/sfdx-workspace';
+        const full = path.resolve(ws);
 
-    let markup = await context.findAllAuraMarkup();
-    markup = markup.map(p => normalize(full, p));
-    markup = markup.sort();
-    expect(markup).toMatchSnapshot();
-    const tags = auraIndexer.getAuraTags();
-    tags.forEach(taginfo => {
-        if (taginfo.file) {
-            taginfo.file = normalize(full, taginfo.file);
-        }
-        if (taginfo.location && taginfo.location.uri) {
-            taginfo.location.uri = normalize(full, uriToFile(taginfo.location.uri));
-        }
-        if (taginfo.attributes) {
-            taginfo.attributes = taginfo.attributes.sort((a, b) => a.name.localeCompare(b.name));
-            for (const attribute of taginfo.attributes) {
-                if (attribute.location && attribute.location.uri) {
-                    attribute.location.uri = normalize(full, uriToFile(attribute.location.uri));
+        const context = new WorkspaceContext(ws);
+        await context.configureProject();
+        const auraIndexer = new AuraIndexer(context);
+        await auraIndexer.configureAndIndex();
+        context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
+
+        let markup = await context.findAllAuraMarkup();
+        markup = markup.map(p => normalize(full, p));
+        markup = markup.sort();
+        expect(markup).toMatchSnapshot();
+        const tags = auraIndexer.getAuraTags();
+        tags.forEach(taginfo => {
+            if (taginfo.file) {
+                taginfo.file = normalize(full, taginfo.file);
+            }
+            if (taginfo.location && taginfo.location.uri) {
+                taginfo.location.uri = normalize(full, uriToFile(taginfo.location.uri));
+            }
+            if (taginfo.attributes) {
+                taginfo.attributes = taginfo.attributes.sort((a, b) => a.name.localeCompare(b.name));
+                for (const attribute of taginfo.attributes) {
+                    if (attribute.location && attribute.location.uri) {
+                        attribute.location.uri = normalize(full, uriToFile(attribute.location.uri));
+                    }
                 }
             }
-        }
-    });
-    const sortedTags = new Map([...tags.entries()].sort());
-    expect(sortedTags).toMatchSnapshot();
+        });
+        const sortedTags = new Map([...tags.entries()].sort());
+        expect(sortedTags).toMatchSnapshot();
 
-    const namespaces = auraIndexer.getAuraNamespaces().sort();
-    expect(namespaces).toMatchSnapshot();
+        const namespaces = auraIndexer.getAuraNamespaces().sort();
+        expect(namespaces).toMatchSnapshot();
+    });
+
+    it('should index a valid aura component', async () => {
+        const ws = 'test-workspaces/sfdx-workspace';
+        const context = new WorkspaceContext(ws);
+        await context.configureProject();
+        const auraIndexer = new AuraIndexer(context);
+        await auraIndexer.configureAndIndex();
+        context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
+
+        const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp');
+        const tagInfo = await auraIndexer.indexFile(auraFilename, true);
+        expect(tagInfo).toBeObject();
+        expect(tagInfo.name).toEqual('c:wireLdsCmp');
+        expect(tagInfo.file).toEndWith('wireLdsCmp.cmp');
+        expect(tagInfo.type).toEqual(2);
+        expect(tagInfo.lwc).toEqual(false);
+        expect(tagInfo.location).toBeObject();
+        expect(tagInfo.location.uri).toEndWith('wireLdsCmp.cmp');
+        expect(tagInfo.location.range).toBeObject();
+        expect(tagInfo.namespace).toEqual('c');
+    });
+
+    it('should handle indexing an invalid aura component', async () => {
+        const ws = 'test-workspaces/sfdx-workspace';
+        const context = new WorkspaceContext(ws);
+        await context.configureProject();
+        const auraIndexer = new AuraIndexer(context);
+        await auraIndexer.configureAndIndex();
+        context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
+
+        const dummyFilePath = '/invalid.cmp';
+        mockFs({
+            ['/invalid.cmp']: '<>',
+        });
+        const tagInfo = await auraIndexer.indexFile(dummyFilePath, true);
+        expect(tagInfo).toBeUndefined();
+    });
 });
