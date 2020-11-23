@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`aura indexer 1`] = `
+exports[`indexer parsing content aura indexer 1`] = `
 Array [
   "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
   "force-app/main/default/aura/indexApp/indexApp.app",
@@ -11,7 +11,7 @@ Array [
 ]
 `;
 
-exports[`aura indexer 2`] = `
+exports[`indexer parsing content aura indexer 2`] = `
 Map {
   "aura:application" => TagInfo {
     "attributes": Array [
@@ -15381,7 +15381,7 @@ Map {
 }
 `;
 
-exports[`aura indexer 3`] = `
+exports[`indexer parsing content aura indexer 3`] = `
 Array [
   "aura",
   "c",
