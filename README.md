@@ -53,6 +53,13 @@ npm run compile
 code ./vscode-workspaces/multiroot-simple.code-workspace
 ```
 
+OR
+
+```
+From the lightning-language-server project, open the file 'multiroot-simple.code-workspace'
+Click button 'Open Workspace'
+```
+
 ### Debugging with VSCode
 
 Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). 
