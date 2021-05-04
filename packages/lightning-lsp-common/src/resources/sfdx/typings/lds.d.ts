@@ -1006,7 +1006,7 @@ declare module 'lightning/analyticsWaveApi' {
      *    (none)
      */
     export interface ScheduleInputRepresentation {
-        /** Frequency on which this schedule is run. */
+        /** Frequency on which this schedule is run. This is case-insensitive. */
         frequency: string;
         /** Level of subscription for the related job. */
         notificationLevel?: string;
