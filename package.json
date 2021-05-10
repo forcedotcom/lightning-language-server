@@ -45,7 +45,7 @@
     "format": "lerna run format --stream --parallel",
     "link-lsp": "lerna exec yarn link --no-bail",
     "unlink-lsp": "lerna exec yarn unlink --no-bail",
-    "publish-lsp": "lerna publish from-package --force-publish --exact --yes",
+    "publish-lsp": "lerna publish from-package --force-publish --exact --yes --no-verify-access",
     "windowsCopySymlinks": "lerna run windowsCopySymlinks --stream --no-bail",
     "package": "lerna run package"
   },
