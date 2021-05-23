@@ -58,7 +58,7 @@
     "jest-extended": "^0.11.5",
     "lint-staged": "^10.2.11",
     "lwc": "1.7.14",
-    "mock-fs": "^4.11.0",
+    "mock-fs": "^5.0.0",
     "prettier": "^2.0.5",
     "shelljs": "^0.8.3",
     "tmp": "^0.0.33",
