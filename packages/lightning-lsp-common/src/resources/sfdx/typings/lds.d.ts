@@ -548,6 +548,16 @@ declare module 'lightning/uiRecordApi' {
     export function getFieldDisplayValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
 }
 
+declare module 'lightning/platformScaleCenterApi' {
+    /**
+     * Wire adapter for a Scale Center observability metrics.     
+     * 
+     * @param request a serialized list of ScaleCenterRequests that define which metrics are to be queried
+     * @returns a serialized list of the requested metric data
+     */
+     export function getMetrics( request: string ): void;
+}
+
 declare module 'lightning/analyticsWaveApi' {
     /**
      * A Wave dataflow node.
