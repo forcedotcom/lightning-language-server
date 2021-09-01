@@ -563,6 +563,42 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Base represenation for fields in Wave.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AdvancedPropertyValueReprensentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface AbstractFieldRepresentation {
+        defaultValue?: string | number | null | boolean;
+        description?: string;
+        fieldType: string;
+        format?: string;
+        label: string;
+        multiValue?: boolean;
+        multiValueSeparator?: string;
+        name: string;
+        precision?: number;
+        scale?: number;
+        systemField?: boolean;
+        uniqueId?: boolean;
+    }
+
+    /**
+     * An advanced property Name and Value.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AdvancedPropertyValueReprensentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface AdvancedPropertyValueRepresentation {
+        name: string;
+        value: string;
+    }
+
+    /**
      * Asset reference representation.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AssetReferenceRepresentation
@@ -572,6 +608,20 @@ declare module 'lightning/analyticsWaveApi' {
      */
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     export interface AssetReferenceRepresentation extends BaseAssetReferenceRepresentation {}
+
+    /**
+     * Base Wave Asset input Representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#BaseAssetInputRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface BaseAssetInputRepresentation {
+        description?: string;
+        label?: string;
+        name?: string;
+    }
 
     /**
      * Base asset reference representation.
@@ -633,6 +683,17 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * A Connection Property Name and Value.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ConnectionPropertyValueRepresentation {
+        name: string;
+        value: string | number | boolean;
+    }
+
+    /**
      * Daily schedule on which to execute some type of job.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#DailyScheduleInputRepresentation
@@ -654,6 +715,57 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export interface DailyScheduleRepresentation extends ScheduleRepresentation {
         frequency: 'daily' | 'Daily';
+    }
+
+    /**
+     * Wave Data Connector input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors.htm#DataConnectorInputRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DataConnectorInputRepresentation extends BaseAssetInputRepresentation {
+        /** Connection properties for the connector */
+        connectionProperties?: Array<any>;
+        /** Third party driver used for connection */
+        connectorHandler?: string;
+        /** The type of the Data Connector. */
+        connectorType?: string;
+        /** Folder for the Live connector */
+        folder?: {
+            [key: string]: string;
+        };
+        /** AssetReference containing ID or API name of target connector associated with the current source connector */
+        targetConnector?: {
+            [key: string]: string;
+        };
+    }
+
+    /**
+     * A Data Connector represents a connection.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors.htm#DataConnectorRepresentation
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface DataConnectorRepresentation extends BaseWaveAssetRepresentation {
+        connectionProperties: Array<ConnectionPropertyValueRepresentation>;
+        connectorHandler?: string;
+        connectorType: string;
+        folder?: AssetReferenceRepresentation;
+        ingestionSchedule:
+            | HourlyScheduleRepresentation
+            | MonthlySpecificScheduleRepresentation
+            | MinutelyScheduleRepresentation
+            | EventDrivenScheduleRepresentation
+            | WeeklyScheduleRepresentation
+            | MonthlyRelativeScheduleRepresentation
+            | DailyScheduleRepresentation
+            | EmptyScheduleRepresentation;
+        targetConnector?: AssetReferenceRepresentation;
+        type: 'dataConnector';
     }
 
     /**
@@ -949,6 +1061,120 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * output source for output objects
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#OutputSourceRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface OutputSourceRepresentation {
+        inputRows?: number;
+        isSyncOut: boolean;
+        name: string;
+        nextScheduledDate?: string;
+        outputRows?: number;
+    }
+
+    /**
+     * Replicates data from an external source object into a Wave as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#ReplicatedDatasetInputRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ReplicatedDatasetInputRepresentation {
+        advancedProperties?: Array<{
+            [key: string]: any;
+        }>;
+        connectionMode?: string;
+        connectorId?: string;
+        fullRefresh?: boolean;
+        passThroughFilter?: string;
+        rowLevelSharing?: boolean;
+        sourceObjectName?: string;
+    }
+
+    /**
+     * Replicates data from an external source object into a Wave as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#ReplicatedDatasetRepresentation
+     *
+     * Keys:
+     *    id (string): uuid
+     */
+    export interface ReplicatedDatasetRepresentation {
+        assetSharingUrl?: string | null;
+        createdBy?: WaveUserRepresentation;
+        createdDate?: string;
+        description?: string;
+        id: string;
+        label?: string;
+        lastAccessedDate?: string | null;
+        lastModifiedBy?: WaveUserRepresentation | null;
+        lastModifiedDate?: string | null;
+        name?: string;
+        namespace?: string;
+        permissions?: PermissionsRepresentation | null;
+        type: string;
+        url: string;
+        advancedProperties: Array<AdvancedPropertyValueRepresentation>;
+        connectionMode?: string;
+        connector: DataConnectorRepresentation;
+        datasetId?: string;
+        fieldCount?: number;
+        fieldsUrl: string;
+        filterApplied: boolean;
+        lastRefreshedDate?: string;
+        outputSource?: OutputSourceRepresentation;
+        passThroughFilter?: string;
+        replicationDataflowId?: string;
+        rowLevelSharing?: boolean;
+        sourceObjectName: string;
+        status?: string;
+        supportedConnectionModes?: Array<string>;
+        uuid: string;
+    }
+
+    /**
+     * A list of configuration metadata that specifies how to replicate each field of a Replicated Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets_id_fields.htm#ReplicatedFieldCollectionInputRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ReplicatedFieldCollectionInputRepresentation {
+        fields: Array<{}>;
+    }
+
+    /**
+     * A list of Replicated Fields.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets_id_fields.htm#ReplicatedFieldCollectionInputRepresentation#ReplicatedFieldCollectionRepresentation
+     *
+     * Keys:
+     *    id (string): replicatedDataset.id
+     */
+    export interface ReplicatedFieldCollectionRepresentation {
+        fields: Array<ReplicatedFieldRepresentation>;
+        replicatedDataset: AssetReferenceRepresentation;
+        url: string;
+    }
+
+    /**
+     * Metadata/configururation for a single field of a Replicated Dataset.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ReplicatedFieldRepresentation extends AbstractFieldRepresentation {
+        skipped: boolean;
+        fieldType: 'replicatedField';
+    }
+
+    /**
      * Permissions of the user on an asset.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#PermissionsRepresentation
@@ -965,6 +1191,19 @@ declare module 'lightning/analyticsWaveApi' {
         modify?: boolean;
         /** The value which indicates whether the user can view an asset. */
         view?: boolean;
+    }
+
+    /**
+     * Representation of a dataset version restore.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors_connectorid_ingest.htm#RestoreDatasetVersionRepresentation
+     *
+     * Keys:
+     *    id (string): url
+     */
+    export interface RestoreDatasetVersionRepresentation {
+        message: string;
+        url: string;
     }
 
     /**
@@ -1116,6 +1355,18 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Creates a Tableau CRM connector.
+     *
+     * @param dataConnector.connectionProperties Connection properties for the connector.
+     * @param dataConnector.connectorHandler Third party driver used for connection.
+     * @param dataConnector.connectorType The type of the Data Connector.
+     * @param dataConnector.folder Folder for the Live connector.
+     * @param dataConnector.targetConnector AssetReference containing ID or API name of target connector associated with the current source connector.
+     * @return A promise that will resolve to the data connector response.
+     */
+    export function createDataConnector({ dataConnector }: { dataConnector: DataConnectorInputRepresentation }): Promise<DataConnectorRepresentation>;
+
+    /**
      * Creates a Tableau CRM dataflow job, which is the equivalent of clicking Run Now for a data prep recipe, a data sync,
      * or a dataflow in the Tableau CRM Data Manager UI.
      *
@@ -1126,6 +1377,24 @@ declare module 'lightning/analyticsWaveApi' {
      * @return A promise that will resolve to the dataflow job response.
      */
     export function createDataflowJob({ dataflowJob }: { dataflowJob: DataflowJobInputRepresentation }): Promise<DataflowJobRepresentation>;
+
+    /**
+     * Creates a Tableau CRM replicated dataset
+     *
+     * @param replicatedDataset.advancedProperties List of user-specified advanced properties associated with this.
+     * @param replicatedDataset.connectionMode Connection mode for pulling the data from the replicated dataset.
+     * @param replicatedDataset.connectorId The id of the connector object used to replicate.
+     * @param replicatedDataset.fullRefresh Whether to perform a one-time full refresh (during the next run) as opposed to incremental.
+     * @param replicatedDataset.passThroughFilter Passthrough filter for the replicated object.
+     * @param replicatedDataset.rowLevelSharing Inherit row level sharing rules for this object.
+     * @param replicatedDataset.sourceObjectName The name of the source object to be replicated.
+     * @return A promise that will resolve to the replicated dataset response.
+     */
+    export function createReplicatedDataset({
+        replicatedDataset,
+    }: {
+        replicatedDataset: ReplicatedDatasetInputRepresentation;
+    }): Promise<ReplicatedDatasetRepresentation>;
 
     /**
      * Deletes a specific Tableau CRM dataset by ID or developer name.
@@ -1148,6 +1417,15 @@ declare module 'lightning/analyticsWaveApi' {
     export function deleteRecipe({ id }: { id: string }): Promise<void>;
 
     /**
+     * Deletes a specific Tableau CRM replicated dataset by ID.
+     *
+     *
+     * @param id The ID of the replicated dataset.
+     * @return A promise that will resolve on completion.
+     */
+    export function deleteReplicatedDataset({ id }: { id: string }): Promise<void>;
+
+    /**
      * Wire adapter to execute a Tableau CRM query.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_execute_query
@@ -1163,14 +1441,60 @@ declare module 'lightning/analyticsWaveApi' {
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_analytics_limits
      *
-     * @param licenseType The response includes dataflow jobs with this license type. Valid values are `EinsteinAnalytics` or `Sonic`.
+     * @param licenseType The Tableau CRM license types. Valid values are `EinsteinAnalytics` or `Sonic`.
      * @param types The types of limits used in Tableau CRM.
      *              Valid values are `BatchTransformationHours`, `DatasetQueries`, `DatasetRowCount`,
      *              `MaxDailyRowsHighOutputCon`, `MaxDailyRowsLowOutputCon`, `MaxDailyRowsMedOutputCon`,
      *              `MaxDailySizeHighOutputCon`, `MaxDailySizeLowOutputCon`, `MaxDailySizeMedOutputCon`,
      *              or `OutputLocalConnectorVolume`.
      */
-    export function getAnalyticsLimits(licenseType: string, types?: string[]): void;
+    export function getAnalyticsLimits(licenseType?: string, types?: string[]): void;
+
+    /**
+     * Wire adapter to retrieve the Connector for Tableau CRM.
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     */
+    export function getDataConnector(connectorIdOrApiName: string): void;
+
+    /**
+     * Wire adapter to retrieve the collection of Connectors for Tableau CRM.
+     *
+     * @param category The categories that the data connector belongs to. Valid values are:
+     *                 AdvancedPropertiesSupport, BatchRead, Direct, FileBased, FilterSupport, MuleSoft, Output
+     * @param connectorType The type of Tableau CRM connector.
+     * @param scope The type of scope to be applied to the returned collection. Valid values are:
+     *              Created​By​Me, Mru (Most Recently Used), Shared​With​Me
+     */
+    export function getDataConnectors(category?: string, connectorType?: string, scope?: string): void;
+
+    /**
+     * Wire adapter to retrieve the collection of source fields for a particular source object.
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param sourceObjectName The name of the source object.
+     */
+    export function getDataConnectorSourceFields(connectorIdOrApiName: string, sourceObjectName: string): void;
+
+    /**
+     * Wire adapter to retrieve a source object resource for a Tableau CRM connector.
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param sourceObjectName The name of the source object.
+     */
+    export function getDataConnectorSourceObject(connectorIdOrApiName: string, sourceObjectName: string): void;
+
+    /**
+     * Wire adapter to test the status of an external Tableau CRM connector.
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     */
+    export function getDataConnectorStatus(connectorIdOrApiName: string): void;
+
+    /**
+     * Wire adapter to retrieve a collection of Tableau CRM connector types.
+     */
+    export function getDataConnectorTypes(): void;
 
     /**
      * Wire adapter to retrieve a specific Tableau CRM dataflow job.
@@ -1291,6 +1615,13 @@ declare module 'lightning/analyticsWaveApi' {
     export function getRecipes(format?: string, licenseType?: string, page?: string, pageSize?: number, q?: string, sort?: string): void;
 
     /**
+     * Wire adapter to retrieve a specific Tableau CRM replicated dataset by ID.
+     *
+     * @param id The ID of the replicated dataset.
+     */
+    export function getReplicatedDataset(id: string): void;
+
+    /**
      * Wire adapter to retrieve a collection of Tableau CRM replicated datasets, also known as connected objects.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_replicated_datasets
@@ -1300,6 +1631,13 @@ declare module 'lightning/analyticsWaveApi' {
      * @param sourceObject Filters the collection to include only connected objects belonging to the specified source object.
      */
     export function getReplicatedDatasets(category?: string, connector?: string, sourceObject?: string): void;
+
+    /**
+     * Wire adapter to retrieve a list of fields for the specified connected object.
+     *
+     * @param id The ID of the replicated dataset.
+     */
+    export function getReplicatedFields(id: string): void;
 
     /**
      * Wire adapter to retrieve a schedule for a Tableau CRM recipe, dataflow, or data sync.
@@ -1352,6 +1690,33 @@ declare module 'lightning/analyticsWaveApi' {
     export function getXmd(datasetIdOrApiName: string, versionId: string, xmdType: string): void;
 
     /**
+     * Wire adapter to triggers the Tableau CRM connector to run a data sync. This API is the equivalent of the “Run Now” UI feature.
+     *
+     * @param connectorIdOrApiName The ID or developer name of the dataset.
+     * @return A promise that will resolve to the ingest data connector response.
+     */
+    export function ingestDataConnector({ connectorIdOrApiName }: { connectorIdOrApiName: string }): Promise<RestoreDatasetVersionRepresentation>;
+
+    /**
+     * Wire adapter to updates Tableau CRM connectors.
+     *
+     * @param connectorIdOrApiName The ID or developer name of the dataset.
+     * @param dataConnector.connectionProperties Connection properties for the connector.
+     * @param dataConnector.connectorHandler Third party driver used for connection.
+     * @param dataConnector.connectorType The type of the Data Connector.
+     * @param dataConnector.folder Folder for the Live connector.
+     * @param dataConnector.targetConnector AssetReference containing ID or API name of target connector associated with the current source connector.
+     * @return A promise that will resolve to the data connector response.
+     */
+    export function updateDataConnector({
+        connectorIdOrApiName,
+        dataConnector,
+    }: {
+        connectorIdOrApiName: string;
+        dataConnector: DataConnectorInputRepresentation;
+    }): Promise<DataConnectorRepresentation>;
+
+    /**
      * Updates a Tableau CRM dataflow job, which is the equivalent of clicking Stop for a data prep recipe, a data sync, or a dataflow in the Tableau CRM Data Manager UI.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_update_dataflow_job
@@ -1367,6 +1732,42 @@ declare module 'lightning/analyticsWaveApi' {
         dataflowJobId: string;
         dataflowJob: DataflowJobInputRepresentation;
     }): Promise<DataflowJobRepresentation>;
+
+    /**
+     * Wire adapter to update the Tableau CRM replicated dataset.
+     *
+     * @param id The ID of the replicated dataset.
+     * @param replicatedDataset.advancedProperties List of user-specified advanced properties associated with this.
+     * @param replicatedDataset.connectionMode Connection mode for pulling the data from the replicated dataset.
+     * @param replicatedDataset.connectorId The id of the connector object used to replicate.
+     * @param replicatedDataset.fullRefresh Whether to perform a one-time full refresh (during the next run) as opposed to incremental.
+     * @param replicatedDataset.passThroughFilter Passthrough filter for the replicated object.
+     * @param replicatedDataset.rowLevelSharing Inherit row level sharing rules for this object.
+     * @param replicatedDataset.sourceObjectName The name of the source object to be replicated.
+     * @return A promise that will resolve to the replicated dataset response.
+     */
+    export function updateReplicatedDataset({
+        id,
+        replicatedDataset,
+    }: {
+        id: string;
+        replicatedDataset: ReplicatedDatasetInputRepresentation;
+    }): Promise<ReplicatedDatasetRepresentation>;
+
+    /**
+     * Wire adapter to update the Tableau CRM replicated fields.
+     *
+     * @param id The ID of the replicated dataset.
+     * @param replicatedFields.fields A list of configuration metadata that specifies how to replicate each field of a Replicated Dataset.
+     * @return A promise that will resolve to the replicated fields response.
+     */
+    export function updateReplicatedFields({
+        id,
+        replicatedFields,
+    }: {
+        id: string;
+        replicatedFields: ReplicatedFieldCollectionInputRepresentation;
+    }): Promise<ReplicatedFieldCollectionRepresentation>;
 
     /**
      * Updates the schedule for a Tableau CRM data prep recipe, data sync, or dataflow.
