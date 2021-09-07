@@ -563,9 +563,9 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Base represenation for fields in Wave.
+     * Base representation for fields in Wave.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AdvancedPropertyValueReprensentation
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AbstractFieldRepresentation
      *
      * Keys:
      *    (none)
@@ -684,6 +684,8 @@ declare module 'lightning/analyticsWaveApi' {
 
     /**
      * A Connection Property Name and Value.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors.htm#ConnectionPropertyValueRepresentation
      *
      * Keys:
      *    (none)
@@ -1164,7 +1166,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Metadata/configururation for a single field of a Replicated Dataset.
+     * Metadata/configuration for a single field of a Replicated Dataset.
      *
      * Keys:
      *    (none)
@@ -1690,7 +1692,7 @@ declare module 'lightning/analyticsWaveApi' {
     export function getXmd(datasetIdOrApiName: string, versionId: string, xmdType: string): void;
 
     /**
-     * Wire adapter to triggers the Tableau CRM connector to run a data sync. This API is the equivalent of the “Run Now” UI feature.
+     * Wire adapter to trigger the Tableau CRM connector to run a data sync. This API is the equivalent of the “Run Now” UI feature.
      *
      * @param connectorIdOrApiName The ID or developer name of the dataset.
      * @return A promise that will resolve to the ingest data connector response.
