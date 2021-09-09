@@ -1482,6 +1482,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to retrieve the collection of source fields for a particular source object.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector_source_fields
+     *
      * @param connectorIdOrApiName The ID of the connector.
      * @param sourceObjectName The name of the source object.
      */
