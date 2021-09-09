@@ -1359,6 +1359,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Creates a Tableau CRM connector.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_create_data_connector
+     *
      * @param dataConnector.connectionProperties Connection properties for the connector.
      * @param dataConnector.connectorHandler Third party driver used for connection.
      * @param dataConnector.connectorType The type of the Data Connector.
@@ -1382,6 +1384,8 @@ declare module 'lightning/analyticsWaveApi' {
 
     /**
      * Creates a Tableau CRM replicated dataset
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_create_replicated_dataset
      *
      * @param replicatedDataset.advancedProperties List of user-specified advanced properties associated with this.
      * @param replicatedDataset.connectionMode Connection mode for pulling the data from the replicated dataset.
@@ -1421,6 +1425,7 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Deletes a specific Tableau CRM replicated dataset by ID.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_delete_replicated_dataset
      *
      * @param id The ID of the replicated dataset.
      * @return A promise that will resolve on completion.
@@ -1455,12 +1460,16 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to retrieve the Connector for Tableau CRM.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector
+     *
      * @param connectorIdOrApiName The ID of the connector.
      */
     export function getDataConnector(connectorIdOrApiName: string): void;
 
     /**
      * Wire adapter to retrieve the collection of Connectors for Tableau CRM.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connectors
      *
      * @param category The categories that the data connector belongs to. Valid values are:
      *                 AdvancedPropertiesSupport, BatchRead, Direct, FileBased, FilterSupport, MuleSoft, Output
@@ -1481,6 +1490,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to retrieve a source object resource for a Tableau CRM connector.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector_source_object
+     *
      * @param connectorIdOrApiName The ID of the connector.
      * @param sourceObjectName The name of the source object.
      */
@@ -1489,12 +1500,16 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to test the status of an external Tableau CRM connector.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector_status
+     *
      * @param connectorIdOrApiName The ID of the connector.
      */
     export function getDataConnectorStatus(connectorIdOrApiName: string): void;
 
     /**
      * Wire adapter to retrieve a collection of Tableau CRM connector types.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector_types
      */
     export function getDataConnectorTypes(): void;
 
@@ -1619,6 +1634,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to retrieve a specific Tableau CRM replicated dataset by ID.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_replicated_dataset
+     *
      * @param id The ID of the replicated dataset.
      */
     export function getReplicatedDataset(id: string): void;
@@ -1636,6 +1653,8 @@ declare module 'lightning/analyticsWaveApi' {
 
     /**
      * Wire adapter to retrieve a list of fields for the specified connected object.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_replicated_fields
      *
      * @param id The ID of the replicated dataset.
      */
@@ -1694,6 +1713,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to trigger the Tableau CRM connector to run a data sync. This API is the equivalent of the “Run Now” UI feature.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_ingest_data_connector
+     *
      * @param connectorIdOrApiName The ID or developer name of the dataset.
      * @return A promise that will resolve to the ingest data connector response.
      */
@@ -1701,6 +1722,8 @@ declare module 'lightning/analyticsWaveApi' {
 
     /**
      * Wire adapter to updates Tableau CRM connectors.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_update_data_connector
      *
      * @param connectorIdOrApiName The ID or developer name of the dataset.
      * @param dataConnector.connectionProperties Connection properties for the connector.
@@ -1738,6 +1761,8 @@ declare module 'lightning/analyticsWaveApi' {
     /**
      * Wire adapter to update the Tableau CRM replicated dataset.
      *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_update_replicated_dataset
+     *
      * @param id The ID of the replicated dataset.
      * @param replicatedDataset.advancedProperties List of user-specified advanced properties associated with this.
      * @param replicatedDataset.connectionMode Connection mode for pulling the data from the replicated dataset.
@@ -1758,6 +1783,8 @@ declare module 'lightning/analyticsWaveApi' {
 
     /**
      * Wire adapter to update the Tableau CRM replicated fields.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_update_replicated_dataset_fields
      *
      * @param id The ID of the replicated dataset.
      * @param replicatedFields.fields A list of configuration metadata that specifies how to replicate each field of a Replicated Dataset.
