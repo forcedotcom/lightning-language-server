@@ -550,7 +550,7 @@ declare module 'lightning/uiRecordApi' {
 
 declare module 'lightning/analyticsWaveApi' {
     /**
-     * A Wave dataflow node.
+     * A Tableau CRM dataflow node.
      *
      * Keys:
      *    (none)
@@ -563,7 +563,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Base representation for fields in Wave.
+     * Base representation for fields in Tableau CRM.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AbstractFieldRepresentation
      *
@@ -610,7 +610,7 @@ declare module 'lightning/analyticsWaveApi' {
     export interface AssetReferenceRepresentation extends BaseAssetReferenceRepresentation {}
 
     /**
-     * Base Wave Asset input Representation
+     * Base Tableau CRM Asset input Representation
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#BaseAssetInputRepresentation
      *
@@ -645,7 +645,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Base Wave asset representation.
+     * Base Tableau CRM asset representation.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#BaseWaveAssetRepresentation
      * Keys:
@@ -720,7 +720,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Wave Data Connector input representation
+     * Tableau CRM Data Connector input representation
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors.htm#DataConnectorInputRepresentation
      *
@@ -783,7 +783,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * A Wave dataflow definition.
+     * A Tableau CRM dataflow definition.
      *
      * Keys:
      *    (none)
@@ -811,7 +811,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Wave dataflow job representation.
+     * Tableau CRM dataflow job representation.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataflowjobs_id.htm#DataflowJobRepresentation
      *
@@ -845,7 +845,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Wave dataflow asset representation.
+     * Tableau CRM dataflow asset representation.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataflows_id.htm#DataflowRepresentation
      *
@@ -871,7 +871,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * A Wave dataflow version.
+     * A Tableau CRM dataflow version.
      *
      * Keys:
      *    (none)
@@ -1079,7 +1079,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Replicates data from an external source object into a Wave as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
+     * Replicates data from an external source object into Tableau CRM as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#ReplicatedDatasetInputRepresentation
      *
@@ -1099,7 +1099,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Replicates data from an external source object into a Wave as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
+     * Replicates data from an external source object into Tableau CRM as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#ReplicatedDatasetRepresentation
      *
