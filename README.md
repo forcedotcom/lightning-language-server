@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master)
+[![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/main)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)<br/>
 [![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lwc-language-server?label=lwc-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/lwc-language-server)
 [![npm (scoped)](https://img.shields.io/npm/v/@salesforce/aura-language-server?label=aura-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/aura-language-server)
@@ -61,7 +61,7 @@ Click button 'Open Workspace'
 
 ### Debugging with VSCode
 
-Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list). 
+Run 'Launch DX - Aura & LWC' from the VSCode debug view (its the last one in that long list).
 
 ### Recompile on change
 
@@ -79,14 +79,14 @@ Easiest way to do this is to kill the vscode client and hit F5 to relaunch your 
 
 ### Automated publish to NPM
 Automated deploys to NPM will occur weekly on Sundays @midnight via CircleCI.
-https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master 
+https://circleci.com/gh/forcedotcom/lightning-language-server/tree/main
 
 ### On-Demand publish to NPM
-If you want to have CircleCI publish the current master branch to NPM, you can run the following script to trigger the deploy job to run:
+If you want to have CircleCI publish the current main branch to NPM, you can run the following script to trigger the deploy job to run:
 
 ```
 curl -v -u ${CircleCIToken}: -X POST --header "Content-Type: application/json" -d '{
-  "branch": "master",
+  "branch": "main",
   "parameters": {
     "deploy": true,
     "version": "patch"
