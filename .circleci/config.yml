@@ -117,29 +117,28 @@ jobs:
 workflows:
   version: 2.1
 
+  # run build and test on every commit
   commit-workflow:
-    unless: << pipeline.parameters.publish >>
     jobs:
       - build-and-test-linux
       - build-and-test-win
 
+  #run the publish workflow on every commit to main
   publish-workflow:
-    when: << pipeline.parameters.publish >>
     jobs:
       - slack/approval-notification:
           message: Pending Approval for Publish of Lightning Language Server
           channel: 'pdt_releases'
           color: '#0E1111'
+          filters:
+            branches:
+              only: main
       - build-and-test-linux
       - build-and-test-win
       - hold: # Requires manual approval in Circle Ci
           type: approval
       - publish:
           context: pdt-publish-restricted-context
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - build-and-test-linux
             - build-and-test-win
