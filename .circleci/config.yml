@@ -133,10 +133,14 @@ workflows:
           filters:
             branches:
               only: main
-      - build-and-test-linux
-      - build-and-test-win
       - hold: # Requires manual approval in Circle Ci
-          type: approval
+          type: approval    
+      - build-and-test-linux:
+          requires:
+            - hold
+      - build-and-test-win:
+          requires:
+            - hold
       - publish:
           context: pdt-publish-restricted-context
           filters:
