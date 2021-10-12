@@ -139,6 +139,9 @@ workflows:
           type: approval
       - publish:
           context: pdt-publish-restricted-context
+          filters:
+            branches:
+              only: main
           requires:
             - build-and-test-linux
             - build-and-test-win
