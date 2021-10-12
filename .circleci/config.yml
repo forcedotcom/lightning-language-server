@@ -131,6 +131,9 @@ workflows:
               only: main
       - hold: # Requires manual approval in Circle Ci
           type: approval
+          filters:
+            branches:
+              only: main
       - publish: # Publish job runs only in main when slack approval is clicked
           context: pdt-publish-restricted-context
           filters:
