@@ -122,10 +122,6 @@ workflows:
     jobs:
       - build-and-test-linux
       - build-and-test-win
-
-  #run the publish workflow on every commit to main
-  publish-workflow:
-    jobs:
       - slack/approval-notification:
           message: Pending Approval for Publish of Lightning Language Server
           channel: 'pdt_releases'
@@ -134,14 +130,8 @@ workflows:
             branches:
               only: main
       - hold: # Requires manual approval in Circle Ci
-          type: approval    
-      - build-and-test-linux:
-          requires:
-            - hold
-      - build-and-test-win:
-          requires:
-            - hold
-      - publish:
+          type: approval
+      - publish: # Publish job runs only in main when slack approval is clicked
           context: pdt-publish-restricted-context
           filters:
             branches:
