@@ -31,7 +31,7 @@ parameters:
   # Version bump for upgrade: [major | minor | patch | premajor | preminor | prepatch | prerelease]
   version:
     type: string
-    default: "patch"
+    default: "minor"
 
 jobs:
   # Default Job
@@ -97,7 +97,7 @@ jobs:
             yarn bump-versions << pipeline.parameters.version >>
             git add .
             export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
-            git commit -m "Updated version $RELEASE_TAG"
+            git commit -m "Updated version $RELEASE_TAG [ci skip]"
       - run:
           name: Set .npmrc
           command: echo "//registry.npmjs.org/:_authToken=${NPM_PUBLISH_TOKEN}" > ~/.npmrc
