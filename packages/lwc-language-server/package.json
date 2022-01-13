@@ -11,7 +11,7 @@
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "cleanTestData": "node ../../scripts/removeTestData.js",
-    "build": "tsc -p . && node scripts/build.js && node scripts/convert.js",
+    "build": "tsc -p . && node scripts/convert.js && node scripts/build.js",
     "watch": "tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "test": "jest --runInBand",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
