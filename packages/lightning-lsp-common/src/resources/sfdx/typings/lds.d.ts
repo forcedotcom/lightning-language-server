@@ -76,6 +76,13 @@ declare module 'lightning/uiRelatedListApi' {
      */
     export function getRelatedListInfo(parentObjectApiName?: string | ObjectId, parentRecordId?: string, relatedListId?: string): void;
 
+    /**
+     *  Gets the metadata for a batch of related lists
+     * @param parentObjectApiName The API name of the parent object for the related lists
+     * @param relatedListIds Comma separated IDs of supported related lists for the specified parent object
+     */
+    export function getRelatedListInfoBatch(parentObjectApiName: string | ObjectId, relatedListIds: Array<string>): void;
+
     /** Gets a collection of metadata for all the related lists for a specific entity
      *
      * @param parentObjectApiName The API name of the parent object
@@ -88,6 +95,13 @@ declare module 'lightning/uiRelatedListApi' {
      * @param relatedListId The ID of the related list
      */
     export function getRelatedListRecords(parentRecordId: string, relatedListId: string): void;
+
+    /**
+     *  Gets record data for a batch of related lists
+     * @param parentRecordId The ID of the parent record you want to get related lists for
+     * @param relatedListIds Comma separated IDs of supported related lists for the specified parent record
+     */
+    export function getRelatedListRecordsBatch(parentRecordId: string, relatedListIds: Array<string>): void;
 
     /**
      * Gets the count of records for a related list on a specific given record
