@@ -1633,6 +1633,15 @@ declare module 'lightning/analyticsWaveApi' {
     export function getDataflowJobs(dataflowId?: string, licenseType?: string, page?: string, pageSize?: number, q?: string, status?: string): void;
 
     /**
+     * Wire adapter to retrieve a collection of Tableau CRM dataflows.
+     *
+     * @param q Search terms. Individual terms are separated by spaces. A wildcard is automatically appended to the last token in the query string.
+     *          If the user’s search query contains quotation marks or wildcards, those symbols are automatically removed from the query string in
+     *          the URI along with any other special characters.
+     */
+    export function getDataflows(q?: string): void;
+
+    /**
      * Wire adapter to retrieve a specific Tableau CRM dataset by ID or developer name.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_dataset
