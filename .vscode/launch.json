@@ -33,16 +33,20 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Launch All LWC Tests",
+      // uses lerna to launch all tests, allowing breakpoints
+      "name": "Launch All Tests",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "program": "${workspaceFolder}/node_modules/.bin/lerna",
       "args": [
-        "${workspaceFolder}/packages/lwc-language-server/src",
-        "--verbose",
-        "--runInBand",
-        "--no-cache"
+        "run",
+        "test",
+        "--stream",
+        "--no-bail",
+        "--",
+        "--colors"
       ],
+      "internalConsoleOptions": "neverOpen",
       "console": "integratedTerminal"
     },
     {

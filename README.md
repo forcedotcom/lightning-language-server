@@ -49,15 +49,20 @@ npm run compile
 ### Open both repositories in a vscode workspace
 
 ```
-code ./vscode-workspaces/multiroot-simple.code-workspace
+cd lightning-language-server
+code ./vscode-workspaces/multiroot-simple.code-workspace # or
+code ./vscode-workspaces/multiroot-flat.code-workspace
 ```
 
-OR
+The "simple" workspace will effectively show two main nodes in the Explorer, while "flat" will show each package separately.
 
-```
-From the lightning-language-server project, open the file 'multiroot-simple.code-workspace'
-Click button 'Open Workspace'
-```
+Simple:
+
+<img src="imgs/workspace-simple.png" width="300">
+
+Flat:
+
+<img src="imgs/workspace-flat.png" width="300">
 
 ### Debugging with VSCode
 
