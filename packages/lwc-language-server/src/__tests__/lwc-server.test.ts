@@ -1,14 +1,19 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
-import { getLanguageService } from 'vscode-html-languageservice';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover } from 'vscode-languageserver';
+import { Diagnostic, getLanguageService } from 'vscode-html-languageservice';
+import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover, TextDocumentChangeEvent } from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
+import * as komaci from '@komaci/static-analyzer';
 
 const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
 const uri = URI.file(filename).toString();
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
+
+const jsFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.js');
+const jsUri = URI.file(jsFilename).toString();
+const jsDocument: TextDocument = TextDocument.create(jsUri, 'javascript', 0, fsExtra.readFileSync(jsFilename).toString());
 
 const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
 const auraUri = URI.file(auraFilename).toString();
@@ -32,6 +37,7 @@ jest.mock('vscode-languageserver', () => {
                 onHover: (): boolean => true,
                 onShutdown: (): boolean => true,
                 onDefinition: (): boolean => true,
+                sendDiagnostics: (): boolean => true,
             };
         }),
         TextDocuments: jest.fn().mockImplementation(() => {
@@ -57,6 +63,59 @@ describe('new', () => {
     it('creates a new instance', () => {
         expect(server.connection);
         expect(server.documents);
+    });
+});
+
+describe('komaci', () => {
+    const initializeParams: InitializeParams = {
+        processId: 0,
+        rootUri: '',
+        capabilities: {},
+        workspaceFolders: [
+            {
+                uri: URI.file(path.resolve('../../test-workspaces/sfdx-workspace/')).toString(),
+                name: path.resolve('../../test-workspaces/sfdx-workspace/'),
+            },
+        ],
+    }; 
+
+    describe('#onDidChangeContent', () => {
+        it('performs static analysis on js file', async () => {
+            const stubDiagnostics: Diagnostic[] = [
+                {
+                    range: { start: { line: 1, character: 1 }, end: { line: 2, character: 2 } },
+                    severity: 3,
+                    code: null,
+                    source: 'komaci',
+                    relatedInformation: null,
+                    message: 'message',
+                },
+            ];
+            Object.defineProperty(komaci, 'generatePrimingDiagnosticsModule', {
+                value: jest.fn().mockImplementation(() => stubDiagnostics),
+            });
+            const spy = jest.spyOn(server.connection, 'sendDiagnostics');
+
+            await server.onInitialize(initializeParams);
+            await server.componentIndexer.init();
+
+            const changeEvent: TextDocumentChangeEvent = { document: jsDocument };
+            await server.onDidChangeContent(changeEvent);
+
+            expect(komaci.generatePrimingDiagnosticsModule).toHaveBeenCalledWith({
+                name: 'todo.js',
+                namespace: 'lwc',
+                type: 'file',
+                fileName: 'todo.js',
+                sourceFile: fsExtra.readFileSync(jsFilename).toString(),
+            });
+
+            // ensure the komaci results were passed back to the server
+            expect(spy).toHaveBeenCalledWith({
+                diagnostics: stubDiagnostics,
+                uri: jsUri,
+            });
+        });
     });
 });
 

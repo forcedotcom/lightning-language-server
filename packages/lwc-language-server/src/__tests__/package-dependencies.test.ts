@@ -7,7 +7,7 @@ import glob from 'glob';
 // and minor/patch updates will break functionality, or because they should only
 // use an exact version.
 
-const checkedPackagePatterns: RegExp[] = [/^@salesforce/i, /^@lwc/i];
+const checkedPackagePatterns: RegExp[] = [/^@salesforce/i, /^@lwc/i, /^@komaci/i];
 
 function readJsonFile(jsonFilePath: string): any {
     try {

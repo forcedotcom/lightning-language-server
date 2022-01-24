@@ -1,14 +1,18 @@
 import {
     createConnection,
+    Diagnostic,
     IConnection,
     TextDocuments,
     TextDocument,
     TextDocumentChangeEvent,
     Location,
+    Position,
+    Range,
     WorkspaceFolder,
     InitializeResult,
     InitializeParams,
     TextDocumentPositionParams,
+    DiagnosticSeverity,
 } from 'vscode-languageserver';
 
 import {
@@ -33,6 +37,9 @@ import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
 import { URI } from 'vscode-uri';
+
+import { generatePrimingDiagnosticsModule, PrimingDiagnostic, AnalyzerInput } from '@komaci/static-analyzer';
+import * as path from 'path';
 
 export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
@@ -185,15 +192,70 @@ export default class Server {
         return this.languageService.doHover(doc, position, htmlDoc);
     }
 
-    async onDidChangeContent(changeEvent: any): Promise<void> {
+    async komaciCompileDocument(document: TextDocument): Promise<Diagnostic[]> {
+        try {
+            const fsPath = URI.parse(document.uri).fsPath;
+            const parsedPath = path.parse(fsPath);
+            const namespace = path.basename(path.dirname(parsedPath.dir));
+            const fileName = path.basename(document.uri);
+
+            const ap: AnalyzerInput = {
+                name: fileName,
+                namespace: namespace,
+                type: 'file',
+                fileName: fileName,
+                sourceFile: document.getText(),
+            };
+            const komaciResults = generatePrimingDiagnosticsModule(ap);
+            return this.processKomaciDiagnostics(komaciResults);
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
+    processKomaciDiagnostics(komaciResults: PrimingDiagnostic[]): Diagnostic[] {
+        const komaciDiagnostics: Diagnostic[] = [];
+
+        komaciResults.forEach(result => {
+            const startPos: Position = result.range.start;
+            const endPos: Position = result.range.end;
+            // komaci results are not 0-based, so need to back up by 1
+            startPos.line--;
+            startPos.character--;
+            endPos.line--;
+            endPos.character--;
+
+            let severity: DiagnosticSeverity = DiagnosticSeverity.Information;
+            switch (result.severity) {
+                case 'error':
+                    severity = DiagnosticSeverity.Error;
+                    break;
+                case 'warning':
+                    severity = DiagnosticSeverity.Warning;
+                    break;
+            }
+            const diagnostic = Diagnostic.create(Range.create(startPos, endPos), result.message, severity, null, 'komaci', null);
+            komaciDiagnostics.push(diagnostic);
+        });
+
+        return komaciDiagnostics;
+    }
+
+    async onDidChangeContent(changeEvent: TextDocumentChangeEvent): Promise<void> {
         const { document } = changeEvent;
         const { uri } = document;
+
         if (await this.context.isLWCTemplate(document)) {
             const diagnostics = templateLinter(document);
             this.connection.sendDiagnostics({ uri, diagnostics });
         }
+
         if (await this.context.isLWCJavascript(document)) {
-            const { metadata, diagnostics } = await javascriptCompileDocument(document);
+            const { metadata, diagnostics: compileDiagnostics } = await javascriptCompileDocument(document);
+            const komaciDiagnostics = await this.komaciCompileDocument(document);
+            const diagnostics = compileDiagnostics.concat(komaciDiagnostics);
+
             this.connection.sendDiagnostics({ uri, diagnostics });
             if (metadata) {
                 const tag: Tag = this.componentIndexer.findTagByURI(uri);

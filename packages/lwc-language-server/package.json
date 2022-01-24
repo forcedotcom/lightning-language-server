@@ -23,6 +23,9 @@
     "package": "yarn pack"
   },
   "dependencies": {
+    "@komaci/static-analyzer": "238.1.4",
+    "@komaci/types": "238.1.4",
+    "@lwc-platform/lwc-metadata-next": "2.5.8-236.1",
     "@lwc/compiler": "0.34.8",
     "@lwc/engine": "1.7.14",
     "@lwc/errors": "1.7.14",
@@ -65,5 +68,9 @@
     "prettier": "^2.0.5",
     "ts-jest": "^26.2.0",
     "typescript": "3.7.5"
+  },
+  "volta": {
+    "node": "14.18.3",
+    "yarn": "1.22.17"
   }
 }
