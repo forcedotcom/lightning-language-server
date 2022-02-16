@@ -100,7 +100,7 @@ jobs:
             git commit -m "Updated version $RELEASE_TAG [ci skip]"
       - run:
           name: Set .npmrc
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_PUBLISH_TOKEN}" > ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run: yarn publish-lsp
       - run: git push origin main
       - run:
