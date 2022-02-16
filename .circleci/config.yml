@@ -123,6 +123,7 @@ workflows:
       - build-and-test-linux
       - build-and-test-win
       - slack/approval-notification:
+          context: IEAT_keys
           message: Pending Approval for Publish of Lightning Language Server
           channel: 'pdt_releases'
           color: '#0E1111'
@@ -135,7 +136,7 @@ workflows:
             branches:
               only: main
       - publish: # Publish job runs only in main when slack approval is clicked
-          context: pdt-publish-restricted-context
+          context: IEAT_keys
           filters:
             branches:
               only: main
