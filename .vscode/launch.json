@@ -18,7 +18,7 @@
       "name": "Debug LWC LSP",
       "type": "node",
       "request": "attach",
-      "port": 6009,
+      "port": 6030,
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/packages/lwc-language-server/lib/**"],
       "protocol": "inspector",
@@ -33,16 +33,20 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Launch All LWC Tests",
+      // uses lerna to launch all tests, allowing breakpoints
+      "name": "Launch All Tests",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "program": "${workspaceFolder}/node_modules/.bin/lerna",
       "args": [
-        "${workspaceFolder}/packages/lwc-language-server/src",
-        "--verbose",
-        "--runInBand",
-        "--no-cache"
+        "run",
+        "test",
+        "--stream",
+        "--no-bail",
+        "--",
+        "--colors"
       ],
+      "internalConsoleOptions": "neverOpen",
       "console": "integratedTerminal"
     },
     {
