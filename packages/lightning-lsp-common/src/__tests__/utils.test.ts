@@ -70,6 +70,11 @@ it('getExtension()', () => {
     expect(utils.getExtension(jsDocument)).toBe('.js');
 });
 
+it('getBasename()', () => {
+    const htmlDocument = TextDocument.create('file:///hello_world.html', 'html', 0, '');
+    expect(utils.getBasename(htmlDocument)).toBe('hello_world');
+});
+
 it('test canonicalizing in nodejs', () => {
     const canonical = resolve(join('tmp', '.', 'a', 'b', '..'));
     expect(canonical.endsWith(join('tmp', 'a'))).toBe(true);
