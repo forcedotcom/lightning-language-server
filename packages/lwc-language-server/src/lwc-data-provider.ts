@@ -3,7 +3,7 @@ import ComponentIndexer from './component-indexer';
 import * as fs from 'fs-extra';
 import { join } from 'path';
 
-type DataProviderAttributes = {
+export type DataProviderAttributes = {
     indexer: ComponentIndexer;
 };
 
