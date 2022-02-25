@@ -1,6 +1,6 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover } from 'vscode-languageserver';
+import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover, CompletionParams } from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -74,8 +74,29 @@ describe('handlers', () => {
     };
 
     describe('#onCompletion', () => {
+        it('should return a list of available completion items in a javascript file', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri },
+                position: {
+                    line: 0,
+                    character: 0,
+                },
+                context: {
+                    triggerCharacter: '{',
+                    triggerKind: 2,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toBeArrayOfSize(19);
+            expect(labels).toInclude('handleToggleAll');
+            expect(labels).toInclude('handleClearCompleted');
+        });
+
         it('returns a list of available completion items in a LWC template', async () => {
-            const params: TextDocumentPositionParams = {
+            const params: CompletionParams = {
                 textDocument: { uri },
                 position: {
                     line: 16,
@@ -94,7 +115,7 @@ describe('handlers', () => {
         });
 
         it('returns a list of available completion items in a Aura template', async () => {
-            const params: TextDocumentPositionParams = {
+            const params: CompletionParams = {
                 textDocument: { uri: auraUri },
                 position: {
                     line: 2,
@@ -241,7 +262,7 @@ describe('#capabilities', () => {
                 textDocumentSync: 'html',
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>'],
+                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>', '{'],
                 },
                 hoverProvider: true,
                 definitionProvider: true,

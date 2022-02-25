@@ -9,6 +9,7 @@ import {
     InitializeResult,
     InitializeParams,
     TextDocumentPositionParams,
+    CompletionParams,
 } from 'vscode-languageserver';
 
 import {
@@ -26,7 +27,7 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
 import { Metadata } from './decorators';
-import { WorkspaceContext, interceptConsoleLogger } from '@salesforce/lightning-lsp-common';
+import { WorkspaceContext, interceptConsoleLogger, utils } from '@salesforce/lightning-lsp-common';
 
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
@@ -116,7 +117,7 @@ export default class Server {
                 textDocumentSync: this.documents.syncKind,
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>'],
+                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>', '{'],
                 },
                 hoverProvider: true,
                 definitionProvider: true,
@@ -129,7 +130,7 @@ export default class Server {
         };
     }
 
-    async onCompletion(params: TextDocumentPositionParams): Promise<CompletionList> {
+    async onCompletion(params: CompletionParams): Promise<CompletionList> {
         const {
             position,
             textDocument: { uri },
@@ -140,6 +141,14 @@ export default class Server {
         if (await this.context.isLWCTemplate(doc)) {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
             this.lwcDataProvider.activated = true;
+            if (params.context?.triggerCharacter === '{') {
+                const docBasename = utils.getBasename(doc);
+                const customTags: CompletionItem[] = this.findBindItems(docBasename);
+                return {
+                    isIncomplete: false,
+                    items: customTags,
+                };
+            }
         } else if (await this.context.isLWCJavascript(doc)) {
             const customTags = this.componentIndexer.customData.map(tag => {
                 return {
@@ -159,6 +168,21 @@ export default class Server {
             return;
         }
         return this.languageService.doComplete(doc, position, htmlDoc);
+    }
+
+    private findBindItems(docBasename: string): CompletionItem[] {
+        const customTags: CompletionItem[] = [];
+        this.componentIndexer.customData.forEach(t => {
+            if (t.name === docBasename) {
+                t.classMembers.forEach(cm => {
+                    const bindName = `${t.name}.${cm.name}`;
+                    const kind = cm.type === 'method' ? CompletionItemKind.Function : CompletionItemKind.Property;
+                    const detail = cm.decorator ? `@${cm.decorator}` : '';
+                    customTags.push({ label: cm.name, kind, documentation: bindName, detail, sortText: bindName });
+                });
+            }
+        });
+        return customTags;
     }
 
     onCompletionResolve(item: CompletionItem): CompletionItem {
