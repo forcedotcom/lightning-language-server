@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import { extname, join, relative, resolve } from 'path';
+import { basename, extname, join, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
@@ -110,6 +110,12 @@ export function pathStartsWith(path: string, root: string): boolean {
 export function getExtension(textDocument: TextDocument): string {
     const filePath = URI.parse(textDocument.uri).fsPath;
     return filePath ? extname(filePath) : '';
+}
+
+export function getBasename(textDocument: TextDocument): string {
+    const filePath = URI.parse(textDocument.uri).fsPath;
+    const ext = extname(filePath);
+    return filePath ? basename(filePath, ext) : '';
 }
 
 export function getResourcePath(resourceName: string): string {

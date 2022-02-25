@@ -3,7 +3,7 @@ import ComponentIndexer from './component-indexer';
 import * as fs from 'fs-extra';
 import { join } from 'path';
 
-type DataProviderAttributes = {
+export type DataProviderAttributes = {
     indexer: ComponentIndexer;
 };
 
@@ -39,11 +39,20 @@ export class LWCDataProvider implements IHTMLDataProvider {
         });
         return [...this._standardTags, ...customTags];
     }
+
     provideAttributes(tagName: string): IAttributeData[] {
         const tag = this.provideTags().find(t => t.name === tagName);
         return [...this._globalAttributes, ...(tag?.attributes || [])];
     }
+
     provideValues(): IValueData[] {
-        return [];
+        const values: IValueData[] = [];
+        this.indexer.customData.forEach(t => {
+            t.classMembers.forEach(cm => {
+                const bindName = `${t.name}.${cm.name}`;
+                values.push({ name: cm.name, description: `${bindName}` });
+            });
+        });
+        return values;
     }
 }
