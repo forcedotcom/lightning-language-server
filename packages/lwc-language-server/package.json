@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "3.1.0",
+  "version": "3.5.0",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "license": "BSD-3-Clause",
@@ -11,7 +11,7 @@
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "cleanTestData": "node ../../scripts/removeTestData.js",
-    "build": "tsc -p . && node scripts/build.js && node scripts/convert.js",
+    "build": "tsc -p . && node scripts/convert.js && node scripts/build.js",
     "watch": "tsc -w | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "test": "jest --runInBand",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --passWithNoTests --runInBand",
@@ -29,7 +29,7 @@
     "@lwc/template-compiler": "1.7.14",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.12",
-    "@salesforce/lightning-lsp-common": "3.1.0",
+    "@salesforce/lightning-lsp-common": "3.5.0",
     "@salesforce/resourceurl": "0.0.12",
     "@salesforce/schema": "0.0.12",
     "@salesforce/user": "0.0.12",
