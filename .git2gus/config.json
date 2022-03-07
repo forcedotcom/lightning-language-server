@@ -1,4 +1,14 @@
 {
-  "productTag": "a1aB0000000oQVeIAM",
-  "defaultBuild": "sfdx.cli.46.x"
+  "productTag": "a1aB000000005G3IAI",
+  "productTagLabels": {
+    "area:aura": "a1aB0000000MRAzIAO",
+    "area:lwc": "a1aB0000000Bn8tIAC"
+  },
+  "issueTypeLabels": {
+    "bug": "BUG P3",
+    "security": "BUG P2"
+  },
+  "defaultBuild": "offcore.tooling.54.0.0",
+  "hideWorkItemUrl": "true",
+  "statusWhenClosed": "CLOSED"
 }
