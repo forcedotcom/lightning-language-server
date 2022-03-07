@@ -50,7 +50,7 @@ const tags = Object.keys(data).map(key => {
     };
 });
 
-//make globalAttribute changes here, not in standard-lwc.json as they'll be overwritten
+// make globalAttribute changes here, not in standard-lwc.json as they'll be overwritten
 const globalAttributes = [
     {
         name: 'for:each',
