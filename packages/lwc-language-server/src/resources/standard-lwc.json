@@ -3649,23 +3649,66 @@
   "globalAttributes": [
     {
       "name": "for:each",
-      "decription": "Renders the element or template block multiple times based on the expression value."
+      "description": "Renders the element or template block multiple times based on the expression value.",
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
     },
     {
       "name": "for:item",
-      "decription": "Bind the current iteration item to an identifier."
+      "description": "Bind the current iteration item to an identifier.",
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
     },
     {
       "name": "for:index",
-      "decription": "Bind the current iteration index to an identifier."
+      "description": "Bind the current iteration index to an identifier.",
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
     },
     {
       "name": "if:true",
-      "decription": "Renders the element or template if the expression value is thruthy."
+      "description": "Renders the element or template if the expression value is truthy.",
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
     },
     {
       "name": "if:false",
-      "decription": "Renders the element or template if the expression value is falsy."
+      "description": "Renders the element or template if the expression value is falsy.",
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
+    },
+    {
+      "name": "iterator:it",
+      "description": {
+        "kind": "markdown",
+        "value": "Bind the current iteration item to an identifier. Contains properties (`value`, `index`, `first`, `last`) that let you apply special behaviors to certain items."
+      },
+      "references": [
+        {
+          "name": "Salesforce",
+          "url": "https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives"
+        }
+      ]
     }
   ]
 }

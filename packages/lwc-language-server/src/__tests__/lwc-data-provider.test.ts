@@ -25,3 +25,17 @@ describe('provideValues()', () => {
         expect(names).toInclude('iconName');
     });
 });
+
+describe('provideAttributes()', () => {
+    it('should return a set list of attributes for template tag', () => {
+        const attributes = provider.provideAttributes('template');
+        expect(attributes).not.toBeEmpty();
+        expect(attributes).toBeArrayOfSize(6);
+        expect(attributes[0].name).toEqual('for:each');
+        expect(attributes[1].name).toEqual('for:item');
+        expect(attributes[2].name).toEqual('for:index');
+        expect(attributes[3].name).toEqual('if:true');
+        expect(attributes[4].name).toEqual('if:false');
+        expect(attributes[5].name).toEqual('iterator:it');
+    });
+});
