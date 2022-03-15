@@ -150,17 +150,19 @@ export default class Server {
                 };
             }
         } else if (await this.context.isLWCJavascript(doc)) {
-            const customTags = this.componentIndexer.customData.map(tag => {
-                return {
-                    label: tag.lwcTypingsName,
-                    kind: CompletionItemKind.Folder,
-                };
-            });
+            if (this.shouldCompleteJavascript(params)) {
+                const customTags = this.componentIndexer.customData.map(tag => {
+                    return {
+                        label: tag.lwcTypingsName,
+                        kind: CompletionItemKind.Folder,
+                    };
+                });
 
-            return {
-                isIncomplete: false,
-                items: customTags,
-            };
+                return {
+                    isIncomplete: false,
+                    items: customTags,
+                };
+            }
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
             this.lwcDataProvider.activated = false;
