@@ -1,6 +1,15 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover, CompletionParams } from 'vscode-languageserver';
+import {
+    TextDocument,
+    InitializeParams,
+    TextDocumentPositionParams,
+    Location,
+    MarkupContent,
+    Hover,
+    CompletionParams,
+    CompletionTriggerKind,
+} from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -88,7 +97,7 @@ describe('handlers', () => {
                 },
                 context: {
                     triggerCharacter: '.',
-                    triggerKind: 2,
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
                 },
             };
 
@@ -109,13 +118,13 @@ describe('handlers', () => {
                 },
                 context: {
                     triggerCharacter: '{',
-                    triggerKind: 2,
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
                 },
             };
 
             await server.onInitialize(initializeParams);
             const completions = await server.onCompletion(params);
-            expect(completions.items).toBeEmpty();
+            expect(completions).toBeUndefined();
         });
 
         it('returns a list of available tag completion items in a LWC template', async () => {
@@ -146,7 +155,7 @@ describe('handlers', () => {
                 },
                 context: {
                     triggerCharacter: '{',
-                    triggerKind: 2,
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
                 },
             };
 
