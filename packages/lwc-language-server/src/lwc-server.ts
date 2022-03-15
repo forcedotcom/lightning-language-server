@@ -162,6 +162,8 @@ export default class Server {
                     isIncomplete: false,
                     items: customTags,
                 };
+            } else {
+                return;
             }
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
