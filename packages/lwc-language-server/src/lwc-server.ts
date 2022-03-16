@@ -141,7 +141,7 @@ export default class Server {
         if (await this.context.isLWCTemplate(doc)) {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
             this.lwcDataProvider.activated = true;
-            if (params.context?.triggerCharacter === '{') {
+            if (this.shouldProvideBindingsInHTML(params)) {
                 const docBasename = utils.getBasename(doc);
                 const customTags: CompletionItem[] = this.findBindItems(docBasename);
                 return {
@@ -150,17 +150,21 @@ export default class Server {
                 };
             }
         } else if (await this.context.isLWCJavascript(doc)) {
-            const customTags = this.componentIndexer.customData.map(tag => {
-                return {
-                    label: tag.lwcTypingsName,
-                    kind: CompletionItemKind.Folder,
-                };
-            });
+            if (this.shouldCompleteJavascript(params)) {
+                const customTags = this.componentIndexer.customData.map(tag => {
+                    return {
+                        label: tag.lwcTypingsName,
+                        kind: CompletionItemKind.Folder,
+                    };
+                });
 
-            return {
-                isIncomplete: false,
-                items: customTags,
-            };
+                return {
+                    isIncomplete: false,
+                    items: customTags,
+                };
+            } else {
+                return;
+            }
         } else if (await this.context.isAuraMarkup(doc)) {
             this.auraDataProvider.activated = true;
             this.lwcDataProvider.activated = false;
@@ -168,6 +172,14 @@ export default class Server {
             return;
         }
         return this.languageService.doComplete(doc, position, htmlDoc);
+    }
+
+    private shouldProvideBindingsInHTML(params: CompletionParams): boolean {
+        return params.context?.triggerCharacter === '{';
+    }
+
+    private shouldCompleteJavascript(params: CompletionParams): boolean {
+        return params.context?.triggerCharacter !== '{';
     }
 
     private findBindItems(docBasename: string): CompletionItem[] {
