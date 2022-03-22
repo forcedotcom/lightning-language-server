@@ -45,8 +45,8 @@ export class LWCDataProvider implements IHTMLDataProvider {
     }
     provideValues(): IValueData[] {
         const values: IValueData[] = [];
-        this.indexer.customData.forEach(t => {
-            t.classMembers.forEach(cm => {
+        this.indexer.customData?.forEach(t => {
+            t.classMembers?.forEach(cm => {
                 const bindName = `${t.name}.${cm.name}`;
                 values.push({ name: cm.name, description: `${bindName}` });
             });
