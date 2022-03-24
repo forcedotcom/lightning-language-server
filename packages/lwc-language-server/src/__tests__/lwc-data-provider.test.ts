@@ -23,6 +23,8 @@ describe('provideValues()', () => {
         expect(values).not.toBeEmpty();
         expect(names).toInclude('info');
         expect(names).toInclude('iconName');
+        expect(names).toInclude('hasTodos');
+        expect(names).toInclude('todos');
     });
 });
 
