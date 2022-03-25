@@ -116,7 +116,7 @@ it('transform throws exceptions on syntax errors', async () => {
         // verify err has the info we need
         const message = extractMessageFromBabelError(err.message);
         expect(message).toMatch('Unexpected token (4:17)');
-        expect(err.location).toEqual({ line: 4, column: 17 });
+        expect(err.location).toEqual({ line: 4, column: 17, index: 110 });
     }
 });
 

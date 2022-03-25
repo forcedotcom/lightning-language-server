@@ -26,8 +26,6 @@ describe('provideValues()', () => {
         expect(values).not.toBeEmpty();
         expect(names).toInclude('info');
         expect(names).toInclude('iconName');
-        expect(names).toInclude('hasTodos');
-        expect(names).toInclude('todos');
     });
 
     it.only('should validate an empty array is returned when tag.classMembers is undefined', () => {
