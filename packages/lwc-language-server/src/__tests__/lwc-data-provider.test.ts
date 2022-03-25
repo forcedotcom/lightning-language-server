@@ -28,7 +28,7 @@ describe('provideValues()', () => {
         expect(names).toInclude('iconName');
     });
 
-    it.only('should validate an empty array is returned when tag.classMembers is undefined', () => {
+    it('should validate an empty array is returned when tag.classMembers is undefined', () => {
         // The setting of the TagAttrs's file property needs to be delayed. It needs to be undefined
         // when passed into the ctor(), and then we'll manually set it afterwards.
         const tagAttrs: TagAttrs = {
