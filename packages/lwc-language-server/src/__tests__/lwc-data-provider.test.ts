@@ -1,9 +1,8 @@
 import ComponentIndexer from '../component-indexer';
 import { ModuleExports, WireDecorator } from '../decorators';
 import { DataProviderAttributes, LWCDataProvider } from '../lwc-data-provider';
-import Tag, { TagAttrs }  from '../tag';
+import Tag, { TagAttrs } from '../tag';
 import * as path from 'path';
-
 
 const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
 const componentIndexer: ComponentIndexer = new ComponentIndexer({
@@ -35,20 +34,20 @@ describe('provideValues()', () => {
             file: undefined,
             metadata: {
                 decorators: [] as WireDecorator[],
-                exports: [] as ModuleExports[]
+                exports: [] as ModuleExports[],
             },
-            updatedAt: undefined
+            updatedAt: undefined,
         };
         const tag = new Tag(tagAttrs);
-        tag.file = "path/to/some-file";
+        tag.file = 'path/to/some-file';
 
         const componentIndexer = new ComponentIndexer({
-            workspaceRoot
+            workspaceRoot,
         });
         componentIndexer.tags.set(tag.name, tag);
 
         const provider = new LWCDataProvider({
-            indexer: componentIndexer
+            indexer: componentIndexer,
         });
 
         const values = provider.provideValues();
