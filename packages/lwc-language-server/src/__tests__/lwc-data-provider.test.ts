@@ -1,6 +1,8 @@
 import ComponentIndexer from '../component-indexer';
+import { ModuleExports, WireDecorator } from '../decorators';
+import { DataProviderAttributes, LWCDataProvider } from '../lwc-data-provider';
+import Tag, { TagAttrs } from '../tag';
 import * as path from 'path';
-import { LWCDataProvider, DataProviderAttributes } from '../lwc-data-provider';
 
 const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
 const componentIndexer: ComponentIndexer = new ComponentIndexer({
@@ -23,6 +25,33 @@ describe('provideValues()', () => {
         expect(values).not.toBeEmpty();
         expect(names).toInclude('info');
         expect(names).toInclude('iconName');
+    });
+
+    it('should validate an empty array is returned when tag.classMembers is undefined', () => {
+        // The setting of the TagAttrs's file property needs to be delayed. It needs to be undefined
+        // when passed into the ctor(), and then we'll manually set it afterwards.
+        const tagAttrs: TagAttrs = {
+            file: undefined,
+            metadata: {
+                decorators: [] as WireDecorator[],
+                exports: [] as ModuleExports[],
+            },
+            updatedAt: undefined,
+        };
+        const tag = new Tag(tagAttrs);
+        tag.file = 'path/to/some-file';
+
+        const componentIndexer = new ComponentIndexer({
+            workspaceRoot,
+        });
+        componentIndexer.tags.set(tag.name, tag);
+
+        const provider = new LWCDataProvider({
+            indexer: componentIndexer,
+        });
+
+        const values = provider.provideValues();
+        expect(values).toEqual([]);
     });
 });
 
