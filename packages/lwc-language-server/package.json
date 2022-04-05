@@ -23,7 +23,7 @@
     "package": "yarn pack"
   },
   "dependencies": {
-    "@lwc/compiler": "0.34.8",
+    "@lwc/compiler": "0.228.5",
     "@lwc/engine": "1.7.14",
     "@lwc/errors": "1.7.14",
     "@lwc/template-compiler": "1.7.14",
