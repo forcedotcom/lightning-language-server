@@ -140,7 +140,7 @@ export default class Server {
 
         if (await this.context.isLWCTemplate(doc)) {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
-            this.lwcDataProvider.activated = true;       
+            this.lwcDataProvider.activated = true;
             if (this.shouldProvideBindingsInHTML(params)) {
                 const docBasename = utils.getBasename(doc);
                 const customTags: CompletionItem[] = this.findBindItems(docBasename);
@@ -173,7 +173,7 @@ export default class Server {
         }
         return this.languageService.doComplete(doc, position, htmlDoc);
     }
-    
+
     private shouldProvideBindingsInHTML(params: CompletionParams): boolean {
         const position = params.position;
         const doc = this.documents.get(params.textDocument.uri);
