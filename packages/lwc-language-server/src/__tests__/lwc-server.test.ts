@@ -167,6 +167,22 @@ describe('handlers', () => {
             expect(labels).toInclude('handleClearCompleted');
         });
 
+        it('should still return a list of completion items inside the curly brace without the trigger character in a LWC template', async() => {
+            const params: CompletionParams = {
+                textDocument: { uri },
+                position: {
+                    line: 12,
+                    character: 31,
+                }
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toInclude('handleToggleAll');
+            expect(labels).toInclude('handleClearCompleted');
+        });
+
         it('returns a list of available completion items in a Aura template', async () => {
             const params: CompletionParams = {
                 textDocument: { uri: auraUri },
