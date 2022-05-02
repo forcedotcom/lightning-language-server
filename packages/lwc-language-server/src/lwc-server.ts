@@ -140,7 +140,7 @@ export default class Server {
 
         if (await this.context.isLWCTemplate(doc)) {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
-            this.lwcDataProvider.activated = true;
+            this.lwcDataProvider.activated = true;       
             if (this.shouldProvideBindingsInHTML(params)) {
                 const docBasename = utils.getBasename(doc);
                 const customTags: CompletionItem[] = this.findBindItems(docBasename);
@@ -173,9 +173,20 @@ export default class Server {
         }
         return this.languageService.doComplete(doc, position, htmlDoc);
     }
-
+    
     private shouldProvideBindingsInHTML(params: CompletionParams): boolean {
-        return params.context?.triggerCharacter === '{';
+        const position = params.position;
+        const doc = this.documents.get(params.textDocument.uri);
+        const offset = doc.offsetAt(position);
+        const text = doc.getText();
+        let startIndex = offset - 1;
+        let char = text.charAt(startIndex);
+        const regPattern = /(\w|\$)/; // Valid variable names in JavaScript can contain letters, digits, underscore or $
+        while(char.match(regPattern)) {
+            startIndex -= 1;
+            char = text.charAt(startIndex);
+        }
+        return params.context?.triggerCharacter === '{' || char === '{'; 
     }
 
     private shouldCompleteJavascript(params: CompletionParams): boolean {
