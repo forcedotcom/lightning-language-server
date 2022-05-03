@@ -182,11 +182,11 @@ export default class Server {
         let startIndex = offset - 1;
         let char = text.charAt(startIndex);
         const regPattern = /(\w|\$)/; // Valid variable names in JavaScript can contain letters, digits, underscore or $
-        while(char.match(regPattern)) {
+        while (char.match(regPattern)) {
             startIndex -= 1;
             char = text.charAt(startIndex);
         }
-        return params.context?.triggerCharacter === '{' || char === '{'; 
+        return params.context?.triggerCharacter === '{' || char === '{';
     }
 
     private shouldCompleteJavascript(params: CompletionParams): boolean {

@@ -167,13 +167,13 @@ describe('handlers', () => {
             expect(labels).toInclude('handleClearCompleted');
         });
 
-        it('should still return a list of completion items inside the curly brace without the trigger character in a LWC template', async() => {
+        it('should still return a list of completion items inside the curly brace without the trigger character in a LWC template', async () => {
             const params: CompletionParams = {
                 textDocument: { uri },
                 position: {
                     line: 12,
                     character: 31,
-                }
+                },
             };
 
             await server.onInitialize(initializeParams);
