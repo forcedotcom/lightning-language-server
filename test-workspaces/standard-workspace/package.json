@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "postinstall": "rm -f static/js/engine.js; mkdir -p static/js; cp node_modules/@lwc/engine/dist/umd/es2017/engine.js static/js/engine.js",
+    "postinstall": "rm -f static/js/engine.js; mkdir -p static/js; cp node_modules/@lwc/engine-dom/dist/umd/es2017/engine.js static/js/engine.js",
     "lint": "eslint *.js src/",
     "build": "cross-env NODE_ENV=development rollup -c",
     "start": "concurrently \"npm run build -- --watch\" \"node server.js\""
@@ -14,8 +14,8 @@
     "eslint": "^4.9.0",
     "eslint-plugin-lwc": "^0.2.0",
     "express": "^4.16.2",
-    "@lwc/compiler": "0.34.7",
-    "@lwc/engine": "0.34.7",
+    "@lwc/compiler": "2.13.3",
+    "@lwc/engine-dom": "2.13.3",
     "rollup": "^0.50.0",
     "@lwc/rollup-plugin": "0.34.7",
     "rollup-watch": "^4.3.1"
