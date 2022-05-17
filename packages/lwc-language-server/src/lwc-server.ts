@@ -175,6 +175,10 @@ export default class Server {
     }
 
     private shouldProvideBindingsInHTML(params: CompletionParams): boolean {
+        return params.context?.triggerCharacter === '{' || this.isWithinCurlyBraces(params);
+    }
+
+    private isWithinCurlyBraces(params: CompletionParams): boolean {
         const position = params.position;
         const doc = this.documents.get(params.textDocument.uri);
         const offset = doc.offsetAt(position);
@@ -186,7 +190,7 @@ export default class Server {
             startIndex -= 1;
             char = text.charAt(startIndex);
         }
-        return params.context?.triggerCharacter === '{' || char === '{';
+        return char === '{';
     }
 
     private shouldCompleteJavascript(params: CompletionParams): boolean {
