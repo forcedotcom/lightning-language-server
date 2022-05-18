@@ -17,7 +17,9 @@ function getCurrentFilter() {
 export default class Todo extends LightningElement {
     @track todos;
     @track filter;
-
+    has5Todos_today;
+    $has5Todos_today;
+    
     constructor() {
         super();
         this.filter = getCurrentFilter();
