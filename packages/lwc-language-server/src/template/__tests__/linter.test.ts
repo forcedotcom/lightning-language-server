@@ -2,7 +2,7 @@ import { TextDocument } from 'vscode-languageserver';
 import templateLinter from '../linter';
 
 it('returns a list of all the template compilation errors', () => {
-    const content = `<template><template if:true="invalidExpression">{Math.random()}</template><lighting-card></lighting-card></template>`;
+    const content = '<template><template if:true="invalidExpression"></template>{Math.random()}<lighting-card></lighting-card></template>';
     const document = TextDocument.create('test://test.html', 'html', 0, content);
 
     const diagnostics = templateLinter(document);
@@ -14,8 +14,8 @@ it('returns a list of all the template compilation errors', () => {
     });
     expect(diagnostics[1].message).toMatch(/Invalid expression/);
     expect(diagnostics[1].range).toMatchObject({
-        start: { character: 48 },
-        end: { character: 63 },
+        start: { character: 59 },
+        end: { character: 74 },
     });
     expect(diagnostics[2].message).toMatch(/<lighting- is not a valid namespace, sure you didn't mean "<lightning-"?/);
     expect(diagnostics[2].range).toMatchObject({
