@@ -185,8 +185,7 @@ describe('Tag', () => {
     describe('handling malformed Tag', () => {
         /**
          * TODO: With the outdated version of the lwc compiler, the NavigationMixin
-         * isn't being compiled correctly. This test and the optional classMember
-         * check in Tag should be removed after upgrading.
+         * isn't being compiled correctly. This test should be updated after upgrading.
          */
         let tag: Tag;
         const fileWithErrors = './src/javascript/__tests__/fixtures/navmetadata.js';
