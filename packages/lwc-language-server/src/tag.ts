@@ -117,7 +117,7 @@ export default class Tag implements ITagData {
     }
 
     classMember(name: string): ClassMember | null {
-        return this.classMembers.find(item => item.name === name) || null;
+        return this.classMembers?.find(item => item.name === name) || null;
     }
 
     classMemberLocation(name: string): Location | null {
