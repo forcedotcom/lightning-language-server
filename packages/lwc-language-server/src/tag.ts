@@ -123,6 +123,7 @@ export default class Tag implements ITagData {
     classMemberLocation(name: string): Location | null {
         const classMember = this.classMember(name);
         if (!classMember) {
+            console.log(`Attribute "${name}" not found`);
             return null;
         }
         return Location.create(this.uri, toVSCodeRange(classMember?.loc));
