@@ -622,7 +622,7 @@ declare module 'lightning/platformScaleCenterApi' {
 
 declare module 'lightning/salesEnablementProgramApi' {
     /**
-     * Wire adapter for getting Sales Enablement program templates list.
+     * Wire adapter for getting Sales Enablement Program templates list.
      */
     export function getProgramTemplates(): void;
 }
