@@ -11,9 +11,9 @@ export function interceptConsoleLogger(connection: IConnection): void {
             if (connection) {
                 const remote: any = connection.console;
                 remote[method].apply(connection.console, args);
+            } else {
+                original.apply(console, args);
             }
-
-            original.apply(console, args);
         };
     };
     const methods = ['log', 'info', 'warn', 'error'];
