@@ -162,9 +162,27 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             const completions = await server.onCompletion(params);
             const labels = completions.items.map(item => item.label);
-            expect(labels).toBeArrayOfSize(19);
+            expect(labels).toBeArrayOfSize(21);
             expect(labels).toInclude('handleToggleAll');
             expect(labels).toInclude('handleClearCompleted');
+        });
+
+        it('should still return a list of completion items inside the curly brace without the trigger character in a LWC template', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri },
+                position: {
+                    line: 44,
+                    character: 22,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toInclude('handleToggleAll');
+            expect(labels).toInclude('handleClearCompleted');
+            expect(labels).toInclude('has5Todos_today');
+            expect(labels).toInclude('$has5Todos_today');
         });
 
         it('returns a list of available completion items in a Aura template', async () => {
@@ -269,7 +287,7 @@ describe('handlers', () => {
             await server.componentIndexer.init();
             const [location] = server.onDefinition(params);
             expect(location.uri).toContain('todo/todo.js');
-            expect(location.range.start.line).toEqual(103);
+            expect(location.range.start.line).toEqual(105);
             expect(location.range.start.character).toEqual(4);
         });
 

@@ -175,7 +175,22 @@ export default class Server {
     }
 
     private shouldProvideBindingsInHTML(params: CompletionParams): boolean {
-        return params.context?.triggerCharacter === '{';
+        return params.context?.triggerCharacter === '{' || this.isWithinCurlyBraces(params);
+    }
+
+    private isWithinCurlyBraces(params: CompletionParams): boolean {
+        const position = params.position;
+        const doc = this.documents.get(params.textDocument.uri);
+        const offset = doc.offsetAt(position);
+        const text = doc.getText();
+        let startIndex = offset - 1;
+        let char = text.charAt(startIndex);
+        const regPattern = /(\w|\$)/; // Valid variable names in JavaScript can contain letters, digits, underscore or $
+        while (char.match(regPattern)) {
+            startIndex -= 1;
+            char = text.charAt(startIndex);
+        }
+        return char === '{';
     }
 
     private shouldCompleteJavascript(params: CompletionParams): boolean {
