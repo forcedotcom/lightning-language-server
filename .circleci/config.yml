@@ -100,7 +100,7 @@ jobs:
             git commit -m "Updated version $RELEASE_TAG [ci skip]"
       - run:
           name: Set .npmrc
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_PUBLISH_TOKEN}" > ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run: yarn publish-lsp
       - run: git push origin main
       - run:
@@ -123,6 +123,7 @@ workflows:
       - build-and-test-linux
       - build-and-test-win
       - slack/approval-notification:
+          context: salesforce-ide
           message: Pending Approval for Publish of Lightning Language Server
           channel: 'pdt_releases'
           color: '#0E1111'
@@ -135,7 +136,9 @@ workflows:
             branches:
               only: main
       - publish: # Publish job runs only in main when slack approval is clicked
-          context: pdt-publish-restricted-context
+          context:
+            - salesforce-ide
+            - NPM_Salesforce-Releases
           filters:
             branches:
               only: main

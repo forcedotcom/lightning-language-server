@@ -65,12 +65,12 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.CORE_PARTIAL);
     });
 
-    test('when package.json dependencies includes @lwc/engine, workspaceType is STANDARD_LWC', () => {
+    test('when package.json dependencies includes @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
                     dependencies: {
-                        '@lwc/engine': 1,
+                        '@lwc/engine-dom': 1,
                     },
                 }),
             },
@@ -112,12 +112,12 @@ describe('detectWorkspaceType', () => {
 
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
-    test('when package.json dependencies includes @lwc/engine, workspaceType is STANDARD_LWC', () => {
+    test('when package.json dependencies includes @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
                     dependencies: {
-                        '@lwc/engine': 1,
+                        '@lwc/engine-dom': 1,
                     },
                 }),
             },
@@ -128,12 +128,12 @@ describe('detectWorkspaceType', () => {
         expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
     });
 
-    test('when package.json devDependencies include @lwc/engine, workspaceType is STANDARD_LWC', () => {
+    test('when package.json devDependencies include @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
         mockFs({
             workspacedir: {
                 'package.json': JSON.stringify({
                     devDependencies: {
-                        '@lwc/engine': 1,
+                        '@lwc/engine-dom': 1,
                     },
                 }),
             },
@@ -275,7 +275,7 @@ describe('detectWorkspaceType with mutliroot', () => {
             standard_lwc_workspace: {
                 'package.json': JSON.stringify({
                     dependencies: {
-                        '@lwc/engine': 1,
+                        '@lwc/engine-dom': 1,
                     },
                 }),
             },
@@ -298,7 +298,7 @@ describe('detectWorkspaceType with mutliroot', () => {
             standard_lwc_workspace: {
                 'package.json': JSON.stringify({
                     dependencies: {
-                        '@lwc/engine': 1,
+                        '@lwc/engine-dom': 1,
                     },
                 }),
             },

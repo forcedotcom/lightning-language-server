@@ -181,4 +181,27 @@ describe('Tag', () => {
             });
         });
     });
+
+    describe('handling malformed Tag', () => {
+        /**
+         * TODO: With the outdated version of the lwc compiler, the NavigationMixin
+         * isn't being compiled correctly. This test should be updated after upgrading.
+         */
+        let tag: Tag;
+        const fileWithErrors = './src/javascript/__tests__/fixtures/navmetadata.js';
+
+        beforeEach(async () => {
+            tag = await Tag.fromFile(fileWithErrors);
+        });
+
+        it('does not throw an error when finding a class member location without class members', () => {
+            let exception;
+            try {
+                tag.classMemberLocation('account');
+            } catch (error) {
+                exception = error;
+            }
+            expect(exception).toBeUndefined();
+        });
+    });
 });

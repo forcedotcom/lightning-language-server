@@ -18,7 +18,7 @@
       "name": "Debug LWC LSP",
       "type": "node",
       "request": "attach",
-      "port": 6009,
+      "port": 6030,
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/packages/lwc-language-server/lib/**"],
       "protocol": "inspector",

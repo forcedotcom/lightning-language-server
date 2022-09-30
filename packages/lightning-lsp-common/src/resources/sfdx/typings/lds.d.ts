@@ -620,6 +620,13 @@ declare module 'lightning/platformScaleCenterApi' {
     export function getMetrics(request: string): void;
 }
 
+declare module 'lightning/salesEnablementProgramApi' {
+    /**
+     * Wire adapter for getting Sales Enablement Program templates list.
+     */
+    export function getProgramTemplates(): void;
+}
+
 declare module 'lightning/analyticsWaveApi' {
     /**
      * A Tableau CRM dataflow node.

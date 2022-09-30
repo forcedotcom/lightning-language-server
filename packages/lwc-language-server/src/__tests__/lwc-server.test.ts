@@ -1,6 +1,15 @@
 import Server, { Token, findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
-import { TextDocument, InitializeParams, TextDocumentPositionParams, Location, MarkupContent, Hover } from 'vscode-languageserver';
+import {
+    TextDocument,
+    InitializeParams,
+    TextDocumentPositionParams,
+    Location,
+    MarkupContent,
+    Hover,
+    CompletionParams,
+    CompletionTriggerKind,
+} from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
 import * as fsExtra from 'fs-extra';
@@ -9,6 +18,10 @@ import * as path from 'path';
 const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
 const uri = URI.file(filename).toString();
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
+
+const jsFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.js');
+const jsUri = URI.file(jsFilename).toString();
+const jsDocument: TextDocument = TextDocument.create(uri, 'javascript', 0, fsExtra.readFileSync(jsFilename).toString());
 
 const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
 const auraUri = URI.file(auraFilename).toString();
@@ -41,6 +54,7 @@ jest.mock('vscode-languageserver', () => {
                 get: (name: string): TextDocument => {
                     const docs = new Map([
                         [uri, document],
+                        [jsUri, jsDocument],
                         [auraUri, auraDocument],
                         [hoverUri, hoverDocument],
                     ]);
@@ -74,8 +88,47 @@ describe('handlers', () => {
     };
 
     describe('#onCompletion', () => {
-        it('returns a list of available completion items in a LWC template', async () => {
-            const params: TextDocumentPositionParams = {
+        it('should return a list of available completion items in a javascript file', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri: jsUri },
+                position: {
+                    line: 0,
+                    character: 0,
+                },
+                context: {
+                    triggerCharacter: '.',
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toBeArrayOfSize(8);
+            expect(labels).toInclude('c/todo_util');
+            expect(labels).toInclude('c/todo_item');
+        });
+
+        it('should not return a list of completion items in a javascript file for open curly brace', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri: jsUri },
+                position: {
+                    line: 0,
+                    character: 0,
+                },
+                context: {
+                    triggerCharacter: '{',
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            expect(completions).toBeUndefined();
+        });
+
+        it('returns a list of available tag completion items in a LWC template', async () => {
+            const params: CompletionParams = {
                 textDocument: { uri },
                 position: {
                     line: 16,
@@ -93,8 +146,47 @@ describe('handlers', () => {
             expect(labels).not.toInclude('lightning:icon'); // this is handled by the aura Lang. server
         });
 
+        it('should return a list of available attribute completion items in a LWC template', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri },
+                position: {
+                    line: 0,
+                    character: 0,
+                },
+                context: {
+                    triggerCharacter: '{',
+                    triggerKind: CompletionTriggerKind.TriggerCharacter,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toBeArrayOfSize(21);
+            expect(labels).toInclude('handleToggleAll');
+            expect(labels).toInclude('handleClearCompleted');
+        });
+
+        it('should still return a list of completion items inside the curly brace without the trigger character in a LWC template', async () => {
+            const params: CompletionParams = {
+                textDocument: { uri },
+                position: {
+                    line: 44,
+                    character: 22,
+                },
+            };
+
+            await server.onInitialize(initializeParams);
+            const completions = await server.onCompletion(params);
+            const labels = completions.items.map(item => item.label);
+            expect(labels).toInclude('handleToggleAll');
+            expect(labels).toInclude('handleClearCompleted');
+            expect(labels).toInclude('has5Todos_today');
+            expect(labels).toInclude('$has5Todos_today');
+        });
+
         it('returns a list of available completion items in a Aura template', async () => {
-            const params: TextDocumentPositionParams = {
+            const params: CompletionParams = {
                 textDocument: { uri: auraUri },
                 position: {
                     line: 2,
@@ -195,7 +287,7 @@ describe('handlers', () => {
             await server.componentIndexer.init();
             const [location] = server.onDefinition(params);
             expect(location.uri).toContain('todo/todo.js');
-            expect(location.range.start.line).toEqual(103);
+            expect(location.range.start.line).toEqual(105);
             expect(location.range.start.character).toEqual(4);
         });
 
@@ -241,7 +333,7 @@ describe('#capabilities', () => {
                 textDocumentSync: 'html',
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>'],
+                    triggerCharacters: ['.', '-', '_', '<', '"', '=', '/', '>', '{'],
                 },
                 hoverProvider: true,
                 definitionProvider: true,
