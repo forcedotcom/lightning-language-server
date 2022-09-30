@@ -3,7 +3,7 @@ import { TextDocument } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../../constants';
 import { compile, transform } from '@lwc/compiler';
 import { Metadata } from '../../decorators';
-import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
+import { CompileOptions } from '@lwc/compiler/dist/types/options';
 import * as fs from 'fs-extra';
 
 import {
@@ -45,7 +45,7 @@ it('can use transform from lwc-compiler', async () => {
         });
     `;
 
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'foo',
         namespace: 'x',
         files: {},
@@ -75,7 +75,7 @@ it('can use compile from lwc-compiler', async () => {
     });
     `;
 
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'foo',
         namespace: 'x',
         files: {
@@ -105,7 +105,7 @@ export default class Foo extends LightningElement {
 
 it('transform throws exceptions on syntax errors', async () => {
     try {
-        const options: CompilerOptions = {
+        const options: CompileOptions = {
             name: 'foo',
             namespace: 'x',
             files: {},
@@ -121,7 +121,7 @@ it('transform throws exceptions on syntax errors', async () => {
 });
 
 it('transform also throws exceptions for other errors', async () => {
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'foo',
         namespace: 'x',
         files: {},
@@ -138,7 +138,7 @@ it('transform also throws exceptions for other errors', async () => {
 });
 
 it('compile returns diagnostics on syntax errors', async () => {
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'foo',
         namespace: 'x',
         files: {
@@ -156,7 +156,7 @@ it('compile returns diagnostics on syntax errors', async () => {
 });
 
 it('compile also returns diagnostics for other errors', async () => {
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'foo',
         namespace: 'x',
         files: {
@@ -215,13 +215,13 @@ it('transform returns javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = fs.readFileSync(filepath, 'utf8');
 
-    const options: CompilerOptions = {
+    const options: CompileOptions = {
         name: 'metadata',
         namespace: 'x',
         files: {},
     };
     const transformerResult = await transform(content, 'metadata.js', options);
-    const metadata: Metadata = transformerResult.metadata as Metadata;
+    const metadata: Metadata = transformerResult.map.metadata as Metadata;
 
     const properties = getProperties(metadata);
 

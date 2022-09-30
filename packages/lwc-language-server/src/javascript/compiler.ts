@@ -5,7 +5,7 @@ import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { transform } from '@lwc/compiler';
-import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
+import { CompileOptions } from '@lwc/compiler/dist/types/options';
 import { ClassMember, Metadata } from '../decorators';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
@@ -123,13 +123,13 @@ function toDiagnostic(err: any): Diagnostic {
 export async function compileSource(source: string, fileName = 'foo.js'): Promise<CompilerResult> {
     try {
         const name = fileName.substring(0, fileName.lastIndexOf('.'));
-        const options: CompilerOptions = {
+        const options: CompileOptions = {
             name,
             namespace: 'x',
             files: {},
         };
         const transformerResult = await transform(source, fileName, options);
-        const metadata = transformerResult.metadata as Metadata;
+        const metadata = transformerResult.map.metadata as Metadata;
         patchComments(metadata);
         return { metadata, diagnostics: [] };
     } catch (err) {
