@@ -3,7 +3,6 @@ name: release
 on:
   release:
     types: [released]
-    workflow_dispatch:
     inputs:
       tag:
         description: tag that needs to publish
