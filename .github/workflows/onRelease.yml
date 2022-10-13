@@ -1,4 +1,4 @@
-name: Release
+name: release
 
 on:
   release:
@@ -18,8 +18,4 @@ jobs:
       sign: true
       tag: latest
       githubTag: ${{ github.event.release.tag_name || inputs.tag }}
-    secrets: inherit
-
-  slack_notify:
-    uses: './.github/actions/slack_notify.yml'
     secrets: inherit

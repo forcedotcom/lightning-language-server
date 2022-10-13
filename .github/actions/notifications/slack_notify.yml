@@ -3,19 +3,17 @@ on:
   workflow_run:
     workflows:
       - Push to main
-      - GitHub release
+      - release
     types:
       - completed
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - name: Announce Failure
+      - name: Announce result
         uses: slackapi/slack-github-action@v1.22.0
         env:
-          # for non-CLI-team-owned plugins, you can send this anywhere you like
           SLACK_WEBHOOK_URL: ${{ secrets.IDEE_RELEASE_ALERT_SLACK_WEBHOOK }}
           # SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
           # SLACK_CHANNEL: pdt_releases
