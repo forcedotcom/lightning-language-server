@@ -2,12 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Publish Language Servers",
-      "command": "./scripts/publish-workflow.sh",
-      "type": "shell",
-      "args": ["${input:circleCiId}"]
-    },
-    {
       "label": "Create Port PR for Publishing",
       "command": "./scripts/port-changes.js",
       "type": "shell",
@@ -37,11 +31,6 @@
     }
   ],
   "inputs": [
-    {
-      "id": "circleCiId",
-      "type": "promptString",
-      "description": "CircleCi Token"
-    },
     {
       "id": "publishType",
       "type": "pickString",

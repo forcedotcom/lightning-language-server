@@ -1,0 +1,14 @@
+name: Push to main
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    uses: salesforcecli/github-workflows/.github/workflows/githubRelease.yml@main
+    secrets: inherit
+
+  slack_notify:
+    uses: './.github/actions/slack_notify.yml'
+    secrets: inherit

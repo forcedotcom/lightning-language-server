@@ -1,4 +1,3 @@
-[![CircleCI](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/master.svg?style=svg)](https://circleci.com/gh/forcedotcom/lightning-language-server/tree/main)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)<br/>
 [![npm (scoped)](https://img.shields.io/npm/v/@salesforce/lwc-language-server?label=lwc-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/lwc-language-server)
 [![npm (scoped)](https://img.shields.io/npm/v/@salesforce/aura-language-server?label=aura-language-server&logo=npm)](https://www.npmjs.com/package/@salesforce/aura-language-server)
@@ -80,34 +79,13 @@ npm run watch
 Note: You need to restart vscode each time you make changes to the language server or the lightning vscode extensions.
 Easiest way to do this is to kill the vscode client and hit F5 to relaunch your debugger.
 
-## Publishing
-
-### Automated publish to NPM
-Automated deploys to NPM will occur weekly on Sundays @midnight via CircleCI.
-https://circleci.com/gh/forcedotcom/lightning-language-server/tree/main
+## Publishing to NPM
+When a commit is merged to main, we will automatically create the github release, and then publish the changes to npm using our Github Actions
 
 ### On-Demand publish to NPM
-If you want to have CircleCI publish the current main branch to NPM, you can run the following script to trigger the deploy job to run:
-
-```
-curl -v -u ${CircleCIToken}: -X POST --header "Content-Type: application/json" -d '{
-  "branch": "main",
-  "parameters": {
-    "deploy": true,
-    "version": "patch"
-  }
-}' https://circleci.com/api/v2/project/gh/forcedotcom/lightning-language-server/pipeline
-```
-
-You can also modify the version parameter in the curl script to configure how the version is bumped. Valid values are: [major | minor | patch | premajor | preminor | prepatch | prerelease]. By default the weekly builds only bump the patch version.
-
-Note: You need to substitute in your own ${CircleCIToken} to make this script work. You can create a Personal API Token by following the instructions here:
-https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token
-
-### Manual publish to NPM (from your local machine)
-```
-yarn bump-versions
-yarn publish-lsp
-```
-
-Note: you will have to be authenticated to an account that has access to the @salesforce org on NPM
+Navigate to the `Actions` tab in the repository
+1. Under `Workflows` on the left side, select `Release`.
+1. Select `Run Workflow` on the top row.
+1. Enter the desired version number, following semantic versioning.
+1. Select `Run Workflow`, and ensure the newest version is published to npm once the workflow completes.
+1. Any failures will notify the pdt release channel internally.

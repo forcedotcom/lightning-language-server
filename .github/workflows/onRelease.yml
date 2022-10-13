@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  release:
+    types: [released]
+    workflow_dispatch:
+    inputs:
+      tag:
+        description: tag that needs to publish
+        type: string
+        required: true
+jobs:
+
+  npm:
+    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml@main
+    with:
+      ctc: true
+      sign: true
+      tag: latest
+      githubTag: ${{ github.event.release.tag_name || inputs.tag }}
+    secrets: inherit
+
+  slack_notify:
+    uses: './.github/actions/slack_notify.yml'
+    secrets: inherit
