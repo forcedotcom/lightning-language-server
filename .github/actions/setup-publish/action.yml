@@ -1,0 +1,34 @@
+name: setup-publish
+description: Build, bump, and package
+
+runs:
+  using: composite
+  steps:
+  - uses: "./.github/actions/gh-config"
+  - uses: actions/checkout@v2
+  - name: Setup Node.js
+    uses: actions/setup-node@v3
+    with:
+      node-version: latest
+      cache: 'yarn'
+  - name: Install dependencies
+    run: |-
+      yarn
+    shell: bash
+  - name: Bump package version
+    run: |-
+      npx lerna version << pipeline.parameters.publish-type >> --force-publish --no-git-tag-version --exact --yes
+      git add .
+      export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
+      git commit --allow-empty -m "chore: updated version $RELEASE_TAG [ci skip]"
+    shell: bash
+  - name: Build project
+    run: yarn build
+    shell: bash
+  - name: Generate plugin manifest
+    run: yarn manifest:generate
+    shell: bash
+  - name: Pack Library
+    run: npm pack
+    working-directory: "./packages/templates"
+    shell: bash

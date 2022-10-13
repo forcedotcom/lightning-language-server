@@ -1,0 +1,28 @@
+name: forcedotcom/lightning-language-server/commit-workflow
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        required: true
+      version:
+        required: false
+        default: minor
+runs:
+  defaults:
+    run:
+      working-directory: "~/lightning-language-server"
+  runs-on: ubuntu-latest
+  container:
+    image: node:lts
+  steps:
+  - uses: actions/checkout@v2
+  - name: restore_cache
+    uses: actions/cache@v2
+    with:
+      key: dependency-cache-win-{{ checksum "yarn.lock" }}
+      path: node_modules
+  - run: yarn install --frozen-lockfile
+  - name: Setup workspace Symlinks for Windows
+    run: yarn windowsCopySymlinks
+  - name: Run tests on windows (Without coverage)
+    run: yarn test

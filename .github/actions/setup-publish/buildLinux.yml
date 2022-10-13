@@ -1,0 +1,29 @@
+name: build and test linux
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        required: true
+      version:
+        required: false
+        default: minor
+runs:
+  defaults:
+    run:
+      working-directory: "~/lightning-language-server"
+  runs-on: ubuntu-latest
+  container:
+    image: node:lts
+  steps:
+  - uses: actions/checkout@v2
+  - name: restore_cache
+    uses: actions/cache@v2
+    with:
+      key: dependency-cache-linux-{{ checksum "yarn.lock" }}
+      path: node_modules
+  - run: yarn install --frozen-lockfile
+  - run: yarn lint
+  - run: yarn test_with_coverage
+  - uses: actions/upload-artifact@v2
+    with:
+      path: "~/lightning-language-server/."
