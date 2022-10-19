@@ -1,20 +1,22 @@
 name: release
 
 on:
-  release:
-    types: [released]
-    inputs:
-      tag:
-        description: tag that needs to publish
-        type: string
-        required: true
+  push:
+    tags:
+      - v*
 jobs:
-#test for demo
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: node:lts
+    steps:
+    - uses: actions/download-artifact@v2
+    - uses: actions/checkout@v2
   npm:
-    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml@main
-    with:
-      ctc: true
-      sign: true
-      tag: latest
-      githubTag: ${{ github.event.release.tag_name || inputs.tag }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    container:
+      image: node:lts
+    steps:
+      - name: Set .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run: yarn publish-lsp
