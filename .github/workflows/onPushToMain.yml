@@ -29,7 +29,7 @@ jobs:
         output-file: false
         tag-prefix: ""
         pre-commit: ./scripts/bump-lerna-version.js
-        fallback-version: 3.22.0
+        fallback-version: 3.11.0
     - name: Create Github Release
       uses: actions/create-release@v1
       if: ${{ steps.changelog.outputs.skipped == 'false' }}
