@@ -1,12 +1,9 @@
 name: Slack notification for Github Actions
 on:
-  workflow_dispatch:
   workflow_run:
     workflows:
       - Push to main
       - release
-      - unit tests
-      - validate pr
     types:
       - completed
 
