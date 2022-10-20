@@ -2,12 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Create Port PR for Publishing",
-      "command": "./scripts/port-changes.js",
-      "type": "shell",
-      "args": ["${input:verboseOutput}", "-r", "${input:publishType}"]
-    },
-    {
       "label": "Commit",
       "command": "npm",
       "type": "shell",

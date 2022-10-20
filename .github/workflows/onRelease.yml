@@ -10,7 +10,6 @@ jobs:
     container:
       image: node:lts
     steps:
-    - uses: actions/download-artifact@v2
     - uses: actions/checkout@v2
   npm:
     runs-on: ubuntu-latest

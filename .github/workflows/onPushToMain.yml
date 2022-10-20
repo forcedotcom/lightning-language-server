@@ -6,7 +6,7 @@ on:
 
 jobs:
   tests:
-      uses: salesforcecli/github-workflows/.github/workflows/unitTest.yml@main
+    uses: salesforcecli/github-workflows/.github/workflows/unitTest.yml@main
   release:
     runs-on: ubuntu-latest
     container:
@@ -14,29 +14,22 @@ jobs:
     needs:
     - tests
     steps:
-    - uses: actions/download-artifact@v2
     - uses: actions/checkout@v3
-    - name: Configuring GitHub
-      run: |-
-        git config credential.helper 'cache --timeout=120'
-        git config user.email "$GH_EMAIL"
-        git config user.name "Release Bot"
-    - name: Bump package version
-      run: |-
-        yarn
-        yarn bump-versions 'minor'
-        git add .
-        export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
-        git commit -m "Updated version $RELEASE_TAG [ci skip]"
-    - name: Set .npmrc
-      run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-    - run: yarn publish-lsp
-    - run: git push origin main
-    - name: Tag the release and push to repo
-      run: |-
-        export RELEASE_TAG="$(node -pe "require('./lerna.json').version")"
-        git tag v${RELEASE_TAG}
-        git push --tags
+    - uses: ./.github/actions/gitConfig
+      with:
+        email: ${{ secrets.GH_EMAIL }}
+    - name: Conventional Changelog Action
+      id: changelog
+      uses: TriPSs/conventional-changelog-action@d360fad3a42feca6462f72c97c165d60a02d4bf2
+      with:
+        git-user-name: Release Bot
+        git-user-email: ${{ secrets.GH_EMAIL }}
+        github-token: ${{ secrets.SF_IDEE_BOT_GITHUB_TOKEN }}
+        skip-version-file: true
+        output-file: false
+        tag-prefix: ""
+        pre-commit: ./scripts/bump-lerna-version.js
+        fallback-version: 3.22.0
     - name: Create Github Release
       uses: actions/create-release@v1
       if: ${{ steps.changelog.outputs.skipped == 'false' }}
