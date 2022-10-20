@@ -23,5 +23,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.IDEE_RELEASE_ALERT_SLACK_WEBHOOK }}
-          SLACK_CHANNEL: pdt_releases
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
