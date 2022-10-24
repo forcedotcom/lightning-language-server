@@ -38,7 +38,7 @@
     "vscode-uri": "^2.1.2"
   },
   "devDependencies": {
-    "@lwc/engine-dom": "2.13.3",
+    "@lwc/engine-dom": "2.26.1",
     "@salesforce/apex": "0.0.12",
     "@types/decamelize": "^1.2.0",
     "@types/deep-equal": "^1.0.1",
@@ -57,7 +57,7 @@
     "jest": "^26.4.1",
     "jest-extended": "^0.11.5",
     "lint-staged": "^10.2.11",
-    "lwc": "2.13.3",
+    "lwc": "2.26.1",
     "mock-fs": "^4.11.0",
     "prettier": "^2.0.5",
     "shelljs": "^0.8.3",
