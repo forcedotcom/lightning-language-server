@@ -1,0 +1,21 @@
+name: release
+
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: node:lts
+    steps:
+    - uses: actions/checkout@v2
+  npm:
+    runs-on: ubuntu-latest
+    container:
+      image: node:lts
+    steps:
+      - name: Set .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.IDEE_NPM_TOKEN }}" > ~/.npmrc
+      - run: yarn publish-lsp
