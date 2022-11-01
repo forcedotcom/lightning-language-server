@@ -17,14 +17,14 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/gitConfig
       with:
-        email: ${{ secrets.GH_EMAIL }}
+        email: ${{ secrets.IDEE_GH_EMAIL }}
     - name: Conventional Changelog Action
       id: changelog
       uses: TriPSs/conventional-changelog-action@d360fad3a42feca6462f72c97c165d60a02d4bf2
       with:
         git-user-name: Release Bot
-        git-user-email: ${{ secrets.GH_EMAIL }}
-        github-token: ${{ secrets.SF_IDEE_BOT_GITHUB_TOKEN }}
+        git-user-email: ${{ secrets.IDEE_GH_EMAIL }}
+        github-token: ${{ secrets.IDEE_GH_TOKEN }}
         skip-version-file: true
         output-file: false
         tag-prefix: ""
@@ -34,7 +34,7 @@ jobs:
       uses: actions/create-release@v1
       if: ${{ steps.changelog.outputs.skipped == 'false' }}
       env:
-        GITHUB_TOKEN: ${{ secrets.SF_IDEE_BOT_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.IDEE_GH_TOKEN }}
       with:
         tag_name: ${{ steps.changelog.outputs.tag }}
         release_name: ${{ steps.changelog.outputs.tag }}
