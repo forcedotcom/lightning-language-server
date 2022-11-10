@@ -1,0 +1,34 @@
+# Trigger a manual version bump and github release
+name: Start Manual Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.IDEE_GH_TOKEN }}
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@d360fad3a42feca6462f72c97c165d60a02d4bf2
+        # Get the version bump from Changelog Action + Create Tag
+        with:
+          git-user-name: Release Bot
+          git-user-email: ${{ secrets.IDEE_GH_EMAIL }}
+          github-token: ${{ secrets.IDEE_GH_TOKEN }}
+          skip-version-file: true
+          skip-on-empty: false
+          output-file: false
+          pre-commit: ./scripts/bump-lerna-version.js
+          tag-prefix: ''
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.IDEE_GH_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
