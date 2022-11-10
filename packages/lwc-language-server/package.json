@@ -24,9 +24,9 @@
   },
   "dependencies": {
     "@lwc/compiler": "0.34.8",
-    "@lwc/engine-dom": "2.13.3",
-    "@lwc/errors": "2.13.3",
-    "@lwc/template-compiler": "2.13.3",
+    "@lwc/engine-dom": "2.26.1",
+    "@lwc/errors": "2.26.1",
+    "@lwc/template-compiler": "2.26.1",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.12",
     "@salesforce/lightning-lsp-common": "3.11.0",
