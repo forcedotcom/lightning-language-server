@@ -46,6 +46,7 @@ npm run compile
 ```
 
 ### Open both repositories in a vscode workspace
+Note: complete the install process before this step, or you may receive errors about "Property ‘objType’ does not exist on type ‘Node’." from the Tern Server. This is due to the node_modules being improperly installed at a level above the lightning-language-server. If this does happen to you, simply remove the extra node_modules directory.
 
 ```
 cd lightning-language-server
@@ -84,8 +85,6 @@ When a commit is merged to main, we will automatically create the github release
 
 ### On-Demand publish to NPM
 Navigate to the `Actions` tab in the repository
-1. Under `Workflows` on the left side, select `Release`.
-1. Select `Run Workflow` on the top row.
-1. Enter the desired version number, following semantic versioning.
+1. Under `Workflows` on the left side, select `Manual Release`.
 1. Select `Run Workflow`, and ensure the newest version is published to npm once the workflow completes.
 1. Any failures will notify the pdt release channel internally.
