@@ -7,7 +7,7 @@
 
 const shell = require("shelljs");
 
-export function preCommit(props) {
+const preCommit = (props) => {
   if (props && props.version) {
     shell.exec(`yarn`);
     shell.exec(`yarn bump-versions ${props.version}`);
@@ -16,4 +16,6 @@ export function preCommit(props) {
       `git commit --allow-empty -m "chore: updated version ${props.version} [ci skip]"`
     );
   }
-}
+};
+
+exports.preCommit = preCommit;
