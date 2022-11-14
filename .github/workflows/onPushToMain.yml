@@ -18,6 +18,7 @@ jobs:
     - uses: ./.github/actions/gitConfig
       with:
         email: ${{ secrets.IDEE_GH_EMAIL }}
+        token: ${{ secrets.IDEE_GH_TOKEN }}
     - run: yarn
     - name: Conventional Changelog Action
       id: changelog
