@@ -11,10 +11,6 @@ const preCommit = (props) => {
   if (props && props.version) {
     shell.exec(`yarn`);
     shell.exec(`yarn bump-versions ${props.version}`);
-    shell.exec(`git add .`);
-    shell.exec(
-      `git commit --allow-empty -m "chore: updated version ${props.version} [ci skip]"`
-    );
   }
 };
 
