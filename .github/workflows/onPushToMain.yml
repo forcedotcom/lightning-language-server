@@ -18,6 +18,7 @@ jobs:
     - uses: ./.github/actions/gitConfig
       with:
         email: ${{ secrets.IDEE_GH_EMAIL }}
+    - run: yarn
     - name: Conventional Changelog Action
       id: changelog
       uses: TriPSs/conventional-changelog-action@d360fad3a42feca6462f72c97c165d60a02d4bf2
