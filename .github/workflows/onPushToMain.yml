@@ -15,10 +15,11 @@ jobs:
     - tests
     steps:
     - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.IDEE_GH_TOKEN }}
     - uses: ./.github/actions/gitConfig
       with:
         email: ${{ secrets.IDEE_GH_EMAIL }}
-        token: ${{ secrets.IDEE_GH_TOKEN }}
     - run: yarn
     - name: Conventional Changelog Action
       id: changelog
