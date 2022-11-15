@@ -11,6 +11,7 @@ jobs:
       image: node:lts
     steps:
       - uses: actions/checkout@v3
+      - run: yarn
       - name: Set .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - run: yarn publish-lsp
