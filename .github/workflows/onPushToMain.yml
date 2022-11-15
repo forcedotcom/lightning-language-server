@@ -30,7 +30,7 @@ jobs:
         github-token: ${{ secrets.IDEE_GH_TOKEN }}
         skip-version-file: true
         output-file: false
-        tag-prefix: ""
+        tag-prefix: "v"
         pre-commit: ./scripts/bump-lerna-version.js
         fallback-version: 3.12.0
     - name: Create Github Release
