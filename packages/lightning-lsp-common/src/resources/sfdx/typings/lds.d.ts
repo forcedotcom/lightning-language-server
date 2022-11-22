@@ -1442,6 +1442,19 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input representation for Restore Dataset Version.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_restore_dataset_version_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RestoreDatasetVersionInputRepresentation {
+        /** Source Version to which restore should happen */
+        sourceVersion: AssetReferenceInputRepresentation;
+    }
+
+    /**
      * Representation of a dataset version restore.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors_connectorid_ingest.htm#RestoreDatasetVersionRepresentation
@@ -2365,6 +2378,22 @@ declare module 'lightning/analyticsWaveApi' {
      * @return A promise that will resolve to the dataset response.
      */
     export function createDataset({ dataset }: { dataset: DatasetInputRepresentation }): Promise<DatasetRepresentation>;
+
+    /** Creates a version of a CRM Analytics dataset.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_create_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param sourceVersion The Source Version to which restore should happen.
+     * @return A promise that will resolve to the dataset version response.
+     */
+    export function createDatasetVersion({
+        datasetIdOrApiName,
+        sourceVersion,
+    }: {
+        datasetIdOrApiName: string;
+        sourceVersion: RestoreDatasetVersionInputRepresentation;
+    }): Promise<RestoreDatasetVersionRepresentation>;
 
     /**
      * Creates a Tableau CRM replicated dataset
