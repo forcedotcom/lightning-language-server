@@ -1479,7 +1479,7 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * recipe conversion details during upconversion
+     * Recipe conversion details during upconversion
      *
      * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_conversion_detail.htm
      *
@@ -2834,6 +2834,49 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Extended Metadata (Xmd) for a Dataset Version
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd.htm
+     *
+     * Keys:
+     *    url (string): url
+     */
+    export interface XmdRepresentation {
+        /** Represents the creator of this Xmd */
+        createdBy: WaveUserRepresentation;
+        /** Time the Xmd was created */
+        createdDate: string;
+        /** Locale specific information about the Dataset represented by this xmd. */
+        dataset: XmdDatasetRepresentation;
+        /** List of dates with formatting information. */
+        dates: Array<XmdDateRepresentation>;
+        /** List of derived dimensions with formatting information. */
+        derivedDimensions: Array<XmdDimensionRepresentation>;
+        /** List of derived measures with formatting information. */
+        derivedMeasures: Array<XmdMeasureRepresentation>;
+        /** List of dimensions with formatting information. */
+        dimensions: Array<XmdDimensionRepresentation>;
+        /** Message if there was error copying forward the current version's user xmd to the newly created version. */
+        errorMessage?: string;
+        /** The type of language this xmd is localized for */
+        language: string;
+        /** Represents the user who last modified this Xmd */
+        lastModifiedBy: WaveUserRepresentation;
+        /** Time the Xmd was last modified */
+        lastModifiedDate: string;
+        /** List of measures with formatting information. */
+        measures: Array<XmdMeasureRepresentation>;
+        /** List of organizations for multi organization support. */
+        organizations: Array<XmdOrganizationRepresentation>;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        showDetailsDefaultFields: Array<string>;
+        /** The type of Xmd (Main, User, System) */
+        type: string;
+        /** Location where this XMD is stored. */
+        url: string;
+    }
+
+    /**
      * Creates a Tableau CRM connector.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_create_data_connector
@@ -3551,4 +3594,26 @@ declare module 'lightning/analyticsWaveApi' {
         | MonthlySpecificScheduleRepresentation
         | WeeklyScheduleRepresentation
     >;
+
+    /**
+     * Updates a specific CRM Analytics user Xmd by dataset ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_xmd
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     * @param xmdType The xmd type. Valid values are `Asset`, `Main`, `System`, or `User`.
+     * @param xmd
+     */
+    export function updateXmd({
+        datasetIdOrApiName,
+        versionId,
+        xmdType,
+        xmd,
+    }: {
+        datasetIdOrApiName: string;
+        versionId: string;
+        xmdType: string;
+        xmd: XmdInputRepresentation;
+    }): Promise<XmdRepresentation>;
 }
