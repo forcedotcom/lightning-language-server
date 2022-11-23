@@ -2949,6 +2949,23 @@ declare module 'lightning/analyticsWaveApi' {
     }): Promise<DataflowJobRepresentation>;
 
     /**
+     * Updates a specific CRM Analytics dataset by ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_dataset
+     *
+     * @param datasetIdOrApiName The ID or API name of the dataset.
+     * @param dataset The dataset to update.
+     * @return A promise that will resolve to the dataset response.
+     */
+    export function updateDataset({
+        datasetIdOrApiName,
+        dataset,
+    }: {
+        datasetIdOrApiName: string;
+        dataset: DatasetInputRepresentation;
+    }): Promise<DatasetRepresentation>;
+
+    /**
      * Wire adapter to update the Tableau CRM replicated dataset.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_update_replicated_dataset
