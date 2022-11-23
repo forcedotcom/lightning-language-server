@@ -1223,6 +1223,19 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input representation for analytics license attributes.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_license_attributes_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface LicenseAttributesInputRepresentation {
+        /** Analytics license type associated with the asset. */
+        type: string;
+    }
+
+    /**
      * The analytics license type and other properties
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_limits.htm#LicenseAttributesRepresentation
@@ -1408,6 +1421,25 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Permissions of the user on an asset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#PermissionsRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface PermissionsRepresentation {
+        /** The value which indicates whether the user can create an asset */
+        create?: boolean;
+        /** The value which indicates whether the user can manage access control on an asset */
+        manage?: boolean;
+        /** The value which indicates whether the user can modify an asset */
+        modify?: boolean;
+        /** The value which indicates whether the user can view an asset. */
+        view?: boolean;
+    }
+
+    /**
      * Replicates data from an external source object into Tableau CRM as a dataset. Replicated Datasets are not intended to be visualized directly, but are used like a cache to speed up other workflows which refer to the same source object.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#ReplicatedDatasetInputRepresentation
@@ -1425,6 +1457,222 @@ declare module 'lightning/analyticsWaveApi' {
         passThroughFilter?: string;
         rowLevelSharing?: boolean;
         sourceObjectName?: string;
+    }
+
+    /**
+     * The conversion detail that will be kept
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_conversion_detail_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeConversionDetailInputRepresentation {
+        /** conversion detail id */
+        conversionDetailId: number;
+        /** conversion detail message */
+        message: string;
+        /** conversion detail node name */
+        nodeName: string;
+        /** conversion detail severity */
+        severity?: string;
+    }
+
+    /**
+     * recipe conversion details during upconversion
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_conversion_detail.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeConversionDetailRepresentation {
+        /** Message */
+        message: string;
+        /** Node name */
+        nodeName: string;
+        /** Severity */
+        severity: string;
+    }
+
+    /**
+     * Input representation of 3.0 Recipe Definition format.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_definition_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeDefinitionInputRepresentation {
+        /** Recipe Name */
+        name: string;
+        /** Recipe nodes */
+        nodes: {
+            [key: string]: RecipeNodeInputRepresentation;
+        };
+        /** Recipe ui metadata */
+        ui: {
+            [key: string]: unknown;
+        };
+        /** Recipe version */
+        version: string;
+    }
+
+    /**
+     * Representation of 3.0 Recipe Definition
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_definition.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeDefinitionRepresentation {
+        /** Recipe name */
+        name?: string;
+        /** Recipe nodes */
+        nodes: {
+            [key: string]: unknown;
+        };
+        /** Recipe ui metadata */
+        ui: {
+            [key: string]: unknown;
+        };
+        /** Recipe version */
+        version: string;
+    }
+
+    /**
+     * Input representation of a Data Prep recipe.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeInputRepresentation {
+        /** The list of conversion detail ids that will be kept */
+        conversionDetails?: Array<RecipeConversionDetailInputRepresentation>;
+        /** The recipe's dataflow definition. */
+        dataflowDefinition?: string;
+        /** The recipe's execution engine. Spark or Dataflow. */
+        executionEngine?: string;
+        /** The recipe's file content, base64 encoded. Consider using multipart form data instead. */
+        fileContent?: string;
+        /** The recipe's publish folder. */
+        folder?: AssetReferenceInputRepresentation;
+        /** Recipe format type (2.0 or 3.0) */
+        format?: string;
+        /** A short label for the recipe. */
+        label?: string;
+        /** An optional representation to tag the license attributes of the recipe being saved. */
+        licenseAttributes?: LicenseAttributesInputRepresentation;
+        /** The name of the recipe. */
+        name?: string;
+        /** Target system or format to publish the recipe to. Dataset, DataPool, or IoT */
+        publishingTarget?: string;
+        /** Recipe definition for 3.0 format */
+        recipeDefinition?: RecipeDefinitionInputRepresentation;
+        /** The recipe's target dataset's security predicate. */
+        rowLevelSecurityPredicate?: string;
+        /** The recipe's schedule dataflow run. */
+        schedule?: string;
+        /** The source dataflow asset which will be converted to the recipe 3.0 */
+        sourceDataflow?: AssetReferenceInputRepresentation;
+    }
+
+    /**
+     * Represents a single step used in building a dashboard.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_node_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeNodeInputRepresentation {
+        /** Node action. */
+        action: string;
+        schema?: SchemaParametersInputRepresentation;
+        /** Source node ids. */
+        sources: Array<string>;
+    }
+
+    /**
+     * A Data Prep recipe.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface RecipeRepresentation extends BaseWaveAssetRepresentation {
+        /** The upconversion details when converting dataflow to R3 */
+        conversionDetails: Array<RecipeConversionDetailRepresentation>;
+        /** Last dataflow update. */
+        dataflowLastUpdate?: string;
+        /** Target Dataset */
+        dataset?: AssetReferenceRepresentation;
+        /** URL to get the recipe's file content. */
+        fileUrl?: string;
+        /** The format of the recipe */
+        format?: string;
+        /** The URL for the version histories associated with the recipe. */
+        historiesUrl?: string;
+        /** The analytics license attributes associated with the recipe. */
+        licenseAttributes?: LicenseAttributesRepresentation;
+        /** The next scheduled run of this recipe. */
+        nextScheduledDate?: string;
+        /** The target format or system to publish to. Dataset, DataPool, or IoT. */
+        publishingTarget?: string;
+        /** Recipe definition for 3.0 format */
+        recipeDefinition?: RecipeDefinitionRepresentation;
+        /** The security predicate of the target dataset */
+        rowLevelSecurityPredicate?: string;
+        /** The schedule cron expression current dataflow. */
+        schedule?: string;
+        scheduleAttributes:
+            | DailyScheduleRepresentation
+            | EmptyScheduleRepresentation
+            | EventDrivenScheduleRepresentation
+            | HourlyScheduleRepresentation
+            | MinutelyScheduleRepresentation
+            | MonthlyRelativeScheduleRepresentation
+            | MonthlySpecificScheduleRepresentation
+            | WeeklyScheduleRepresentation;
+        /** The schedule type of the recipe */
+        scheduleType?: string;
+        /** dataflow from which the current recipe was upconverted to or was reverted from. */
+        sourceDataflow?: string;
+        /** Recipe from which the current recipe was upconverted to or was reverted from. */
+        sourceRecipe?: string;
+        /** The status of recipe. */
+        status?: string;
+        /** Target Dataflow ID. */
+        targetDataflowId?: string;
+        /** The validation details for the recipe 3.0 */
+        validationDetails: Array<RecipeValidationDetailRepresentation>;
+    }
+
+    /**
+     * Validation detail on recipe graph or recipe node
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_validation_detail.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeValidationDetailRepresentation {
+        /** Message */
+        message?: string;
+        /** Node name */
+        nodeName?: string;
+        /** Node type */
+        nodeType?: string;
+        /** Severity */
+        severity?: string;
+        /** Validation action */
+        validationAction?: string;
+        /** Validation code */
+        validationCode?: number;
     }
 
     /**
@@ -1506,25 +1754,6 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Permissions of the user on an asset.
-     *
-     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#PermissionsRepresentation
-     *
-     * Keys:
-     *    (none)
-     */
-    export interface PermissionsRepresentation {
-        /** The value which indicates whether the user can create an asset */
-        create?: boolean;
-        /** The value which indicates whether the user can manage access control on an asset */
-        manage?: boolean;
-        /** The value which indicates whether the user can modify an asset */
-        modify?: boolean;
-        /** The value which indicates whether the user can view an asset. */
-        view?: boolean;
-    }
-
-    /**
      * Input representation for Restore Dataset Version.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_restore_dataset_version_input.htm
@@ -1578,6 +1807,110 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export interface SaqlQueryMetadataInputRepresentation {
         [key: string]: any;
+    }
+
+    /**
+     * Schema node field
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_parameters_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFieldParametersInputRepresentation {
+        /** Value to output on error */
+        errorValue?: string;
+        /** Schema field name */
+        name?: string;
+        /** Field Properties */
+        newProperties?: SchemaFieldPropertiesInputRepresentation;
+    }
+
+    /**
+     * Common Field Properties
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_properties_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFieldPropertiesInputRepresentation {
+        /** Field label */
+        label?: string;
+        /** Field name */
+        name?: string;
+        typeProperties: SchemaTypePropertiesCastInputRepresentation;
+    }
+
+    /**
+     * Format for symbols
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_format_symbols_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFormatSymbolsInputRepresentation {
+        /** Currency symbol format */
+        currencySymbol?: string;
+        /** Decimal symbol format */
+        decimalSymbol?: string;
+        /** Grouping symbol format */
+        groupingSymbol?: string;
+    }
+
+    /**
+     * Schema Node in Recipes
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_parameters_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaParametersInputRepresentation {
+        /** Schema Fields */
+        fields: Array<SchemaFieldParametersInputRepresentation>;
+        slice?: SchemaSliceInputRepresentation;
+    }
+
+    /**
+     * Slice definition
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_slice_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaSliceInputRepresentation {
+        /** Fields for SELECT or DROP */
+        fields: Array<string>;
+        /** Ignore missing fields */
+        ignoreMissingFields?: boolean;
+        /** Slice mode SELECT or DROP */
+        mode?: string;
+    }
+
+    /**
+     * Cast for types
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_type_properties_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaTypePropertiesCastInputRepresentation {
+        /** DateTime Format */
+        format?: string;
+        /** Total length of text */
+        length?: number;
+        /** Length of arbitrary precision value */
+        precision?: number;
+        /** Number of digits to right of decimal point */
+        scale?: number;
+        /** Number Format */
+        symbols?: SchemaFormatSymbolsInputRepresentation;
+        /** DataType to Convert to */
+        type?: string;
     }
 
     /**
@@ -3078,6 +3411,29 @@ declare module 'lightning/analyticsWaveApi' {
         versionId: string;
         datasetVersion: DatasetVersionInputRepresentation;
     }): Promise<DatasetVersionRepresentation>;
+
+    /**
+     * Updates a specific CRM Analytics recipe by ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_recipe
+     *
+     * @param id The ID of the recipe.
+     * @param enableEditorValidation Indicates whether editor validation for the recipe is enabled (true) or not ( false).
+     * @param validationContext The recipe validation context. Valid values are `Default` or `Editor`.
+     * @param recipeObject  The recipe to update.
+     * @return A promise that will resolce to the recipe response.
+     */
+    export function updateRecipe({
+        id,
+        enableEditorValidation,
+        validationContext,
+        recipeObject,
+    }: {
+        id: string;
+        enableEditorValidation?: boolean;
+        validationContext?: string;
+        recipeObject: RecipeInputRepresentation;
+    }): Promise<RecipeRepresentation>;
 
     /**
      * Wire adapter to update the Tableau CRM replicated dataset.
