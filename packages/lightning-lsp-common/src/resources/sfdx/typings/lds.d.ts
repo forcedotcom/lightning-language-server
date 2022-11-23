@@ -2743,6 +2743,15 @@ declare module 'lightning/analyticsWaveApi' {
     export function getRecipe(id: string, format?: string): void;
 
     /**
+     * Wire adapter to retrieve a Data Prep recipe job notification.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_resources_recipes_id_notification.htm
+     *
+     * @param id The ID of the recipe.
+     */
+    export function getRecipeNotification(id: string): void;
+
+    /**
      * Wire adapter to retrieve a collection of Tableau CRM data prep recipes.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_recipes
