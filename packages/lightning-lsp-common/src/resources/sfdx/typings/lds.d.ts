@@ -2806,6 +2806,15 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export function getSchedule(assetId: string): void;
 
+    /** Wire adapter to retrieve the security coverage, also known as sharing inheritance, for a particular dataset version.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_security_coverage_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     */
+    export function getSecurityCoverageDatasetVersion(datasetIdOrApiName: string, versionId: string): void;
+
     /**
      * Wire adapter to retrieve a collection of Tableau CRM apps or folders.
      *
