@@ -2465,6 +2465,14 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export function executeQuery(query: SaqlQueryInputRepresentation): void;
 
+    /** Wire adapter to retrieve a collection of Salesforce actions available to a CRM Analytics user.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_actions
+     *
+     * @param entityId The ID of the CRM Analytics user.
+     */
+    export function getActions(entityId: string): void;
+
     /**
      * Wire adapter to retrieve the Analytics limits for Tableau CRM.
      *
