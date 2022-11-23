@@ -2723,6 +2723,15 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export function getDatasetVersions(datasetIdOrApiName: string): void;
 
+    /** Wire adapter to retrieve the dependencies for an asset.
+     * The dependencies resource returns only assets for which the user has view access.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dependencies
+     *
+     * @param assetId The ID of the CRM Analytics asset.
+     */
+    export function getDependencies(assetId: string): void;
+
     /**
      * Wire adapter to retrieve a specific Tableau CRM data prep recipe by ID.
      *
