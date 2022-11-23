@@ -665,6 +665,21 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Wave Data Connector Advanced Property input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_advanced_property_value_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface AdvancedPropertyValueInputRepresentation {
+        /** The name of the advanced property. */
+        name: string;
+        /** The value of the advanced property */
+        value: string;
+    }
+
+    /**
      * An advanced property Name and Value.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AdvancedPropertyValueReprensentation
@@ -1534,6 +1549,21 @@ declare module 'lightning/analyticsWaveApi' {
         notificationLevel?: string;
         /** Hour and timezone in which this schedule is run. */
         time?: TimeRepresentation;
+    }
+
+    /**
+     * Input representation for getting source object data given a list of fields and advanced properties
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_source_object_data_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SourceObjectDataInputRepresentation {
+        /** List of user-specified advanced properties associated with this object. */
+        advancedProperties?: Array<AdvancedPropertyValueInputRepresentation>;
+        /** List of fields as a way to filter the fields returned in the response. */
+        sourceObjectFields: Array<string>;
     }
 
     /**
@@ -2528,6 +2558,21 @@ declare module 'lightning/analyticsWaveApi' {
      * @param sourceObjectName The name of the source object.
      */
     export function getDataConnectorSourceObject(connectorIdOrApiName: string, sourceObjectName: string): void;
+
+    /**
+     * Wire adapter to retrieve a preview collection of source fields for a source object used by a CRM Analytics data connector.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_data_connector_source_object_data_preview_with_fields
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param sourceObjectName The name of the source object.
+     * @param sourceObjectParam The fields of the source object.
+     */
+    export function getDataConnectorSourceObjectDataPreviewWithFields(
+        connectorIdOrApiName: string,
+        sourceObjectName: string,
+        sourceObjectParam: SourceObjectDataInputRepresentation,
+    ): void;
 
     /**
      * Wire adapter to test the status of an external Tableau CRM connector.
