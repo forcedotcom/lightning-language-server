@@ -1087,6 +1087,74 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input representation for wave Dataset Version.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_dataset_version_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DatasetVersionInputRepresentation {
+        /** Indicates whether the Dataset Version is complete */
+        isComplete?: boolean;
+        /** The row level security predicate to be applied to this Dataset Version. */
+        predicate?: string;
+        /** Entity from which sharing rules should be inherited */
+        sharingSource?: AssetReferenceInputRepresentation | null;
+        /** The total number of rows for the dataset version */
+        totalRowCount?: number;
+    }
+
+    /**
+     * An instantiated version of a Wave dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_dataset_version.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface DatasetVersionRepresentation extends BaseWaveAssetRepresentation {
+        /** A reference to the dataset. */
+        dataset?: AssetReferenceRepresentation;
+        /** Information about the data files that make up the dataset version. */
+        files?: Array<WaveFileMetadataRepresentation>;
+        /** The URL of the files resource for this dataset version. */
+        filesUrl?: string;
+        /** The row level security predicate. */
+        predicate?: string;
+        /** The version of the row level security predicate. */
+        predicateVersion?: number;
+        /** Dataset sharing inheritance coverage information resource. */
+        securityCoverageUrl: string;
+        /** Entity from which sharing rules will be inherited for this dataset version */
+        sharingSource?: DatasetVersionSharingSourceRepresentation;
+        /** The parent dataflow or file for this dataset version. */
+        source?: AssetReferenceRepresentation;
+        /** Dataset version supports new date format */
+        supportsNewDates?: boolean;
+        /** Total number of rows for this dataset version */
+        totalRowCount?: number;
+        xmdMain?: XmdInnerRepresentation;
+        /** The URL of the Xmd Collection resource for this dataset version. */
+        xmdsUrl?: string;
+    }
+
+    /**
+     * Asset reference representation.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_asset_reference.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DatasetVersionSharingSourceRepresentation {
+        /** The asset developer name. */
+        name: string;
+        /** The namespace that qualifies the asset name */
+        namespace?: string;
+    }
+
+    /**
      * Represents an empty schedule on an asset
      *
      * Keys:
@@ -1598,6 +1666,32 @@ declare module 'lightning/analyticsWaveApi' {
         name: string;
         /** The zone ID of this time zone. */
         zoneId: string;
+    }
+
+    /**
+     * Information about a file.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_wave_file_metadata.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface WaveFileMetadataRepresentation {
+        createdBy?: WaveUserRepresentation;
+        /** created date */
+        createdDate?: string;
+        /** The 18 character lens file ID. */
+        id?: string;
+        /** last accessed date */
+        lastAccessedDate?: string;
+        /** last modified date */
+        lastModifiedDate?: string;
+        /** size of the lens file */
+        length?: number;
+        /** name of lens file */
+        name?: string;
+        /** url of file. */
+        url?: string;
     }
 
     /**
@@ -2964,6 +3058,26 @@ declare module 'lightning/analyticsWaveApi' {
         datasetIdOrApiName: string;
         dataset: DatasetInputRepresentation;
     }): Promise<DatasetRepresentation>;
+
+    /**
+     * Updates a specific CRM Analytics dataset version by dataset ID and version ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or API name of the dataset.
+     * @param versionId The ID of the dataset version.
+     * @param datasetVersion The dataset version to update.
+     * @return A promise that will resolve to the dataset version response.
+     */
+    export function updateDatasetVersion({
+        datasetIdOrApiName,
+        versionId,
+        datasetVersion,
+    }: {
+        datasetIdOrApiName: string;
+        versionId: string;
+        datasetVersion: DatasetVersionInputRepresentation;
+    }): Promise<DatasetVersionRepresentation>;
 
     /**
      * Wire adapter to update the Tableau CRM replicated dataset.
