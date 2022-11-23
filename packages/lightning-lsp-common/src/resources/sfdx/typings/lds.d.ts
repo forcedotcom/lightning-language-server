@@ -2575,6 +2575,20 @@ declare module 'lightning/analyticsWaveApi' {
     ): void;
 
     /**
+     * Wire adapter to retrieve a source object resource for a Tableau CRM connector.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors_connectorid_sourceobjects.htm
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param q Search terms. Individual terms are separated by spaces. A wildcard is automatically appended to the last token in the query string.
+     *          If the user’s search query contains quotation marks or wildcards, those symbols are automatically removed from the query string in
+     *          the URI along with any other special characters.
+     * @param page Generated token that indicates the view of dataflow jobs to be returned.
+     * @param pageSize Number of items to be returned in a single page. Minimum is 1, maximum is 200, and the default is 25.
+     */
+    export function getDataConnectorSourceObjects(connectorIdOrApiName: string, q?: string, page?: string, pageSize?: number): void;
+
+    /**
      * Wire adapter to test the status of an external Tableau CRM connector.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_data_connector_status
