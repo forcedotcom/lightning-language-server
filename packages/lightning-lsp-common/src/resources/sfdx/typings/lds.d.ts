@@ -2415,6 +2415,15 @@ declare module 'lightning/analyticsWaveApi' {
         replicatedDataset: ReplicatedDatasetInputRepresentation;
     }): Promise<ReplicatedDatasetRepresentation>;
 
+    /** Deletes a specific CRM Analytics data connector by ID or developer name.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_delete_data_connector
+     *
+     * @param connectorIdOrApiName The ID or developer name of the connector.
+     * @return A promise that will resolve on completion.
+     */
+    export function deleteDataConnector({ connectorIdOrApiName }: { connectorIdOrApiName: string }): Promise<void>;
+
     /**
      * Deletes a specific Tableau CRM dataset by ID or developer name.
      *
