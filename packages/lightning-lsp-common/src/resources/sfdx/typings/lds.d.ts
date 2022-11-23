@@ -2705,6 +2705,25 @@ declare module 'lightning/analyticsWaveApi' {
     ): void;
 
     /**
+     * Wire adapter to retrieve a specific CRM Analytics dataset version by dataset ID or developer name and version ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     */
+    export function getDatasetVersion(datasetIdOrApiName: string, versionId: string): void;
+
+    /**
+     * Wire adapter to retrieve a list of CRM Analytics dataset versions for a specific dataset.
+     *
+     *  https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dataset_versions
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     */
+    export function getDatasetVersions(datasetIdOrApiName: string): void;
+
+    /**
      * Wire adapter to retrieve a specific Tableau CRM data prep recipe by ID.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_recipe
