@@ -1597,6 +1597,38 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input required to create recipe notifications that are sent to the current user.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_notification_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeNotificationInputRepresentation {
+        /** Number of minutes that a recipe can run before sending an alert. */
+        longRunningAlertInMins?: number | null;
+        /** Notification level for emails. */
+        notificationLevel: string;
+    }
+
+    /**
+     * Notification conditions on a recipe for the current user.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_notification.htm
+     *
+     * Keys:
+     *    id (string): recipe.id
+     */
+    export interface RecipeNotificationRepresentation {
+        /** Number of minutes that a recipe can run before sending an alert. */
+        longRunningAlertInMins?: number;
+        /** Notification level for emails. */
+        notificationLevel: string;
+        /** A reference to the Recipe that the notification belongs to. */
+        recipe: AssetReferenceRepresentation;
+    }
+
+    /**
      * A Data Prep recipe.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe.htm
@@ -3434,6 +3466,23 @@ declare module 'lightning/analyticsWaveApi' {
         validationContext?: string;
         recipeObject: RecipeInputRepresentation;
     }): Promise<RecipeRepresentation>;
+
+    /**
+     * Updates a Data Prep recipe job notification.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_resources_recipes_id_notification.htm
+     *
+     * @param id The ID of the recipe.
+     * @param recipeNotification The recipe notification to update.
+     * @return A promise that will resolve to the recipe notification response.
+     */
+    export function updateRecipeNotification({
+        id,
+        recipeNotification,
+    }: {
+        id: string;
+        recipeNotification: RecipeNotificationInputRepresentation;
+    }): Promise<RecipeNotificationRepresentation>;
 
     /**
      * Wire adapter to update the Tableau CRM replicated dataset.
