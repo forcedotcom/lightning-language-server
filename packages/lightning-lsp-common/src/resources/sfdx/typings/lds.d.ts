@@ -2846,6 +2846,50 @@ declare module 'lightning/analyticsWaveApi' {
     ): void;
 
     /**
+     * Wire adapter to retrieve a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     */
+    export function getWaveTemplate(templateIdOrApiName: string, options?: string): void;
+
+    /**
+     * Wire adapter to retrieve the configuration for a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template_config
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     * @param disableApex Indicates whether Apex integration hooks are disabled (true) or not (false).
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     */
+    export function getWaveTemplateConfig(templateIdOrApiName: string, disableApex?: boolean, options?: string): void;
+
+    /**
+     * Wire adapter to retrieve the release notes for a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template_release_notes
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     */
+    export function getWaveTemplateReleaseNotes(templateIdOrApiName: string): void;
+
+    /**
+     * Wire adapter to retrieve a collection of CRM Analytics templates.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_templates
+     *
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     * @param type Template type to apply to the collection results.
+     *             Valid values are `App`, `Dashboard`, `Data`, `Embedded`, or `Lens`.
+     */
+    export function getWaveTemplates(options?: string, type?: string): void;
+
+    /**
      * Wire adapter to retrieve a specific Tableau CRM extended metadata type (Xmd) for a version of a dataset.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_xmd
