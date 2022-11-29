@@ -665,6 +665,21 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Wave Data Connector Advanced Property input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_advanced_property_value_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface AdvancedPropertyValueInputRepresentation {
+        /** The name of the advanced property. */
+        name: string;
+        /** The value of the advanced property */
+        value: string;
+    }
+
+    /**
      * An advanced property Name and Value.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AdvancedPropertyValueReprensentation
@@ -689,6 +704,15 @@ declare module 'lightning/analyticsWaveApi' {
     export interface AssetReferenceRepresentation extends BaseAssetReferenceRepresentation {}
 
     /**
+     * Simple, reference input representation for wave assets.
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface AssetReferenceInputRepresentation extends BaseAssetReferenceInputRepresentation {}
+
+    /**
      * Base Tableau CRM Asset input Representation
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#BaseAssetInputRepresentation
@@ -700,6 +724,23 @@ declare module 'lightning/analyticsWaveApi' {
         description?: string;
         label?: string;
         name?: string;
+    }
+
+    /**
+     * Base class for Asset reference input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#AssetReferenceInputRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface BaseAssetReferenceInputRepresentation {
+        /** ID of the asset */
+        id?: string;
+        /** Developer name of the asset */
+        name?: string;
+        /** The namespace that qualifies the asset name */
+        namespace?: string;
     }
 
     /**
@@ -759,6 +800,23 @@ declare module 'lightning/analyticsWaveApi' {
         type: string;
         /** URL to get the definition of the asset. */
         url: string;
+    }
+
+    /**
+     * Extended metadata for property in conditional formatting linked to a Dimension / Measure.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface ConditionalFormattingPropertyInputRepresentation {
+        /** Valid conditional formatting parameters based on its type */
+        parameters?: {
+            [key: string]: unknown;
+        };
+        /** Conditional Formatting based on Reference field if any. */
+        referenceField?: string;
+        /** The type of the conditional formatting */
+        type?: string;
     }
 
     /**
@@ -966,6 +1024,136 @@ declare module 'lightning/analyticsWaveApi' {
         id: string;
     }
 
+    /** Wave Dataset input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_dataset_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DatasetInputRepresentation extends BaseAssetInputRepresentation {
+        /** Type of the dataset */
+        datasetType?: string;
+        /** Folder in which this dataset is stored */
+        folder?: AssetReferenceInputRepresentation;
+        liveConnection?: LiveConnectionInputRepresentation;
+        userXmd?: XmdInputRepresentation;
+        /** If dataset should be hidden from users with view access */
+        visibility?: string;
+    }
+
+    /**
+     * A Wave dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_dataset.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface DatasetRepresentation extends BaseWaveAssetRepresentation {
+        /** The URL for dataset shards. */
+        clientShardsUrl?: string;
+        currentVersionCreatedBy?: WaveUserRepresentation;
+        /** Date on which the current version was created. */
+        currentVersionCreatedDate?: string;
+        /** The 18 character ID of the current DatasetVersion. */
+        currentVersionId?: string;
+        currentVersionLastModifiedBy?: WaveUserRepresentation;
+        /** Date on which the current version was last modified. */
+        currentVersionLastModifiedDate?: string;
+        /** Current dataset version supports new date format */
+        currentVersionSupportsNewDates?: boolean;
+        /** The total number of rows in the dataset. */
+        currentVersionTotalRowCount?: number;
+        /** The URL for the current DatasetVersion. */
+        currentVersionUrl?: string;
+        /** Date/time when this dataset was last updated by a dataflow. */
+        dataRefreshDate?: string;
+        /** The type of the dataset. */
+        datasetType: string;
+        /** A reference to the folder in which this dataset is stored. */
+        folder: AssetReferenceRepresentation;
+        /** Date/time when the metadata(Edgemart's Folder, MasterLabel, Current, EdgemartData's Sharing and security predicate) of dataset was last changed. */
+        lastMetadataChangedDate?: string;
+        /** Date/time when this dataset was last queried. */
+        lastQueriedDate?: string;
+        licenseAttributes?: LicenseAttributesRepresentation;
+        liveConnection?: LiveConnectionRepresentation;
+        userXmd?: XmdInnerRepresentation;
+        /** The URL for dataset versions. */
+        versionsUrl: string;
+        /** If dataset should be hidden from users with view access */
+        visibility: string;
+    }
+
+    /**
+     * Input representation for wave Dataset Version.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_dataset_version_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DatasetVersionInputRepresentation {
+        /** Indicates whether the Dataset Version is complete */
+        isComplete?: boolean;
+        /** The row level security predicate to be applied to this Dataset Version. */
+        predicate?: string;
+        /** Entity from which sharing rules should be inherited */
+        sharingSource?: AssetReferenceInputRepresentation | null;
+        /** The total number of rows for the dataset version */
+        totalRowCount?: number;
+    }
+
+    /**
+     * An instantiated version of a Wave dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_dataset_version.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface DatasetVersionRepresentation extends BaseWaveAssetRepresentation {
+        /** A reference to the dataset. */
+        dataset?: AssetReferenceRepresentation;
+        /** Information about the data files that make up the dataset version. */
+        files?: Array<WaveFileMetadataRepresentation>;
+        /** The URL of the files resource for this dataset version. */
+        filesUrl?: string;
+        /** The row level security predicate. */
+        predicate?: string;
+        /** The version of the row level security predicate. */
+        predicateVersion?: number;
+        /** Dataset sharing inheritance coverage information resource. */
+        securityCoverageUrl: string;
+        /** Entity from which sharing rules will be inherited for this dataset version */
+        sharingSource?: DatasetVersionSharingSourceRepresentation;
+        /** The parent dataflow or file for this dataset version. */
+        source?: AssetReferenceRepresentation;
+        /** Dataset version supports new date format */
+        supportsNewDates?: boolean;
+        /** Total number of rows for this dataset version */
+        totalRowCount?: number;
+        xmdMain?: XmdInnerRepresentation;
+        /** The URL of the Xmd Collection resource for this dataset version. */
+        xmdsUrl?: string;
+    }
+
+    /**
+     * Asset reference representation.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_asset_reference.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface DatasetVersionSharingSourceRepresentation {
+        /** The asset developer name. */
+        name: string;
+        /** The namespace that qualifies the asset name */
+        namespace?: string;
+    }
+
     /**
      * Represents an empty schedule on an asset
      *
@@ -1035,6 +1223,19 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input representation for analytics license attributes.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_license_attributes_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface LicenseAttributesInputRepresentation {
+        /** Analytics license type associated with the asset. */
+        type: string;
+    }
+
+    /**
      * The analytics license type and other properties
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_limits.htm#LicenseAttributesRepresentation
@@ -1045,6 +1246,40 @@ declare module 'lightning/analyticsWaveApi' {
     export interface LicenseAttributesRepresentation {
         /** The associated analytics license type */
         type: string;
+    }
+
+    /**
+     * Connection details of a live dataset
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_live_connection.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface LiveConnectionRepresentation {
+        /** The label of the connection */
+        connectionLabel: string;
+        /** The developer name of the connection */
+        connectionName: string;
+        /** The type of the connection */
+        connectionType: string;
+        /** The source object name from the connection */
+        sourceObjectName: string;
+    }
+
+    /**
+     * Connection details for a live dataset
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_live_connection_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface LiveConnectionInputRepresentation {
+        /** The developer name of the connection */
+        connectionName: string;
+        /** The source object name from the connection */
+        sourceObjectName: string;
     }
 
     /**
@@ -1142,6 +1377,34 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Wave XMD measure format number input representation with numeric separators
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface NumericSeparatorsInputRepresentation {
+        /** Decimal separator */
+        decimal?: string;
+        /** Thousands separator */
+        thousands?: string;
+    }
+
+    /**
+     * Thousands and decimal numeric separators
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_numeric_separators.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface NumericSeparatorsRepresentation {
+        /** Decimal separator */
+        decimal?: string;
+        /** Thousand separator */
+        thousands?: string;
+    }
+
+    /**
      * output source for output objects
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_replicateddatasets.htm#OutputSourceRepresentation
@@ -1155,6 +1418,25 @@ declare module 'lightning/analyticsWaveApi' {
         name: string;
         nextScheduledDate?: string;
         outputRows?: number;
+    }
+
+    /**
+     * Permissions of the user on an asset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#PermissionsRepresentation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface PermissionsRepresentation {
+        /** The value which indicates whether the user can create an asset */
+        create?: boolean;
+        /** The value which indicates whether the user can manage access control on an asset */
+        manage?: boolean;
+        /** The value which indicates whether the user can modify an asset */
+        modify?: boolean;
+        /** The value which indicates whether the user can view an asset. */
+        view?: boolean;
     }
 
     /**
@@ -1175,6 +1457,254 @@ declare module 'lightning/analyticsWaveApi' {
         passThroughFilter?: string;
         rowLevelSharing?: boolean;
         sourceObjectName?: string;
+    }
+
+    /**
+     * The conversion detail that will be kept
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_conversion_detail_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeConversionDetailInputRepresentation {
+        /** conversion detail id */
+        conversionDetailId: number;
+        /** conversion detail message */
+        message: string;
+        /** conversion detail node name */
+        nodeName: string;
+        /** conversion detail severity */
+        severity?: string;
+    }
+
+    /**
+     * Recipe conversion details during upconversion
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_conversion_detail.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeConversionDetailRepresentation {
+        /** Message */
+        message: string;
+        /** Node name */
+        nodeName: string;
+        /** Severity */
+        severity: string;
+    }
+
+    /**
+     * Input representation of 3.0 Recipe Definition format.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_definition_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeDefinitionInputRepresentation {
+        /** Recipe Name */
+        name: string;
+        /** Recipe nodes */
+        nodes: {
+            [key: string]: RecipeNodeInputRepresentation;
+        };
+        /** Recipe ui metadata */
+        ui: {
+            [key: string]: unknown;
+        };
+        /** Recipe version */
+        version: string;
+    }
+
+    /**
+     * Representation of 3.0 Recipe Definition
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_definition.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeDefinitionRepresentation {
+        /** Recipe name */
+        name?: string;
+        /** Recipe nodes */
+        nodes: {
+            [key: string]: unknown;
+        };
+        /** Recipe ui metadata */
+        ui: {
+            [key: string]: unknown;
+        };
+        /** Recipe version */
+        version: string;
+    }
+
+    /**
+     * Input representation of a Data Prep recipe.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeInputRepresentation {
+        /** The list of conversion detail ids that will be kept */
+        conversionDetails?: Array<RecipeConversionDetailInputRepresentation>;
+        /** The recipe's dataflow definition. */
+        dataflowDefinition?: string;
+        /** The recipe's execution engine. Spark or Dataflow. */
+        executionEngine?: string;
+        /** The recipe's file content, base64 encoded. Consider using multipart form data instead. */
+        fileContent?: string;
+        /** The recipe's publish folder. */
+        folder?: AssetReferenceInputRepresentation;
+        /** Recipe format type (2.0 or 3.0) */
+        format?: string;
+        /** A short label for the recipe. */
+        label?: string;
+        /** An optional representation to tag the license attributes of the recipe being saved. */
+        licenseAttributes?: LicenseAttributesInputRepresentation;
+        /** The name of the recipe. */
+        name?: string;
+        /** Target system or format to publish the recipe to. Dataset, DataPool, or IoT */
+        publishingTarget?: string;
+        /** Recipe definition for 3.0 format */
+        recipeDefinition?: RecipeDefinitionInputRepresentation;
+        /** The recipe's target dataset's security predicate. */
+        rowLevelSecurityPredicate?: string;
+        /** The recipe's schedule dataflow run. */
+        schedule?: string;
+        /** The source dataflow asset which will be converted to the recipe 3.0 */
+        sourceDataflow?: AssetReferenceInputRepresentation;
+    }
+
+    /**
+     * Represents a single step used in building a dashboard.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_node_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeNodeInputRepresentation {
+        /** Node action. */
+        action: string;
+        schema?: SchemaParametersInputRepresentation;
+        /** Source node ids. */
+        sources: Array<string>;
+    }
+
+    /**
+     * Input required to create recipe notifications that are sent to the current user.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_recipe_notification_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeNotificationInputRepresentation {
+        /** Number of minutes that a recipe can run before sending an alert. */
+        longRunningAlertInMins?: number | null;
+        /** Notification level for emails. */
+        notificationLevel: string;
+    }
+
+    /**
+     * Notification conditions on a recipe for the current user.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_notification.htm
+     *
+     * Keys:
+     *    id (string): recipe.id
+     */
+    export interface RecipeNotificationRepresentation {
+        /** Number of minutes that a recipe can run before sending an alert. */
+        longRunningAlertInMins?: number;
+        /** Notification level for emails. */
+        notificationLevel: string;
+        /** A reference to the Recipe that the notification belongs to. */
+        recipe: AssetReferenceRepresentation;
+    }
+
+    /**
+     * A Data Prep recipe.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface RecipeRepresentation extends BaseWaveAssetRepresentation {
+        /** The upconversion details when converting dataflow to R3 */
+        conversionDetails: Array<RecipeConversionDetailRepresentation>;
+        /** Last dataflow update. */
+        dataflowLastUpdate?: string;
+        /** Target Dataset */
+        dataset?: AssetReferenceRepresentation;
+        /** URL to get the recipe's file content. */
+        fileUrl?: string;
+        /** The format of the recipe */
+        format?: string;
+        /** The URL for the version histories associated with the recipe. */
+        historiesUrl?: string;
+        /** The analytics license attributes associated with the recipe. */
+        licenseAttributes?: LicenseAttributesRepresentation;
+        /** The next scheduled run of this recipe. */
+        nextScheduledDate?: string;
+        /** The target format or system to publish to. Dataset, DataPool, or IoT. */
+        publishingTarget?: string;
+        /** Recipe definition for 3.0 format */
+        recipeDefinition?: RecipeDefinitionRepresentation;
+        /** The security predicate of the target dataset */
+        rowLevelSecurityPredicate?: string;
+        /** The schedule cron expression current dataflow. */
+        schedule?: string;
+        scheduleAttributes:
+            | DailyScheduleRepresentation
+            | EmptyScheduleRepresentation
+            | EventDrivenScheduleRepresentation
+            | HourlyScheduleRepresentation
+            | MinutelyScheduleRepresentation
+            | MonthlyRelativeScheduleRepresentation
+            | MonthlySpecificScheduleRepresentation
+            | WeeklyScheduleRepresentation;
+        /** The schedule type of the recipe */
+        scheduleType?: string;
+        /** dataflow from which the current recipe was upconverted to or was reverted from. */
+        sourceDataflow?: string;
+        /** Recipe from which the current recipe was upconverted to or was reverted from. */
+        sourceRecipe?: string;
+        /** The status of recipe. */
+        status?: string;
+        /** Target Dataflow ID. */
+        targetDataflowId?: string;
+        /** The validation details for the recipe 3.0 */
+        validationDetails: Array<RecipeValidationDetailRepresentation>;
+    }
+
+    /**
+     * Validation detail on recipe graph or recipe node
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_responses_recipe_validation_detail.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface RecipeValidationDetailRepresentation {
+        /** Message */
+        message?: string;
+        /** Node name */
+        nodeName?: string;
+        /** Node type */
+        nodeType?: string;
+        /** Severity */
+        severity?: string;
+        /** Validation action */
+        validationAction?: string;
+        /** Validation code */
+        validationCode?: number;
     }
 
     /**
@@ -1256,22 +1786,16 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
-     * Permissions of the user on an asset.
+     * Input representation for Restore Dataset Version.
      *
-     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#PermissionsRepresentation
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_restore_dataset_version_input.htm
      *
      * Keys:
      *    (none)
      */
-    export interface PermissionsRepresentation {
-        /** The value which indicates whether the user can create an asset */
-        create?: boolean;
-        /** The value which indicates whether the user can manage access control on an asset */
-        manage?: boolean;
-        /** The value which indicates whether the user can modify an asset */
-        modify?: boolean;
-        /** The value which indicates whether the user can view an asset. */
-        view?: boolean;
+    export interface RestoreDatasetVersionInputRepresentation {
+        /** Source Version to which restore should happen */
+        sourceVersion: AssetReferenceInputRepresentation;
     }
 
     /**
@@ -1318,6 +1842,110 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Schema node field
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_parameters_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFieldParametersInputRepresentation {
+        /** Value to output on error */
+        errorValue?: string;
+        /** Schema field name */
+        name?: string;
+        /** Field Properties */
+        newProperties?: SchemaFieldPropertiesInputRepresentation;
+    }
+
+    /**
+     * Common Field Properties
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_properties_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFieldPropertiesInputRepresentation {
+        /** Field label */
+        label?: string;
+        /** Field name */
+        name?: string;
+        typeProperties: SchemaTypePropertiesCastInputRepresentation;
+    }
+
+    /**
+     * Format for symbols
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_format_symbols_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaFormatSymbolsInputRepresentation {
+        /** Currency symbol format */
+        currencySymbol?: string;
+        /** Decimal symbol format */
+        decimalSymbol?: string;
+        /** Grouping symbol format */
+        groupingSymbol?: string;
+    }
+
+    /**
+     * Schema Node in Recipes
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_parameters_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaParametersInputRepresentation {
+        /** Schema Fields */
+        fields: Array<SchemaFieldParametersInputRepresentation>;
+        slice?: SchemaSliceInputRepresentation;
+    }
+
+    /**
+     * Slice definition
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_slice_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaSliceInputRepresentation {
+        /** Fields for SELECT or DROP */
+        fields: Array<string>;
+        /** Ignore missing fields */
+        ignoreMissingFields?: boolean;
+        /** Slice mode SELECT or DROP */
+        mode?: string;
+    }
+
+    /**
+     * Cast for types
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_requests_schema_field_type_properties_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SchemaTypePropertiesCastInputRepresentation {
+        /** DateTime Format */
+        format?: string;
+        /** Total length of text */
+        length?: number;
+        /** Length of arbitrary precision value */
+        precision?: number;
+        /** Number of digits to right of decimal point */
+        scale?: number;
+        /** Number Format */
+        symbols?: SchemaFormatSymbolsInputRepresentation;
+        /** DataType to Convert to */
+        type?: string;
+    }
+
+    /**
      * Input representation for specifying a schedule on which to execute some type of job.
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#ScheduleInputRepresentation
@@ -1357,6 +1985,21 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Input representation for getting source object data given a list of fields and advanced properties
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_source_object_data_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface SourceObjectDataInputRepresentation {
+        /** List of user-specified advanced properties associated with this object. */
+        advancedProperties?: Array<AdvancedPropertyValueInputRepresentation>;
+        /** List of fields as a way to filter the fields returned in the response. */
+        sourceObjectFields: Array<string>;
+    }
+
+    /**
      * Time at which something should happen
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#TimeRepresentation
@@ -1388,6 +2031,32 @@ declare module 'lightning/analyticsWaveApi' {
         name: string;
         /** The zone ID of this time zone. */
         zoneId: string;
+    }
+
+    /**
+     * Information about a file.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_wave_file_metadata.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface WaveFileMetadataRepresentation {
+        createdBy?: WaveUserRepresentation;
+        /** created date */
+        createdDate?: string;
+        /** The 18 character lens file ID. */
+        id?: string;
+        /** last accessed date */
+        lastAccessedDate?: string;
+        /** last modified date */
+        lastModifiedDate?: string;
+        /** size of the lens file */
+        length?: number;
+        /** name of lens file */
+        name?: string;
+        /** url of file. */
+        url?: string;
     }
 
     /**
@@ -1436,6 +2105,778 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * Base class for XMD Dimension and Derived Dimension Action.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_dimension_salesforce_action_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseDimensionActionInputRepresentation {
+        /** Whether the Action is enabled. */
+        enabled: boolean;
+        /** Name of the action. */
+        name: string;
+    }
+
+    /**
+     * Base class for Wave XMD Dimension and Dervied Dimension Custom Action input representation
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseDimensionCustomActionInputRepresentation extends XmdBaseDimensionActionInputRepresentation {
+        /** icon for the action. */
+        icon?: string;
+        /** method for the action. */
+        method?: string;
+        /** target for the action. */
+        target?: string;
+        /** tooltip for the action. */
+        tooltip?: string;
+        /** Url for the action. */
+        url?: string;
+    }
+
+    /**
+     * Base class for Wave XMD Dimension and Derived Dimension input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_dimension_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseDimensionInputRepresentation {
+        /** Conditional formatting for a Dimension. */
+        conditionalFormatting?: {
+            [key: string]: ConditionalFormattingPropertyInputRepresentation;
+        };
+        /** Whether the Dimension has custom actions enabled. */
+        customActionsEnabled?: boolean;
+        /** Date format to be used for a Date that is a dimension. */
+        dateFormat?: string;
+        /** Default action for the dimension. */
+        defaultAction?: string;
+        /** Description of the Dimension. */
+        description?: string;
+        /** Field name of the Dimension (used in queries). */
+        field: string;
+        /** Fully qualified name of the dimension. */
+        fullyQualifiedName?: string;
+        /** Image template. */
+        imageTemplate?: string;
+        /** Label for the Dimension. */
+        label?: string;
+        /** Template for formatting a Link. */
+        linkTemplate?: string;
+        /** Whether the Dimension has link templates enabled. */
+        linkTemplateEnabled?: boolean;
+        /** Tooltip to be displayed for links. */
+        linkTooltip?: string;
+        /** Origin of this dimension. */
+        origin?: string;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        recordDisplayFields?: Array<string>;
+        /** Record Id for this dimension. */
+        recordIdField?: string;
+        /** Record Organization Id for this dimension. */
+        recordOrganizationIdField?: string;
+        /** Whether the Dimension has salesforce actions enabled. */
+        salesforceActionsEnabled?: boolean;
+        /** Whether the Dimension should be shown in the Explorer. */
+        showInExplorer?: boolean;
+    }
+
+    /**
+     * Base class for Wave XMD Dimension and Derived Dimension Member input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_dimension_member_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseDimensionMemberInputRepresentation {
+        /** Color for the member. */
+        color?: string;
+        /** Label for the member. */
+        label?: string;
+        /** Member value. */
+        member?: string;
+    }
+
+    /**
+     * Base class for Wave XMD Measure and Derived Measure Format input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_measure_format_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseMeasureFormatInputRepresentation {
+        /** displays the original xmd 1.1 format array as a String. */
+        customFormat?: string;
+        /** Number of digits to be displayed after the decimal place. */
+        decimalDigits?: number;
+        /** Thousands and decimal numeric separators for number formatting */
+        delimiters?: NumericSeparatorsInputRepresentation;
+        /** displays negative numbers with parenthesis or not minus sign */
+        negativeParentheses?: boolean;
+        /** Prefix to be placed before the field value. */
+        prefix?: string;
+        /** Suffix to be placed after the field value. */
+        suffix?: string;
+        /** Unit string for the measure. (eg. 'cm') */
+        unit?: string;
+        /** Multiplier for the unit. */
+        unitMultiplier?: number;
+    }
+
+    /**
+     * Base class for Wave XMD Measure and Derived Measure input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_measure_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdBaseMeasureInputRepresentation {
+        /** Conditional formatting for a Measure. */
+        conditionalFormatting?: {
+            [key: string]: ConditionalFormattingPropertyInputRepresentation;
+        };
+        /** Date format to be used for a Date that is a measure. */
+        dateFormat?: string;
+        /** Description of the Measure. */
+        description?: string;
+        /** Field name of the Measure (used in queries). */
+        field: string;
+        /** Fully qualified name of the Measure. */
+        fullyQualifiedName?: string;
+        /** Label for the Measure. */
+        label?: string;
+        /** Origin of the Measure. */
+        origin?: string;
+        /** Whether the Measure should be shown in the Explorer. */
+        showInExplorer?: boolean;
+    }
+
+    /**
+     * Wave XMD Dataset input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_dataset_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDatasetInputRepresentation {
+        /** Connector source for the dataset. */
+        connector?: string;
+        /** Description of the dataset. */
+        description?: string;
+        /** Fully qualified name of the dataset version. */
+        fullyQualifiedName?: string;
+        /** Origin representing where this dataset version comes from. */
+        origin?: string;
+    }
+
+    /**
+     * Extended metadata for the dataset
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDatasetRepresentation {
+        /** Connector source for the dataset */
+        connector?: string;
+        /** Description of the dataset. */
+        description?: string;
+        /** Fully qualified name of the dataset version. */
+        fullyQualifiedName?: string;
+        /** Origin representing where this dataset version comes from. */
+        origin?: string;
+    }
+
+    /**
+     * Wave XMD Date Fields input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_date_field_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDateFieldsInputRepresentation {
+        /** day field. */
+        day?: string;
+        /** epochDay field. */
+        epochDay?: string;
+        /** epochSecond field. */
+        epochSecond?: string;
+        /** fiscalMonth field. */
+        fiscalMonth?: string;
+        /** fiscalQuarter field. */
+        fiscalQuarter?: string;
+        /** fiscalWeek field. */
+        fiscalWeek?: string;
+        /** fiscalYear field. */
+        fiscalYear?: string;
+        /** fullField field. */
+        fullField?: string;
+        /** hour field. */
+        hour?: string;
+        /** minute field. */
+        minute?: string;
+        /** month field. */
+        month?: string;
+        /** quarter field. */
+        quarter?: string;
+        /** second field. */
+        second?: string;
+        /** week field. */
+        week?: string;
+        /** year field. */
+        year?: string;
+    }
+
+    /**
+     * Extended metadata for the formatting of a Date Field in a Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_date_field.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDateFieldRepresentation {
+        /** day field. */
+        day?: string;
+        /** epochDay field. */
+        epochDay?: string;
+        /** epochSecond field. */
+        epochSecond?: string;
+        /** fiscalMonth field. */
+        fiscalMonth?: string;
+        /** fiscalQuarter field. */
+        fiscalQuarter?: string;
+        /** fiscalWeek field. */
+        fiscalWeek?: string;
+        /** fiscalYear field. */
+        fiscalYear?: string;
+        /** fullField field. */
+        fullField?: string;
+        /** hour field */
+        hour?: string;
+        /** minute field */
+        minute?: string;
+        /** month field. */
+        month?: string;
+        /** quarter field. */
+        quarter?: string;
+        /** second field */
+        second?: string;
+        /** week field. */
+        week?: string;
+        /** year field. */
+        year?: string;
+    }
+
+    /**
+     * Wave XMD Date input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_date_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDateInputRepresentation {
+        /** Alias of the Date column. */
+        alias?: string;
+        /** Whether the Date should be displayed as compact. */
+        compact?: boolean;
+        /** Description of the Date column. */
+        description?: string;
+        /** Formatting information for the date fields. */
+        fields?: XmdDateFieldsInputRepresentation;
+        /** What the first day of the week is. */
+        firstDayOfWeek?: number;
+        /** Offset number of months for the fiscal year in relation to the calendar year. */
+        fiscalMonthOffset?: number;
+        /** Fully qualified name of the date. */
+        fullyQualifiedName?: string;
+        /** Whether the Year End is the Fiscal year. */
+        isYearEndFiscalYear?: boolean;
+        /** Label of the Date column. */
+        label?: string;
+        /** Whether the Date should be show in the explorer. */
+        showInExplorer?: boolean;
+    }
+
+    /**
+     * Extended metadata for a date
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_date.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDateRepresentation {
+        /** Alias of the Date column. */
+        alias?: string;
+        /** Whether or not the Date should be displayed as compact. */
+        compact?: boolean;
+        /** Description of the Date column. */
+        description?: string;
+        /** Formatting information for the date fields. */
+        fields: XmdDateFieldRepresentation;
+        /** What the first day of the week is. */
+        firstDayOfWeek?: number;
+        /** Offset number of months for the fiscal year in relation to the calendar year. */
+        fiscalMonthOffset?: number;
+        /** Format of the date field. */
+        format?: string;
+        /** Fully qualified name of the date. */
+        fullyQualifiedName?: string;
+        /** If the DateTime type is from timezone auto conversion. */
+        isConvertedDateTime?: boolean;
+        /** If the Year End is the Fiscal year. */
+        isYearEndFiscalYear?: boolean;
+        /** Label of the Date column. */
+        label?: string;
+        /** Whether or not the Date should be show in the explorer. */
+        showInExplorer?: boolean;
+        /** Date type of the Date column. */
+        type?: string;
+    }
+
+    /**
+     * Wave XMD Derived Dimension input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_dimension_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDerivedDimensionInputRepresentation extends XmdBaseDimensionInputRepresentation {
+        /** Custom Actions linked to this Derived Dimension. */
+        customActions?: Array<XmdBaseDimensionCustomActionInputRepresentation>;
+        /** Whether the Derived Dimension is multi-value. */
+        isMultiValue?: boolean;
+        /** Member overrides for a Derived Dimension. */
+        members?: Array<XmdDerivedDimensionMemberInputRepresentation>;
+        /** Salesfoce Actions linked to this Derived Dimension. */
+        salesforceActions?: Array<XmdDerivedDimensionSalesforceActionInputRepresentation>;
+    }
+
+    /**
+     * Wave XMD Derived Dimension Member input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_dimension_member_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface XmdDerivedDimensionMemberInputRepresentation extends XmdBaseDimensionMemberInputRepresentation {}
+
+    /**
+     * Wave XMD Derived Dimension Salesforce Action input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_dimension_salesforce_action_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface XmdDerivedDimensionSalesforceActionInputRepresentation extends XmdBaseDimensionActionInputRepresentation {}
+
+    /**
+     * Wave XMD Derived Measure input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_derived_measure_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDerivedMeasureInputRepresentation extends XmdBaseMeasureInputRepresentation {
+        /** Format details for the Derived Measure. */
+        format?: XmdBaseMeasureFormatInputRepresentation;
+    }
+
+    /**
+     * Base Action Representation for a Dimension in an Xmd.
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDimensionBaseActionRepresentation {
+        /** If Action is enabled for a specific dimension. */
+        enabled: boolean;
+        /** Name of the action. */
+        name: string;
+    }
+
+    /**
+     * Custom Action Representation for a Dimension in an Xmd.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_dimension_custom_action.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDimensionCustomActionRepresentation extends XmdDimensionBaseActionRepresentation {
+        /** icon for the action. */
+        icon?: string;
+        /** method for the action. */
+        method?: string;
+        /** target for the action. */
+        target?: string;
+        /** tooltip for the action. */
+        tooltip?: string;
+        /** Url for the action. */
+        url: string;
+    }
+
+    /**
+     * Wave XMD Dimension input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_dimension_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDimensionInputRepresentation extends XmdBaseDimensionInputRepresentation {
+        /** Custom Actions linked to this Dimension. */
+        customActions?: Array<XmdBaseDimensionCustomActionInputRepresentation>;
+        /** Member overrides for a Dimension. */
+        members?: Array<XmdDimensionMemberInputRepresentation>;
+        /** Salesfoce Actions linked to this Dimension. */
+        salesforceActions?: Array<XmdDimensionSalesforceActionInputRepresentation>;
+    }
+
+    /**
+     * Wave XMD Dimension Member input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_dimension_member_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface XmdDimensionMemberInputRepresentation extends XmdBaseDimensionMemberInputRepresentation {}
+
+    /**
+     * Extended metadata a Member linked to a Dimension in a Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_dimension_member.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDimensionMemberRepresentation {
+        /** Color for the member. */
+        color?: string;
+        /** Label for the member. */
+        label?: string;
+        /** Member value. */
+        member: string;
+    }
+
+    /**
+     * Extended metadata a Dimension in a Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_dimension.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdDimensionRepresentation {
+        /** Conditional formatting for a Dimension. */
+        conditionalFormatting: {
+            [key: string]: unknown;
+        };
+        /** Custom Actions linked to this Dimension. */
+        customActions: Array<XmdDimensionCustomActionRepresentation>;
+        /** Whether the Dimension has custom actions enabled. */
+        customActionsEnabled?: boolean;
+        /** Date format to be used for a Date that is a dimension. */
+        dateFormat?: string;
+        /** Default action for the dimension. */
+        defaultAction?: string;
+        /** Description of the Dimension. */
+        description?: string;
+        /** Field name of the Dimension (used in queries). */
+        field: string;
+        /** Fully qualified name of the dimension. */
+        fullyQualifiedName?: string;
+        /** Image template. */
+        imageTemplate?: string;
+        /** Whether the Dimension is multi-value. */
+        isMultiValue?: boolean;
+        /** Label for the Dimension. */
+        label?: string;
+        /** Template for formatting a Link. */
+        linkTemplate?: string;
+        /** Whether the Dimension has link templates enabled. */
+        linkTemplateEnabled?: boolean;
+        /** Tooltip to be displayed for links. */
+        linkTooltip?: string;
+        /** Member overrides for a Dimension. */
+        members: Array<XmdDimensionMemberRepresentation>;
+        /** Origin of this dimension. */
+        origin?: string;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        recordDisplayFields: Array<string>;
+        /** Record Id for this dimension. */
+        recordIdField?: string;
+        /** Record Organization Id for this dimension. */
+        recordOrganizationIdField?: string;
+        /** Salesfoce Actions linked to this Dimension. */
+        salesforceActions: Array<XmdDimensionSalesforceActionRepresentation>;
+        /** Whether the Dimension has salesforce actions enabled. */
+        salesforceActionsEnabled?: boolean;
+        /** Whether the Dimension should be shown in the Explorer. */
+        showInExplorer?: boolean;
+    }
+
+    /**
+     * Wave XMD Dimension Salesforce Action input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_dimension_salesforce_action_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface XmdDimensionSalesforceActionInputRepresentation extends XmdBaseDimensionActionInputRepresentation {}
+
+    /**
+     * Salesforce Action Representation for a Dimension in an Xmd.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_dimension_salesforce_action.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    export interface XmdDimensionSalesforceActionRepresentation extends XmdDimensionBaseActionRepresentation {}
+
+    /**
+     * Extended Metadata (Xmd) for a Dataset Version
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdInnerRepresentation {
+        /** Represents the creator of this Xmd */
+        createdBy: WaveUserRepresentation;
+        /** Time the Xmd was created */
+        createdDate: string;
+        /** Locale specific information about the Dataset represented by this xmd. */
+        dataset: XmdDatasetRepresentation;
+        /** List of dates with formatting information. */
+        dates: Array<XmdDateRepresentation>;
+        /** List of derived dimensions with formatting information. */
+        derivedDimensions: Array<XmdDimensionRepresentation>;
+        /** List of derived measures with formatting information. */
+        derivedMeasures: Array<XmdMeasureRepresentation>;
+        /** List of dimensions with formatting information. */
+        dimensions: Array<XmdDimensionRepresentation>;
+        /** Message if there was error copying forward the current version's user xmd to the newly created version. */
+        errorMessage?: string;
+        /** The type of language this xmd is localized for */
+        language: string;
+        /** Represents the user who last modified this Xmd */
+        lastModifiedBy: WaveUserRepresentation;
+        /** Time the Xmd was last modified */
+        lastModifiedDate: string;
+        /** List of measures with formatting information. */
+        measures: Array<XmdMeasureRepresentation>;
+        /** List of organizations for multi organization support. */
+        organizations: Array<XmdOrganizationRepresentation>;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        showDetailsDefaultFields: Array<string>;
+        /** The type of Xmd (Main, User, System) */
+        type: string;
+        /** Location where this XMD is stored. */
+        url?: string;
+    }
+
+    /**
+     * Wave XMD input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdInputRepresentation {
+        /** Locale specific information about the Dataset represented by this xmd. */
+        dataset?: XmdDatasetInputRepresentation;
+        /** List of dates with formatting information. */
+        dates?: Array<XmdDateInputRepresentation>;
+        /** List of derived dimensions with formatting information. */
+        derivedDimensions?: Array<XmdDerivedDimensionInputRepresentation>;
+        /** List of derived measures with formatting information. */
+        derivedMeasures?: Array<XmdDerivedMeasureInputRepresentation>;
+        /** List of dimensions with formatting information. */
+        dimensions?: Array<XmdDimensionInputRepresentation>;
+        /** List of measures with formatting information. */
+        measures?: Array<XmdMeasureInputRepresentation>;
+        /** List of organizations for multi organization support. */
+        organizations?: Array<XmdOrganizationInputRepresentation>;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        showDetailsDefaultFields?: Array<string>;
+    }
+
+    /**
+     * Format for a Measure in a Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_measure_format.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdMeasureFormatRepresentation {
+        /** displays the original xmd 1.1 format array as a String. */
+        customFormat?: string;
+        /** Number of digits to be displayed after the decimal place. */
+        decimalDigits?: number;
+        /** Thousands and decimal numeric separators. */
+        delimiters?: NumericSeparatorsRepresentation;
+        /** displays negative numbers with parenthesis or not minus sign */
+        negativeParentheses?: boolean;
+        /** Prefix to be placed before the field value. */
+        prefix?: string;
+        /** Suffix to be places after the field value. */
+        suffix?: string;
+        /** Unit string for the measure. (eg. 'cm') */
+        unit?: string;
+        /** Multiplier for the unit. */
+        unitMultiplier?: number;
+    }
+
+    /**
+     * Wave XMD Measure input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_measure_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdMeasureInputRepresentation extends XmdBaseMeasureInputRepresentation {
+        /** Format details for the Measure. */
+        format?: XmdBaseMeasureFormatInputRepresentation;
+    }
+
+    /**
+     * Extended metadata for a Measure in a Dataset.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_measure.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdMeasureRepresentation {
+        /** Conditional formatting for a Measure. */
+        conditionalFormatting: {
+            [key: string]: unknown;
+        };
+        /** Date format to be used for a Date that is a measure. */
+        dateFormat?: string;
+        /** Description of the Measure. */
+        description?: string;
+        /** Field name of the Measure (used in queries). */
+        field: string;
+        /** Format details for the Measure. */
+        format?: XmdMeasureFormatRepresentation;
+        /** Fully qualified name of the Measure. */
+        fullyQualifiedName?: string;
+        /** Label for the Measure. */
+        label?: string;
+        /** Origin of this measure. */
+        origin?: string;
+        /** Whether the Measure should be shown in the Explorer. */
+        showInExplorer?: boolean;
+    }
+
+    /**
+     * Wave XMD Organization input representation
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_requests_xmd_organization_input.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdOrganizationInputRepresentation {
+        /** ID of the organization. */
+        id?: string;
+        /** Instance Url for the organization. */
+        instanceUrl?: string;
+        /** Label for the organization. */
+        label?: string;
+    }
+
+    /**
+     * Extended metadata for an organization
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd_organization.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface XmdOrganizationRepresentation {
+        /** id of the organization */
+        id: string;
+        /** Instance Url for an organization. */
+        instanceUrl: string;
+        /** Label for an organization. */
+        label: string;
+    }
+
+    /**
+     * Extended Metadata (Xmd) for a Dataset Version
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_xmd.htm
+     *
+     * Keys:
+     *    url (string): url
+     */
+    export interface XmdRepresentation {
+        /** Represents the creator of this Xmd */
+        createdBy: WaveUserRepresentation;
+        /** Time the Xmd was created */
+        createdDate: string;
+        /** Locale specific information about the Dataset represented by this xmd. */
+        dataset: XmdDatasetRepresentation;
+        /** List of dates with formatting information. */
+        dates: Array<XmdDateRepresentation>;
+        /** List of derived dimensions with formatting information. */
+        derivedDimensions: Array<XmdDimensionRepresentation>;
+        /** List of derived measures with formatting information. */
+        derivedMeasures: Array<XmdMeasureRepresentation>;
+        /** List of dimensions with formatting information. */
+        dimensions: Array<XmdDimensionRepresentation>;
+        /** Message if there was error copying forward the current version's user xmd to the newly created version. */
+        errorMessage?: string;
+        /** The type of language this xmd is localized for */
+        language: string;
+        /** Represents the user who last modified this Xmd */
+        lastModifiedBy: WaveUserRepresentation;
+        /** Time the Xmd was last modified */
+        lastModifiedDate: string;
+        /** List of measures with formatting information. */
+        measures: Array<XmdMeasureRepresentation>;
+        /** List of organizations for multi organization support. */
+        organizations: Array<XmdOrganizationRepresentation>;
+        /** Ordered list of Dimensions and Measures. Represents the default order to show them in the UI. */
+        showDetailsDefaultFields: Array<string>;
+        /** The type of Xmd (Main, User, System) */
+        type: string;
+        /** Location where this XMD is stored. */
+        url: string;
+    }
+
+    /**
      * Creates a Tableau CRM connector.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_create_data_connector
@@ -1461,6 +2902,31 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export function createDataflowJob({ dataflowJob }: { dataflowJob: DataflowJobInputRepresentation }): Promise<DataflowJobRepresentation>;
 
+    /** Creates a CRM Analytics dataset.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_create_dataset
+     *
+     * @param dataset The dataset to create.
+     * @return A promise that will resolve to the dataset response.
+     */
+    export function createDataset({ dataset }: { dataset: DatasetInputRepresentation }): Promise<DatasetRepresentation>;
+
+    /** Creates a version of a CRM Analytics dataset.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_create_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param sourceVersion The Source Version to which restore should happen.
+     * @return A promise that will resolve to the dataset version response.
+     */
+    export function createDatasetVersion({
+        datasetIdOrApiName,
+        sourceVersion,
+    }: {
+        datasetIdOrApiName: string;
+        sourceVersion: RestoreDatasetVersionInputRepresentation;
+    }): Promise<RestoreDatasetVersionRepresentation>;
+
     /**
      * Creates a Tableau CRM replicated dataset
      *
@@ -1480,6 +2946,15 @@ declare module 'lightning/analyticsWaveApi' {
     }: {
         replicatedDataset: ReplicatedDatasetInputRepresentation;
     }): Promise<ReplicatedDatasetRepresentation>;
+
+    /** Deletes a specific CRM Analytics data connector by ID or developer name.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_delete_data_connector
+     *
+     * @param connectorIdOrApiName The ID or developer name of the connector.
+     * @return A promise that will resolve on completion.
+     */
+    export function deleteDataConnector({ connectorIdOrApiName }: { connectorIdOrApiName: string }): Promise<void>;
 
     /**
      * Deletes a specific Tableau CRM dataset by ID or developer name.
@@ -1521,6 +2996,14 @@ declare module 'lightning/analyticsWaveApi' {
      * @param query.timezone The timezone for the query.
      */
     export function executeQuery(query: SaqlQueryInputRepresentation): void;
+
+    /** Wire adapter to retrieve a collection of Salesforce actions available to a CRM Analytics user.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_actions
+     *
+     * @param entityId The ID of the CRM Analytics user.
+     */
+    export function getActions(entityId: string): void;
 
     /**
      * Wire adapter to retrieve the Analytics limits for Tableau CRM.
@@ -1577,6 +3060,35 @@ declare module 'lightning/analyticsWaveApi' {
      * @param sourceObjectName The name of the source object.
      */
     export function getDataConnectorSourceObject(connectorIdOrApiName: string, sourceObjectName: string): void;
+
+    /**
+     * Wire adapter to retrieve a preview collection of source fields for a source object used by a CRM Analytics data connector.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_data_connector_source_object_data_preview_with_fields
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param sourceObjectName The name of the source object.
+     * @param sourceObjectParam The fields of the source object.
+     */
+    export function getDataConnectorSourceObjectDataPreviewWithFields(
+        connectorIdOrApiName: string,
+        sourceObjectName: string,
+        sourceObjectParam: SourceObjectDataInputRepresentation,
+    ): void;
+
+    /**
+     * Wire adapter to retrieve a source object resource for a Tableau CRM connector.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_dataconnectors_connectorid_sourceobjects.htm
+     *
+     * @param connectorIdOrApiName The ID of the connector.
+     * @param q Search terms. Individual terms are separated by spaces. A wildcard is automatically appended to the last token in the query string.
+     *          If the user’s search query contains quotation marks or wildcards, those symbols are automatically removed from the query string in
+     *          the URI along with any other special characters.
+     * @param page Generated token that indicates the view of dataflow jobs to be returned.
+     * @param pageSize Number of items to be returned in a single page. Minimum is 1, maximum is 200, and the default is 25.
+     */
+    export function getDataConnectorSourceObjects(connectorIdOrApiName: string, q?: string, page?: string, pageSize?: number): void;
 
     /**
      * Wire adapter to test the status of an external Tableau CRM connector.
@@ -1695,6 +3207,34 @@ declare module 'lightning/analyticsWaveApi' {
     ): void;
 
     /**
+     * Wire adapter to retrieve a specific CRM Analytics dataset version by dataset ID or developer name and version ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     */
+    export function getDatasetVersion(datasetIdOrApiName: string, versionId: string): void;
+
+    /**
+     * Wire adapter to retrieve a list of CRM Analytics dataset versions for a specific dataset.
+     *
+     *  https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dataset_versions
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     */
+    export function getDatasetVersions(datasetIdOrApiName: string): void;
+
+    /** Wire adapter to retrieve the dependencies for an asset.
+     * The dependencies resource returns only assets for which the user has view access.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_dependencies
+     *
+     * @param assetId The ID of the CRM Analytics asset.
+     */
+    export function getDependencies(assetId: string): void;
+
+    /**
      * Wire adapter to retrieve a specific Tableau CRM data prep recipe by ID.
      *
      * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_wire_adapters_get_recipe
@@ -1703,6 +3243,15 @@ declare module 'lightning/analyticsWaveApi' {
      * @param format Specifies the format of the returned recipe. Valid values are `R2 or `R3`. The default is `R3`.
      */
     export function getRecipe(id: string, format?: string): void;
+
+    /**
+     * Wire adapter to retrieve a Data Prep recipe job notification.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_resources_recipes_id_notification.htm
+     *
+     * @param id The ID of the recipe.
+     */
+    export function getRecipeNotification(id: string): void;
 
     /**
      * Wire adapter to retrieve a collection of Tableau CRM data prep recipes.
@@ -1759,6 +3308,15 @@ declare module 'lightning/analyticsWaveApi' {
      */
     export function getSchedule(assetId: string): void;
 
+    /** Wire adapter to retrieve the security coverage, also known as sharing inheritance, for a particular dataset version.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_security_coverage_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     */
+    export function getSecurityCoverageDatasetVersion(datasetIdOrApiName: string, versionId: string): void;
+
     /**
      * Wire adapter to retrieve a collection of Tableau CRM apps or folders.
      *
@@ -1788,6 +3346,50 @@ declare module 'lightning/analyticsWaveApi' {
         sort?: string,
         templateSourceId?: string,
     ): void;
+
+    /**
+     * Wire adapter to retrieve a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     */
+    export function getWaveTemplate(templateIdOrApiName: string, options?: string): void;
+
+    /**
+     * Wire adapter to retrieve the configuration for a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template_config
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     * @param disableApex Indicates whether Apex integration hooks are disabled (true) or not (false).
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     */
+    export function getWaveTemplateConfig(templateIdOrApiName: string, disableApex?: boolean, options?: string): void;
+
+    /**
+     * Wire adapter to retrieve the release notes for a CRM Analytics template.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_template_release_notes
+     *
+     * @param templateIdOrApiName The ID or developer name of the template.
+     */
+    export function getWaveTemplateReleaseNotes(templateIdOrApiName: string): void;
+
+    /**
+     * Wire adapter to retrieve a collection of CRM Analytics templates.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_get_wave_templates
+     *
+     * @param options Template visibility options to apply to the collection results.
+     *                Valid values are `CreateApp`, `ManageableOnly`, or `ViewOnly`.
+     * @param type Template type to apply to the collection results.
+     *             Valid values are `App`, `Dashboard`, `Data`, `Embedded`, or `Lens`.
+     */
+    export function getWaveTemplates(options?: string, type?: string): void;
 
     /**
      * Wire adapter to retrieve a specific Tableau CRM extended metadata type (Xmd) for a version of a dataset.
@@ -1847,6 +3449,83 @@ declare module 'lightning/analyticsWaveApi' {
         dataflowJobId: string;
         dataflowJob: DataflowJobInputRepresentation;
     }): Promise<DataflowJobRepresentation>;
+
+    /**
+     * Updates a specific CRM Analytics dataset by ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_dataset
+     *
+     * @param datasetIdOrApiName The ID or API name of the dataset.
+     * @param dataset The dataset to update.
+     * @return A promise that will resolve to the dataset response.
+     */
+    export function updateDataset({
+        datasetIdOrApiName,
+        dataset,
+    }: {
+        datasetIdOrApiName: string;
+        dataset: DatasetInputRepresentation;
+    }): Promise<DatasetRepresentation>;
+
+    /**
+     * Updates a specific CRM Analytics dataset version by dataset ID and version ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_dataset_version
+     *
+     * @param datasetIdOrApiName The ID or API name of the dataset.
+     * @param versionId The ID of the dataset version.
+     * @param datasetVersion The dataset version to update.
+     * @return A promise that will resolve to the dataset version response.
+     */
+    export function updateDatasetVersion({
+        datasetIdOrApiName,
+        versionId,
+        datasetVersion,
+    }: {
+        datasetIdOrApiName: string;
+        versionId: string;
+        datasetVersion: DatasetVersionInputRepresentation;
+    }): Promise<DatasetVersionRepresentation>;
+
+    /**
+     * Updates a specific CRM Analytics recipe by ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_recipe
+     *
+     * @param id The ID of the recipe.
+     * @param enableEditorValidation Indicates whether editor validation for the recipe is enabled (true) or not ( false).
+     * @param validationContext The recipe validation context. Valid values are `Default` or `Editor`.
+     * @param recipeObject  The recipe to update.
+     * @return A promise that will resolce to the recipe response.
+     */
+    export function updateRecipe({
+        id,
+        enableEditorValidation,
+        validationContext,
+        recipeObject,
+    }: {
+        id: string;
+        enableEditorValidation?: boolean;
+        validationContext?: string;
+        recipeObject: RecipeInputRepresentation;
+    }): Promise<RecipeRepresentation>;
+
+    /**
+     * Updates a Data Prep recipe job notification.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.salesforce_recipes_api.meta/salesforce_recipes_api/sforce_recipes_api_resources_recipes_id_notification.htm
+     *
+     * @param id The ID of the recipe.
+     * @param recipeNotification The recipe notification to update.
+     * @return A promise that will resolve to the recipe notification response.
+     */
+    export function updateRecipeNotification({
+        id,
+        recipeNotification,
+    }: {
+        id: string;
+        recipeNotification: RecipeNotificationInputRepresentation;
+    }): Promise<RecipeNotificationRepresentation>;
 
     /**
      * Wire adapter to update the Tableau CRM replicated dataset.
@@ -1915,4 +3594,26 @@ declare module 'lightning/analyticsWaveApi' {
         | MonthlySpecificScheduleRepresentation
         | WeeklyScheduleRepresentation
     >;
+
+    /**
+     * Updates a specific CRM Analytics user Xmd by dataset ID.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_analytics_update_xmd
+     *
+     * @param datasetIdOrApiName The ID or developer name of the dataset.
+     * @param versionId The ID of the dataset version.
+     * @param xmdType The xmd type. Valid values are `Asset`, `Main`, `System`, or `User`.
+     * @param xmd
+     */
+    export function updateXmd({
+        datasetIdOrApiName,
+        versionId,
+        xmdType,
+        xmd,
+    }: {
+        datasetIdOrApiName: string;
+        versionId: string;
+        xmdType: string;
+        xmd: XmdInputRepresentation;
+    }): Promise<XmdRepresentation>;
 }
