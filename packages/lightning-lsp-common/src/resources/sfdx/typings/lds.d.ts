@@ -625,6 +625,13 @@ declare module 'lightning/salesEnablementProgramApi' {
      * Wire adapter for getting Sales Enablement Program templates list.
      */
     export function getProgramTemplates(): void;
+
+    /**
+     * Wire adapter for getting Sales Enablement Program details of the programTemplateName passed as url param.
+     * @param programTemplateName name of the template for which details are required
+     */
+     
+         export function getProgramTemplate(programTemplateName: string): void;
 }
 
 declare module 'lightning/analyticsWaveApi' {
