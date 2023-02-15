@@ -620,6 +620,13 @@ declare module 'lightning/platformScaleCenterApi' {
     export function getMetrics(request: string): void;
 }
 
+declare module 'lightning/placeQuoteApi' {
+    /**
+     * Wire adapter for updates using Place Quote API
+     */
+    export function updateQuote(): void;
+}
+
 declare module 'lightning/salesEnablementProgramApi' {
     /**
      * Wire adapter for getting Sales Enablement Program templates list.
