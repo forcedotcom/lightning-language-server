@@ -610,6 +610,23 @@ declare module 'lightning/uiRecordApi' {
     export function getFieldDisplayValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
 }
 
+declare module 'lightning/industriesSchedulerApi' {
+    /**
+     * Wire adapter for getting Engagment ChannelTypes.
+     */
+    export function getEngagementChannelTypes(): void;
+
+    /**
+     * Wire adapter for creating a Service Appointment.
+     */
+    export function createServiceAppointment(): void;
+
+    /**
+     * Wire adapter for updating a Service Appointment.
+     */
+    export function updateServiceAppointment(): void;
+}
+
 declare module 'lightning/platformScaleCenterApi' {
     /**
      * Wire adapter for a Scale Center observability metrics.
