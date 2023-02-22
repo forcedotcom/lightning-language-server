@@ -637,6 +637,13 @@ declare module 'lightning/platformScaleCenterApi' {
     export function getMetrics(request: string): void;
 }
 
+declare module 'lightning/placeQuoteApi' {
+    /**
+     * Wire adapter for updates using Place Quote API
+     */
+    export function updateQuote(): void;
+}
+
 declare module 'lightning/salesEnablementProgramApi' {
     /**
      * Wire adapter for getting Sales Enablement Program templates list.
@@ -647,8 +654,7 @@ declare module 'lightning/salesEnablementProgramApi' {
      * Wire adapter for getting Sales Enablement Program details of the programTemplateName passed as url param.
      * @param programTemplateName name of the template for which details are required
      */
-     
-         export function getProgramTemplate(programTemplateName: string): void;
+    export function getProgramTemplate(programTemplateName: string): void;
 }
 
 declare module 'lightning/analyticsWaveApi' {
