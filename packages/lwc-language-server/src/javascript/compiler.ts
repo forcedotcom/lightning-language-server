@@ -160,6 +160,7 @@ export function toVSCodeRange(babelRange: SourceLocation): Range {
 }
 
 export function extractAttributes(metadata: Metadata, uri: string): { privateAttributes: AttributeInfo[]; publicAttributes: AttributeInfo[] } {
+    console.log('I hit here');
     const publicAttributes: AttributeInfo[] = [];
     const privateAttributes: AttributeInfo[] = [];
     for (const x of getProperties(metadata)) {

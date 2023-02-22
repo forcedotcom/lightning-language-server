@@ -610,6 +610,23 @@ declare module 'lightning/uiRecordApi' {
     export function getFieldDisplayValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
 }
 
+declare module 'lightning/industriesSchedulerApi' {
+    /**
+     * Wire adapter for getting Engagment ChannelTypes.
+     */
+    export function getEngagementChannelTypes(): void;
+
+    /**
+     * Wire adapter for creating a Service Appointment.
+     */
+    export function createServiceAppointment(): void;
+
+    /**
+     * Wire adapter for updating a Service Appointment.
+     */
+    export function updateServiceAppointment(): void;
+}
+
 declare module 'lightning/platformScaleCenterApi' {
     /**
      * Wire adapter for a Scale Center observability metrics.
@@ -620,11 +637,24 @@ declare module 'lightning/platformScaleCenterApi' {
     export function getMetrics(request: string): void;
 }
 
+declare module 'lightning/placeQuoteApi' {
+    /**
+     * Wire adapter for updates using Place Quote API
+     */
+    export function updateQuote(): void;
+}
+
 declare module 'lightning/salesEnablementProgramApi' {
     /**
      * Wire adapter for getting Sales Enablement Program templates list.
      */
     export function getProgramTemplates(): void;
+
+    /**
+     * Wire adapter for getting Sales Enablement Program details of the programTemplateName passed as url param.
+     * @param programTemplateName name of the template for which details are required
+     */
+    export function getProgramTemplate(programTemplateName: string): void;
 }
 
 declare module 'lightning/analyticsWaveApi' {
