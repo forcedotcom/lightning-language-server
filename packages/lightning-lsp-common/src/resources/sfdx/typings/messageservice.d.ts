@@ -14,7 +14,7 @@ declare module 'lightning/messageService' {
      * @param {Object} messageContext - The MessageContext object.
      * @param {Object} messageChannel - MessageChannel object.
      * @param {Function} listener - Function to be invoked when messages are published on the channel.
-     * @param {Object} [subscriberOptions] - Options to influence message channel subscription.
+     * @param {Object} [subscriberOptions] - Optional, options to influence message channel subscription.
      *                                     Current subscriber options:
      *                                       1. 'scope' - the scope that a component is subscribed to.
      *                                          Setting this to 'APPLICATION_SCOPE' subscribes in the application
