@@ -4,8 +4,8 @@ declare module 'lightning/messageService' {
      *
      * @param {Object} messageContext - The MessageContext object.
      * @param {Object} messageChannel - MessageChannel object.
-     * @param {Object} message - Optional, serializable object to be sent to subscribers.
-     * @param {Object} publisherOptions - Optional, options to influence message delivery.
+     * @param {Object} [message] - Optional, serializable object to be sent to subscribers.
+     * @param {Object} [publisherOptions] - Optional, options to influence message delivery.
      */
     export function publish(messageContext: Object, messageChannel: Object, message?: Object, publisherOptions?: Object): void;
     /**
