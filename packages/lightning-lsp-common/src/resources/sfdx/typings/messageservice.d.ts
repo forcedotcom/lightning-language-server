@@ -4,8 +4,8 @@ declare module 'lightning/messageService' {
      *
      * @param {Object} messageContext - The MessageContext object.
      * @param {Object} messageChannel - MessageChannel object.
-     * @param {Object} message - Optional, serializable object to be sent to subscribers.
-     * @param {Object} publisherOptions - Optional, options to influence message delivery.
+     * @param {Object} [message] - Optional, serializable object to be sent to subscribers.
+     * @param {Object} [publisherOptions] - Optional, options to influence message delivery.
      */
     export function publish(messageContext: Object, messageChannel: Object, message?: Object, publisherOptions?: Object): void;
     /**
@@ -14,14 +14,14 @@ declare module 'lightning/messageService' {
      * @param {Object} messageContext - The MessageContext object.
      * @param {Object} messageChannel - MessageChannel object.
      * @param {Function} listener - Function to be invoked when messages are published on the channel.
-     * @param {Object} subscriberOptions - Options to influence message channel subscription.
+     * @param {Object} [subscriberOptions] - Optional, options to influence message channel subscription.
      *                                     Current subscriber options:
      *                                       1. 'scope' - the scope that a component is subscribed to.
      *                                          Setting this to 'APPLICATION_SCOPE' subscribes in the application
      *                                          scope. See the 'APPLICATION_SCOPE' export for full documentation.
      * @return {Object} - Subscription object used to unsubscribe the listener, if no longer interested.
      */
-    export function subscribe(messageContext: Object, messageChannel: Object, listener: Function, subscriberOptions: Object): Object;
+    export function subscribe(messageContext: Object, messageChannel: Object, listener: Function, subscriberOptions?: Object): Object;
     /**
      * Unregisters the listener associated with the subscription.
      *
