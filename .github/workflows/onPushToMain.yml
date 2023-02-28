@@ -9,36 +9,32 @@ jobs:
     uses: salesforcecli/github-workflows/.github/workflows/unitTest.yml@main
   release:
     runs-on: ubuntu-latest
-    container:
-      image: node:lts
     needs:
     - tests
     steps:
-    - uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.IDEE_GH_TOKEN }}
-    - uses: ./.github/actions/gitConfig
-      with:
-        email: ${{ secrets.IDEE_GH_EMAIL }}
-    - run: yarn
-    - name: Conventional Changelog Action
-      id: changelog
-      uses: TriPSs/conventional-changelog-action@ed98b658f3015c5afb96a13caf9bb81f69df49e6
-      with:
-        git-user-name: Release Bot
-        git-user-email: ${{ secrets.IDEE_GH_EMAIL }}
-        github-token: ${{ secrets.IDEE_GH_TOKEN }}
-        skip-version-file: true
-        output-file: false
-        tag-prefix: "v"
-        pre-commit: ./scripts/bump-lerna-version.js
-        fallback-version: 3.12.0
-    - name: Create Github Release
-      uses: actions/create-release@v1
-      if: ${{ steps.changelog.outputs.skipped == 'false' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.IDEE_GH_TOKEN }}
-      with:
-        tag_name: ${{ steps.changelog.outputs.tag }}
-        release_name: ${{ steps.changelog.outputs.tag }}
-        body: ${{ steps.changelog.outputs.clean_changelog }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.IDEE_GH_TOKEN }}
+      - run: yarn
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@d360fad3a42feca6462f72c97c165d60a02d4bf2
+        with:
+          git-user-name: Release Bot
+          git-user-email: ${{ secrets.IDEE_GH_EMAIL }}
+          github-token: ${{ secrets.IDEE_GH_TOKEN }}
+          skip-version-file: true
+          output-file: false
+          pre-commit: ./scripts/bump-lerna-version.js
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.IDEE_GH_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
