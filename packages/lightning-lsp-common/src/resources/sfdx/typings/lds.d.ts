@@ -657,6 +657,28 @@ declare module 'lightning/salesEnablementProgramApi' {
     export function getProgramTemplate(programTemplateName: string): void;
 }
 
+declare module 'lightning/salesUserWorkingHoursApi' {
+    /**
+     * Wire adapter for getting sales user working hours availability.
+     */
+    export function getSalesUserWorkingHours(): void;
+
+    /**
+     * Wire adapter for updating sales user working hours availability.
+     */
+    export function updateSalesUserWorkingHours(): void;
+
+    /**
+     * Wire adapter for creating sales user working hours availability.
+     */
+    export function createSalesUserWorkingHours(): void;
+
+    /**
+     * Wire adapter for deleting sales user working hours availability.
+     */
+    export function deleteSalesUserWorkingHours(): void;
+}
+
 declare module 'lightning/analyticsWaveApi' {
     /**
      * A Tableau CRM dataflow node.
