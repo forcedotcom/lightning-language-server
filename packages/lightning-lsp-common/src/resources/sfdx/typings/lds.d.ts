@@ -669,12 +669,12 @@ declare module 'lightning/salesUserWorkingHoursApi' {
     export function updateSalesUserWorkingHours(): void;
    
     /**
-     * Wire adapter for creating sales user working hours  for availability.
+     * Wire adapter for creating sales user working hours for availability.
      */
     export function createSalesUserWorkingHours(): void;
    
     /**
-     * Wire adapter for deleting sales user working hours  for availability.
+     * Wire adapter for deleting sales user working hours for availability.
      */
     export function deleteSalesUserWorkingHours(): void;
 }
