@@ -1,4 +1,4 @@
-name: Push to main
+name: Push to Main
 
 on:
   push:
@@ -12,12 +12,12 @@ jobs:
     needs:
     - tests
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: '.nvmrc'
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.IDEE_GH_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
       - run: yarn
       - name: Conventional Changelog Action
         id: changelog
