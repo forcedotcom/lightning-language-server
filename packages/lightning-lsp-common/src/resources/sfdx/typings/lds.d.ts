@@ -645,12 +645,10 @@ declare module 'lightning/placeQuoteApi' {
 }
 
 declare module 'lightning/salesAutomationRulesApi' {
-    /*
-      Wire adapter for Automation Rules apply reminder
+    /**
+     * Wire adapter for Automation Rules apply reminder
      *
-
      * @param id the ID string of the reminder to be applied
-
      */
     export function applyReminder(id: string): void;
 }
