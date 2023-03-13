@@ -644,6 +644,17 @@ declare module 'lightning/placeQuoteApi' {
     export function updateQuote(): void;
 }
 
+
+declare module 'lightning/salesAutomationRulesApi' {
+    /**
+     * Wire adapter for Automation Rules apply reminder
+     *
+     * @param id the ID string of the reminder to be applied
+     */
+    export function applyReminder(id: string): void;
+}
+
+
 declare module 'lightning/salesEnablementProgramApi' {
     /**
      * Wire adapter for getting Sales Enablement Program templates list.
