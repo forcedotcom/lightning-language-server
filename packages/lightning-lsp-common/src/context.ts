@@ -452,7 +452,7 @@ export class WorkspaceContext {
         try {
             configBlt = await this.readConfigBlt();
         } catch (error) {
-            console.warn("Error reading core config", configBlt);
+            console.warn(`Error reading core config. Expected for git repos. ${error}`);
             return;
         }
         const variableMap = {
@@ -474,7 +474,7 @@ export class WorkspaceContext {
         try {
             configBlt = await this.readConfigBlt();
         } catch (error) {
-            console.warn("Error reading core config", configBlt);
+            console.warn(`Error reading core config. Expected for git repos. ${error}`);
             return;
         }
         const variableMap = {
@@ -488,8 +488,14 @@ export class WorkspaceContext {
         this.updateConfigFile('core.code-workspace', templateContent);
     }
 
-    private async readConfigBlt(): Promise<{[key:string]: string}> {
-        const devProperties = path.join(this.workspaceRoots[0], 'build', 'dev.properties');
+    private async readConfigBlt(): Promise<{ [key: string]: string }> {
+        let devProperties;
+        if (this.type === WorkspaceType.CORE_PARTIAL) {
+            // most common because this is the workspace corecli generates
+            devProperties = path.join(this.workspaceRoots[0], '..', 'build', 'dev.properties');
+        } else if (this.type === WorkspaceType.CORE_ALL) {
+            devProperties = path.join(this.workspaceRoots[0], 'build', 'dev.properties');
+        }
         const configBltContent = await fs.readFile(devProperties, 'utf8');
         return parse(configBltContent);
     }
