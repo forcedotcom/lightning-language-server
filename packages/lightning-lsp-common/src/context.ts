@@ -448,7 +448,13 @@ export class WorkspaceContext {
     }
 
     private async updateCoreSettings(): Promise<void> {
-        const configBlt = await this.readConfigBlt();
+        let configBlt;
+        try {
+            configBlt = await this.readConfigBlt();
+        } catch (error) {
+            console.warn("Error reading core config", configBlt);
+            return;
+        }
         const variableMap = {
             eslint_node_path: await findCoreESLint(),
             p4_port: configBlt['p4.port'],
@@ -464,7 +470,13 @@ export class WorkspaceContext {
     }
 
     private async updateCoreCodeWorkspace(): Promise<void> {
-        const configBlt = await this.readConfigBlt();
+        let configBlt;
+        try {
+            configBlt = await this.readConfigBlt();
+        } catch (error) {
+            console.warn("Error reading core config", configBlt);
+            return;
+        }
         const variableMap = {
             eslint_node_path: await findCoreESLint(),
             p4_port: configBlt['p4.port'],
@@ -476,13 +488,9 @@ export class WorkspaceContext {
         this.updateConfigFile('core.code-workspace', templateContent);
     }
 
-    private async readConfigBlt(): Promise<any> {
-        const isMain = this.workspaceRoots[0].indexOf(path.join('main', 'core')) !== -1;
-        let relativeBltDir = isMain ? path.join('..', '..', '..') : path.join('..', '..', '..', '..');
-        if (this.type === WorkspaceType.CORE_PARTIAL) {
-            relativeBltDir = path.join(relativeBltDir, '..');
-        }
-        const configBltContent = await fs.readFile(path.join(this.workspaceRoots[0], relativeBltDir, 'config.blt'), 'utf8');
+    private async readConfigBlt(): Promise<{[key:string]: string}> {
+        const devProperties = path.join(this.workspaceRoots[0], 'build', 'dev.properties');
+        const configBltContent = await fs.readFile(devProperties, 'utf8');
         return parse(configBltContent);
     }
 
