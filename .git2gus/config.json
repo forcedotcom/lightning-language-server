@@ -9,7 +9,7 @@
     "security": "BUG P2",
     "type:community-contrib": "USER STORY"
   },
-  "defaultBuild": "offcore.tooling.54.0.0",
+  "defaultBuild": "offcore.tooling.57.0.0",
   "hideWorkItemUrl": "true",
   "statusWhenClosed": "CLOSED"
 }
