@@ -448,12 +448,10 @@ export class WorkspaceContext {
     }
 
     private async updateCoreSettings(): Promise<void> {
-        const configBlt = await this.readConfigBlt();
+        const configBlt = await this.readConfig();
         const variableMap = {
             eslint_node_path: await findCoreESLint(),
-            p4_port: configBlt['p4.port'],
-            p4_client: configBlt['p4.client'],
-            p4_user: configBlt['p4.user'],
+            ...configBlt,
         };
         const templateString = await fs.readFile(utils.getCoreResource('settings-core.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
@@ -464,26 +462,40 @@ export class WorkspaceContext {
     }
 
     private async updateCoreCodeWorkspace(): Promise<void> {
-        const configBlt = await this.readConfigBlt();
+        const configBlt = await this.readConfig();
         const variableMap = {
             eslint_node_path: await findCoreESLint(),
-            p4_port: configBlt['p4.port'],
-            p4_client: configBlt['p4.client'],
-            p4_user: configBlt['p4.user'],
+            ...configBlt,
         };
         const templateString = await fs.readFile(utils.getCoreResource('core.code-workspace.json'), 'utf8');
         const templateContent = this.processTemplate(templateString, variableMap);
         this.updateConfigFile('core.code-workspace', templateContent);
     }
 
-    private async readConfigBlt(): Promise<any> {
-        const isMain = this.workspaceRoots[0].indexOf(path.join('main', 'core')) !== -1;
-        let relativeBltDir = isMain ? path.join('..', '..', '..') : path.join('..', '..', '..', '..');
+    // As of 04/2023, core users define Perforce variables in env vars.
+    // Fallback to build/user.properties, which some users have configured.
+    private async readConfig(): Promise<{ p4_port?: string; p4_client?: string; p4_user?: string }> {
+        let userProperties;
         if (this.type === WorkspaceType.CORE_PARTIAL) {
-            relativeBltDir = path.join(relativeBltDir, '..');
+            // most common because this is the workspace corecli generates
+            userProperties = path.join(this.workspaceRoots[0], '..', 'build', 'user.properties');
+        } else if (this.type === WorkspaceType.CORE_ALL) {
+            userProperties = path.join(this.workspaceRoots[0], 'build', 'user.properties');
         }
-        const configBltContent = await fs.readFile(path.join(this.workspaceRoots[0], relativeBltDir, 'config.blt'), 'utf8');
-        return parse(configBltContent);
+
+        let properties: any = {};
+        try {
+            const userPropertiesContent = await fs.readFile(userProperties, 'utf8');
+            properties = parse(userPropertiesContent);
+        } catch (error) {
+            console.warn(`Error reading core config. Continuing, but may be missing some config. ${error}`);
+        }
+
+        return {
+            p4_port: process.env.P4PORT || properties['p4.port'],
+            p4_client: process.env.P4CLIENT || properties['p4.client'],
+            p4_user: process.env.P4USER || properties['p4.user'],
+        };
     }
 
     private processTemplate(
