@@ -644,7 +644,6 @@ declare module 'lightning/placeQuoteApi' {
     export function updateQuote(): void;
 }
 
-
 declare module 'lightning/salesAutomationRulesApi' {
     /**
      * Wire adapter for Automation Rules apply reminder
@@ -653,7 +652,6 @@ declare module 'lightning/salesAutomationRulesApi' {
      */
     export function applyReminder(id: string): void;
 }
-
 
 declare module 'lightning/salesEnablementProgramApi' {
     /**
@@ -3241,6 +3239,7 @@ declare module 'lightning/analyticsWaveApi' {
      * @param folderId Filters the collection to only contain datasets for the specified folder. The ID can be the requesting user's ID for
      *                 datasets in the user's private folder.
      * @param hasCurrentOnly Filters the collection of datasets to include only those datasets that have a current version. The default is `false`.
+     * @param ids Filter the collection to include only datasets with the specified IDs.
      * @param includeCurrentVersion Specifies if the response should include the current version metadata. The default is `false`.
      * @param licenseType The response includes dataflow jobs with this license type. Valid values are `EinsteinAnalytics` or `Sonic`.
      * @param order Ordering to apply to the collection results. Valid values are `Ascending` or `Descending`.
@@ -3259,6 +3258,7 @@ declare module 'lightning/analyticsWaveApi' {
         datasetTypes?: string,
         folderId?: string,
         hasCurrentOnly?: boolean,
+        ids?: string[],
         includeCurrentVersion?: boolean,
         licenseType?: string,
         order?: string,
