@@ -127,8 +127,10 @@ export default class ComponentIndexer extends BaseIndexer {
     }
 
     get staleTags(): Tag[] {
+        const { componentEntries } = this;
+
         return this.customData.filter(tag => {
-            return !this.componentEntries.some(entry => entry.path === tag.file);
+            return !componentEntries.some(entry => entry.path === tag.file);
         });
     }
 
