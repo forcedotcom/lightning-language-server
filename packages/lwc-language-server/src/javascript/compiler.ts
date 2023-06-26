@@ -151,7 +151,7 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
         ],
     };
     const modernMetadata = collectBundleMetadata(options);
-    if (modernMetadata?.diagnostics.length) {
+    if (modernMetadata.diagnostics.length) {
         return {
             diagnostics: modernMetadata.diagnostics.map(toDiagnostic),
         };
