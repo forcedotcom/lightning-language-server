@@ -51,7 +51,7 @@ describe('Tag', () => {
             it('returns a classMember of a Tag by name', () => {
                 const location = tag.classMemberLocation('todo');
                 expect(location.uri).toContain('metadata.js');
-                expect(location.range.start.line).toEqual(4);
+                expect(location.range.start.line).toEqual(9);
                 expect(location.range.start.character).toEqual(4);
 
                 expect(tag.classMemberLocation('index').uri).toContain('metadata.js');
@@ -77,7 +77,10 @@ describe('Tag', () => {
 
         describe('#range', () => {
             it('returns a range for the component', () => {
-                const range = { end: { character: 1, line: 30 }, start: { character: 0, line: 2 } };
+                const range = {
+                    end: { character: 1, line: 79 },
+                    start: { character: 0, line: 7 }
+                };
                 expect(tag.range).toEqual(range);
             });
         });
@@ -151,7 +154,14 @@ describe('Tag', () => {
                 const attributeDocs = `### Attributes
 - **todo**
 - **index**
-- **index-same-line**`;
+- **initialized-as-api-number**
+- **index-same-line**
+- **initialized-with-imported-val**
+- **arr-of-stuff**
+- **string-val**
+- **callback**
+- **foo-null**
+- **super-complex**`;
 
                 expect(tag.attributeDocs).toEqual(attributeDocs);
             });
@@ -162,7 +172,14 @@ describe('Tag', () => {
                 const attributeDocs = `### Attributes
 - **todo**
 - **index**
-- **index-same-line**`;
+- **initialized-as-api-number**
+- **index-same-line**
+- **initialized-with-imported-val**
+- **arr-of-stuff**
+- **string-val**
+- **callback**
+- **foo-null**
+- **super-complex**`;
 
                 expect(tag.attributeDocs).toEqual(attributeDocs);
             });
@@ -174,7 +191,14 @@ describe('Tag', () => {
 ### Attributes
 - **todo**
 - **index**
+- **initialized-as-api-number**
 - **index-same-line**
+- **initialized-with-imported-val**
+- **arr-of-stuff**
+- **string-val**
+- **callback**
+- **foo-null**
+- **super-complex**
 ### Methods
 - **apiMethod()**`;
                 expect(tag.description).toEqual(description);

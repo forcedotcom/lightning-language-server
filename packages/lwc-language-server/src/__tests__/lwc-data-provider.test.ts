@@ -13,9 +13,8 @@ const attributes: DataProviderAttributes = {
 };
 const provider = new LWCDataProvider(attributes);
 
-beforeEach(async done => {
+beforeEach(async () => {
     await componentIndexer.init();
-    done();
 });
 
 describe('provideValues()', () => {

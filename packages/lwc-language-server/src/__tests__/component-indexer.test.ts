@@ -12,9 +12,8 @@ const componentIndexer: ComponentIndexer = new ComponentIndexer({
     workspaceRoot,
 });
 
-beforeEach(async done => {
+beforeEach(async () => {
     await componentIndexer.init();
-    done();
 });
 
 afterEach(() => {

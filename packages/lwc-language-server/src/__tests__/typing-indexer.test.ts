@@ -6,6 +6,16 @@ const typingIndexer: TypingIndexer = new TypingIndexer({
     workspaceRoot: path.resolve('..', '..', 'test-workspaces', 'sfdx-workspace'),
 });
 
+// This is required in order to spyOn fsExtra functions in newer versions of
+// jest and ts-jest. Solution adapted from Jest docs here:
+// https://jestjs.io/docs/jest-object
+jest.mock('fs-extra', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('fs-extra'),
+  };
+});
+
 describe('TypingIndexer', () => {
     afterEach(() => {
         fsExtra.removeSync(typingIndexer.typingsBaseDir);
@@ -66,6 +76,11 @@ describe('TypingIndexer', () => {
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
 `;
             jest.spyOn(fsExtra, 'readFileSync').mockReturnValue(Buffer.from(xmlDocument));
+            jest.spyOn(typingIndexer, 'customLabelFiles', 'get')
+                .mockReturnValue([
+                    '/foo/bar/test-workspaces/sfdx-workspace/utils/meta/labels/CustomLabels.labels-meta.xml'
+                ]);
+
             const fileWriter = jest.spyOn(fsExtra, 'writeFileSync');
             await typingIndexer.saveCustomLabelTypings();
             expect(fileWriter).toBeCalledTimes(0);
