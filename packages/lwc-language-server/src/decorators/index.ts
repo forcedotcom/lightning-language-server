@@ -46,7 +46,6 @@ export interface WireDecoratorTarget {
     params: { [name: string]: string };
     static: any;
     type: DecoratorTargetType;
-    // This property is not and should not be used, but is provided for completeness.
     adapter?: unknown;
 }
 
