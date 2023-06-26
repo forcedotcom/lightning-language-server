@@ -6,7 +6,7 @@ import {
     WireDecorator,
     LwcDecorator,
     SourceLocation,
-  Value,
+    Value,
 } from '@lwc/metadata';
 import {
     Metadata as InternalMetadata,
