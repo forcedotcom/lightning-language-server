@@ -104,7 +104,7 @@ export default class Server {
             useDefaultDataProvider: false,
         });
 
-        this.context.configureProject();
+        await this.context.configureProject();
         this.componentIndexer.init();
         this.typingIndexer.init();
 
