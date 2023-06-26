@@ -2448,7 +2448,7 @@
     "@lwc/style-compiler" "2.37.3"
     "@lwc/template-compiler" "2.37.3"
 
-"@lwc/compiler@^2.50.0":
+"@lwc/compiler@2.50.0":
   version "2.50.0"
   resolved "https://registry.yarnpkg.com/@lwc/compiler/-/compiler-2.50.0.tgz#b4b50798561563b6e5ae3a3ee2c711cf74e37b30"
   integrity sha512-cd20tq7ExJSQRymO78V/SYA7NvtiNBffeF1BOkDCltG4nIAsW5vjXN6JpNWMVRL97HjldvM6pDuLhu9yih9sQA==
@@ -2470,6 +2470,11 @@
   resolved "https://registry.yarnpkg.com/@lwc/engine-dom/-/engine-dom-2.37.3.tgz#2a5a37111f60f1bc49bad9b4b0ac0d6161668fef"
   integrity sha512-f0mV3Uf9OHsgA8veJDcBUh78ZO8JzdssAgyTZqEMgvYvO7DPppE6OF86NGUS4CPPzKg0GmnoMRsi8RFgq3TlEQ==
 
+"@lwc/engine-dom@2.50.0":
+  version "2.50.0"
+  resolved "https://registry.yarnpkg.com/@lwc/engine-dom/-/engine-dom-2.50.0.tgz#5842bb86e5fc456108c1c30e7de1549a49b91dff"
+  integrity sha512-BKiNJ/E9eC/vIQ3+CYL1TCrDvXWxfjrzqs4G/zOJOxEL4/BfHBxW2H0fndUmN0kHrFwBNklTqlji5Cos1ZezNQ==
+
 "@lwc/engine-server@2.37.3":
   version "2.37.3"
   resolved "https://registry.yarnpkg.com/@lwc/engine-server/-/engine-server-2.37.3.tgz#f8be5d0649de1c42f1996cf1b1c6ba83e21e5b0c"
@@ -2485,11 +2490,6 @@
   resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-2.37.3.tgz#8c4d23a45749a899b58fea840b32d9ab6f609ea1"
   integrity sha512-3tM8p5YRdLNcPp/wJ3zchPcWGKsWjv4QtiITcVrDZvKxjdgYWE0VMS2804kJEoDWxIO7xFIoAAezcseIPaytaQ==
 
-"@lwc/errors@2.46.0":
-  version "2.46.0"
-  resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-2.46.0.tgz#0cb6898d4fe41ebb377307f176c3d0f55c6ef6ec"
-  integrity sha512-Ka2otW1nDn7DJKzYQAUjSPLCh2LCF8Vd6esqF1QcjWQpye3rEbYbFpgaX67rVz+sfxveVtyLdpatkK7tiUK/Aw==
-
 "@lwc/errors@2.50.0":
   version "2.50.0"
   resolved "https://registry.yarnpkg.com/@lwc/errors/-/errors-2.50.0.tgz#f64422a71f3deb9cbec12c06861d68425177b9b8"
@@ -2502,10 +2502,10 @@
   dependencies:
     "@lwc/shared" "2.37.3"
 
-"@lwc/metadata@2.49.1-1":
-  version "2.49.1-1"
-  resolved "https://registry.yarnpkg.com/@lwc/metadata/-/metadata-2.49.1-1.tgz#7cc383d025dd7dcf7060839af112d66461b47e90"
-  integrity sha512-lrKdW7KMaqQpLqlQbSJgkn/w30OxQOB8+JUelgbs21DigsazYn3i3CfDbXxQulMgCQjclGG/hxVVtZHVVxt5Vg==
+"@lwc/metadata@2.50.0-0":
+  version "2.50.0-0"
+  resolved "https://registry.yarnpkg.com/@lwc/metadata/-/metadata-2.50.0-0.tgz#6f543d10b407201a5d6e650296880ef4ef3627fb"
+  integrity sha512-Vb2xhnyxbB2I83BVQixlO1xlvciu/GQJgIRnKA6Lg1kdb0sScgv6ftucv3IojXdirI0xBRbfbTtFyulR0mzJaA==
   dependencies:
     "@babel/parser" "~7.22.5"
     "@babel/traverse" "~7.22.5"
@@ -2531,10 +2531,10 @@
     rollup "0.66.2"
     rollup-plugin-replace "^2.0.0"
 
-"@lwc/sfdc-compiler-utils@2.49.1-1":
-  version "2.49.1-1"
-  resolved "https://registry.yarnpkg.com/@lwc/sfdc-compiler-utils/-/sfdc-compiler-utils-2.49.1-1.tgz#f1789df2a4c3572105d612aac9560e6b74d20d9e"
-  integrity sha512-vSRg1DAhioQInIDGIM4nhYOZXO94EjV1Z0W0jlNnnPV79EEY7xGeZJYedohbXmYMCevrrRFzuurqJZcW1RD2lg==
+"@lwc/sfdc-compiler-utils@2.50.0-0":
+  version "2.50.0-0"
+  resolved "https://registry.yarnpkg.com/@lwc/sfdc-compiler-utils/-/sfdc-compiler-utils-2.50.0-0.tgz#77a6308698cc82c24b130860d1e6fd74376a7eb0"
+  integrity sha512-9GPW2tjvaBv6LroKp0hOIQTejsVCDH9oTt5xbCcIF5wcCk9/EzPmSJ46FiM+9ZJeNVi4G9qRnP4Qk/yAxt7rHw==
 
 "@lwc/shared@2.37.3":
   version "2.37.3"
@@ -5511,11 +5511,6 @@ espree@^7.3.0:
     acorn-jsx "^5.2.0"
     eslint-visitor-keys "^1.3.0"
 
-esprima@^2.6.0:
-  version "2.7.3"
-  resolved "https://registry.yarnpkg.com/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
-  integrity sha512-OarPfz0lFCiW4/AV2Oy1Rp9qu0iusTKqykwTspGCZtPxmF81JR4MmIebvF1F9+UOKth2ZubLQ4XGGaU+hSn99A==
-
 esprima@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
@@ -7847,21 +7842,13 @@ js-tokens@^4.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@^3.13.1:
+js-yaml@^3.13.1, js-yaml@~3.7.0:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.1.tgz#aff151b30bfdfa8e49e05da22e7415e9dfa37847"
   integrity sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
-
-js-yaml@~3.7.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.7.0.tgz#5c967ddd837a9bfdca5f2de84253abe8a1c03b80"
-  integrity sha512-eIlkGty7HGmntbV6P/ZlAsoncFLGsNoM27lkTzS+oneY/EiNhj+geqD9ezg/ip+SW6Var0BJU2JtV0vEUZpWVQ==
-  dependencies:
-    argparse "^1.0.7"
-    esprima "^2.6.0"
 
 jsbn@~0.1.0:
   version "0.1.1"
