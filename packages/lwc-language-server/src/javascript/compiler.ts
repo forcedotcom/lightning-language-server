@@ -4,11 +4,14 @@ import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
-import { transform } from '@lwc/compiler';
-import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
+import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
+import { CompilerError } from '@lwc/errors';
+import { transformSync } from '@lwc/compiler';
+import { mapLwcMetadataToInternal } from './type-mapping';
 import { ClassMember, Metadata } from '../decorators';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
+import { CompilerDiagnostic } from '@lwc/errors';
 
 export interface CompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic
@@ -120,21 +123,48 @@ function toDiagnostic(err: any): Diagnostic {
     };
 }
 
+function externalToInternalDiagnostic(ext: CompilerDiagnostic[]): Diagnostic[] {
+    // TODO: do this for real
+    return ext as unknown as Diagnostic[];
+}
+
 export async function compileSource(source: string, fileName = 'foo.js'): Promise<CompilerResult> {
+    const name = fileName.substring(0, fileName.lastIndexOf('.'));
+
+    const transformOptions = {
+        name,
+        namespace: 'x',
+    };
     try {
-        const name = fileName.substring(0, fileName.lastIndexOf('.'));
-        const options: CompilerOptions = {
-            name,
-            namespace: 'x',
-            files: {},
-        };
-        const transformerResult = await transform(source, fileName, options);
-        const metadata = transformerResult.metadata as Metadata;
-        patchComments(metadata);
-        return { metadata, diagnostics: [] };
+        transformSync(source, fileName, transformOptions);
     } catch (err) {
-        return { diagnostics: [toDiagnostic(err)] };
+        return {
+            diagnostics: [toDiagnostic(err)],
+        };
     }
+    // TODO: should we do something with transformSync(...).warnings?
+
+    const options: BundleConfig = {
+        type: 'platform',
+        name,
+        namespace: 'x',
+        namespaceMapping: {},
+        files: [
+            {
+                fileName,
+                source,
+            },
+        ],
+    };
+    const modernMetadata = collectBundleMetadata(options);
+    if (modernMetadata?.diagnostics.length) {
+        return { diagnostics: externalToInternalDiagnostic(modernMetadata.diagnostics) };
+    }
+
+    const metadata = mapLwcMetadataToInternal(modernMetadata.files[0] as ScriptFile);
+    patchComments(metadata);
+
+    return { metadata, diagnostics: [] };
 }
 
 /**
