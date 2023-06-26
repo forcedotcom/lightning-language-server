@@ -123,11 +123,6 @@ function toDiagnostic(err: any): Diagnostic {
     };
 }
 
-function externalToInternalDiagnostic(ext: CompilerDiagnostic[]): Diagnostic[] {
-    // TODO: do this for real
-    return ext as unknown as Diagnostic[];
-}
-
 export async function compileSource(source: string, fileName = 'foo.js'): Promise<CompilerResult> {
     const name = fileName.substring(0, fileName.lastIndexOf('.'));
 
@@ -142,7 +137,6 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
             diagnostics: [toDiagnostic(err)],
         };
     }
-    // TODO: should we do something with transformSync(...).warnings?
 
     const options: BundleConfig = {
         type: 'platform',
@@ -158,7 +152,9 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
     };
     const modernMetadata = collectBundleMetadata(options);
     if (modernMetadata?.diagnostics.length) {
-        return { diagnostics: externalToInternalDiagnostic(modernMetadata.diagnostics) };
+        return {
+            diagnostics: modernMetadata.diagnostics.map(toDiagnostic),
+        };
     }
 
     const metadata = mapLwcMetadataToInternal(modernMetadata.files[0] as ScriptFile);

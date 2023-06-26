@@ -103,7 +103,7 @@ it('linter returns empty diagnostics on correct file', async () => {
     expect(diagnostics).toEqual([]);
 });
 
-it('transform returns javascript metadata', async () => {
+it('mapLwcMetadataToInternal returns expected javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = fs.readFileSync(filepath, 'utf8');
 
@@ -120,8 +120,6 @@ it('transform returns javascript metadata', async () => {
 
     const modernMetadata = collectBundleMetadata(options);
     const metadata = mapLwcMetadataToInternal(modernMetadata.files[0] as ScriptFile);
-
-    // TODO: see if the rest of this works as expected
     const properties = getProperties(metadata);
 
     expect(metadata.doc).toBe('* Foo doc');

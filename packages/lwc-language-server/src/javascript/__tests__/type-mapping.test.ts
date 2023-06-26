@@ -10,7 +10,6 @@ it('can map new metadata to old metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = fs.readFileSync(filepath, 'utf8');
 
-    // Work with new metadata.
     const newMetadataOpts: BundleConfig = {
         type: 'internal',
         name: 'metadata',
