@@ -688,6 +688,28 @@ declare module 'lightning/salesUserWorkingHoursApi' {
     export function deleteSalesUserWorkingHours(): void;
 }
 
+declare module 'lightning/salesEngagementWorkspaceApi' {
+    /**
+     * Wire adapter for getting sales user workspace personalization.
+     */
+    export function getWorkspaceUserPersonalization(): void;
+
+    /**
+     * Wire adapter for getting sales user workspace supported objects.
+     */
+    export function getEngagementWorkspaceObjects(): void;
+
+    /**
+     * Wire adapter for updating sales user workspace personalization.
+     */
+    export function updateWorkspaceUserPersonalization(): void;
+
+    /**
+     * Wire adapter for deleting sales user workspace personalization.
+     */
+    export function deleteWorkspaceUserPersonalization(): void;
+}
+
 declare module 'lightning/analyticsWaveApi' {
     /**
      * A Tableau CRM dataflow node.
