@@ -13,6 +13,13 @@ import {
     CORE_MULTI_ROOT,
 } from './test-utils';
 
+beforeAll(() => {
+    // make sure test runner config doesn't overlap with test workspace
+    delete process.env.P4PORT;
+    delete process.env.P4CLIENT;
+    delete process.env.P4USER;
+});
+
 it('WorkspaceContext', async () => {
     let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     expect(context.type).toBe(WorkspaceType.SFDX);
@@ -253,8 +260,9 @@ it('configureCoreProject()', async () => {
     const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
 
     // make sure no generated files are there from previous runs
-    fs.removeSync(jsconfigPath);
-    fs.removeSync(typingsPath);
+    await fs.remove(jsconfigPath);
+    await fs.remove(typingsPath);
+    await fs.remove(settingsPath);
 
     // configure and verify typings/jsconfig after configuration:
     await context.configureProject();
@@ -262,7 +270,7 @@ it('configureCoreProject()', async () => {
     verifyJsconfigCore(jsconfigPath);
     verifyTypingsCore();
 
-    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    const settings = JSON.parse(await fs.readFile(settingsPath, 'utf8'));
     verifyCoreSettings(settings);
 });
 
