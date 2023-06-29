@@ -49,7 +49,7 @@ npm run compile
 Note: complete the install process before this step, or you may receive errors about "Property ‘objType’ does not exist on type ‘Node’." from the Tern Server. This is due to the node_modules being improperly installed at a level above the lightning-language-server. If this does happen to you, simply remove the extra node_modules directory.
 
 ```
-cd lightning-language-server
+cd ../lightning-language-server
 code ./vscode-workspaces/multiroot-simple.code-workspace # or
 code ./vscode-workspaces/multiroot-flat.code-workspace
 ```

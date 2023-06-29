@@ -84,7 +84,7 @@ const globalAttributes = [
     },
     {
         name: 'if:true',
-        description: 'Renders the element or template if the expression value is truthy.',
+        description: 'Renders the element or template if the expression value is truthy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
         references: [
             {
                 name: 'Salesforce',
@@ -94,7 +94,37 @@ const globalAttributes = [
     },
     {
         name: 'if:false',
-        description: 'Renders the element or template if the expression value is falsy.',
+        description: 'Renders the element or template if the expression value is falsy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
+        references: [
+            {
+                name: 'Salesforce',
+                url: 'https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives',
+            },
+        ],
+    },
+    {
+        name: 'lwc:if',
+        description: 'Renders the element or template if the expression value is truthy.',
+        references: [
+            {
+                name: 'Salesforce',
+                url: 'https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives',
+            },
+        ],
+    },
+    {
+        name: 'lwc:elseif',
+        description: 'Renders the element or template if the expression value is truthy.',
+        references: [
+            {
+                name: 'Salesforce',
+                url: 'https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_directives',
+            },
+        ],
+    },
+    {
+        name: 'lwc:else',
+        description: 'Renders the element or template if none of the expressions values of the preceding lwc:if or lwc:elseif are truthy.',
         references: [
             {
                 name: 'Salesforce',
