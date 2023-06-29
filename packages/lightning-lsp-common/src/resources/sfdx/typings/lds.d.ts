@@ -644,7 +644,6 @@ declare module 'lightning/placeQuoteApi' {
     export function updateQuote(): void;
 }
 
-
 declare module 'lightning/salesAutomationRulesApi' {
     /**
      * Wire adapter for Automation Rules apply reminder
@@ -653,7 +652,6 @@ declare module 'lightning/salesAutomationRulesApi' {
      */
     export function applyReminder(id: string): void;
 }
-
 
 declare module 'lightning/salesEnablementProgramApi' {
     /**
@@ -2063,6 +2061,65 @@ declare module 'lightning/analyticsWaveApi' {
     }
 
     /**
+     * An Analytics template asset reference.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_asset_reference.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface TemplateAssetReferenceRepresentation {
+        /** The 18 character ID of the asset. */
+        id?: string;
+        /** The asset label. */
+        label?: string;
+        /** The asset developer name. */
+        name?: string;
+        /** The namespace that qualifies the asset name */
+        namespace?: string;
+        /** The asset URL. */
+        url?: string;
+    }
+
+    /**
+     * Representation for individual validation task
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_template_readiness_item.htm
+     *
+     * Keys:
+     *    (none)
+     */
+    export interface TemplateReadinessItemRepresentation {
+        /** The icon/image associated with the validation task. */
+        image: TemplateAssetReferenceRepresentation | null;
+        /** The task specific label. */
+        label: string | null;
+        /** The task specific message. */
+        message: string | null;
+        /** The status for the readiness task */
+        readinessStatus: string | null;
+        /** The collection of tags describing the purpose of the validation. */
+        tags: Array<string>;
+        /** The task specific type, associated with readiness check type. */
+        type: string | null;
+    }
+
+    /**
+     * Representation for a single Wave Template verification.
+     *
+     * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_responses_template_validate.htm
+     *
+     * Keys:
+     *    id (string): id
+     */
+    export interface TemplateValidateRepresentation {
+        /** The ID or fully qualified API name of this template. */
+        id: string;
+        /** The individual validation tasks for this template */
+        tasks: Array<TemplateReadinessItemRepresentation>;
+    }
+
+    /**
      * Time at which something should happen
      *
      * https://developer.salesforce.com/docs/atlas.en-us.bi_dev_guide_rest.meta/bi_dev_guide_rest/bi_resources_appendix.htm#TimeRepresentation
@@ -3241,6 +3298,7 @@ declare module 'lightning/analyticsWaveApi' {
      * @param folderId Filters the collection to only contain datasets for the specified folder. The ID can be the requesting user's ID for
      *                 datasets in the user's private folder.
      * @param hasCurrentOnly Filters the collection of datasets to include only those datasets that have a current version. The default is `false`.
+     * @param ids Filter the collection to include only datasets with the specified IDs.
      * @param includeCurrentVersion Specifies if the response should include the current version metadata. The default is `false`.
      * @param licenseType The response includes dataflow jobs with this license type. Valid values are `EinsteinAnalytics` or `Sonic`.
      * @param order Ordering to apply to the collection results. Valid values are `Ascending` or `Descending`.
@@ -3259,6 +3317,7 @@ declare module 'lightning/analyticsWaveApi' {
         datasetTypes?: string,
         folderId?: string,
         hasCurrentOnly?: boolean,
+        ids?: string[],
         includeCurrentVersion?: boolean,
         licenseType?: string,
         order?: string,
@@ -3679,4 +3738,21 @@ declare module 'lightning/analyticsWaveApi' {
         xmdType: string;
         xmd: XmdInputRepresentation;
     }): Promise<XmdRepresentation>;
+
+    /**
+     * Validates an Analytics template for org readiness.
+     *
+     * https://developer.salesforce.com/docs/component-library/documentation/en/lwc/reference_analytics_validate_wave_template
+     *
+     * @param templateIdOrApiName The ID of template to retrieve the validation value for.
+     * @param templateValidateParam The input to validate an Analytics template.
+     * @param templateValidateParam.values A map of runtime template values to use during validation. These values override any default values.
+     */
+    export function validateWaveTemplate({
+        templateIdOrApiName,
+        templateValidateParam,
+    }: {
+        templateIdOrApiName: string;
+        templateValidateParam: { values?: { [key: string]: unknown } };
+    }): Promise<TemplateValidateRepresentation>;
 }
