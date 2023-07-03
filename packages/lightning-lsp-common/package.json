@@ -32,7 +32,7 @@
     "lodash.template": "^4.4.0",
     "lodash.templatesettings": "^4.1.0",
     "properties": "^1.2.1",
-    "semver": "^5.6.0",
+    "semver": "^7.5.2",
     "vscode-languageserver": "^5.2.1",
     "vscode-nls": "^4.1.2",
     "vscode-uri": "^2.1.2"
