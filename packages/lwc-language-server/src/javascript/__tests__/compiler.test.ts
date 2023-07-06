@@ -1,9 +1,8 @@
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../../constants';
-import { compile, transform } from '@lwc/compiler';
-import { Metadata } from '../../decorators';
-import { CompilerOptions } from '@lwc/compiler/dist/types/compiler/options';
+import { collectBundleMetadata, BundleConfig, ScriptFile } from '@lwc/metadata';
+import { mapLwcMetadataToInternal } from '../type-mapping';
 import * as fs from 'fs-extra';
 
 import {
@@ -15,86 +14,18 @@ import {
     getPrivateReactiveProperties,
     getProperties,
     getPublicReactiveProperties,
-    extractLocationFromBabelError,
-    extractMessageFromBabelError,
 } from '../compiler';
 
 const codeOk = `
 import { LightningElement } from 'lwc';
 export default class Foo extends LightningElement {}
 `;
-
-function pretify(str: string): string {
-    return str
-        .toString()
-        .replace(/^\s+|\s+$/, '')
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length)
-        .join('\n');
-}
-
-it('can use transform from lwc-compiler', async () => {
-    const expected = `
-        import _tmpl from "./foo.html";
-        import { registerComponent as _registerComponent } from "lwc";
-        import { LightningElement } from 'lwc';
-        class Foo extends LightningElement {}
-        export default _registerComponent(Foo, {
-        tmpl: _tmpl
-        });
-    `;
-
-    const options: CompilerOptions = {
-        name: 'foo',
-        namespace: 'x',
-        files: {},
-    };
-    const transformerResult = await transform(codeOk, 'foo.js', options);
-    const code = transformerResult.code;
-    expect(pretify(code)).toBe(pretify(expected));
-});
-
-it('can use compile from lwc-compiler', async () => {
-    const expected = `
-    define('x/foo', ['lwc'], function (lwc) {
-    function tmpl($api, $cmp, $slotset, $ctx) {
-    return [];
-    }
-    var _tmpl = lwc.registerTemplate(tmpl);
-    tmpl.stylesheets = [];
-    tmpl.stylesheetTokens = {
-    hostAttribute: \"x-foo_foo-host\",
-    shadowAttribute: \"x-foo_foo\"
-    };
-    class Foo extends lwc.LightningElement {}
-    var foo = lwc.registerComponent(Foo, {
-    tmpl: _tmpl
-    });
-    return foo;
-    });
-    `;
-
-    const options: CompilerOptions = {
-        name: 'foo',
-        namespace: 'x',
-        files: {
-            'foo.js': codeOk,
-            'foo.html': '<template></template>',
-        },
-    };
-    const compilerOutput = await compile(options);
-    const code = compilerOutput.result.code;
-    expect(pretify(code)).toBe(pretify(expected));
-});
-
 const codeSyntaxError = `
 import { LightningElement } from 'lwc';
 export default class Foo extends LightningElement {
     connectCallb ack() {}
 }
 `;
-
 const codeError = `
 import { LightningElement, api } from 'lwc';
 
@@ -103,74 +34,35 @@ export default class Foo extends LightningElement {
 }
 `;
 
-it('transform throws exceptions on syntax errors', async () => {
-    try {
-        const options: CompilerOptions = {
-            name: 'foo',
-            namespace: 'x',
-            files: {},
-        };
-        await transform(codeSyntaxError, 'foo.js', options);
-        fail('expects exception');
-    } catch (err) {
-        // verify err has the info we need
-        const message = extractMessageFromBabelError(err.message);
-        expect(message).toMatch('Unexpected token (4:17)');
-        expect(err.location).toEqual({ line: 4, column: 17 });
-    }
+it('can get metadata from a simple component', async () => {
+    await compileSource(codeOk, 'foo.js');
 });
 
-it('transform also throws exceptions for other errors', async () => {
-    const options: CompilerOptions = {
-        name: 'foo',
-        namespace: 'x',
-        files: {},
-    };
-    try {
-        await transform(codeError, 'foo.js', options);
-    } catch (err) {
-        // verify err has the info we need
-        const message = extractMessageFromBabelError(err.message);
-        expect(message).toMatch('Boolean public property must default to false.');
-        const location = extractLocationFromBabelError(err.message);
-        expect(location).toEqual({ line: 5, column: 4 });
-    }
+it('displays an error for a component with syntax error', async () => {
+    const result = await compileSource(codeSyntaxError, 'foo.js');
+    expect(result.metadata).toBeUndefined();
+    expect(result.diagnostics).toHaveLength(1);
+    const [diagnostic] = result.diagnostics;
+    expect(diagnostic.message).toMatch('Unexpected token (4:17)');
 });
 
-it('compile returns diagnostics on syntax errors', async () => {
-    const options: CompilerOptions = {
-        name: 'foo',
-        namespace: 'x',
-        files: {
-            'foo.js': codeSyntaxError,
-            'foo.html': '<template></template>',
+it('displays an error for a component with other errors', async () => {
+    const result = await compileSource(codeError, 'foo.js');
+    expect(result.metadata).toBeUndefined();
+    expect(result.diagnostics).toHaveLength(1);
+
+    const [diagnostic] = result.diagnostics;
+    expect(diagnostic.message).toMatch('Boolean public property must default to false.');
+    expect(diagnostic.range).toEqual({
+        start: {
+            line: 4,
+            character: 4,
         },
-    };
-    await compile(options);
-    const compilerOutput = await compile(options);
-    // verify err has the info we need
-    const diagnostic = compilerOutput.diagnostics[0];
-    expect(diagnostic.filename).toBe('foo.js');
-    expect(diagnostic.message).toMatch(/Unexpected token/);
-    // TODO: diagnostic missing location info
-});
-
-it('compile also returns diagnostics for other errors', async () => {
-    const options: CompilerOptions = {
-        name: 'foo',
-        namespace: 'x',
-        files: {
-            'foo.js': codeError,
-            'foo.html': '<template></template>',
-        },
-    };
-    await compile(options);
-    const compilerOutput = await compile(options);
-    // verify err has the info we need
-    const diagnostic = compilerOutput.diagnostics[0];
-    expect(diagnostic.filename).toBe('foo.js');
-    expect(diagnostic.message).toMatch(/Boolean public property must default to false/);
-    // TODO: diagnostic missing location info
+        end: {
+            line: 4,
+            character: MAX_32BIT_INTEGER,
+        }
+    });
 });
 
 it('compileDocument returns list of javascript syntax errors', async () => {
@@ -211,72 +103,98 @@ it('linter returns empty diagnostics on correct file', async () => {
     expect(diagnostics).toEqual([]);
 });
 
-it('transform returns javascript metadata', async () => {
+it('mapLwcMetadataToInternal returns expected javascript metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
     const content = fs.readFileSync(filepath, 'utf8');
 
-    const options: CompilerOptions = {
+    const options: BundleConfig = {
+        type: 'internal',
         name: 'metadata',
         namespace: 'x',
-        files: {},
+        namespaceMapping: {},
+        files: [{
+            fileName: 'metadata.js',
+            source: content,
+        }],
     };
-    const transformerResult = await transform(content, 'metadata.js', options);
-    const metadata: Metadata = transformerResult.metadata as Metadata;
 
+    const modernMetadata = collectBundleMetadata(options);
+    const metadata = mapLwcMetadataToInternal(modernMetadata.files[0] as ScriptFile);
     const properties = getProperties(metadata);
 
     expect(metadata.doc).toBe('* Foo doc');
-    expect(metadata.declarationLoc).toEqual({ start: { column: 0, line: 3 }, end: { column: 1, line: 31 } });
+    expect(metadata.declarationLoc).toEqual({
+        start: { column: 0, line: 8 },
+        end: { column: 1, line: 80 }
+    });
 
-    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }, { name: 'indexSameLine' }]);
-    expect(properties).toMatchObject([
+    expect(getPublicReactiveProperties(metadata)).toMatchObject([
         { name: 'todo' },
         { name: 'index' },
+        { name: 'initializedAsApiNumber' },
         { name: 'indexSameLine' },
-        { name: 'trackedPrivateIndex' },
-        { name: 'privateComputedValue' },
+        { name: 'initializedWithImportedVal' },
+        { name: 'arrOfStuff' },
+        { name: 'stringVal' },
+        { name: 'callback' },
+        { name: 'fooNull' },
+        { name: 'superComplex' },
     ]);
-    expect(getMethods(metadata)).toMatchObject([{ name: 'onclickAction' }, { name: 'apiMethod' }, { name: 'methodWithArguments' }]);
+    expect(properties).toMatchObject([
+      { name: 'todo' },
+      { name: 'index' },
+      { name: 'initializedAsApiNumber' },
+      { name: 'initializedAsTrackNumber' },
+      { name: 'indexSameLine' },
+      { name: 'initializedWithImportedVal' },
+      { name: 'arrOfStuff' },
+      { name: 'trackedPrivateIndex' },
+      { name: 'stringVal' },
+      { name: 'trackedThing' },
+      { name: 'trackedArr' },
+      { name: 'callback' },
+      { name: 'fooNull' },
+      { name: 'superComplex' },
+      { name: 'wiredProperty' },
+      { name: 'wiredPropertyWithNestedParam' },
+      { name: 'wiredPropertyWithNestedObjParam' },
+      { name: 'apexWiredProperty' },
+      { name: 'apexWiredInitVal' },
+      { name: 'apexWiredInitArr' },
+      { name: 'privateComputedValue' },
+    ]);
+    expect(getMethods(metadata)).toMatchObject([
+        { name: 'onclickAction' },
+        { name: 'apiMethod' },
+        { name: 'myWiredMethod' },
+        { name: 'methodWithArguments' },
+    ]);
 
-    expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
+    expect(getPrivateReactiveProperties(metadata)).toMatchObject([
+        { name: 'initializedAsTrackNumber' },
+        { name: 'trackedPrivateIndex' },
+        { name: 'trackedThing' },
+        { name: 'trackedArr' },
+    ]);
     expect(getApiMethods(metadata)).toMatchObject([{ name: 'apiMethod' }]);
 
     // location of @api properties
     const indexProperty = properties[1];
-    expect(indexProperty).toMatchObject({ name: 'index', loc: { start: { column: 4, line: 11 }, end: { column: 10, line: 12 } } });
-    const indexSameLineProperty = properties[2];
-    expect(indexSameLineProperty).toMatchObject({ name: 'indexSameLine', loc: { start: { column: 4, line: 14 }, end: { column: 23, line: 14 } } });
-});
-
-it('returns javascript metadata', async () => {
-    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');
-    const content = fs.readFileSync(filepath, 'utf8');
-
-    const compilerResult = await compileSource(content, 'metadata.js');
-    const metadata = compilerResult.metadata;
-    const properties = getProperties(metadata);
-
-    expect(metadata.doc).toBe('Foo doc');
-    expect(metadata.declarationLoc).toEqual({ start: { column: 0, line: 3 }, end: { column: 1, line: 31 } });
-
-    expect(getPublicReactiveProperties(metadata)).toMatchObject([{ name: 'todo' }, { name: 'index' }, { name: 'indexSameLine' }]);
-    expect(properties).toMatchObject([
-        { name: 'todo' },
-        { name: 'index' },
-        { name: 'indexSameLine' },
-        { name: 'trackedPrivateIndex' },
-        { name: 'privateComputedValue' },
-    ]);
-    expect(getMethods(metadata)).toMatchObject([{ name: 'onclickAction' }, { name: 'apiMethod' }, { name: 'methodWithArguments' }]);
-
-    expect(getPrivateReactiveProperties(metadata)).toMatchObject([{ name: 'trackedPrivateIndex' }]);
-    expect(getApiMethods(metadata)).toMatchObject([{ name: 'apiMethod' }]);
-
-    // location of @api properties
-    const indexProperty = properties[1];
-    expect(indexProperty).toMatchObject({ name: 'index', loc: { start: { column: 4, line: 11 }, end: { column: 10, line: 12 } } });
-    const indexSameLineProperty = properties[2];
-    expect(indexSameLineProperty).toMatchObject({ name: 'indexSameLine', loc: { start: { column: 4, line: 14 }, end: { column: 23, line: 14 } } });
+    expect(indexProperty).toMatchObject({
+        name: 'index',
+        loc: {
+            start: { column: 4, line: 16 },
+            end: { column: 10, line: 17 },
+        },
+    });
+    const indexSameLineProperty = properties[4];
+    expect(indexSameLineProperty).toMatchObject({
+        name: 'indexSameLine',
+        loc: {
+            start: { column: 4, line: 22 },
+            end: { column: 23, line: 22 },
+        },
+    });
 });
 
 it('use compileDocument()', async () => {

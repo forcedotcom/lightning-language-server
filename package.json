@@ -30,7 +30,7 @@
     "patch-package": "^6.0.5",
     "rimraf": "^3.0.1",
     "shelljs": "^0.8.3",
-    "typescript": "^3.2.4"
+    "typescript": "^5.0.4"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap --force-local",

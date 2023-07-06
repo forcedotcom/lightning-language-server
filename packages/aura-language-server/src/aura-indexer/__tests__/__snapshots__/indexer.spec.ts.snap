@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`indexer parsing content aura indexer 1`] = `
-Array [
+[
   "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
   "force-app/main/default/aura/indexApp/indexApp.app",
   "force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
@@ -14,7 +14,7 @@ Array [
 exports[`indexer parsing content aura indexer 2`] = `
 Map {
   "aura:application" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -135,7 +135,7 @@ Map {
     "type": 1,
   },
   "aura:attribute" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -202,7 +202,7 @@ Map {
     "type": 1,
   },
   "aura:component" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -224,7 +224,7 @@ Map {
     "type": 0,
   },
   "aura:dependency" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -264,7 +264,7 @@ Map {
     "type": 1,
   },
   "aura:event" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -322,7 +322,7 @@ Map {
     "type": 1,
   },
   "aura:expression" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -333,7 +333,7 @@ Map {
         "type": "string",
       },
     ],
-    "documentation": "Renders the value to which an expression evaluates. Creates an instance of this component which renders the                         referenced \\"property reference value\\" set to the value attribute when expressions are found in free text or markup.",
+    "documentation": "Renders the value to which an expression evaluates. Creates an instance of this component which renders the                         referenced "property reference value" set to the value attribute when expressions are found in free text or markup.",
     "file": null,
     "location": undefined,
     "lwc": false,
@@ -344,7 +344,7 @@ Map {
     "type": 0,
   },
   "aura:handler" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -402,7 +402,7 @@ Map {
     "type": 1,
   },
   "aura:html" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -442,7 +442,7 @@ Map {
     "type": 0,
   },
   "aura:if" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -482,7 +482,7 @@ Map {
     "type": 0,
   },
   "aura:interface" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -531,7 +531,7 @@ Map {
     "type": 1,
   },
   "aura:iteration" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -616,7 +616,7 @@ Map {
     "type": 0,
   },
   "aura:method" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -665,7 +665,7 @@ Map {
     "type": 1,
   },
   "aura:registerEvent" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -705,7 +705,7 @@ Map {
     "type": 1,
   },
   "aura:renderIf" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -745,7 +745,7 @@ Map {
     "type": 0,
   },
   "aura:rootComponent" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "This is a marker interface for top-level components like aura:component, aura:expression, and aura:html",
     "file": null,
     "location": undefined,
@@ -757,7 +757,7 @@ Map {
     "type": 0,
   },
   "aura:set" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -788,7 +788,7 @@ Map {
     "type": 1,
   },
   "aura:template" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -882,7 +882,7 @@ Map {
     "type": 0,
   },
   "aura:text" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -904,7 +904,7 @@ Map {
     "type": 0,
   },
   "aura:unescapedHtml" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -935,16 +935,16 @@ Map {
     "type": 0,
   },
   "c:helloWorldApp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/helloWorldApp/helloWorldApp.app",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 19,
           "line": 5,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -959,16 +959,16 @@ Map {
     "type": 2,
   },
   "c:indexApp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/indexApp/indexApp.app",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 19,
           "line": 3,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -983,16 +983,16 @@ Map {
     "type": 2,
   },
   "c:lightningExamplesApp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/lightningExamplesApp/lightningExamplesApp.app",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 19,
           "line": 13,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -1007,16 +1007,16 @@ Map {
     "type": 2,
   },
   "c:todoApp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/todoApp/todoApp.app",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 19,
           "line": 6,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -1031,16 +1031,16 @@ Map {
     "type": 2,
   },
   "c:wireLdsApp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/wireLdsApp/wireLdsApp.app",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 19,
           "line": 3,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -1055,16 +1055,16 @@ Map {
     "type": 2,
   },
   "c:wireLdsCmp" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "",
     "file": "force-app/main/default/aura/wireLdsCmp/wireLdsCmp.cmp",
-    "location": Object {
-      "range": Object {
-        "end": Object {
+    "location": {
+      "range": {
+        "end": {
           "character": 17,
           "line": 3,
         },
-        "start": Object {
+        "start": {
           "character": 1,
           "line": 1,
         },
@@ -1079,7 +1079,7 @@ Map {
     "type": 2,
   },
   "clients:availableForMailAppAppPage" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Marker Interface that allows components to show up in the Lightning for Gmail or Lightning For Outlook Flexipages",
     "file": null,
     "location": undefined,
@@ -1091,7 +1091,7 @@ Map {
     "type": 0,
   },
   "clients:hasEventContext" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1122,7 +1122,7 @@ Map {
     "type": 0,
   },
   "clients:hasItemContext" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1180,7 +1180,7 @@ Map {
     "type": 0,
   },
   "design:component" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1202,7 +1202,7 @@ Map {
     "type": 1,
   },
   "flexipage:availableForAllPageTypes" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Marks a component as being able to be used inside a Lightning App Builder page",
     "file": null,
     "location": undefined,
@@ -1214,7 +1214,7 @@ Map {
     "type": 0,
   },
   "flexipage:availableForRecordHome" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Able to be used inside a Record Home Lightning App Builder page",
     "file": null,
     "location": undefined,
@@ -1226,7 +1226,7 @@ Map {
     "type": 0,
   },
   "force:appHostable" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": null,
     "file": null,
     "location": undefined,
@@ -1238,7 +1238,7 @@ Map {
     "type": 0,
   },
   "force:canvasApp" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1440,7 +1440,7 @@ Map {
     "type": 0,
   },
   "force:hasRecordId" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1462,7 +1462,7 @@ Map {
     "type": 0,
   },
   "force:hasSObjectName" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1484,7 +1484,7 @@ Map {
     "type": 0,
   },
   "force:inputField" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1542,7 +1542,7 @@ Map {
     "type": 0,
   },
   "force:lightningQuickAction" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": null,
     "file": null,
     "location": undefined,
@@ -1554,7 +1554,7 @@ Map {
     "type": 0,
   },
   "force:lightningQuickActionWithoutHeader" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": null,
     "file": null,
     "location": undefined,
@@ -1566,7 +1566,7 @@ Map {
     "type": 0,
   },
   "force:outputField" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1606,7 +1606,7 @@ Map {
     "type": 0,
   },
   "force:recordData" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1691,7 +1691,7 @@ Map {
     "type": 0,
   },
   "force:recordEdit" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1722,7 +1722,7 @@ Map {
     "type": 0,
   },
   "force:recordView" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1771,7 +1771,7 @@ Map {
     "type": 0,
   },
   "forceChatter:feed" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1820,7 +1820,7 @@ Map {
     "type": 0,
   },
   "forceChatter:fullFeed" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1869,7 +1869,7 @@ Map {
     "type": 0,
   },
   "forceChatter:publisher" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1909,7 +1909,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:appLauncher" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1931,7 +1931,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:availableForAllPageTypes" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a component for drag and drop in the Lightning Components panel in Experience Builder.",
     "file": null,
     "location": undefined,
@@ -1943,7 +1943,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:layout" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a component to be used as a custom layout for creating pages in the Experience Builder",
     "file": null,
     "location": undefined,
@@ -1955,7 +1955,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:navigationMenuBase" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -1995,7 +1995,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:notifications" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2017,7 +2017,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:profileMenuInterface" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a component to be used as a custom profile menu in Experience Builder.",
     "file": null,
     "location": undefined,
@@ -2029,7 +2029,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:routeLink" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2105,7 +2105,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:searchInterface" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a components to be used as a custom search component in the Experience Builder.",
     "file": null,
     "location": undefined,
@@ -2117,7 +2117,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:themeLayout" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Represent the layout for a theme and hosted inside the Experience Builder",
     "file": null,
     "location": undefined,
@@ -2129,7 +2129,7 @@ Map {
     "type": 0,
   },
   "forceCommunity:waveDashboard" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2259,7 +2259,7 @@ Map {
     "type": 0,
   },
   "lightning:accordion" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2326,7 +2326,7 @@ Map {
     "type": 0,
   },
   "lightning:accordionSection" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2393,7 +2393,7 @@ Map {
     "type": 0,
   },
   "lightning:actionOverride" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a component to be used as an override for a standard action. You can override the View, New, Edit, and Tab standard actions on most standard and all custom components. This interface has no effect except when used within Lightning Experience and Salesforce1.",
     "file": null,
     "location": undefined,
@@ -2405,7 +2405,7 @@ Map {
     "type": 0,
   },
   "lightning:appHomeTemplate" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Indicates the component can be used as a flexipage page template for the APP_PAGE page type",
     "file": null,
     "location": undefined,
@@ -2417,7 +2417,7 @@ Map {
     "type": 0,
   },
   "lightning:availableForChatterExtensionComposer" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Enables a component to be used as a chatter extension composer",
     "file": null,
     "location": undefined,
@@ -2429,7 +2429,7 @@ Map {
     "type": 0,
   },
   "lightning:availableForChatterExtensionRenderer" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2460,7 +2460,7 @@ Map {
     "type": 0,
   },
   "lightning:availableForFlowActions" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2482,7 +2482,7 @@ Map {
     "type": 0,
   },
   "lightning:availableForFlowScreens" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2531,7 +2531,7 @@ Map {
     "type": 0,
   },
   "lightning:avatar" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2625,7 +2625,7 @@ Map {
     "type": 0,
   },
   "lightning:backgroundUtilityItem" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "This interface is used to indicate that the component is available to be instantiated at the app level without rendering any UI.",
     "file": null,
     "location": undefined,
@@ -2637,7 +2637,7 @@ Map {
     "type": 0,
   },
   "lightning:badge" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2686,7 +2686,7 @@ Map {
     "type": 0,
   },
   "lightning:breadcrumb" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2762,7 +2762,7 @@ Map {
     "type": 0,
   },
   "lightning:breadcrumbs" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -2802,7 +2802,7 @@ Map {
     "type": 0,
   },
   "lightning:button" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3013,7 +3013,7 @@ Map {
     "type": 0,
   },
   "lightning:buttonGroup" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3053,7 +3053,7 @@ Map {
     "type": 0,
   },
   "lightning:buttonIcon" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3282,7 +3282,7 @@ Map {
     "type": 0,
   },
   "lightning:buttonIconStateful" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3439,7 +3439,7 @@ Map {
     "type": 0,
   },
   "lightning:buttonMenu" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3668,7 +3668,7 @@ Map {
     "type": 0,
   },
   "lightning:buttonStateful" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3699,7 +3699,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "The name of the icon to be used in the format \\\\'utility:close\\\\' when the state is true and the button receives focus.",
+        "documentation": "The name of the icon to be used in the format \\'utility:close\\' when the state is true and the button receives focus.",
         "location": undefined,
         "memberType": undefined,
         "name": "iconNameWhenHover",
@@ -3708,7 +3708,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "The name of the icon to be used in the format \\\\'utility:add\\\\' when the state is false.",
+        "documentation": "The name of the icon to be used in the format \\'utility:add\\' when the state is false.",
         "location": undefined,
         "memberType": undefined,
         "name": "iconNameWhenOff",
@@ -3717,7 +3717,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "The name of the icon to be used in the format \\\\'utility:check\\\\' when the state is true.",
+        "documentation": "The name of the icon to be used in the format \\'utility:check\\' when the state is true.",
         "location": undefined,
         "memberType": undefined,
         "name": "iconNameWhenOn",
@@ -3825,7 +3825,7 @@ Map {
     "type": 0,
   },
   "lightning:card" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3901,7 +3901,7 @@ Map {
     "type": 0,
   },
   "lightning:carousel" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -3968,7 +3968,7 @@ Map {
     "type": 0,
   },
   "lightning:checkboxGroup" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4125,7 +4125,7 @@ Map {
     "type": 0,
   },
   "lightning:clickToDial" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4192,7 +4192,7 @@ Map {
     "type": 0,
   },
   "lightning:combobox" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4313,7 +4313,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Text that is displayed before an option is selected, to prompt the user to select an option. The default is \\"Select an Option\\".",
+        "documentation": "Text that is displayed before an option is selected, to prompt the user to select an option. The default is "Select an Option".",
         "location": undefined,
         "memberType": undefined,
         "name": "placeholder",
@@ -4403,7 +4403,7 @@ Map {
     "type": 0,
   },
   "lightning:container" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4470,7 +4470,7 @@ Map {
     "type": 0,
   },
   "lightning:conversationToolkitAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4492,7 +4492,7 @@ Map {
     "type": 0,
   },
   "lightning:datatable" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -4820,7 +4820,7 @@ Map {
     "type": 0,
   },
   "lightning:dualListbox" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5121,7 +5121,7 @@ Map {
     "type": 0,
   },
   "lightning:dynamicIcon" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5197,7 +5197,7 @@ Map {
     "type": 0,
   },
   "lightning:empApi" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5219,7 +5219,7 @@ Map {
     "type": 0,
   },
   "lightning:fileCard" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5268,7 +5268,7 @@ Map {
     "type": 0,
   },
   "lightning:fileUpload" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5371,7 +5371,7 @@ Map {
     "type": 0,
   },
   "lightning:flexipageRegionInfo" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5402,7 +5402,7 @@ Map {
     "type": 0,
   },
   "lightning:flow" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5451,7 +5451,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedAddress" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5572,7 +5572,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedDateTime" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5720,7 +5720,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedEmail" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5778,7 +5778,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedLocation" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5836,7 +5836,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedName" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -5939,7 +5939,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedNumber" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6060,7 +6060,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedPhone" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6118,7 +6118,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedRichText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6176,7 +6176,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6234,7 +6234,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedTime" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6283,7 +6283,7 @@ Map {
     "type": 0,
   },
   "lightning:formattedUrl" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6359,7 +6359,7 @@ Map {
     "type": 0,
   },
   "lightning:hasPageReference" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6381,7 +6381,7 @@ Map {
     "type": 0,
   },
   "lightning:helptext" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6448,7 +6448,7 @@ Map {
     "type": 0,
   },
   "lightning:homeTemplate" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Indicates the component can be used as a flexipage page template for the HOME_PAGE page type",
     "file": null,
     "location": undefined,
@@ -6460,7 +6460,7 @@ Map {
     "type": 0,
   },
   "lightning:icon" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6545,7 +6545,7 @@ Map {
     "type": 0,
   },
   "lightning:input" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -6756,7 +6756,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Text shown for the active state of a toggle. The default is \\"Active\\".",
+        "documentation": "Text shown for the active state of a toggle. The default is "Active".",
         "location": undefined,
         "memberType": undefined,
         "name": "messageToggleActive",
@@ -6765,7 +6765,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Text shown for then inactive state of a toggle. The default is \\"Inactive\\".",
+        "documentation": "Text shown for then inactive state of a toggle. The default is "Inactive".",
         "location": undefined,
         "memberType": undefined,
         "name": "messageToggleInactive",
@@ -7089,7 +7089,7 @@ Map {
     "type": 0,
   },
   "lightning:inputAddress" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7327,7 +7327,7 @@ Map {
     "type": 0,
   },
   "lightning:inputField" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7412,7 +7412,7 @@ Map {
     "type": 0,
   },
   "lightning:inputLocation" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7551,7 +7551,7 @@ Map {
     "type": 0,
   },
   "lightning:inputName" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7744,7 +7744,7 @@ Map {
     "type": 0,
   },
   "lightning:inputRichText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7820,7 +7820,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "A list of formats accepted by the text editor. By default, the list is computed based on enabled categories. The \\"table\\" format is always enabled to support copying and pasting of tables. If formats are specified, all desired formats must be specified. Omitting a format from the list removes the corresponding button.",
+        "documentation": "A list of formats accepted by the text editor. By default, the list is computed based on enabled categories. The "table" format is always enabled to support copying and pasting of tables. If formats are specified, all desired formats must be specified. Omitting a format from the list removes the corresponding button.",
         "location": undefined,
         "memberType": undefined,
         "name": "formats",
@@ -7946,7 +7946,7 @@ Map {
     "type": 0,
   },
   "lightning:insertImageButton" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7968,7 +7968,7 @@ Map {
     "type": 0,
   },
   "lightning:isUrlAddressable" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -7990,7 +7990,7 @@ Map {
     "type": 0,
   },
   "lightning:layout" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8066,7 +8066,7 @@ Map {
     "type": 0,
   },
   "lightning:layoutItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8169,7 +8169,7 @@ Map {
     "type": 0,
   },
   "lightning:listView" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8254,7 +8254,7 @@ Map {
     "type": 0,
   },
   "lightning:map" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8366,7 +8366,7 @@ Map {
     "type": 0,
   },
   "lightning:menuItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8541,7 +8541,7 @@ Map {
     "type": 0,
   },
   "lightning:messageChannel" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8590,7 +8590,7 @@ Map {
     "type": 0,
   },
   "lightning:navigation" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8612,7 +8612,7 @@ Map {
     "type": 0,
   },
   "lightning:navigationItemAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8634,7 +8634,7 @@ Map {
     "type": 0,
   },
   "lightning:notificationsLibrary" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8656,7 +8656,7 @@ Map {
     "type": 0,
   },
   "lightning:omniToolkitAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8678,7 +8678,7 @@ Map {
     "type": 0,
   },
   "lightning:outputField" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8727,7 +8727,7 @@ Map {
     "type": 0,
   },
   "lightning:overlayLibrary" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8749,7 +8749,7 @@ Map {
     "type": 0,
   },
   "lightning:pageReferenceUtils" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8771,7 +8771,7 @@ Map {
     "type": 0,
   },
   "lightning:path" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8829,7 +8829,7 @@ Map {
     "type": 0,
   },
   "lightning:picklistPath" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8887,7 +8887,7 @@ Map {
     "type": 0,
   },
   "lightning:pill" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -8990,7 +8990,7 @@ Map {
     "type": 0,
   },
   "lightning:pillContainer" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9066,7 +9066,7 @@ Map {
     "type": 0,
   },
   "lightning:progressBar" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9133,7 +9133,7 @@ Map {
     "type": 0,
   },
   "lightning:progressIndicator" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9209,7 +9209,7 @@ Map {
     "type": 0,
   },
   "lightning:progressRing" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9267,7 +9267,7 @@ Map {
     "type": 0,
   },
   "lightning:quickActionAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9289,7 +9289,7 @@ Map {
     "type": 0,
   },
   "lightning:quipCard" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9320,7 +9320,7 @@ Map {
     "type": 0,
   },
   "lightning:radioGroup" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9504,7 +9504,7 @@ Map {
     "type": 0,
   },
   "lightning:recordEditForm" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9607,7 +9607,7 @@ Map {
     "type": 0,
   },
   "lightning:recordForm" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9746,7 +9746,7 @@ Map {
     "type": 0,
   },
   "lightning:recordHomeTemplate" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Indicates the component can be used as a flexipage page template for the RECORD_PAGE page type",
     "file": null,
     "location": undefined,
@@ -9758,7 +9758,7 @@ Map {
     "type": 0,
   },
   "lightning:recordViewForm" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9816,7 +9816,7 @@ Map {
     "type": 0,
   },
   "lightning:relativeDateTime" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -9865,7 +9865,7 @@ Map {
     "type": 0,
   },
   "lightning:select" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10031,7 +10031,7 @@ Map {
     "type": 0,
   },
   "lightning:slider" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10251,7 +10251,7 @@ Map {
     "type": 0,
   },
   "lightning:spinner" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10318,7 +10318,7 @@ Map {
     "type": 0,
   },
   "lightning:tab" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10466,7 +10466,7 @@ Map {
     "type": 0,
   },
   "lightning:tabset" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10533,7 +10533,7 @@ Map {
     "type": 0,
   },
   "lightning:textarea" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10753,7 +10753,7 @@ Map {
     "type": 0,
   },
   "lightning:tile" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10820,7 +10820,7 @@ Map {
     "type": 0,
   },
   "lightning:tree" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -10896,7 +10896,7 @@ Map {
     "type": 0,
   },
   "lightning:treeGrid" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11089,7 +11089,7 @@ Map {
     "type": 0,
   },
   "lightning:unsavedChanges" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11138,7 +11138,7 @@ Map {
     "type": 0,
   },
   "lightning:utilityBarAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11160,7 +11160,7 @@ Map {
     "type": 0,
   },
   "lightning:utilityItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11182,7 +11182,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigation" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11276,7 +11276,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigationItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11343,7 +11343,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigationItemBadge" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11428,7 +11428,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigationItemIcon" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11504,7 +11504,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigationOverflow" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11544,7 +11544,7 @@ Map {
     "type": 0,
   },
   "lightning:verticalNavigationSection" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11593,7 +11593,7 @@ Map {
     "type": 0,
   },
   "lightning:workspaceAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11615,7 +11615,7 @@ Map {
     "type": 0,
   },
   "lightningcommunity:allowInRelaxedCSP" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "This interface is used to indicate that a component is allowed in a Relaxed CSP community page.",
     "file": null,
     "location": undefined,
@@ -11627,7 +11627,7 @@ Map {
     "type": 0,
   },
   "lightningcommunity:backButton" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11676,7 +11676,7 @@ Map {
     "type": 0,
   },
   "lightningsnapin:minimizedAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11698,7 +11698,7 @@ Map {
     "type": 0,
   },
   "lightningsnapin:minimizedUI" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "This marker interface is used to indicate that a component can be used as the user interface for a minimized snap-in.",
     "file": null,
     "location": undefined,
@@ -11710,7 +11710,7 @@ Map {
     "type": 0,
   },
   "lightningsnapin:prechatAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11732,7 +11732,7 @@ Map {
     "type": 0,
   },
   "lightningsnapin:prechatUI" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "This marker interface is used to indicate that a component can be used with Snap-Ins Pre-Chat.",
     "file": null,
     "location": undefined,
@@ -11744,7 +11744,7 @@ Map {
     "type": 0,
   },
   "lightningsnapin:settingsAPI" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11766,7 +11766,7 @@ Map {
     "type": 0,
   },
   "ltng:allowGuestAccess" => TagInfo {
-    "attributes": Array [],
+    "attributes": [],
     "documentation": "Allows guest user access on an application.",
     "file": null,
     "location": undefined,
@@ -11778,7 +11778,7 @@ Map {
     "type": 0,
   },
   "ltng:require" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11818,7 +11818,7 @@ Map {
     "type": 0,
   },
   "ui:actionMenuItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11840,7 +11840,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -11894,7 +11894,7 @@ Map {
     "type": 0,
   },
   "ui:button" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -11943,7 +11943,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is \\"false\\".",
+        "documentation": "Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -11979,7 +11979,7 @@ Map {
     "type": 0,
   },
   "ui:checkboxMenuItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12001,7 +12001,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12055,7 +12055,7 @@ Map {
     "type": 0,
   },
   "ui:inputCheckbox" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12077,7 +12077,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12122,7 +12122,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12149,7 +12149,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change,click\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change,click".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12176,7 +12176,7 @@ Map {
     "type": 0,
   },
   "ui:inputCurrency" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12198,7 +12198,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12261,7 +12261,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12288,7 +12288,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12315,7 +12315,7 @@ Map {
     "type": 0,
   },
   "ui:inputDate" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12337,7 +12337,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12400,7 +12400,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12418,7 +12418,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12445,7 +12445,7 @@ Map {
     "type": 0,
   },
   "ui:inputDateTime" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12467,7 +12467,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12530,7 +12530,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12548,7 +12548,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12575,7 +12575,7 @@ Map {
     "type": 0,
   },
   "ui:inputDefaultError" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12615,7 +12615,7 @@ Map {
     "type": 0,
   },
   "ui:inputEmail" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12637,7 +12637,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12691,7 +12691,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12718,7 +12718,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12745,7 +12745,7 @@ Map {
     "type": 0,
   },
   "ui:inputNumber" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12767,7 +12767,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12830,7 +12830,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12857,7 +12857,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -12884,7 +12884,7 @@ Map {
     "type": 0,
   },
   "ui:inputPhone" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -12906,7 +12906,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -12960,7 +12960,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -12987,7 +12987,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13014,7 +13014,7 @@ Map {
     "type": 0,
   },
   "ui:inputRadio" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13036,7 +13036,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether this radio button should be displayed in a disabled state. Disabled radio buttons can't be clicked. Default value is \\"false\\".",
+        "documentation": "Specifies whether this radio button should be displayed in a disabled state. Disabled radio buttons can't be clicked. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13081,7 +13081,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13108,7 +13108,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13135,7 +13135,7 @@ Map {
     "type": 0,
   },
   "ui:inputRichText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13166,7 +13166,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13238,7 +13238,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13274,7 +13274,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13310,7 +13310,7 @@ Map {
     "type": 0,
   },
   "ui:inputSecret" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13332,7 +13332,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13386,7 +13386,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13413,7 +13413,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13440,7 +13440,7 @@ Map {
     "type": 0,
   },
   "ui:inputSelect" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13462,7 +13462,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13516,7 +13516,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13534,7 +13534,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13561,7 +13561,7 @@ Map {
     "type": 0,
   },
   "ui:inputSelectOption" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13583,7 +13583,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13637,7 +13637,7 @@ Map {
     "type": 0,
   },
   "ui:inputText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13659,7 +13659,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13713,7 +13713,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13740,7 +13740,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13767,7 +13767,7 @@ Map {
     "type": 0,
   },
   "ui:inputTextArea" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13798,7 +13798,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -13861,7 +13861,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -13897,7 +13897,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -13924,7 +13924,7 @@ Map {
     "type": 0,
   },
   "ui:inputURL" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -13946,7 +13946,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -14000,7 +14000,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the input is required. Default value is \\"false\\".",
+        "documentation": "Specifies whether the input is required. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "required",
@@ -14027,7 +14027,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is \\"change\\".",
+        "documentation": "Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is "change".",
         "location": undefined,
         "memberType": undefined,
         "name": "updateOn",
@@ -14054,7 +14054,7 @@ Map {
     "type": 0,
   },
   "ui:menu" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14085,7 +14085,7 @@ Map {
     "type": 0,
   },
   "ui:menuItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14107,7 +14107,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -14161,7 +14161,7 @@ Map {
     "type": 0,
   },
   "ui:menuItemSeparator" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14192,7 +14192,7 @@ Map {
     "type": 0,
   },
   "ui:menuList" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14277,7 +14277,7 @@ Map {
     "type": 0,
   },
   "ui:menuTrigger" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14299,7 +14299,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -14335,7 +14335,7 @@ Map {
     "type": 0,
   },
   "ui:menuTriggerLink" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14357,7 +14357,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -14393,7 +14393,7 @@ Map {
     "type": 0,
   },
   "ui:message" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14451,7 +14451,7 @@ Map {
     "type": 0,
   },
   "ui:outputCheckbox" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14509,7 +14509,7 @@ Map {
     "type": 0,
   },
   "ui:outputCurrency" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14576,7 +14576,7 @@ Map {
     "type": 0,
   },
   "ui:outputDate" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14634,7 +14634,7 @@ Map {
     "type": 0,
   },
   "ui:outputDateTime" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14701,7 +14701,7 @@ Map {
     "type": 0,
   },
   "ui:outputEmail" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14741,7 +14741,7 @@ Map {
     "type": 0,
   },
   "ui:outputNumber" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14790,7 +14790,7 @@ Map {
     "type": 0,
   },
   "ui:outputPhone" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14830,7 +14830,7 @@ Map {
     "type": 0,
   },
   "ui:outputRichText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14879,7 +14879,7 @@ Map {
     "type": 0,
   },
   "ui:outputText" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14928,7 +14928,7 @@ Map {
     "type": 0,
   },
   "ui:outputTextArea" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -14977,7 +14977,7 @@ Map {
     "type": 0,
   },
   "ui:outputURL" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15008,7 +15008,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -15071,7 +15071,7 @@ Map {
     "type": 0,
   },
   "ui:radioMenuItem" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15093,7 +15093,7 @@ Map {
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
-        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is \\"false\\".",
+        "documentation": "Specifies whether the component should be displayed in a disabled state. Default value is "false".",
         "location": undefined,
         "memberType": undefined,
         "name": "disabled",
@@ -15147,7 +15147,7 @@ Map {
     "type": 0,
   },
   "ui:scrollerWrapper" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15178,7 +15178,7 @@ Map {
     "type": 0,
   },
   "ui:spinner" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15218,7 +15218,7 @@ Map {
     "type": 0,
   },
   "wave:sdk" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15240,7 +15240,7 @@ Map {
     "type": 0,
   },
   "wave:waveDashboard" => TagInfo {
-    "attributes": Array [
+    "attributes": [
       AttributeInfo {
         "decorator": undefined,
         "detail": "Aura Attribute",
@@ -15382,7 +15382,7 @@ Map {
 `;
 
 exports[`indexer parsing content aura indexer 3`] = `
-Array [
+[
   "aura",
   "c",
   "clients",
