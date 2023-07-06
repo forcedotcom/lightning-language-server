@@ -105,7 +105,7 @@ export default class Server {
         });
 
         await this.context.configureProject();
-        this.componentIndexer.init();
+        await this.componentIndexer.init();
         this.typingIndexer.init();
 
         return this.capabilities;
