@@ -541,8 +541,14 @@ function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
  * LWC language server to analyze code in a user's IDE.
  */
 export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata {
-    const mainClassObj = lwcMeta.classes.find(classObj => {
-        return classObj.id == lwcMeta.mainClass.refId;
+    const hasLwc = () => lwcMeta.mainClass;
+
+    if (!hasLwc()) {
+        return genEmptyMetadata();
+    }
+
+    const mainClassObj = lwcMeta.classes.find((classObj) => {
+        return lwcMeta.mainClass && classObj.id == lwcMeta.mainClass.refId;
     });
 
     const defaultExport = lwcMeta.exports.filter((exp) => exp.defaultExport)[0];
@@ -558,3 +564,24 @@ export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata 
 
     return internalMeta;
 }
+
+function genEmptyMetadata() {
+    const internalMeta: InternalMetadata = {
+        decorators: [],
+        classMembers: [],
+        doc: '',
+        declarationLoc: {
+            start: {
+                line: 0,
+                column: 0,
+            },
+            end: {
+                line: 0,
+                column: 0,
+            },
+        },
+        exports: [],
+    };
+    return internalMeta;
+}
+
