@@ -10,8 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        nodeVersion:
-          - 16.15.1
+        nodeVersion: [lts/-1, lts/*]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
