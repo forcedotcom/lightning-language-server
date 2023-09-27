@@ -1,8 +1,13 @@
-name: unit testss
+name: Unit Tests
 on:
   push:
     branches-ignore: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: false
 
 jobs:
   unit-tests:
