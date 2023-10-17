@@ -33,6 +33,21 @@ export default class Foo extends LightningElement {
     @api property = true;
 }
 `;
+const codeWithoutDefaultExportSingleClass = `
+import { api, LightningElement } from 'lwc';
+class Foo extends LightningElement {
+    @api foo;
+}
+`;
+const codeWithoutDefaultExportMultipleClasses = `
+import { api, LightningElement } from 'lwc';
+class Foo extends LightningElement {
+    @api foo;
+}
+class Bar extends LightningElement {
+    @api bar;
+}
+`;
 
 it('can get metadata from a simple component', async () => {
     await compileSource(codeOk, 'foo.js');
@@ -44,6 +59,21 @@ it('displays an error for a component with syntax error', async () => {
     expect(result.diagnostics).toHaveLength(1);
     const [diagnostic] = result.diagnostics;
     expect(diagnostic.message).toMatch('Unexpected token (4:17)');
+});
+
+it('returns empty metadata for a script without a clear main component class', async () => {
+    const result = await compileSource(codeWithoutDefaultExportMultipleClasses, 'foo.js');
+    expect(result.metadata?.decorators).toHaveLength(0);
+    expect(result.metadata?.classMembers).toHaveLength(0);
+    expect(result.metadata?.exports).toHaveLength(0);
+});
+
+it('returns metadata for a script with one component class, even when not exported', async () => {
+    const result = await compileSource(codeWithoutDefaultExportSingleClass, 'foo.js');
+    console.log(result);
+    expect(result.metadata?.decorators).toHaveLength(1);
+    expect(result.metadata?.classMembers).toHaveLength(1);
+    expect(result.metadata?.exports).toHaveLength(0);
 });
 
 it('displays an error for a component with other errors', async () => {
