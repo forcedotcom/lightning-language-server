@@ -9,6 +9,9 @@
     "type": "git",
     "url": "https://github.com/forcedotcom/lightning-language-server.git"
   },
+  "bin": {
+    "aura-language-server": "bin/aura-language-server.js"
+  },
   "scripts": {
     "clean": "rm -rf lib",
     "cleanTestData": "node ../../scripts/removeTestData.js",
