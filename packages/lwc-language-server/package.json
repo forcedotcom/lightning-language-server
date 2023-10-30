@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/forcedotcom/lightning-language-server.git"
   },
+  "bin": {
+    "lwc-language-server": "./bin/lwc-language-server.js"
+  },
   "scripts": {
     "clean": "rm -rf lib && rm -rf src/resources/sfdx/typings/copied",
     "cleanTestData": "node ../../scripts/removeTestData.js",
