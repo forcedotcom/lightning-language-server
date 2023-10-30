@@ -36,3 +36,34 @@ it('can map new metadata to old metadata', async () => {
 
     expect(derivedMetadata).toEqual(oldMetadata);
 });
+
+it('Should handle mapping when there is a property with only a setter', async () => {
+    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'nogetter.js');
+    const content = fs.readFileSync(filepath, 'utf8');
+
+    const newMetadataOpts: BundleConfig = {
+        type: 'internal',
+        name: 'nogetter',
+        namespace: 'x',
+        namespaceMapping: {},
+        files: [
+            {
+                fileName: 'nogetter.js',
+                source: content,
+            },
+        ],
+    };
+
+    const modernMetadata = collectBundleMetadata(newMetadataOpts);
+    const derivedMetadata = mapLwcMetadataToInternal(modernMetadata.files[0] as ScriptFile);
+
+    const oldTransformOpts: OldCompilerOptions = {
+        name: 'metadata',
+        namespace: 'x',
+        files: {},
+    };
+    const transformerResult = await transform(content, 'nogetter.js', oldTransformOpts);
+    const oldMetadata: Metadata = transformerResult.metadata as Metadata;
+
+    expect(derivedMetadata).toEqual(oldMetadata);
+});
