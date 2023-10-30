@@ -217,17 +217,25 @@ function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | nu
         propertyObj.dataProperty,
     );
 
+    // Note there can only be a getter or only a setter, both are not required.
+    // Use the getter if available, or the setter if there is no getter.  
+    let loc: SourceLocation;
+    if (propertyObj.propertyType === 'accessor') {
+        if (propertyObj.getter) {
+            loc = propertyObj.getter.location
+        } else if (propertyObj.setter) {
+            loc = propertyObj.setter.location
+        }
+     } else {
+        loc = propertyObj?.dataProperty.location
+    }
     return stripKeysWithUndefinedVals({
         name: propertyObj.name,
         type: 'property',
         value,
         decorator: decoratorType,
         doc: propertyObj.__internal__doc,
-        loc: externalToInternalLoc(
-            propertyObj.propertyType === 'accessor'
-                ? propertyObj.getter.location
-                : propertyObj.dataProperty.location
-        ),
+        loc: externalToInternalLoc(loc),
     });
 }
 
