@@ -396,6 +396,15 @@ export class WorkspaceContext {
     }
 
     /**
+     * @param modulesDir
+     * @returns whether a tsconfig.json file exists in the same directory of modulesDir
+     */
+    private hasTSConfigOnCore(modulesDir: string): boolean {
+        const tsConfigFile = path.join(modulesDir, '..', 'tsconfig.json');
+        return fs.pathExistsSync(tsConfigFile);
+    }
+
+    /**
      * Writes to and updates Jsconfig files and ES Lint files of WorkspaceRoots, optimizing by type
      */
     private async writeJsconfigJson(): Promise<void> {
@@ -419,16 +428,22 @@ export class WorkspaceContext {
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const modulesDir of modulesDirs) {
-                    const jsConfigPath = path.join(modulesDir, 'jsconfig.json');
-                    this.updateConfigFile(jsConfigPath, jsConfigContent);
+                    // only writes jsconfig.json if there is no tsconfig.json on core
+                    if (!this.hasTSConfigOnCore(modulesDir)) {
+                        const jsConfigPath = path.join(modulesDir, 'jsconfig.json');
+                        this.updateConfigFile(jsConfigPath, jsConfigContent);
+                    }
                 }
                 break;
             case WorkspaceType.CORE_PARTIAL:
                 jsConfigTemplate = await fs.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: '../..' });
                 for (const modulesDir of modulesDirs) {
-                    const jsConfigPath = path.join(modulesDir, 'jsconfig.json');
-                    this.updateConfigFile(jsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
+                    // only writes jsconfig.json if there is no tsconfig.json on core
+                    if (!this.hasTSConfigOnCore(modulesDir)) {
+                        const jsConfigPath = path.join(modulesDir, 'jsconfig.json');
+                        this.updateConfigFile(jsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
+                    }
                 }
                 break;
         }
