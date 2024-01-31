@@ -80,8 +80,9 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
         for (const subdir of subdirs) {
             // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
-            const modulePath = path.join(subdir, basename + '.js');
-            if (fs.existsSync(modulePath)) {
+            const modulePathJs = path.join(subdir, basename + '.js');
+            const modulePathTs = path.join(subdir, basename + '.ts');
+            if (fs.existsSync(modulePathJs) || fs.existsSync(modulePathTs)) {
                 // TODO: check contents for: from 'lwc'?
                 return true;
             }
@@ -305,6 +306,11 @@ export class WorkspaceContext {
         await this.writeJsconfigJson();
         await this.writeSettings();
         await this.writeTypings();
+
+        const modules = await this.findAllModules();
+        for (const ns in modules) {
+            console.log(ns);
+        }
     }
 
     /**
@@ -446,6 +452,15 @@ export class WorkspaceContext {
                     }
                 }
                 break;
+        }
+    }
+
+    private async updateTsConfigOnCore(): Promise<void> {
+        if (this.type === WorkspaceType.CORE_ALL || this.type === WorkspaceType.CORE_PARTIAL) {
+            const modulesDirs = await this.getModulesDirs();
+            for (const modulesDir of modulesDirs) {
+                console.log(modulesDir);
+            }
         }
     }
 
