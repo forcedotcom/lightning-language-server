@@ -54,6 +54,21 @@ async function findModulesIn(namespaceRoot: string): Promise<string[]> {
     return files;
 }
 
+async function generateLWCMappings(namespaceRoot: string): Promise<Record<string, string[]>> {
+    const componentMappings: Record<string, string[]> = {};
+    const subdirs = await findSubdirectories(namespaceRoot);
+    const namespace = path.basename(namespaceRoot);
+    for (const subdir of subdirs) {
+        const componentName = path.basename(subdir);
+        const componentPath = path.join(subdir, componentName + '.ts');
+        if (await fs.pathExists(componentPath)) {
+            const componentFullName = `${namespace}/${componentName}`;
+            componentMappings[componentFullName] = [`./modules/${namespace}/${componentName}/${componentName}`];
+        }
+    }
+    return componentMappings;
+}
+
 async function readSfdxProjectConfig(root: string): Promise<SfdxProjectConfig> {
     try {
         return JSON.parse(await fs.readFile(getSfdxProjectFile(root), 'utf8'));
@@ -306,11 +321,7 @@ export class WorkspaceContext {
         await this.writeJsconfigJson();
         await this.writeSettings();
         await this.writeTypings();
-
-        const modules = await this.findAllModules();
-        for (const ns in modules) {
-            console.log(ns);
-        }
+        await this.updateTsConfigOnCore();
     }
 
     /**
@@ -457,9 +468,31 @@ export class WorkspaceContext {
 
     private async updateTsConfigOnCore(): Promise<void> {
         if (this.type === WorkspaceType.CORE_ALL || this.type === WorkspaceType.CORE_PARTIAL) {
-            const modulesDirs = await this.getModulesDirs();
-            for (const modulesDir of modulesDirs) {
-                console.log(modulesDir);
+            const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
+            for (const namespaceRoot of namespaceRoots.lwc) {
+                const tsConfigFile = path.join(namespaceRoot, '..', '..', 'tsconfig.json');
+                if (await fs.pathExists(tsConfigFile)) {
+                    const mapping = await generateLWCMappings(namespaceRoot);
+                    if (Object.keys(mapping).length > 0) {
+                        try {
+                            const tsconfigString = await fs.readFile(tsConfigFile, 'utf8');
+                            // remove any trailing commas
+                            const tsconfig = JSON.parse(tsconfigString.replace(/,([ |\t|\n]+[\}|\]|\)])/g, '$1'));
+                            if (tsconfig?.compilerOptions?.paths) {
+                                Object.assign(tsconfig.compilerOptions.paths, mapping);
+                                const sortedKeys = Object.keys(tsconfig.compilerOptions.paths).sort();
+                                const sortedPaths: Record<string, string[]> = {};
+                                sortedKeys.forEach(key => {
+                                    sortedPaths[key] = tsconfig.compilerOptions.paths[key];
+                                });
+                                tsconfig.compilerOptions.paths = sortedPaths;
+                                utils.writeJsonSync(tsConfigFile, tsconfig);
+                            }
+                        } catch (error) {
+                            console.warn(`Error updating core tsconfig. Continuing, but may be missing some config. ${error}`);
+                        }
+                    }
+                }
             }
         }
     }
