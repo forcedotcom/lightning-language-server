@@ -107,7 +107,7 @@ export default class TSConfigPathIndexer {
         const imports = await collectImportsForDocument(document);
         if (imports.size > 0) {
             for (const importee of imports) {
-                const isInSameModule = this.doesModuleContainNS(projectRoot, importee.substring(0, importee.indexOf('/')));
+                const isInSameModule = this.moduleContainsNS(projectRoot, importee.substring(0, importee.indexOf('/')));
                 const tsPath = this.pathMapping.get(importee)?.tsPath;
                 if (tsPath) {
                     mappings.set(importee, this.getRelativeTSPath(tsPath, isInSameModule));
@@ -115,7 +115,7 @@ export default class TSConfigPathIndexer {
             }
         }
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
-        this.updateTSConfigFile(tsconfigFile, mappings);
+        this.updateTSConfigFile(tsconfigFile, mappings, false);
     }
 
     /**
@@ -128,17 +128,18 @@ export default class TSConfigPathIndexer {
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
         const moduleName = path.basename(projectRoot);
         const mappings = this.getTSMappingsForModule(moduleName);
-        this.updateTSConfigFile(tsconfigFile, mappings);
+        this.updateTSConfigFile(tsconfigFile, mappings, true);
     }
 
     /**
      * Update tsconfig.json file with updated mapping.
      * @param tsconfigFile target tsconfig.json file path
      * @param mapping updated map that contains path info to update
+     * @param isReIndex true if the deleted existing paths should be removed
      */
-    private async updateTSConfigFile(tsconfigFile: string, mapping: Map<string, string>): Promise<void> {
+    private async updateTSConfigFile(tsconfigFile: string, mapping: Map<string, string>, isReIndex: boolean): Promise<void> {
         if (!fs.pathExistsSync(tsconfigFile)) {
-            return; // file does not exist, exit early
+            return; // file does not exist, no-op
         }
         try {
             const tsconfigString = await fs.readFile(tsconfigFile, 'utf8');
@@ -150,11 +151,22 @@ export default class TSConfigPathIndexer {
                     formattedMapping.set(key, [value]);
                 });
                 const existingPaths = tsconfig.compilerOptions.paths;
+                const updatedPaths = { ...existingPaths };
                 let updated = false;
+                // remove the existing paths that are not in the updated mapping
+                if (isReIndex) {
+                    const projectRoot = path.join(tsconfigFile, '..');
+                    for (const key in existingPaths) {
+                        if (!formattedMapping.has(key) && this.moduleContainsNS(projectRoot, key.substring(0, key.indexOf('/')))) {
+                            updated = true;
+                            delete updatedPaths[key];
+                        }
+                    }
+                }
                 formattedMapping.forEach((value, key) => {
                     if (!existingPaths[key] || existingPaths[key][0] !== value[0]) {
                         updated = true;
-                        existingPaths[key] = value;
+                        updatedPaths[key] = value;
                     }
                 });
                 // only update tsconfig.json if any path mapping is updated
@@ -162,10 +174,10 @@ export default class TSConfigPathIndexer {
                     return;
                 }
                 // sort the path mappings before update the file
-                const sortedKeys = Object.keys(existingPaths).sort();
+                const sortedKeys = Object.keys(updatedPaths).sort();
                 const sortedPaths: Record<string, string[]> = {};
                 sortedKeys.forEach(key => {
-                    sortedPaths[key] = existingPaths[key];
+                    sortedPaths[key] = updatedPaths[key];
                 });
                 tsconfig.compilerOptions.paths = sortedPaths;
                 fs.writeJSONSync(tsconfigFile, tsconfig, {
@@ -276,7 +288,7 @@ export default class TSConfigPathIndexer {
     /**
      * Checks if a given namespace exists in a given module path.
      */
-    private doesModuleContainNS(modulePath: string, nsName: string): boolean {
+    private moduleContainsNS(modulePath: string, nsName: string): boolean {
         return fs.pathExistsSync(path.join(modulePath, 'modules', nsName));
     }
 }
