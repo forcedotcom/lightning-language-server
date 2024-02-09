@@ -41,7 +41,7 @@ class TSConfigPathItem {
  * so that TypeScript can find the component on the file system.
  */
 export default class TSConfigPathIndexer {
-    readonly workspaceRoots: string[];
+    readonly coreModulesWithTSConfig: string[];
     readonly workspaceType: number;
     // the root path for core directory
     readonly coreRoot: string;
@@ -49,19 +49,30 @@ export default class TSConfigPathIndexer {
     pathMapping: Map<string, TSConfigPathItem> = new Map<string, TSConfigPathItem>();
 
     constructor(workspaceRoots: string[]) {
-        this.workspaceRoots = workspaceRoots;
-        this.workspaceType = detectWorkspaceType(this.workspaceRoots);
+        this.workspaceType = detectWorkspaceType(workspaceRoots);
         switch (this.workspaceType) {
             case WorkspaceType.CORE_ALL:
-                this.coreRoot = this.workspaceRoots[0];
+                this.coreRoot = workspaceRoots[0];
+                const dirs = fs.readdirSync(this.coreRoot);
+                const subdirs: string[] = [];
+                for (const file of dirs) {
+                    const subdir = path.join(this.coreRoot, file);
+                    if (fs.statSync(subdir).isDirectory()) {
+                        subdirs.push(subdir);
+                    }
+                }
+                this.coreModulesWithTSConfig = this.getCoreModulesWithTSConfig(subdirs);
                 break;
             case WorkspaceType.CORE_PARTIAL:
-                this.coreRoot = path.join(this.workspaceRoots[0], '..');
+                this.coreRoot = path.join(workspaceRoots[0], '..');
+                this.coreModulesWithTSConfig = this.getCoreModulesWithTSConfig(workspaceRoots);
                 break;
         }
     }
 
-    // gets all paths for TypeScript LWC components on core
+    /**
+     * Gets all paths for TypeScript LWC components on core.
+     */
     get componentEntries(): string[] {
         const defaultSource = normalize(`${this.coreRoot}/*/modules/*/*/*.ts`);
         const files = sync(defaultSource);
@@ -76,7 +87,9 @@ export default class TSConfigPathIndexer {
         });
     }
 
-    // Initialization: build the path mapping for Core workspace.
+    /**
+     * Initialization: build the path mapping for Core workspace.
+     */
     public async init(): Promise<void> {
         if (!this.isOnCore()) {
             return; // no-op if this is not a Core workspace
@@ -85,8 +98,9 @@ export default class TSConfigPathIndexer {
             this.addNewPathMapping(entry);
         });
         // update each project under the workspaceRoots
-        for (const workspaceRoot of this.workspaceRoots) {
-            this.updateTSConfigPaths(workspaceRoot);
+
+        for (const workspaceRoot of this.coreModulesWithTSConfig) {
+            await this.updateTSConfigPaths(workspaceRoot);
         }
     }
 
@@ -119,16 +133,30 @@ export default class TSConfigPathIndexer {
     }
 
     /**
+     * @param coreModules A list of core modules root paths
+     * @returns A sublist of core modules from input that has a tsconfig.json file
+     */
+    private getCoreModulesWithTSConfig(coreModules: string[]): string[] {
+        const modules = [];
+        for (const module of coreModules) {
+            if (fs.existsSync(path.join(module, 'tsconfig.json'))) {
+                modules.push(module);
+            }
+        }
+        return modules;
+    }
+
+    /**
      * Update the tsconfig.json file for one module(project) in core.
      * Note that this only updates the path for all TypeScript LWCs within the module.
      * This does not analyze any imported LWCs outside of the module.
      * @param projectRoot the core module(project)'s root path, e.g., 'core-workspace/core/ui-force-components'
      */
-    private updateTSConfigPaths(projectRoot: string): void {
+    private async updateTSConfigPaths(projectRoot: string): Promise<void> {
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
         const moduleName = path.basename(projectRoot);
         const mappings = this.getTSMappingsForModule(moduleName);
-        this.updateTSConfigFile(tsconfigFile, mappings, true);
+        await this.updateTSConfigFile(tsconfigFile, mappings, true);
     }
 
     /**

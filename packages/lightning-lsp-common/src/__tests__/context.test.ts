@@ -318,7 +318,7 @@ it('configureCoreMulti()', async () => {
     // verify newly created jsconfig.json
     verifyJsconfigCore(jsconfigPathGlobal);
     // verify jsconfig.json is not created when there is a tsconfig.json
-    expect(fs.existsSync(tsconfigPathForce)).not.toExist();
+    expect(fs.existsSync(jsconfigPathForce)).not.toExist();
     verifyTypingsCore();
 
     fs.removeSync(tsconfigPathForce);
