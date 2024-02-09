@@ -154,6 +154,26 @@ it('isLWCJavascript()', async () => {
     expect(await context.isLWCJavascript(document)).toBeTruthy();
 });
 
+it('isLWCTypeScript()', async () => {
+    const context = new WorkspaceContext(CORE_PROJECT_ROOT);
+
+    // lwc .ts
+    let document = readAsTextDocument(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.ts');
+    expect(await context.isLWCTypeScript(document)).toBeTruthy();
+
+    // lwc .ts outside namespace root
+    document = readAsTextDocument(CORE_ALL_ROOT + '/ui-force-components/modules/force/input-phone/input-phone.ts');
+    expect(await context.isLWCTypeScript(document)).toBeFalsy();
+
+    // lwc .html
+    document = readAsTextDocument(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.html');
+    expect(await context.isLWCTypeScript(document)).toBeFalsy();
+
+    // lwc .js
+    document = readAsTextDocument(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.js');
+    expect(await context.isLWCTypeScript(document)).toBeFalsy();
+});
+
 it('configureSfdxProject()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
     const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';

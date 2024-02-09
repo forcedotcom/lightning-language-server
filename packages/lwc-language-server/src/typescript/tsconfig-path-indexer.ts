@@ -18,9 +18,9 @@ type TSConfigPathItemAttribute = {
 // An internal object representing a path mapping for tsconfig.json file on core
 class TSConfigPathItem {
     // internal typescript path mapping, e.g., "ui-force-components/modules/force/wireUtils/wireUtils"
-    public readonly tsPath: string;
+    readonly tsPath: string;
     // actual file path for the ts file
-    public readonly filePath: string;
+    readonly filePath: string;
 
     constructor(attribute: TSConfigPathItemAttribute) {
         this.tsPath = attribute.tsPath;
