@@ -1,7 +1,10 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { shared } from '@salesforce/lightning-lsp-common';
+import { readAsTextDocument } from './test-utils';
 import TSConfigPathIndexer from '../typescript/tsconfig-path-indexer';
+import { collectImportsForDocument } from '../typescript/imports';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 const { WorkspaceType } = shared;
 const TEST_WORKSPACE_PARENT_DIR = path.resolve('../..');
@@ -64,7 +67,7 @@ describe('ComponentIndexer', () => {
     });
 
     describe('instance methods', () => {
-        describe('#init', () => {
+        describe('init', () => {
             it('no-op on sfdx workspace root', async () => {
                 const tsconfigPathIndexer = new TSConfigPathIndexer([path.join(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
                 const spy = jest.spyOn(tsconfigPathIndexer, 'componentEntries', 'get');
@@ -96,6 +99,81 @@ describe('ComponentIndexer', () => {
                     },
                 });
             });
+        });
+
+        describe('updateTSConfigFileForDocument', () => {
+            it('no-op on sfdx workspace root', async () => {
+                const tsconfigPathIndexer = new TSConfigPathIndexer([path.join(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
+                await tsconfigPathIndexer.init();
+                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                const spy = jest.spyOn(tsconfigPathIndexer as any, 'addNewPathMapping');
+                await tsconfigPathIndexer.updateTSConfigFileForDocument(readAsTextDocument(filePath));
+                expect(spy).not.toHaveBeenCalled();
+                expect(tsconfigPathIndexer.coreRoot).toBeUndefined();
+            });
+
+            it('updates tsconfig for all imports', async () => {
+                const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
+                await tsconfigPathIndexer.init();
+                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                await tsconfigPathIndexer.updateTSConfigFileForDocument(readAsTextDocument(filePath));
+                const tsConfigForceObj = readTSConfigFile(tsConfigForce);
+                expect(tsConfigForceObj).toEqual({
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'one/app-nav-bar': ['../ui-global-components/modules/one/app-nav-bar/app-nav-bar'],
+                            'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
+                            'force/input-phone': ['./modules/force/input-phone/input-phone'],
+                        },
+                    },
+                });
+            });
+        });
+    });
+});
+
+function createTextDocumentFromString(content: string): TextDocument {
+    return TextDocument.create('mockUri', 'typescript', 0, content);
+}
+
+describe('imports', () => {
+    describe('collectImportsForDocument', () => {
+        it('should exclude special imports', async () => {
+            const document = createTextDocumentFromString(`
+                import {api} from 'lwc';
+                import {obj1} from './abc';
+                import {obj2} from '../xyz';
+                import {obj3} from 'lightning/confirm';
+                import {obj4} from '@salesforce/label/x';
+                import {obj5} from 'x.html';
+                import {obj6} from 'y.css';
+                import {obj7} from 'namespace/cmpName';
+            `);
+            const imports = await collectImportsForDocument(document);
+            expect(imports.size).toEqual(1);
+            expect(imports.has('namespace/cmpName'));
+        });
+
+        it('should work for partial file content', async () => {
+            const document = createTextDocumentFromString(`
+                import from
+            `);
+            const imports = await collectImportsForDocument(document);
+            expect(imports.size).toEqual(0);
+        });
+
+        it('dynamic imports', async () => {
+            const document = createTextDocumentFromString(`
+                const {
+                    default: myDefault,
+                    foo,
+                    bar,
+                } = await import("force/wireUtils");
+            `);
+            const imports = await collectImportsForDocument(document);
+            expect(imports.size).toEqual(1);
+            expect(imports.has('force/wireUtils'));
         });
     });
 });

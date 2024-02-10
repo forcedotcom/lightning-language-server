@@ -97,8 +97,7 @@ export default class TSConfigPathIndexer {
         this.componentEntries.forEach(entry => {
             this.addNewPathMapping(entry);
         });
-        // update each project under the workspaceRoots
-
+        // update each project under the workspaceRoots that has a tsconfig.json
         for (const workspaceRoot of this.coreModulesWithTSConfig) {
             await this.updateTSConfigPaths(workspaceRoot);
         }
@@ -129,7 +128,7 @@ export default class TSConfigPathIndexer {
             }
         }
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
-        this.updateTSConfigFile(tsconfigFile, mappings, false);
+        await this.updateTSConfigFile(tsconfigFile, mappings, false);
     }
 
     /**

@@ -274,7 +274,7 @@ export default class Server {
             }
         } else if (await this.context.isLWCTypeScript(document)) {
             // update tsconfig.json file paths when a TS file is saved
-            this.tsconfigPathIndexer.updateTSConfigFileForDocument(document);
+            await this.tsconfigPathIndexer.updateTSConfigFileForDocument(document);
         }
     }
 
