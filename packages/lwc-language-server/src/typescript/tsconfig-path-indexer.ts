@@ -29,16 +29,16 @@ class TSConfigPathItem {
 }
 
 /**
- * An indexer that stores the TypeScript path mapping info on Core workspace.
+ * An indexer that stores the TypeScript path mapping info for the Core workspace.
  *
- * When using TypeScript for LWCs on core, tsconfig.json file's 'paths' attribute needs to be maintained so that
- * TypeScript compiler knows how to resolve imported LWC modules. This class maintains a mapping between LWCs
- * and their paths in tsconfig.json and automatically updates tsconfig.json file when initialized and when a LWC
- * TypeScript file is changed.
+ * When using TypeScript for LWCs in the core workspace, the tsconfig.json file's 'paths' attribute needs to be
+ * maintained to ensure that the TypeScript compiler can resolve imported LWC modules. This class serves to maintain
+ * a mapping between LWCs and their paths in tsconfig.json, automatically updating the file when initialized and
+ * whenever a LWC TypeScript file is changed.
  *
- * This includes a map for all TypeScript LWCs on core, the key is a component's full name (namespace/cmpName)
- * and the value is an object that contains info on how this component should be mapped to in tsconfig.json
- * so that TypeScript can find the component on the file system.
+ * This mapping encompasses all TypeScript LWCs in the core workspace. Each component's full name (namespace/cmpName)
+ * serves as the key, with the corresponding value being an object containing information on how the component should be
+ * mapped in tsconfig.json, thereby enabling TypeScript to locate the component within the file system.
  */
 export default class TSConfigPathIndexer {
     readonly coreModulesWithTSConfig: string[];
