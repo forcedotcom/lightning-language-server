@@ -44,7 +44,7 @@ afterEach(() => {
     restoreTSConfigFiles();
 });
 
-describe('ComponentIndexer', () => {
+describe('TSConfigPathIndexer', () => {
     describe('new', () => {
         it('initializes with the root of a core root dir', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/core-like-workspace/coreTS/core');
@@ -95,6 +95,32 @@ describe('ComponentIndexer', () => {
                     compilerOptions: {
                         paths: {
                             'one/app-nav-bar': ['./modules/one/app-nav-bar/app-nav-bar'],
+                        },
+                    },
+                });
+            });
+
+            it('removes paths mapping for deleted module on core', async () => {
+                const oldTSConfig = {
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'force/deleted': './modules/force/deleted/deleted',
+                        },
+                    },
+                };
+                fs.writeJSONSync(tsConfigForce, oldTSConfig, {
+                    spaces: 4,
+                });
+                const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
+                await tsconfigPathIndexer.init();
+                const tsConfigForceObj = readTSConfigFile(tsConfigForce);
+                expect(tsConfigForceObj).toEqual({
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
+                            'force/input-phone': ['./modules/force/input-phone/input-phone'],
                         },
                     },
                 });
