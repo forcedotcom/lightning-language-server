@@ -155,13 +155,14 @@ it('isLWCJavascript()', async () => {
 });
 
 it('isLWCTypeScript()', async () => {
+    // workspace root project is ui-global-components
     const context = new WorkspaceContext(CORE_PROJECT_ROOT);
 
     // lwc .ts
     let document = readAsTextDocument(CORE_PROJECT_ROOT + '/modules/one/app-nav-bar/app-nav-bar.ts');
     expect(await context.isLWCTypeScript(document)).toBeTruthy();
 
-    // lwc .ts outside namespace root
+    // lwc .ts outside workspace root in ui-force-components
     document = readAsTextDocument(CORE_ALL_ROOT + '/ui-force-components/modules/force/input-phone/input-phone.ts');
     expect(await context.isLWCTypeScript(document)).toBeFalsy();
 
