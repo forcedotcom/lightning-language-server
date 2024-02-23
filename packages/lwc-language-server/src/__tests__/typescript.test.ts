@@ -5,6 +5,7 @@ import { readAsTextDocument } from './test-utils';
 import TSConfigPathIndexer from '../typescript/tsconfig-path-indexer';
 import { collectImportsForDocument } from '../typescript/imports';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { file } from 'babel-types';
 
 const { WorkspaceType } = shared;
 const TEST_WORKSPACE_PARENT_DIR = path.resolve('../..');
@@ -33,6 +34,10 @@ function restoreTSConfigFiles(): void {
             spaces: 4,
         });
     }
+}
+
+function createTextDocumentFromString(content: string, uri?: string): TextDocument {
+    return TextDocument.create(uri ? uri : 'mockUri', 'typescript', 0, content);
 }
 
 beforeEach(async () => {
@@ -105,7 +110,8 @@ describe('TSConfigPathIndexer', () => {
                     extends: '../tsconfig.json',
                     compilerOptions: {
                         paths: {
-                            'force/deleted': './modules/force/deleted/deleted',
+                            'force/deleted': ['./modules/force/deleted/deleted'],
+                            'one/deleted': ['../ui-global-components/modules/one/deleted/deleted'],
                         },
                     },
                 };
@@ -121,6 +127,60 @@ describe('TSConfigPathIndexer', () => {
                         paths: {
                             'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
                             'force/input-phone': ['./modules/force/input-phone/input-phone'],
+                        },
+                    },
+                });
+            });
+
+            it('keep existing path mapping for any js cmp', async () => {
+                const oldTSConfig = {
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'force/input-phone-js': ['./modules/force/input-phone-js/input-phone-js'],
+                        },
+                    },
+                };
+                fs.writeJSONSync(tsConfigForce, oldTSConfig, {
+                    spaces: 4,
+                });
+                const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
+                await tsconfigPathIndexer.init();
+                const tsConfigForceObj = readTSConfigFile(tsConfigForce);
+                expect(tsConfigForceObj).toEqual({
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
+                            'force/input-phone': ['./modules/force/input-phone/input-phone'],
+                            'force/input-phone-js': ['./modules/force/input-phone-js/input-phone-js'],
+                        },
+                    },
+                });
+            });
+
+            it('update existing path mapping for cross-namespace cmp', async () => {
+                const oldTSConfig = {
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'one/app-nav-bar': ['../ui-global-components/modules/one/deletedOldPath/deletedOldPath'],
+                        },
+                    },
+                };
+                fs.writeJSONSync(tsConfigForce, oldTSConfig, {
+                    spaces: 4,
+                });
+                const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
+                await tsconfigPathIndexer.init();
+                const tsConfigForceObj = readTSConfigFile(tsConfigForce);
+                expect(tsConfigForceObj).toEqual({
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
+                            'force/input-phone': ['./modules/force/input-phone/input-phone'],
+                            'one/app-nav-bar': ['../ui-global-components/modules/one/app-nav-bar/app-nav-bar'],
                         },
                     },
                 });
@@ -155,13 +215,29 @@ describe('TSConfigPathIndexer', () => {
                     },
                 });
             });
+
+            it('do not update tsconfig for import that is not found', async () => {
+                const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
+                await tsconfigPathIndexer.init();
+                const fileContent = `
+                    import { util } from 'ns/notFound';
+                `;
+                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                await tsconfigPathIndexer.updateTSConfigFileForDocument(createTextDocumentFromString(fileContent, filePath));
+                const tsConfigForceObj = readTSConfigFile(tsConfigForce);
+                expect(tsConfigForceObj).toEqual({
+                    extends: '../tsconfig.json',
+                    compilerOptions: {
+                        paths: {
+                            'clients/context-library-lwc': ['./modules/clients/context-library-lwc/context-library-lwc'],
+                            'force/input-phone': ['./modules/force/input-phone/input-phone'],
+                        },
+                    },
+                });
+            });
         });
     });
 });
-
-function createTextDocumentFromString(content: string): TextDocument {
-    return TextDocument.create('mockUri', 'typescript', 0, content);
-}
 
 describe('imports', () => {
     describe('collectImportsForDocument', () => {

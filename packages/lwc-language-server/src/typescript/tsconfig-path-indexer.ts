@@ -128,7 +128,7 @@ export default class TSConfigPathIndexer {
             }
         }
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
-        await this.updateTSConfigFile(tsconfigFile, mappings, false);
+        await this.updateTSConfigFile(tsconfigFile, mappings);
     }
 
     /**
@@ -155,16 +155,15 @@ export default class TSConfigPathIndexer {
         const tsconfigFile = path.join(projectRoot, 'tsconfig.json');
         const moduleName = path.basename(projectRoot);
         const mappings = this.getTSMappingsForModule(moduleName);
-        await this.updateTSConfigFile(tsconfigFile, mappings, true);
+        await this.updateTSConfigFile(tsconfigFile, mappings);
     }
 
     /**
      * Update tsconfig.json file with updated mapping.
      * @param tsconfigFile target tsconfig.json file path
      * @param mapping updated map that contains path info to update
-     * @param isReIndex true if the deleted existing paths should be removed
      */
-    private async updateTSConfigFile(tsconfigFile: string, mapping: Map<string, string>, isReIndex: boolean): Promise<void> {
+    private async updateTSConfigFile(tsconfigFile: string, mapping: Map<string, string>): Promise<void> {
         if (!fs.pathExistsSync(tsconfigFile)) {
             return; // file does not exist, no-op
         }
@@ -180,11 +179,24 @@ export default class TSConfigPathIndexer {
                 const existingPaths = tsconfig.compilerOptions.paths;
                 const updatedPaths = { ...existingPaths };
                 let updated = false;
-                // remove the existing paths that are not in the updated mapping
-                if (isReIndex) {
-                    const projectRoot = path.join(tsconfigFile, '..');
-                    for (const key in existingPaths) {
-                        if (!formattedMapping.has(key) && this.moduleContainsNS(projectRoot, key.substring(0, key.indexOf('/')))) {
+                const projectRoot = path.join(tsconfigFile, '..');
+                for (const key in existingPaths) {
+                    if (!formattedMapping.has(key)) {
+                        const existingPath = path.join(projectRoot, existingPaths[key][0]);
+                        if (this.isExistingPathMappingValid(existingPath)) {
+                            // existing path mapping still exists
+                            continue;
+                        }
+                        const tsPath = this.pathMapping.get(key)?.tsPath;
+                        if (tsPath) {
+                            // update path mapping when found a new path
+                            const relativeTSPath = this.getRelativeTSPath(tsPath, false);
+                            if (relativeTSPath !== existingPaths[key][0]) {
+                                updated = true;
+                                updatedPaths[key] = [relativeTSPath];
+                            }
+                        } else {
+                            // remove the existing paths that are deleted
                             updated = true;
                             delete updatedPaths[key];
                         }
@@ -214,6 +226,20 @@ export default class TSConfigPathIndexer {
         } catch (error) {
             console.warn(`Error updating core tsconfig. Continuing, but may be missing some config. ${error}`);
         }
+    }
+
+    /**
+     * @param mappedPath An existing mapped path as a file path
+     * @returns true only if this path is still valid
+     */
+    private isExistingPathMappingValid(mappedPath: string): boolean {
+        const exts = ['.ts', '.d.ts', '.js'];
+        for (const ext of exts) {
+            if (fs.pathExistsSync(mappedPath + ext)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
