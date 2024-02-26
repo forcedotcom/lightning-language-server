@@ -5,14 +5,13 @@ import { readAsTextDocument } from './test-utils';
 import TSConfigPathIndexer from '../typescript/tsconfig-path-indexer';
 import { collectImportsForDocument } from '../typescript/imports';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { file } from 'babel-types';
 
 const { WorkspaceType } = shared;
 const TEST_WORKSPACE_PARENT_DIR = path.resolve('../..');
-const CORE_ROOT = path.join(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'core-like-workspace', 'coreTS', 'core');
+const CORE_ROOT = path.resolve(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'core-like-workspace', 'coreTS', 'core');
 
-const tsConfigForce = path.join(CORE_ROOT, 'ui-force-components', 'tsconfig.json');
-const tsConfigGlobal = path.join(CORE_ROOT, 'ui-global-components', 'tsconfig.json');
+const tsConfigForce = path.resolve(CORE_ROOT, 'ui-force-components', 'tsconfig.json');
+const tsConfigGlobal = path.resolve(CORE_ROOT, 'ui-global-components', 'tsconfig.json');
 
 function readTSConfigFile(tsconfigPath: string): object {
     if (!fs.pathExistsSync(tsconfigPath)) {
@@ -55,17 +54,17 @@ describe('TSConfigPathIndexer', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/core-like-workspace/coreTS/core');
             const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
             expect(tsconfigPathIndexer.coreModulesWithTSConfig.length).toEqual(2);
-            expect(tsconfigPathIndexer.coreModulesWithTSConfig[0]).toEqual(path.join(expectedPath, 'ui-force-components'));
-            expect(tsconfigPathIndexer.coreModulesWithTSConfig[1]).toEqual(path.join(expectedPath, 'ui-global-components'));
+            expect(tsconfigPathIndexer.coreModulesWithTSConfig[0]).toEqual(path.resolve(expectedPath, 'ui-force-components'));
+            expect(tsconfigPathIndexer.coreModulesWithTSConfig[1]).toEqual(path.resolve(expectedPath, 'ui-global-components'));
             expect(tsconfigPathIndexer.workspaceType).toEqual(WorkspaceType.CORE_ALL);
             expect(tsconfigPathIndexer.coreRoot).toEqual(expectedPath);
         });
 
         it('initializes with the root of a core project dir', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/core-like-workspace/coreTS/core');
-            const tsconfigPathIndexer = new TSConfigPathIndexer([path.join(CORE_ROOT, 'ui-force-components')]);
+            const tsconfigPathIndexer = new TSConfigPathIndexer([path.resolve(CORE_ROOT, 'ui-force-components')]);
             expect(tsconfigPathIndexer.coreModulesWithTSConfig.length).toEqual(1);
-            expect(tsconfigPathIndexer.coreModulesWithTSConfig[0]).toEqual(path.join(expectedPath, 'ui-force-components'));
+            expect(tsconfigPathIndexer.coreModulesWithTSConfig[0]).toEqual(path.resolve(expectedPath, 'ui-force-components'));
             expect(tsconfigPathIndexer.workspaceType).toEqual(WorkspaceType.CORE_PARTIAL);
             expect(tsconfigPathIndexer.coreRoot).toEqual(expectedPath);
         });
@@ -74,7 +73,7 @@ describe('TSConfigPathIndexer', () => {
     describe('instance methods', () => {
         describe('init', () => {
             it('no-op on sfdx workspace root', async () => {
-                const tsconfigPathIndexer = new TSConfigPathIndexer([path.join(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
+                const tsconfigPathIndexer = new TSConfigPathIndexer([path.resolve(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
                 const spy = jest.spyOn(tsconfigPathIndexer, 'componentEntries', 'get');
                 await tsconfigPathIndexer.init();
                 expect(spy).not.toHaveBeenCalled();
@@ -189,9 +188,9 @@ describe('TSConfigPathIndexer', () => {
 
         describe('updateTSConfigFileForDocument', () => {
             it('no-op on sfdx workspace root', async () => {
-                const tsconfigPathIndexer = new TSConfigPathIndexer([path.join(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
+                const tsconfigPathIndexer = new TSConfigPathIndexer([path.resolve(TEST_WORKSPACE_PARENT_DIR, 'test-workspaces', 'sfdx-workspace')]);
                 await tsconfigPathIndexer.init();
-                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                const filePath = path.resolve(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
                 const spy = jest.spyOn(tsconfigPathIndexer as any, 'addNewPathMapping');
                 await tsconfigPathIndexer.updateTSConfigFileForDocument(readAsTextDocument(filePath));
                 expect(spy).not.toHaveBeenCalled();
@@ -201,7 +200,7 @@ describe('TSConfigPathIndexer', () => {
             it('updates tsconfig for all imports', async () => {
                 const tsconfigPathIndexer = new TSConfigPathIndexer([CORE_ROOT]);
                 await tsconfigPathIndexer.init();
-                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                const filePath = path.resolve(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
                 await tsconfigPathIndexer.updateTSConfigFileForDocument(readAsTextDocument(filePath));
                 const tsConfigForceObj = readTSConfigFile(tsConfigForce);
                 expect(tsConfigForceObj).toEqual({
@@ -222,7 +221,7 @@ describe('TSConfigPathIndexer', () => {
                 const fileContent = `
                     import { util } from 'ns/notFound';
                 `;
-                const filePath = path.join(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
+                const filePath = path.resolve(CORE_ROOT, 'ui-force-components', 'modules', 'force', 'input-phone', 'input-phone.ts');
                 await tsconfigPathIndexer.updateTSConfigFileForDocument(createTextDocumentFromString(fileContent, filePath));
                 const tsConfigForceObj = readTSConfigFile(tsConfigForce);
                 expect(tsConfigForceObj).toEqual({
