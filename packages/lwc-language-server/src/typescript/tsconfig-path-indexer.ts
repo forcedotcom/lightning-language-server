@@ -111,7 +111,8 @@ export default class TSConfigPathIndexer {
         if (!this.isOnCore()) {
             return; // no-op if this is not a Core workspace
         }
-        const filePath = URI.file(document.uri).fsPath;
+        // replace Windows file separator
+        const filePath = path.normalize(URI.file(document.uri).fsPath).replace(/\\/g, '/');
         this.addNewPathMapping(filePath);
         const moduleName = this.getModuleName(filePath);
         const projectRoot = this.getProjectRoot(filePath);
