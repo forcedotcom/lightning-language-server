@@ -281,20 +281,27 @@ it('configureCoreMulti()', async () => {
     const jsconfigPathGlobal = context.workspaceRoots[1] + '/modules/jsconfig.json';
     const codeWorkspacePath = CORE_ALL_ROOT + '/core.code-workspace';
     const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
+    const tsconfigPathForce = context.workspaceRoots[0] + '/tsconfig.json';
 
     // make sure no generated files are there from previous runs
     fs.removeSync(jsconfigPathGlobal);
     fs.removeSync(jsconfigPathForce);
     fs.removeSync(codeWorkspacePath);
     fs.removeSync(launchPath);
+    fs.removeSync(tsconfigPathForce);
+
+    fs.createFileSync(tsconfigPathForce);
 
     // configure and verify typings/jsconfig after configuration:
     await context.configureProject();
 
     // verify newly created jsconfig.json
     verifyJsconfigCore(jsconfigPathGlobal);
-    verifyJsconfigCore(jsconfigPathForce);
+    // verify jsconfig.json is not created when there is a tsconfig.json
+    expect(fs.existsSync(tsconfigPathForce)).not.toExist();
     verifyTypingsCore();
+
+    fs.removeSync(tsconfigPathForce);
 });
 
 it('configureCoreAll()', async () => {

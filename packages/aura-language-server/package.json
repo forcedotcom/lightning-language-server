@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/aura-language-server",
-  "version": "4.7.2",
+  "version": "4.7.4",
   "description": "Language server for Aura components.",
   "main": "lib/aura-indexer/indexer.js",
   "typings": "lib/shared.d.ts",
@@ -27,7 +27,7 @@
     "package": "yarn pack"
   },
   "dependencies": {
-    "@salesforce/lightning-lsp-common": "4.7.2",
+    "@salesforce/lightning-lsp-common": "4.7.4",
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
@@ -50,7 +50,7 @@
     "@types/glob": "^7.1.3",
     "@types/jest": "^29.5.0",
     "@types/mock-fs": "^4.10.0",
-    "@types/node": "^16.0.0",
+    "@types/node": "^18.11.0",
     "@types/shelljs": "^0.8.8",
     "babel-types": "^6.26.0",
     "eslint": "^7.7.0",
