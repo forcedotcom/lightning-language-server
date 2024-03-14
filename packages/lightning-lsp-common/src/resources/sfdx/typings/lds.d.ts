@@ -610,6 +610,81 @@ declare module 'lightning/uiRecordApi' {
     export function getFieldDisplayValue(record: RecordRepresentation, field: FieldId | string): FieldValueRepresentationValue | undefined;
 }
 
+declare module 'lightning/industriesEducationPublicApi' {
+    /**
+     * Representation of the benefit assignment record updated with provider information.
+     * Keys:
+     *    id (string): id
+     */
+    export interface MentoringBenefitAssignment {
+        /** The ID of the benefit associated with the benefit assignment. */
+        benefitId: string;
+        /** The contact ID of the provider associated with the benefit assignment. */
+        providerId: string;
+        /** The ID of the user who created the benefit assignment. */
+        createdById: string;
+        /** The date that the benefit assignment was created. */
+        createdDate: string;
+        /** The last date and time that the benefit assignment is available. */
+        endDateTime: string;
+        /** The ID of the enrollee assoicated with the benefit assignment. */
+        enrolleeId: string;
+        /** The default quantity associated with the benefit assignment. */
+        enrollmentCount: string;
+        /** The amount of the entitlement associated with the benefit assignment. */
+        entitlementAmount: string;
+        /** The ID of the benefit assignment */
+        id: string;
+        /** The ID of the user who updated the benefit assignment. */
+        lastModifiedById: string;
+        /** The date of the most recent update to the benefit assignment. */
+        lastModifiedDate: string;
+        /** The maximum amount of the benefit associated with the benefit assignment. */
+        maximumBenefitAmount: string;
+        /** The minimum amount of the benefit associated with the benefit. */
+        minimumBenefitAmount: string;
+        /** The name of the benefit assignment. */
+        name: string;
+        /** The ID of the parent record associated with the benefit assignment. */
+        parentRecordId: string;
+        /** The priority associated with the benefit assignment. */
+        priority: string;
+        /** The ID of the program enrollment created for the participant to whom you want to assign this benefit. */
+        programEnrollmentId: string;
+        /** The date and time when the benefit assignment is first available. */
+        startDateTime: string;
+        /** The status associated with the benefit assignment. */
+        status: string;
+        /** The status of the task job associated with the benefit assignment. */
+        taskJobStatus: string;
+        /** The status message of the task job associated with the benefit assignment. */
+        taskJobStatusMessage: string;
+        /** The ID of the unit of measure associated with the benefit assignment. */
+        unitOfMeasureId: string;
+    }
+
+    /**
+     * Representation of the output for the benefit assignment request.
+     */
+    export interface MentoringBenefitAssignmentOutputRepresentation {
+        /** Representation of the benefit assignment record updated with provider information. */
+        mentoringBenefitAssignment: MentoringBenefitAssignment;
+    }
+
+    /**
+     * Return the benefit assignment record with updated provider record lookup.
+     * @param benefitAssignmentId The ID of the benefit assignment record.
+     * @param providerId The ID of the provider offering associated with the benefit assignment.
+     */
+    export function postBenefitAssignment({
+        benefitAssignmentId,
+        providerId,
+    }: {
+        benefitAssignmentId: string;
+        providerId: string;
+    }): Promise<MentoringBenefitAssignmentOutputRepresentation>;
+}
+
 declare module 'lightning/industriesSchedulerApi' {
     /**
      * Wire adapter for getting Engagment ChannelTypes.
