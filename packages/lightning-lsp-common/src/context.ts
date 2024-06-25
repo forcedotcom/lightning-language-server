@@ -557,7 +557,9 @@ export class WorkspaceContext {
 
     private async updateForceIgnoreFile(ignoreFile: string): Promise<void> {
         await utils.appendLineIfMissing(ignoreFile, '**/jsconfig.json');
+        await utils.appendLineIfMissing(ignoreFile, '**/tsconfig.json');
         await utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
+        await utils.appendLineIfMissing(ignoreFile, '**/*.ts');
     }
 
     /**
