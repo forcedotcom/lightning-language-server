@@ -349,9 +349,6 @@ it('configureProjectForTs()', async () => {
     // verify tsconfig.sfdx.json
     const baseTsConfigForceAppContent = fs.readJsonSync(baseTsconfigPathForceApp);
     expect(baseTsConfigForceAppContent).toEqual({
-        typeAcquisition: {
-            include: ['jest'],
-        },
         compilerOptions: {
             target: 'ESNext',
             paths: {
