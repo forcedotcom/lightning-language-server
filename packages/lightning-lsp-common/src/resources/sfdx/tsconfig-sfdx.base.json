@@ -1,0 +1,13 @@
+{
+    "typeAcquisition": {
+        "include": [
+            "jest"
+        ]
+    },
+    "compilerOptions": {
+        "target": "ESNext",
+        "paths": {
+            "c/*": []
+        }
+    }
+}

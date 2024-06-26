@@ -80,6 +80,7 @@ export default class Server {
 
     constructor() {
         this.connection.onInitialize(this.onInitialize.bind(this));
+        this.connection.onInitialized(this.onInitialized.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
         this.connection.onHover(this.onHover.bind(this));
@@ -128,6 +129,15 @@ export default class Server {
                 },
             },
         };
+    }
+
+    async onInitialized(): Promise<void> {
+        // The config value comes from salesforcedx-vscode/salesforcedx-vscode-lwc
+        const hasTsEnabled = await this.connection.workspace.getConfiguration('salesforcedx-vscode-lwc.preview.typeScriptSupport');
+        // TODO: add onDidChangeConfiguration handler to detect changes in config value
+        if (hasTsEnabled) {
+            await this.context.configureProjectForTs();
+        }
     }
 
     async onCompletion(params: CompletionParams): Promise<CompletionList> {
