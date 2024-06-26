@@ -308,6 +308,14 @@ export class WorkspaceContext {
     }
 
     /**
+     * Configures LWC project to support TypeScript
+     */
+    public async configureProjectForTs(): Promise<void> {
+        // TODO: This should be moved into configureProject after dev preview
+        await this.writeTsconfigJson();
+    }
+
+    /**
      * Acquires list of absolute modules directories, optimizing for workspace type
      * @returns Promise
      */
@@ -444,6 +452,29 @@ export class WorkspaceContext {
                         const jsConfigPath = path.join(modulesDir, 'jsconfig.json');
                         this.updateConfigFile(jsConfigPath, jsConfigContent); // no workspace reference yet, that comes in update config file
                     }
+                }
+                break;
+        }
+    }
+
+    private async writeTsconfigJson(): Promise<void> {
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                // Write tsconfig.sfdx.json first
+                const baseTsConfigPath = path.join(this.workspaceRoots[0], '.sfdx', 'tsconfig.sfdx.json');
+                const baseTsConfig = await fs.readFile(utils.getSfdxResource('tsconfig-sfdx.base.json'), 'utf8');
+                this.updateConfigFile(baseTsConfigPath, baseTsConfig);
+                // Write to the tsconfig.json in each module subdirectory
+                const tsConfigTemplate = await fs.readFile(utils.getSfdxResource('tsconfig-sfdx.json'), 'utf8');
+                const forceignore = path.join(this.workspaceRoots[0], '.forceignore');
+                // TODO: We should only be looking through modules that have TS files
+                const modulesDirs = await this.getModulesDirs();
+                for (const modulesDir of modulesDirs) {
+                    const tsConfigPath = path.join(modulesDir, 'tsconfig.json');
+                    const relativeWorkspaceRoot = utils.relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
+                    const tsConfigContent = this.processTemplate(tsConfigTemplate, { project_root: relativeWorkspaceRoot });
+                    this.updateConfigFile(tsConfigPath, tsConfigContent);
+                    await this.updateForceIgnoreFile(forceignore);
                 }
                 break;
         }

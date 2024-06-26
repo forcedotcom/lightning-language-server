@@ -334,3 +334,44 @@ it('configureCoreAll()', async () => {
     // const launchContent = fs.readFileSync(launchPath, 'utf8');
     // expect(launchContent).toContain('"name": "SFDC (attach)"');
 });
+
+it('configureProjectForTs()', async () => {
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+    const baseTsconfigPathForceApp = 'test-workspaces/sfdx-workspace/.sfdx/tsconfig.sfdx.json';
+    const tsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/tsconfig.json';
+    const tsconfigPathUtils = UTILS_ROOT + '/lwc/tsconfig.json';
+    const tsconfigPathRegisteredEmpty = REGISTERED_EMPTY_FOLDER_ROOT + '/lwc/tsconfig.json';
+    const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+
+    // configure and verify typings/jsconfig after configuration:
+    await context.configureProjectForTs();
+
+    // verify tsconfig.sfdx.json
+    const baseTsConfigForceAppContent = fs.readJsonSync(baseTsconfigPathForceApp);
+    expect(baseTsConfigForceAppContent).toEqual({
+        typeAcquisition: {
+            include: ['jest'],
+        },
+        compilerOptions: {
+            target: 'ESNext',
+            paths: {
+                'c/*': [],
+            },
+        },
+    });
+
+    //verify newly create tsconfig.json
+    const tsconfigForceAppContent = fs.readJsonSync(tsconfigPathForceApp);
+    expect(tsconfigForceAppContent).toEqual({
+        extends: '../../../../.sfdx/tsconfig.sfdx.json',
+        include: ['**/*.ts', '../../../../.sfdx/typings/lwc/**/*.d.ts'],
+        exclude: ['**/__tests__/**'],
+    });
+
+    // clean up artifacts
+    fs.removeSync(baseTsconfigPathForceApp);
+    fs.removeSync(tsconfigPathForceApp);
+    fs.removeSync(tsconfigPathUtils);
+    fs.removeSync(tsconfigPathRegisteredEmpty);
+    fs.removeSync(forceignorePath);
+});
