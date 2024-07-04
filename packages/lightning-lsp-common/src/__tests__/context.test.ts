@@ -199,7 +199,9 @@ it('configureSfdxProject()', async () => {
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
     expect(forceignoreContent).toContain('**/jsconfig.json');
+    expect(forceignoreContent).toContain('**/tsconfig.json');
     expect(forceignoreContent).toContain('**/.eslintrc.json');
+    expect(forceignoreContent).toContain('**/*.ts');
 
     // typings
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
