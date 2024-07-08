@@ -12,26 +12,30 @@ import {
 } from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
+import { sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
-const filename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.html');
+const SFDX_WORKSPACE_ROOT = '../../test-workspaces/sfdx-workspace';
+const filename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/todo/todo.html');
 const uri = URI.file(filename).toString();
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
-const jsFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/todo/todo.js');
+const jsFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/todo/todo.js');
 const jsUri = URI.file(jsFilename).toString();
 const jsDocument: TextDocument = TextDocument.create(uri, 'javascript', 0, fsExtra.readFileSync(jsFilename).toString());
 
-const auraFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/aura/todoApp/todoApp.app');
+const auraFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/aura/todoApp/todoApp.app');
 const auraUri = URI.file(auraFilename).toString();
 const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
 
-const hoverFilename = path.resolve('../../test-workspaces/sfdx-workspace/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.html');
+const hoverFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.html');
 const hoverUri = URI.file(hoverFilename).toString();
 const hoverDocument: TextDocument = TextDocument.create(hoverFilename, 'html', 0, fsExtra.readFileSync(hoverFilename).toString());
 
 const server: Server = new Server();
+
+let mockTypeScriptSupportConfig = false;
 
 jest.mock('vscode-languageserver', () => {
     const actual = jest.requireActual('vscode-languageserver');
@@ -40,11 +44,15 @@ jest.mock('vscode-languageserver', () => {
         createConnection: jest.fn().mockImplementation(() => {
             return {
                 onInitialize: (): boolean => true,
+                onInitialized: (): boolean => true,
                 onCompletion: (): boolean => true,
                 onCompletionResolve: (): boolean => true,
                 onHover: (): boolean => true,
                 onShutdown: (): boolean => true,
                 onDefinition: (): boolean => true,
+                workspace: {
+                    getConfiguration: (): boolean => mockTypeScriptSupportConfig,
+                },
             };
         }),
         TextDocuments: jest.fn().mockImplementation(() => {
@@ -81,8 +89,8 @@ describe('handlers', () => {
         capabilities: {},
         workspaceFolders: [
             {
-                uri: URI.file(path.resolve('../../test-workspaces/sfdx-workspace/')).toString(),
-                name: path.resolve('../../test-workspaces/sfdx-workspace/'),
+                uri: URI.file(path.resolve(SFDX_WORKSPACE_ROOT)).toString(),
+                name: path.resolve(SFDX_WORKSPACE_ROOT),
             },
         ],
     };
@@ -322,6 +330,36 @@ describe('handlers', () => {
             expect(location.uri).toContain('todo/todo.html');
             expect(location.range.start.line).toEqual(15);
             expect(location.range.start.character).toEqual(60);
+        });
+    });
+
+    describe('onInitialized()', () => {
+        it('skip tsconfig initialization when salesforcedx-vscode-lwc.preview.typeScriptSupport = false', async () => {
+            await server.onInitialize(initializeParams);
+            await server.onInitialized();
+
+            const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
+            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+            expect(fsExtra.existsSync(baseTsconfigPath)).toBe(false);
+            expect(tsconfigPaths.length).toBe(0);
+        });
+
+        it('skip tsconfig initialization when salesforcedx-vscode-lwc.preview.typeScriptSupport = true', async () => {
+            // Enable feature flag
+            mockTypeScriptSupportConfig = true;
+            await server.onInitialize(initializeParams);
+            await server.onInitialized();
+
+            const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
+            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+            expect(fsExtra.existsSync(baseTsconfigPath)).toBe(true);
+            // There are currently 3 lwc subdirectories under SFDX_WORKSPACE_ROOT
+            expect(tsconfigPaths.length).toBe(3);
+
+            // Clean up after test run
+            fsExtra.removeSync(baseTsconfigPath);
+            await Promise.all(tsconfigPaths.map(tsconfig => fsExtra.remove(tsconfig)));
+            mockTypeScriptSupportConfig = false;
         });
     });
 });
