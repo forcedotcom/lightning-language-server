@@ -404,7 +404,7 @@ describe('handlers', () => {
         });
 
         ['.js', '.ts'].forEach(ext => {
-            it(`updates tsconfig.sfdx.json path mapping when ${ext} file added`, async () => {
+            it(`updates tsconfig.sfdx.json path mapping when ${ext} file created`, async () => {
                 // Enable feature flag
                 mockTypeScriptSupportConfig = true;
                 await server.onInitialize(initializeParams);
@@ -433,7 +433,7 @@ describe('handlers', () => {
                 expect(pathMapping.length).toEqual(12);
             });
 
-            it(`removes tsconfig.sfdx.json path mapping when ${ext} files removed`, async () => {
+            it(`removes tsconfig.sfdx.json path mapping when ${ext} files deleted`, async () => {
                 // Create files before initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
                 fsExtra.createFileSync(watchedFilePath);
