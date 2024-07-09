@@ -10,6 +10,9 @@ import {
     InitializeParams,
     TextDocumentPositionParams,
     CompletionParams,
+    DidChangeWatchedFilesParams,
+    ShowMessageNotification,
+    MessageType,
 } from 'vscode-languageserver';
 
 import {
@@ -27,16 +30,19 @@ import { compileDocument as javascriptCompileDocument } from './javascript/compi
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
 import { Metadata } from './decorators';
-import { WorkspaceContext, interceptConsoleLogger, utils } from '@salesforce/lightning-lsp-common';
+import { WorkspaceContext, interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
 
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
 import { URI } from 'vscode-uri';
+import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
 
 export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
+
+const { WorkspaceType } = shared;
 
 export enum Token {
     Tag = 'tag',
@@ -86,6 +92,8 @@ export default class Server {
         this.connection.onHover(this.onHover.bind(this));
         this.connection.onShutdown(this.onShutdown.bind(this));
         this.connection.onDefinition(this.onDefinition.bind(this));
+        this.connection.onInitialized(this.onInitialized.bind(this));
+        this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
@@ -132,12 +140,15 @@ export default class Server {
     }
 
     async onInitialized(): Promise<void> {
-        // The config value comes from salesforcedx-vscode/salesforcedx-vscode-lwc
-        const hasTsEnabled = await this.connection.workspace.getConfiguration('salesforcedx-vscode-lwc.preview.typeScriptSupport');
-        // TODO: add onDidChangeConfiguration handler to detect changes in config value
+        const hasTsEnabled = await this.isTsSupportEnabled();
         if (hasTsEnabled) {
             await this.context.configureProjectForTs();
+            this.componentIndexer.updateSfdxTsConfigPath();
         }
+    }
+
+    private async isTsSupportEnabled(): Promise<any> {
+        return this.connection.workspace.getConfiguration(TYPESCRIPT_SUPPORT_SETTING);
     }
 
     async onCompletion(params: CompletionParams): Promise<CompletionList> {
@@ -261,6 +272,28 @@ export default class Server {
                 if (tag) {
                     tag.updateMetadata(metadata);
                 }
+            }
+        }
+    }
+
+    // TODO: Once the LWC custom module resolution plugin has been developed in the language server
+    // this can be removed.
+    async onDidChangeWatchedFiles(changeEvent: DidChangeWatchedFilesParams): Promise<void> {
+        if (this.context.type === WorkspaceType.SFDX) {
+            try {
+                const hasTsEnabled = await this.isTsSupportEnabled();
+                if (hasTsEnabled) {
+                    const { changes } = changeEvent;
+                    const shouldUpdateSfdxTsConfigPathMapping = await utils.includesLwcWatchedComponent(this.context, changes);
+                    if (shouldUpdateSfdxTsConfigPathMapping) {
+                        this.componentIndexer.updateSfdxTsConfigPath();
+                    }
+                }
+            } catch (e) {
+                this.connection.sendNotification(ShowMessageNotification.type, {
+                    type: MessageType.Error,
+                    message: `Error updating tsconfig.sfdx.json path mapping: ${e.message}`,
+                });
             }
         }
     }

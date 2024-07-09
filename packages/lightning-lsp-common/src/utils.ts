@@ -1,10 +1,10 @@
 import * as fs from 'fs-extra';
-import { basename, extname, join, relative, resolve } from 'path';
+import { basename, extname, join, parse, relative, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { WorkspaceContext } from './context';
-import { WorkspaceType } from './shared';
+import { WorkspaceType, isLWC } from './shared';
 import { promisify } from 'util';
 import { Glob } from 'glob';
 import * as jsonc from 'jsonc-parser';
@@ -69,6 +69,23 @@ export async function includesDeletedAuraWatchedDirectory(context: WorkspaceCont
     for (const event of changes) {
         if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && (await isAuraWatchedDirectory(context, event.uri))) {
             return true;
+        }
+    }
+    return false;
+}
+
+export async function includesLwcWatchedComponent(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+    for (const event of changes) {
+        if (event.type !== FileChangeType.Changed) {
+            const insideLwcWatchedDirectory = await isLWCWatchedDirectory(context, event.uri);
+            if (insideLwcWatchedDirectory) {
+                const file = toResolvedPath(event.uri);
+                const { dir, name, ext } = parse(file);
+                // Only update path mapping for newly created lwc modules
+                if (/.*(.ts|.js)$/.test(ext) && dir.endsWith(name)) {
+                    return true;
+                }
+            }
         }
     }
     return false;
