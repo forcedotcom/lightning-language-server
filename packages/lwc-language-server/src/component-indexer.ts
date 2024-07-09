@@ -1,6 +1,6 @@
 import Tag from './tag';
 import * as path from 'path';
-import { shared } from '@salesforce/lightning-lsp-common';
+import { shared, utils } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fsExtra from 'fs-extra';
@@ -120,6 +120,43 @@ export default class ComponentIndexer extends BaseIndexer {
         ensureDirectoryExists(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
         const indexJsonString = JSON.stringify(this.customData);
         fsExtra.writeFileSync(indexPath, indexJsonString);
+    }
+
+    // This is a temporary solution to enable automated LWC module resolution for TypeScript modules.
+    // It is intended to update the path mapping in the .sfdx/tsconfig.sfdx.json file.
+    // TODO: Once the LWC custom module resolution plugin has been developed in the language server
+    // this can be removed.
+    updateSfdxTsConfigPath(): void {
+        const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
+        if (fs.existsSync(sfdxTsConfigPath)) {
+            try {
+                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                // The assumption here is that sfdxTsConfig will not be modified by the user as
+                // it is located in the .sfdx directory.
+                sfdxTsConfig.compilerOptions.paths['c/*'] = this.tsConfigPathMappingFiles;
+                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    get tsConfigPathMappingFiles(): string[] {
+        let files: string[] = [];
+        if (this.workspaceType === WorkspaceType.SFDX) {
+            const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
+            const filePaths = sync(sfdxSource, { stats: true });
+            const filePathSet = new Set<string>();
+            for (const filePath of filePaths) {
+                const { dir, name } = path.parse(filePath.path);
+                if (dir.endsWith(name)) {
+                    // Dedupe file path mapping in case of presence of both js and ts files
+                    filePathSet.add(path.join(path.dirname(dir), '*', name));
+                }
+            }
+            files = [...filePathSet];
+        }
+        return files;
     }
 
     get unIndexedFiles(): Entry[] {
