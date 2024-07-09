@@ -4,7 +4,7 @@ import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { WorkspaceContext } from './context';
-import { WorkspaceType, isLWC } from './shared';
+import { WorkspaceType } from './shared';
 import { promisify } from 'util';
 import { Glob } from 'glob';
 import * as jsonc from 'jsonc-parser';
