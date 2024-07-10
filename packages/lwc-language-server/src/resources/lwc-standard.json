@@ -1042,6 +1042,159 @@
     ],
     "description": "Displays a phone number as a hyperlink with the tel: URL scheme."
   },
+  "lightning-record-picker": {
+    "type": "module",
+    "namespace": "lightning",
+    "attributes": [
+      {
+        "name": "disabled",
+        "type": "BOOLEAN",
+        "description": "If present, the component is disabled and you can't interact with it.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "display-info",
+        "type": "",
+        "description": "The display configuration used to customize the way retrieved records are presented.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "field-level-help",
+        "type": "STRING",
+        "description": "Help text detailing the purpose and function of the record picker, displayed on hover for desktop and on click for mobile",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "filter",
+        "type": "",
+        "description": "The filter applied to the retrieved records.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "STRING",
+        "description": "The text label for the component.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": true
+      },
+      {
+        "name": "matching-info",
+        "type": "",
+        "description": "The matching configuration to customize the fields used to match the search results to the search term entered by the user.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "message-when-bad-input",
+        "type": "STRING",
+        "description": "The error message displayed when the user enters a search term in the input but doesn't select an option.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "object-api-name",
+        "type": "STRING",
+        "description": "The API name of the object for the retrieved records.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": true
+      },
+      {
+        "name": "placeholder",
+        "type": "STRING",
+        "description": "The text displayed when the input is empty to prompt the user to enter a search term.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "required",
+        "type": "BOOLEAN",
+        "description": "If present, specifies that a user must select a record. If no record is selected, the record picker is in an invalid state.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "STRING",
+        "description": "The ID of the record that is selected in the record picker.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "STRING",
+        "description": "The variant changes the appearance of the component. The component displays the label above the combobox by default. Specify variant=\"label-hidden\" to hide the label but make it available to assistive technology. The only variant is label-hidden.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      }
+    ],
+    "methods": [
+      {
+        "name": "blur",
+        "type": "",
+        "description": "Remove the focus of the component.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "checkValidity",
+        "type": "",
+        "description": "Check if the component is in a valid state.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "clearSelection",
+        "type": "",
+        "description": "Clears the selected record.\nThis method does not clear the search term or refresh the validity message.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "focus",
+        "type": "",
+        "description": "Set the focus of the component.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "reportValidity",
+        "type": "",
+        "description": "Check if the component is in a valid state and refresh the validity message.\nIf the component is valid, it clears the validity error message.\nIf the component is invalid, it displays the validity error message.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      },
+      {
+        "name": "setCustomValidity",
+        "type": "",
+        "description": "Set a custom validity error message.",
+        "access": "global",
+        "parent": "lightning-record-picker",
+        "required": false
+      }
+    ],
+    "description": "A component that provides an input search field, that can search for Salesforce records."
+  },
   "lightningsnapin-base-prechat": {
     "type": "module",
     "namespace": "lightningsnapin",
