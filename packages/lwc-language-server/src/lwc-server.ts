@@ -13,6 +13,7 @@ import {
     DidChangeWatchedFilesParams,
     ShowMessageNotification,
     MessageType,
+    FileChangeType,
 } from 'vscode-languageserver';
 
 import {
@@ -26,6 +27,8 @@ import {
     CompletionItemKind,
 } from 'vscode-html-languageservice';
 
+import { basename, dirname, parse } from 'path';
+
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
@@ -38,6 +41,7 @@ import templateLinter from './template/linter';
 import Tag from './tag';
 import { URI } from 'vscode-uri';
 import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
+import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
 
 export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
@@ -284,9 +288,36 @@ export default class Server {
                 const hasTsEnabled = await this.isTsSupportEnabled();
                 if (hasTsEnabled) {
                     const { changes } = changeEvent;
-                    const shouldUpdateSfdxTsConfigPathMapping = await utils.includesLwcWatchedComponent(this.context, changes);
-                    if (shouldUpdateSfdxTsConfigPathMapping) {
+                    if (utils.isLWCRootDirectoryCreated(this.context, changes)) {
+                        // LWC directory created
+                        this.context.updateNamespaceRootTypeCache();
                         this.componentIndexer.updateSfdxTsConfigPath();
+                    } else {
+                        const hasDeleteEvent = await utils.containsDeletedLwcWatchedDirectory(this.context, changes);
+                        if (hasDeleteEvent) {
+                            // We need to scan the file system for deletion events as the change event does not include
+                            // information about the files that were deleted.
+                            this.componentIndexer.updateSfdxTsConfigPath();
+                        } else {
+                            const filePaths = [];
+                            for (const event of changes) {
+                                const insideLwcWatchedDirectory = await isLWCWatchedDirectory(this.context, event.uri);
+                                if (event.type === FileChangeType.Created && insideLwcWatchedDirectory) {
+                                    // File creation
+                                    const filePath = utils.toResolvedPath(event.uri);
+                                    const { dir, name: fileName, ext } = parse(filePath);
+                                    const folderName = basename(dir);
+                                    const parentFolder = basename(dirname(dir));
+                                    // Only update path mapping for newly created lwc modules
+                                    if (/.*(.ts|.js)$/.test(ext) && folderName === fileName && parentFolder === 'lwc') {
+                                        filePaths.push(filePath);
+                                    }
+                                }
+                            }
+                            if (filePaths.length) {
+                                this.componentIndexer.insertSfdxTsConfigPath(filePaths);
+                            }
+                        }
                     }
                 }
             } catch (e) {

@@ -18,6 +18,10 @@ type ComponentIndexerAttributes = {
     workspaceRoot: string;
 };
 
+type TsConfigPaths = {
+    [key: string]: string[];
+};
+
 export enum DelimiterType {
     Aura = ':',
     LWC = '-',
@@ -122,6 +126,28 @@ export default class ComponentIndexer extends BaseIndexer {
         fsExtra.writeFileSync(indexPath, indexJsonString);
     }
 
+    insertSfdxTsConfigPath(filePaths: string[]): void {
+        const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
+        if (fs.existsSync(sfdxTsConfigPath)) {
+            try {
+                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                for (const filePath of filePaths) {
+                    const { dir, name: fileName } = path.parse(filePath);
+                    const componentName = `c/${fileName}`;
+                    const componentFilePath = path.join(dir, fileName);
+                    const tsConfigFilePaths: string[] = (sfdxTsConfig.compilerOptions.paths[componentName] ??= []);
+                    const hasExistingPath = tsConfigFilePaths.some((existingPath: string) => existingPath === componentFilePath);
+                    if (!hasExistingPath) {
+                        tsConfigFilePaths.push(componentFilePath);
+                    }
+                }
+                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
     // This is a temporary solution to enable automated LWC module resolution for TypeScript modules.
     // It is intended to update the path mapping in the .sfdx/tsconfig.sfdx.json file.
     // TODO: Once the LWC custom module resolution plugin has been developed in the language server
@@ -133,7 +159,7 @@ export default class ComponentIndexer extends BaseIndexer {
                 const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
                 // The assumption here is that sfdxTsConfig will not be modified by the user as
                 // it is located in the .sfdx directory.
-                sfdxTsConfig.compilerOptions.paths['c/*'] = this.tsConfigPathMappingFiles;
+                sfdxTsConfig.compilerOptions.paths = this.tsConfigPathMapping;
                 utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
             } catch (err) {
                 console.error(err);
@@ -141,20 +167,24 @@ export default class ComponentIndexer extends BaseIndexer {
         }
     }
 
-    get tsConfigPathMappingFiles(): string[] {
-        let files: string[] = [];
+    get tsConfigPathMapping(): TsConfigPaths {
+        const files: TsConfigPaths = {};
         if (this.workspaceType === WorkspaceType.SFDX) {
             const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
             const filePaths = sync(sfdxSource, { stats: true });
-            const filePathSet = new Set<string>();
             for (const filePath of filePaths) {
-                const { dir, name } = path.parse(filePath.path);
-                if (dir.endsWith(name)) {
-                    // Dedupe file path mapping in case of presence of both js and ts files
-                    filePathSet.add(path.join(path.dirname(dir), '*', name));
+                const { dir, name: fileName } = path.parse(filePath.path);
+                const folderName = path.basename(dir);
+                if (folderName === fileName) {
+                    const componentName = `c/${fileName}`;
+                    const componentFilePath = path.join(dir, fileName);
+                    const tsConfigFilePaths = (files[componentName] ??= []);
+                    const hasExistingPath = tsConfigFilePaths.some((existingPath: string) => existingPath === componentFilePath);
+                    if (!hasExistingPath) {
+                        tsConfigFilePaths.push(componentFilePath);
+                    }
                 }
             }
-            files = [...filePathSet];
         }
         return files;
     }

@@ -658,4 +658,8 @@ export class WorkspaceContext {
         }
         return roots;
     }
+
+    public async updateNamespaceRootTypeCache(): Promise<void> {
+        this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
+    }
 }

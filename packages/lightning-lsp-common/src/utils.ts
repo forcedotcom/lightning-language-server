@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import { basename, extname, join, parse, relative, resolve } from 'path';
+import { basename, extname, join, parse, relative, resolve, dirname } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
@@ -74,17 +74,22 @@ export async function includesDeletedAuraWatchedDirectory(context: WorkspaceCont
     return false;
 }
 
-export async function includesLwcWatchedComponent(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+export async function containsDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
     for (const event of changes) {
-        if (event.type !== FileChangeType.Changed) {
-            const insideLwcWatchedDirectory = await isLWCWatchedDirectory(context, event.uri);
-            if (insideLwcWatchedDirectory) {
-                const file = toResolvedPath(event.uri);
-                const { dir, name, ext } = parse(file);
-                // Only update path mapping for newly created lwc modules
-                if (/.*(.ts|.js)$/.test(ext) && dir.endsWith(name)) {
-                    return true;
-                }
+        const insideLwcWatchedDirectory = await isLWCWatchedDirectory(context, event.uri);
+        if (event.type === FileChangeType.Deleted && insideLwcWatchedDirectory) {
+            const { dir, name, ext } = parse(event.uri);
+            const folder = basename(dir);
+            const parentFolder= basename(dirname(dir));
+            if (
+                // LWC component
+                (/.*(.ts|.js)$/.test(ext) && folder === name && parentFolder === 'lwc') || 
+                // Folder deletion, subdirectory of lwc or lwc directory itself
+                // When there is no extension the name is the folder name and 
+                // folder becomes the parent folder
+                // ex: /path/to/some/dir, name => dir, folder => some
+                (!ext && (folder === 'lwc' || name === 'lwc'))) {
+                return true
             }
         }
     }
