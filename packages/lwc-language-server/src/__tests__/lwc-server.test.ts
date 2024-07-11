@@ -376,7 +376,7 @@ describe('handlers', () => {
             await server.onInitialized();
 
             const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
-            const pathMapping = sfdxTsConfig.compilerOptions.paths['c/*'];
+            const pathMapping = Object.keys(sfdxTsConfig.compilerOptions.paths);
             expect(pathMapping.length).toEqual(11);
         });
     });
@@ -385,9 +385,9 @@ describe('handlers', () => {
         const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
         const watchedFileDir = SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/newlyAddedFile';
 
-        const getPathMapping = (): string[] => {
+        const getPathMappingKeys = (): string[] => {
             const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
-            return sfdxTsConfig.compilerOptions.paths['c/*'];
+            return Object.keys(sfdxTsConfig.compilerOptions.paths);
         };
 
         beforeEach(() => {
@@ -410,12 +410,12 @@ describe('handlers', () => {
                 await server.onInitialize(initializeParams);
                 await server.onInitialized();
 
-                const initializedSfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
-                const initializedPathMapping = initializedSfdxTsConfig.compilerOptions.paths['c/*'];
+                const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(11);
 
                 // Create files after initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
+                console.log(watchedFilePath);
                 fsExtra.createFileSync(watchedFilePath);
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
@@ -428,7 +428,7 @@ describe('handlers', () => {
                 };
 
                 await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
-                const pathMapping = getPathMapping();
+                const pathMapping = getPathMappingKeys();
                 // Path mapping updated
                 expect(pathMapping.length).toEqual(12);
             });
@@ -441,7 +441,7 @@ describe('handlers', () => {
                 await server.onInitialize(initializeParams);
                 await server.onInitialized();
 
-                const initializedPathMapping = getPathMapping();
+                const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
                 fsExtra.removeSync(watchedFilePath);
@@ -456,7 +456,7 @@ describe('handlers', () => {
                 };
 
                 await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
-                const updatedPathMapping = getPathMapping();
+                const updatedPathMapping = getPathMappingKeys();
                 expect(updatedPathMapping.length).toEqual(11);
             });
 
@@ -468,7 +468,7 @@ describe('handlers', () => {
                 await server.onInitialize(initializeParams);
                 await server.onInitialized();
 
-                const initializedPathMapping = getPathMapping();
+                const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
                 fsExtra.removeSync(watchedFilePath);
@@ -483,8 +483,32 @@ describe('handlers', () => {
                 };
 
                 await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
-                const updatedPathMapping = getPathMapping();
+                const updatedPathMapping = getPathMappingKeys();
                 expect(updatedPathMapping.length).toEqual(12);
+            });
+
+            it(`doesn't update path mapping when parent directory is not lwc`, async () => {
+                await server.onInitialize(initializeParams);
+                await server.onInitialized();
+
+                const initializedPathMapping = getPathMappingKeys();
+                expect(initializedPathMapping.length).toEqual(11);
+
+                const watchedFilePath = path.resolve(watchedFileDir, '__tests__', 'newlyAddedFile', `newlyAddedFile${ext}`);
+                fsExtra.createFileSync(watchedFilePath);
+
+                const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                    changes: [
+                        {
+                            uri: watchedFilePath,
+                            type: FileChangeType.Created,
+                        },
+                    ],
+                };
+
+                await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                const updatedPathMapping = getPathMappingKeys();
+                expect(updatedPathMapping.length).toEqual(11);
             });
         });
 
@@ -499,7 +523,7 @@ describe('handlers', () => {
                     await server.onInitialize(initializeParams);
                     await server.onInitialized();
 
-                    const initializedPathMapping = getPathMapping();
+                    const initializedPathMapping = getPathMappingKeys();
                     expect(initializedPathMapping.length).toEqual(12);
 
                     fsExtra.removeSync(nonJsOrTsFilePath);
@@ -514,7 +538,7 @@ describe('handlers', () => {
                     };
 
                     await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
-                    const updatedPathMapping = getPathMapping();
+                    const updatedPathMapping = getPathMappingKeys();
                     expect(updatedPathMapping.length).toEqual(12);
                 });
             });
