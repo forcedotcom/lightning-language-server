@@ -404,6 +404,60 @@
       ]
     },
     {
+      "name": "lightning-record-picker",
+      "description": "A component that provides an input search field, that can search for Salesforce records.\n[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/lightning-record-picker)\n### Attributes\n* **disabled**: *BOOLEAN* If present, the component is disabled and you can't interact with it.\n* **display-info**\n* **field-level-help**: *STRING* Help text detailing the purpose and function of the record picker, displayed on hover for desktop and on click for mobile\n* **filter**\n* **label**: *STRING* The text label for the component.\n* **matching-info**\n* **message-when-bad-input**: *STRING* The error message displayed when the user enters a search term in the input but doesn't select an option.\n* **object-api-name**: *STRING* The API name of the object for the retrieved records.\n* **placeholder**: *STRING* The text displayed when the input is empty to prompt the user to enter a search term.\n* **required**: *BOOLEAN* If present, specifies that a user must select a record. If no record is selected, the record picker is in an invalid state.\n* **value**: *STRING* The ID of the record that is selected in the record picker.\n* **variant**: *STRING* The variant changes the appearance of the component. The component displays the label above the combobox by default. Specify variant=\"label-hidden\" to hide the label but make it available to assistive technology. The only variant is label-hidden.\n",
+      "attributes": [
+        {
+          "name": "disabled",
+          "description": "If present, the component is disabled and you can't interact with it."
+        },
+        {
+          "name": "display-info",
+          "description": "The display configuration used to customize the way retrieved records are presented."
+        },
+        {
+          "name": "field-level-help",
+          "description": "Help text detailing the purpose and function of the record picker, displayed on hover for desktop and on click for mobile"
+        },
+        {
+          "name": "filter",
+          "description": "The filter applied to the retrieved records."
+        },
+        {
+          "name": "label",
+          "description": "The text label for the component."
+        },
+        {
+          "name": "matching-info",
+          "description": "The matching configuration to customize the fields used to match the search results to the search term entered by the user."
+        },
+        {
+          "name": "message-when-bad-input",
+          "description": "The error message displayed when the user enters a search term in the input but doesn't select an option."
+        },
+        {
+          "name": "object-api-name",
+          "description": "The API name of the object for the retrieved records."
+        },
+        {
+          "name": "placeholder",
+          "description": "The text displayed when the input is empty to prompt the user to enter a search term."
+        },
+        {
+          "name": "required",
+          "description": "If present, specifies that a user must select a record. If no record is selected, the record picker is in an invalid state."
+        },
+        {
+          "name": "value",
+          "description": "The ID of the record that is selected in the record picker."
+        },
+        {
+          "name": "variant",
+          "description": "The variant changes the appearance of the component. The component displays the label above the combobox by default. Specify variant=\"label-hidden\" to hide the label but make it available to assistive technology. The only variant is label-hidden."
+        }
+      ]
+    },
+    {
       "name": "lightningsnapin-base-prechat",
       "description": "null\n[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/lightningsnapin-base-prechat)\n### Attributes\n",
       "attributes": []
