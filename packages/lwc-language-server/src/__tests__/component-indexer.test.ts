@@ -154,7 +154,7 @@ describe('ComponentIndexer', () => {
             });
 
             describe('updateSfdxTsConfigPath', () => {
-                it('updates updates tsconfig.sfdx.json path mapping', async () => {
+                it('updates tsconfig.sfdx.json path mapping', async () => {
                     const tsconfigTemplate = {
                         compilerOptions: {
                             target: 'ESNext',
