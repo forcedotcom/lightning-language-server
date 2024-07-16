@@ -1,6 +1,6 @@
 import Tag from './tag';
 import * as path from 'path';
-import { shared } from '@salesforce/lightning-lsp-common';
+import { shared, utils } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fsExtra from 'fs-extra';
@@ -16,6 +16,10 @@ const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<de
 
 type ComponentIndexerAttributes = {
     workspaceRoot: string;
+};
+
+type TsConfigPaths = {
+    [key: string]: string[];
 };
 
 export enum DelimiterType {
@@ -120,6 +124,69 @@ export default class ComponentIndexer extends BaseIndexer {
         ensureDirectoryExists(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
         const indexJsonString = JSON.stringify(this.customData);
         fsExtra.writeFileSync(indexPath, indexJsonString);
+    }
+
+    insertSfdxTsConfigPath(filePaths: string[]): void {
+        const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
+        if (fs.existsSync(sfdxTsConfigPath)) {
+            try {
+                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                for (const filePath of filePaths) {
+                    const { dir, name: fileName } = path.parse(filePath);
+                    const componentName = `c/${fileName}`;
+                    const componentFilePath = path.join(dir, fileName);
+                    const tsConfigFilePaths: string[] = (sfdxTsConfig.compilerOptions.paths[componentName] ??= []);
+                    const hasExistingPath = tsConfigFilePaths.some((existingPath: string) => existingPath === componentFilePath);
+                    if (!hasExistingPath) {
+                        tsConfigFilePaths.push(componentFilePath);
+                    }
+                }
+                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    // This is a temporary solution to enable automated LWC module resolution for TypeScript modules.
+    // It is intended to update the path mapping in the .sfdx/tsconfig.sfdx.json file.
+    // TODO: Once the LWC custom module resolution plugin has been developed in the language server
+    // this can be removed.
+    updateSfdxTsConfigPath(): void {
+        const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
+        if (fs.existsSync(sfdxTsConfigPath)) {
+            try {
+                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                // The assumption here is that sfdxTsConfig will not be modified by the user as
+                // it is located in the .sfdx directory.
+                sfdxTsConfig.compilerOptions.paths = this.tsConfigPathMapping;
+                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    get tsConfigPathMapping(): TsConfigPaths {
+        const files: TsConfigPaths = {};
+        if (this.workspaceType === WorkspaceType.SFDX) {
+            const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
+            const filePaths = sync(sfdxSource, { stats: true });
+            for (const filePath of filePaths) {
+                const { dir, name: fileName } = path.parse(filePath.path);
+                const folderName = path.basename(dir);
+                if (folderName === fileName) {
+                    const componentName = `c/${fileName}`;
+                    const componentFilePath = path.join(dir, fileName);
+                    const tsConfigFilePaths = (files[componentName] ??= []);
+                    const hasExistingPath = tsConfigFilePaths.some((existingPath: string) => existingPath === componentFilePath);
+                    if (!hasExistingPath) {
+                        tsConfigFilePaths.push(componentFilePath);
+                    }
+                }
+            }
+        }
+        return files;
     }
 
     get unIndexedFiles(): Entry[] {

@@ -10,6 +10,10 @@ import {
     InitializeParams,
     TextDocumentPositionParams,
     CompletionParams,
+    DidChangeWatchedFilesParams,
+    ShowMessageNotification,
+    MessageType,
+    FileChangeType,
 } from 'vscode-languageserver';
 
 import {
@@ -23,20 +27,26 @@ import {
     CompletionItemKind,
 } from 'vscode-html-languageservice';
 
+import { basename, dirname, parse } from 'path';
+
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
 import { Metadata } from './decorators';
-import { WorkspaceContext, interceptConsoleLogger, utils } from '@salesforce/lightning-lsp-common';
+import { WorkspaceContext, interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
 
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
 import { URI } from 'vscode-uri';
+import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
+import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
 
 export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
+
+const { WorkspaceType } = shared;
 
 export enum Token {
     Tag = 'tag',
@@ -86,6 +96,8 @@ export default class Server {
         this.connection.onHover(this.onHover.bind(this));
         this.connection.onShutdown(this.onShutdown.bind(this));
         this.connection.onDefinition(this.onDefinition.bind(this));
+        this.connection.onInitialized(this.onInitialized.bind(this));
+        this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
 
         this.documents.listen(this.connection);
         this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
@@ -132,12 +144,15 @@ export default class Server {
     }
 
     async onInitialized(): Promise<void> {
-        // The config value comes from salesforcedx-vscode/salesforcedx-vscode-lwc
-        const hasTsEnabled = await this.connection.workspace.getConfiguration('salesforcedx-vscode-lwc.preview.typeScriptSupport');
-        // TODO: add onDidChangeConfiguration handler to detect changes in config value
+        const hasTsEnabled = await this.isTsSupportEnabled();
         if (hasTsEnabled) {
             await this.context.configureProjectForTs();
+            this.componentIndexer.updateSfdxTsConfigPath();
         }
+    }
+
+    private async isTsSupportEnabled(): Promise<any> {
+        return this.connection.workspace.getConfiguration(TYPESCRIPT_SUPPORT_SETTING);
     }
 
     async onCompletion(params: CompletionParams): Promise<CompletionList> {
@@ -261,6 +276,55 @@ export default class Server {
                 if (tag) {
                     tag.updateMetadata(metadata);
                 }
+            }
+        }
+    }
+
+    // TODO: Once the LWC custom module resolution plugin has been developed in the language server
+    // this can be removed.
+    async onDidChangeWatchedFiles(changeEvent: DidChangeWatchedFilesParams): Promise<void> {
+        if (this.context.type === WorkspaceType.SFDX) {
+            try {
+                const hasTsEnabled = await this.isTsSupportEnabled();
+                if (hasTsEnabled) {
+                    const { changes } = changeEvent;
+                    if (utils.isLWCRootDirectoryCreated(this.context, changes)) {
+                        // LWC directory created
+                        this.context.updateNamespaceRootTypeCache();
+                        this.componentIndexer.updateSfdxTsConfigPath();
+                    } else {
+                        const hasDeleteEvent = await utils.containsDeletedLwcWatchedDirectory(this.context, changes);
+                        if (hasDeleteEvent) {
+                            // We need to scan the file system for deletion events as the change event does not include
+                            // information about the files that were deleted.
+                            this.componentIndexer.updateSfdxTsConfigPath();
+                        } else {
+                            const filePaths = [];
+                            for (const event of changes) {
+                                const insideLwcWatchedDirectory = await isLWCWatchedDirectory(this.context, event.uri);
+                                if (event.type === FileChangeType.Created && insideLwcWatchedDirectory) {
+                                    // File creation
+                                    const filePath = utils.toResolvedPath(event.uri);
+                                    const { dir, name: fileName, ext } = parse(filePath);
+                                    const folderName = basename(dir);
+                                    const parentFolder = basename(dirname(dir));
+                                    // Only update path mapping for newly created lwc modules
+                                    if (/.*(.ts|.js)$/.test(ext) && folderName === fileName && parentFolder === 'lwc') {
+                                        filePaths.push(filePath);
+                                    }
+                                }
+                            }
+                            if (filePaths.length) {
+                                this.componentIndexer.insertSfdxTsConfigPath(filePaths);
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                this.connection.sendNotification(ShowMessageNotification.type, {
+                    type: MessageType.Error,
+                    message: `Error updating tsconfig.sfdx.json path mapping: ${e.message}`,
+                });
             }
         }
     }

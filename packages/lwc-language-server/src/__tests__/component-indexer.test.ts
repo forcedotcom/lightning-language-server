@@ -5,6 +5,7 @@ import * as path from 'path';
 import { URI } from 'vscode-uri';
 import { shared } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
+import { readJsonSync, removeSync, writeJsonSync } from 'fs-extra';
 
 const { WorkspaceType } = shared;
 const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
@@ -123,6 +124,58 @@ describe('ComponentIndexer', () => {
         describe('#generateIndex()', () => {
             it('creates Tag objects for all the component JS files', async () => {
                 expect(componentIndexer.tags.size).toBe(8);
+            });
+        });
+
+        describe('typescript path mapping', () => {
+            const data = [
+                ['c/hello_world', 'force-app/main/default/lwc/hello_world/hello_world'],
+                ['c/import_relative', 'force-app/main/default/lwc/import_relative/import_relative'],
+                ['c/index', 'force-app/main/default/lwc/index/index'],
+                ['c/lightning_datatable_example', 'force-app/main/default/lwc/lightning_datatable_example/lightning_datatable_example'],
+                ['c/lightning_tree_example', 'force-app/main/default/lwc/lightning_tree_example/lightning_tree_example'],
+                ['c/todo_item', 'force-app/main/default/lwc/todo_item/todo_item'],
+                ['c/todo', 'force-app/main/default/lwc/todo/todo'],
+                ['c/typescript', 'force-app/main/default/lwc/typescript/typescript'],
+                ['c/utils', 'force-app/main/default/lwc/utils/utils'],
+                ['c/todo_util', 'utils/meta/lwc/todo_util/todo_util'],
+                ['c/todo_utils', 'utils/meta/lwc/todo_utils/todo_utils'],
+            ].map(([componentName, filePath]) => {
+                const resolvedFilePath = [path.join(componentIndexer.workspaceRoot, filePath)];
+                return [componentName, resolvedFilePath];
+            });
+            const expectedComponents = Object.fromEntries(data);
+
+            describe('#tsConfigPathMapping', () => {
+                it('returns a map of files inside an lwc watched directory where the .js or .ts files match the directory name', () => {
+                    const tsConfigPathMapping = componentIndexer.tsConfigPathMapping;
+                    expect(tsConfigPathMapping).toEqual(expectedComponents);
+                });
+            });
+
+            describe('updateSfdxTsConfigPath', () => {
+                it('updates tsconfig.sfdx.json path mapping', async () => {
+                    const tsconfigTemplate = {
+                        compilerOptions: {
+                            target: 'ESNext',
+                            paths: {
+                                // @ts-ignore
+                                'c/*': [],
+                            },
+                        },
+                    };
+                    const sfdxPath = path.resolve('../../test-workspaces/sfdx-workspace/.sfdx/tsconfig.sfdx.json');
+                    writeJsonSync(sfdxPath, tsconfigTemplate);
+
+                    componentIndexer.updateSfdxTsConfigPath();
+
+                    const tsconfig = readJsonSync(sfdxPath);
+                    const tsconfigPathMapping = tsconfig.compilerOptions.paths;
+                    expect(tsconfigPathMapping).toEqual(expectedComponents);
+
+                    // Clean-up test files
+                    removeSync(sfdxPath);
+                });
             });
         });
     });

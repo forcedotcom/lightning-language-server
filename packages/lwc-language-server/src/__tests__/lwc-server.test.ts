@@ -9,6 +9,8 @@ import {
     Hover,
     CompletionParams,
     CompletionTriggerKind,
+    DidChangeWatchedFilesParams,
+    FileChangeType,
 } from 'vscode-languageserver';
 
 import { URI } from 'vscode-uri';
@@ -47,6 +49,7 @@ jest.mock('vscode-languageserver', () => {
                 onInitialized: (): boolean => true,
                 onCompletion: (): boolean => true,
                 onCompletionResolve: (): boolean => true,
+                onDidChangeWatchedFiles: (): boolean => true,
                 onHover: (): boolean => true,
                 onShutdown: (): boolean => true,
                 onDefinition: (): boolean => true,
@@ -334,32 +337,211 @@ describe('handlers', () => {
     });
 
     describe('onInitialized()', () => {
+        const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
+        const getTsConfigPaths = (): string[] => sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+
+        afterEach(async () => {
+            // Clean up after each test run
+            fsExtra.removeSync(baseTsconfigPath);
+            const tsconfigPaths = getTsConfigPaths();
+            tsconfigPaths.forEach(tsconfigPath => fsExtra.removeSync(tsconfigPath));
+            mockTypeScriptSupportConfig = false;
+        });
+
         it('skip tsconfig initialization when salesforcedx-vscode-lwc.preview.typeScriptSupport = false', async () => {
             await server.onInitialize(initializeParams);
             await server.onInitialized();
 
-            const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
-            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
             expect(fsExtra.existsSync(baseTsconfigPath)).toBe(false);
+            const tsconfigPaths = getTsConfigPaths();
             expect(tsconfigPaths.length).toBe(0);
         });
 
-        it('skip tsconfig initialization when salesforcedx-vscode-lwc.preview.typeScriptSupport = true', async () => {
+        it('initializes tsconfig when salesforcedx-vscode-lwc.preview.typeScriptSupport = true', async () => {
             // Enable feature flag
             mockTypeScriptSupportConfig = true;
             await server.onInitialize(initializeParams);
             await server.onInitialized();
 
-            const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
-            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
             expect(fsExtra.existsSync(baseTsconfigPath)).toBe(true);
+            const tsconfigPaths = getTsConfigPaths();
             // There are currently 3 lwc subdirectories under SFDX_WORKSPACE_ROOT
             expect(tsconfigPaths.length).toBe(3);
+        });
 
-            // Clean up after test run
+        it('updates tsconfig.sfdx.json path mapping', async () => {
+            // Enable feature flag
+            mockTypeScriptSupportConfig = true;
+            await server.onInitialize(initializeParams);
+            await server.onInitialized();
+
+            const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
+            const pathMapping = Object.keys(sfdxTsConfig.compilerOptions.paths);
+            expect(pathMapping.length).toEqual(11);
+        });
+    });
+
+    describe('onDidChangeWatchedFiles', () => {
+        const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
+        const watchedFileDir = SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/newlyAddedFile';
+
+        const getPathMappingKeys = (): string[] => {
+            const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
+            return Object.keys(sfdxTsConfig.compilerOptions.paths);
+        };
+
+        beforeEach(() => {
+            mockTypeScriptSupportConfig = true;
+        });
+
+        afterEach(() => {
+            // Clean up after each test run
             fsExtra.removeSync(baseTsconfigPath);
-            await Promise.all(tsconfigPaths.map(tsconfig => fsExtra.remove(tsconfig)));
+            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+            tsconfigPaths.forEach(tsconfigPath => fsExtra.removeSync(tsconfigPath));
+            fsExtra.removeSync(watchedFileDir);
             mockTypeScriptSupportConfig = false;
+        });
+
+        ['.js', '.ts'].forEach(ext => {
+            it(`updates tsconfig.sfdx.json path mapping when ${ext} file created`, async () => {
+                // Enable feature flag
+                mockTypeScriptSupportConfig = true;
+                await server.onInitialize(initializeParams);
+                await server.onInitialized();
+
+                const initializedPathMapping = getPathMappingKeys();
+                expect(initializedPathMapping.length).toEqual(11);
+
+                // Create files after initialized
+                const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
+                console.log(watchedFilePath);
+                fsExtra.createFileSync(watchedFilePath);
+
+                const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                    changes: [
+                        {
+                            uri: watchedFilePath,
+                            type: FileChangeType.Created,
+                        },
+                    ],
+                };
+
+                await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                const pathMapping = getPathMappingKeys();
+                // Path mapping updated
+                expect(pathMapping.length).toEqual(12);
+            });
+
+            it(`removes tsconfig.sfdx.json path mapping when ${ext} files deleted`, async () => {
+                // Create files before initialized
+                const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
+                fsExtra.createFileSync(watchedFilePath);
+
+                await server.onInitialize(initializeParams);
+                await server.onInitialized();
+
+                const initializedPathMapping = getPathMappingKeys();
+                expect(initializedPathMapping.length).toEqual(12);
+
+                fsExtra.removeSync(watchedFilePath);
+
+                const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                    changes: [
+                        {
+                            uri: watchedFilePath,
+                            type: FileChangeType.Deleted,
+                        },
+                    ],
+                };
+
+                await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                const updatedPathMapping = getPathMappingKeys();
+                expect(updatedPathMapping.length).toEqual(11);
+            });
+
+            it(`no updates to tsconfig.sfdx.json path mapping when ${ext} files changed`, async () => {
+                // Create files before initialized
+                const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
+                fsExtra.createFileSync(watchedFilePath);
+
+                await server.onInitialize(initializeParams);
+                await server.onInitialized();
+
+                const initializedPathMapping = getPathMappingKeys();
+                expect(initializedPathMapping.length).toEqual(12);
+
+                fsExtra.removeSync(watchedFilePath);
+
+                const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                    changes: [
+                        {
+                            uri: watchedFilePath,
+                            type: FileChangeType.Changed,
+                        },
+                    ],
+                };
+
+                await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                const updatedPathMapping = getPathMappingKeys();
+                expect(updatedPathMapping.length).toEqual(12);
+            });
+
+            it(`doesn't update path mapping when parent directory is not lwc`, async () => {
+                await server.onInitialize(initializeParams);
+                await server.onInitialized();
+
+                const initializedPathMapping = getPathMappingKeys();
+                expect(initializedPathMapping.length).toEqual(11);
+
+                const watchedFilePath = path.resolve(watchedFileDir, '__tests__', 'newlyAddedFile', `newlyAddedFile${ext}`);
+                fsExtra.createFileSync(watchedFilePath);
+
+                const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                    changes: [
+                        {
+                            uri: watchedFilePath,
+                            type: FileChangeType.Created,
+                        },
+                    ],
+                };
+
+                await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                const updatedPathMapping = getPathMappingKeys();
+                expect(updatedPathMapping.length).toEqual(11);
+            });
+        });
+
+        ['.html', '.css', '.js-meta.xml', '.txt'].forEach(ext => {
+            [FileChangeType.Created, FileChangeType.Changed, FileChangeType.Deleted].forEach(type => {
+                it(`no path mapping updates made for ${ext} on ${type} event`, async () => {
+                    const lwcComponentPath = path.resolve(watchedFileDir, `newlyAddedFile.ts`);
+                    const nonJsOrTsFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
+                    fsExtra.createFileSync(lwcComponentPath);
+                    fsExtra.createFileSync(nonJsOrTsFilePath);
+
+                    await server.onInitialize(initializeParams);
+                    await server.onInitialized();
+
+                    const initializedPathMapping = getPathMappingKeys();
+                    expect(initializedPathMapping.length).toEqual(12);
+
+                    fsExtra.removeSync(nonJsOrTsFilePath);
+
+                    const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
+                        changes: [
+                            {
+                                uri: nonJsOrTsFilePath,
+                                type: type as FileChangeType,
+                            },
+                        ],
+                    };
+
+                    await server.onDidChangeWatchedFiles(didChangeWatchedFilesParams);
+                    const updatedPathMapping = getPathMappingKeys();
+                    expect(updatedPathMapping.length).toEqual(12);
+                });
+            });
         });
     });
 });
