@@ -18,6 +18,8 @@ function languageId(path: string): string {
     switch (suffix.substring(1)) {
         case 'js':
             return 'javascript';
+        case 'ts':
+            return 'typescript';
         case 'html':
             return 'html';
         case 'app':
