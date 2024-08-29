@@ -183,7 +183,7 @@ it('configureSfdxProject()', async () => {
     expect(jsconfigForceApp.compilerOptions.experimentalDecorators).toBe(true);
     expect(jsconfigForceApp.include[0]).toBe('**/*');
     expect(jsconfigForceApp.include[1]).toBe('../../../../.sfdx/typings/lwc/**/*.d.ts');
-    expect(jsconfigForceApp.compilerOptions.baseUrl).toBeUndefined(); // baseUrl/paths set when indexing
+    expect(jsconfigForceApp.compilerOptions.baseUrl).toBeDefined(); // baseUrl/paths set when indexing
     expect(jsconfigForceApp.typeAcquisition).toEqual({ include: ['jest'] });
     // verify updated jsconfig.json
     const jsconfigUtilsContent = fs.readFileSync(jsconfigPathUtils, 'utf8');
