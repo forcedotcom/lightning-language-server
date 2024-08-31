@@ -38,7 +38,7 @@
     "vscode-uri": "^2.1.2"
   },
   "devDependencies": {
-    "@jest/reporters": "^29.5.0",
+    "@jest/reporters": "^29.7.0",
     "@lwc/engine-dom": "2.37.3",
     "@salesforce/apex": "0.0.12",
     "@types/decamelize": "^1.2.0",

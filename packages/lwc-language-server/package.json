@@ -53,7 +53,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@jest/reporters": "^29.5.0",
+    "@jest/reporters": "^29.7.0",
     "@komaci/types": "^246.0.10",
     "@lwc/old-compiler": "npm:@lwc/compiler@0.34.8",
     "@types/babel-types": "^7.0.8",

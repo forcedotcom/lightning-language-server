@@ -44,7 +44,7 @@
     "vscode-uri": "1.0.6"
   },
   "devDependencies": {
-    "@jest/reporters": "^29.5.0",
+    "@jest/reporters": "^29.7.0",
     "@types/babel-types": "^7.0.8",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.3",
