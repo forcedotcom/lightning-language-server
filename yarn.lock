@@ -1707,10 +1707,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@komaci/types@^246.0.2":
-  version "246.0.2"
-  resolved "https://registry.yarnpkg.com/@komaci/types/-/types-246.0.2.tgz#3f32bd5796e584b3452a1576f01abcb86e9e46ac"
-  integrity sha512-7HjYXg9VDwoKGYYUZKQ63roVcTettZAGX3n2nCf+Jd+zvmVBq6rqG+lUqOYs94kVEGCsxep7bmeeF3T8J5dg2A==
+"@komaci/types@^246.0.10":
+  version "246.0.10"
+  resolved "https://registry.yarnpkg.com/@komaci/types/-/types-246.0.10.tgz#bf386b4f6bb3a4a0e595f8d18fb3a294c40df05c"
+  integrity sha512-F7WsU38hG7GL3Gu6IepAT3J0NH2plDWP08JkF80A5ok3utExXARWbDVAOW+IS6jdck0WIcKW/cnZoSHw3+0lzw==
 
 "@lerna/add@3.21.0":
   version "3.21.0"
