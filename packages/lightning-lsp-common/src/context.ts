@@ -429,7 +429,7 @@ export class WorkspaceContext {
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsConfigPath), this.workspaceRoots[0]);
                     jsConfigContent = this.processTemplate(jsConfigTemplate, { project_root: relativeWorkspaceRoot });
                     this.updateConfigFile(jsConfigPath, jsConfigContent);
-                    await this.updateForceIgnoreFile(forceignore);
+                    await this.updateForceIgnoreFile(forceignore, false);
                 }
                 break;
             case WorkspaceType.CORE_ALL:
@@ -474,7 +474,7 @@ export class WorkspaceContext {
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
                     const tsConfigContent = this.processTemplate(tsConfigTemplate, { project_root: relativeWorkspaceRoot });
                     this.updateConfigFile(tsConfigPath, tsConfigContent);
-                    await this.updateForceIgnoreFile(forceignore);
+                    await this.updateForceIgnoreFile(forceignore, true);
                 }
                 break;
         }
@@ -586,11 +586,14 @@ export class WorkspaceContext {
         }
     }
 
-    private async updateForceIgnoreFile(ignoreFile: string): Promise<void> {
+    private async updateForceIgnoreFile(ignoreFile: string, hasTsEnabled: boolean): Promise<void> {
         await utils.appendLineIfMissing(ignoreFile, '**/jsconfig.json');
-        await utils.appendLineIfMissing(ignoreFile, '**/tsconfig.json');
         await utils.appendLineIfMissing(ignoreFile, '**/.eslintrc.json');
-        await utils.appendLineIfMissing(ignoreFile, '**/*.ts');
+        if (hasTsEnabled) {
+            // WJH
+            await utils.appendLineIfMissing(ignoreFile, '**/tsconfig.json');
+            await utils.appendLineIfMissing(ignoreFile, '**/*.ts');
+        }
     }
 
     /**
