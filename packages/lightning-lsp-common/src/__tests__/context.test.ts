@@ -358,6 +358,7 @@ it('configureProjectForTs()', async () => {
     const baseTsConfigForceAppContent = fs.readJsonSync(baseTsconfigPathForceApp);
     expect(baseTsConfigForceAppContent).toEqual({
         compilerOptions: {
+            module: 'NodeNext',
             skipLibCheck: true,
             target: 'ESNext',
             paths: {
