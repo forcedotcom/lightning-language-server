@@ -199,9 +199,10 @@ it('configureSfdxProject()', async () => {
     // .forceignore
     const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
     expect(forceignoreContent).toContain('**/jsconfig.json');
-    expect(forceignoreContent).toContain('**/tsconfig.json');
     expect(forceignoreContent).toContain('**/.eslintrc.json');
-    expect(forceignoreContent).toContain('**/*.ts');
+    // These should only be present for TypeScript projects
+    expect(forceignoreContent).not.toContain('**/tsconfig.json');
+    expect(forceignoreContent).not.toContain('**/*.ts');
 
     // typings
     expect(join(sfdxTypingsPath, 'lds.d.ts')).toExist();
@@ -348,10 +349,16 @@ it('configureProjectForTs()', async () => {
     // configure and verify typings/jsconfig after configuration:
     await context.configureProjectForTs();
 
+    // verify forceignore
+    const forceignoreContent = fs.readFileSync(forceignorePath, 'utf8');
+    expect(forceignoreContent).toContain('**/tsconfig.json');
+    expect(forceignoreContent).toContain('**/*.ts');
+
     // verify tsconfig.sfdx.json
     const baseTsConfigForceAppContent = fs.readJsonSync(baseTsconfigPathForceApp);
     expect(baseTsConfigForceAppContent).toEqual({
         compilerOptions: {
+            module: 'NodeNext',
             skipLibCheck: true,
             target: 'ESNext',
             paths: {
