@@ -29,7 +29,7 @@
     "@lwc/compiler": "2.50.0",
     "@lwc/engine-dom": "2.50.0",
     "@lwc/errors": "2.50.0",
-    "@lwc/metadata": "2.50.0-0",
+    "@lwc/metadata": "8.0.0",
     "@lwc/sfdc-compiler-utils": "2.50.0-0",
     "@lwc/template-compiler": "2.50.0",
     "@salesforce/apex": "0.0.12",
