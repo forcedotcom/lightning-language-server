@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { globSync } from 'glob';
+import glob from 'glob';
 
 // These unit tests check that specified dependencies in package.json do not use
 // ^ or ~ in the version range, either because those packages do not use semver
@@ -29,7 +29,7 @@ if (fs.existsSync(monorepoConfigPath)) {
     const monorepoConfig = readJsonFile(monorepoConfigPath);
     if (monorepoConfig.packages && Array.isArray(monorepoConfig.packages)) {
         monorepoConfig.packages.forEach((packageGlob: string) => {
-            const matches = globSync(packageGlob, {
+            const matches = glob.sync(packageGlob, {
                 cwd: monorepoRootPath,
             });
             matches.forEach(match => {
