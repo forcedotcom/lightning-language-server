@@ -209,7 +209,7 @@ it('configureSfdxProject()', async () => {
     expect(join(sfdxTypingsPath, 'engine.d.ts')).toExist();
     expect(join(sfdxTypingsPath, 'apex.d.ts')).toExist();
     const schemaContents = fs.readFileSync(join(sfdxTypingsPath, 'schema.d.ts'), 'utf8');
-    expect(schemaContents).toContain('declare module "@salesforce/schema" {');
+    expect(schemaContents).toContain(`declare module '@salesforce/schema' {`);
     const apexContents = fs.readFileSync(join(sfdxTypingsPath, 'apex.d.ts'), 'utf8');
     expect(apexContents).not.toContain('declare type');
 });

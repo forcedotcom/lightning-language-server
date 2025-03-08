@@ -415,7 +415,6 @@ describe('handlers', () => {
 
                 // Create files after initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
-                console.log(watchedFilePath);
                 fsExtra.createFileSync(watchedFilePath);
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {

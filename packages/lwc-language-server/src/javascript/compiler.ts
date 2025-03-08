@@ -147,6 +147,7 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
                 source,
             },
         ],
+        npmModuleMapping: {}
     };
     const modernMetadata = collectBundleMetadata(options);
     if (modernMetadata.diagnostics.length) {
