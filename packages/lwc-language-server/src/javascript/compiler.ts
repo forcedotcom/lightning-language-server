@@ -5,13 +5,11 @@ import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
-import { CompilerError } from '@lwc/errors';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
 import { ClassMember, Metadata } from '../decorators';
 import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
-import { CompilerDiagnostic } from '@lwc/errors';
 
 export interface CompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic

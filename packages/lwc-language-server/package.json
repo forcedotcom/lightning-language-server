@@ -26,12 +26,11 @@
     "package": "yarn pack"
   },
   "dependencies": {
-    "@lwc/compiler": "2.50.0",
-    "@lwc/engine-dom": "2.50.0",
-    "@lwc/errors": "2.50.0",
+    "@lwc/compiler": "8.16.0",
+    "@lwc/engine-dom": "8.16.0",
     "@lwc/metadata": "2.50.0-0",
-    "@lwc/sfdc-compiler-utils": "2.50.0-0",
-    "@lwc/template-compiler": "2.50.0",
+    "@lwc/sfdc-compiler-utils": "12.2.0",
+    "@lwc/template-compiler": "8.16.0",
     "@salesforce/apex": "0.0.12",
     "@salesforce/label": "0.0.12",
     "@salesforce/lightning-lsp-common": "4.12.2",

@@ -1,7 +1,19 @@
-import { DiagnosticLevel } from '@lwc/errors';
 import templateCompiler from '@lwc/template-compiler';
-import { TextDocument, Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
+import path from 'path';
+import { Diagnostic, DiagnosticSeverity, Range, TextDocument } from 'vscode-languageserver';
+import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
+
+enum DiagnosticLevel {
+    /** Unexpected error, parsing error, bundling error */
+    Fatal = 0,
+    /** Linting error with error level, invalid external reference, invalid import, invalid transform */
+    Error = 1,
+    /** Linting error with warning level, usage of an API to be deprecated */
+    Warning = 2,
+    /** Logging messages */
+    Log = 3
+}
 
 const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
     [DiagnosticLevel.Log, DiagnosticSeverity.Information],
@@ -44,7 +56,10 @@ function lintTypos(document: TextDocument): Diagnostic[] {
 
 export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
     const source = document.getText();
-    const { warnings } = templateCompiler(source, {});
+    const file = URI.file(document.uri).fsPath;
+    const filePath = path.parse(file);
+    const fileName = filePath.base;
+    const { warnings } = templateCompiler(source, fileName, {});
 
     let warningsLwc: Diagnostic[] = warnings.map(warning => {
         const { start = 0, length = 0 } = warning.location || { start: 0, length: 0 };
