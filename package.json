@@ -1,5 +1,5 @@
 {
-  "name": "lightning-language-server",
+  "name": "@salesforce/lightning-language-server",
   "description": "Mono-repo for the Aura and LWC langauge servers",
   "license": "BSD-3-Clause",
   "repository": {
@@ -73,7 +73,6 @@
   "resolutions": {
     "set-value": "^2.0.1",
     "js-yaml": "^3.13.1"
-
   },
   "config": {
     "commitizen": {
