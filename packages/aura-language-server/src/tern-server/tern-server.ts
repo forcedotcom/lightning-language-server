@@ -89,7 +89,7 @@ const searchAuraResourcesPath = (dir: string): string => {
         return path.join(dir, 'resources', 'aura');
     }
     if (path.dirname(dir) === dir) {
-        throw new Error('No resources/aura directoryfound');
+        throw new Error('No resources/aura directory found');
     }
     return searchAuraResourcesPath(path.dirname(dir));
 };
