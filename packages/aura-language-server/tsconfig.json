@@ -14,7 +14,7 @@
         "noImplicitAny": false,
         "noUnusedParameters": false,
         "noUnusedLocals": false,
-
+        "resolveJsonModule": true,
         "pretty": true,
         "declaration": true,
         "esModuleInterop": true,
