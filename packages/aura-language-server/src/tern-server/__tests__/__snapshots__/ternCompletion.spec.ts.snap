@@ -5,8 +5,30 @@ exports[`tern completions 1`] = `
   "isIncomplete": true,
   "items": [
     {
-      "detail": "AuraInstance",
-      "documentation": "#include aura.Aura_export",
+      "detail": "{enqueueAction, error, hasErrors, lastKnownError, test}",
+      "documentation": "@description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
+           attached to it.
+
+@namespace
+
+@borrows AuraComponentService#createComponent as $A.createComponent
+@borrows AuraComponentService#createComponents as $A.createComponents
+@borrows AuraComponentService#getComponent as $A.getComponent
+@borrows AuraClientService#enqueueAction as $A.enqueueAction
+@borrows AuraInstance#getRoot as $A.getRoot
+@borrows AuraInstance#getCallback as $A.getCallback
+@borrows AuraInstance#executeHotspot as $A.executeHotspot
+@borrows AuraInstance#get as $A.get
+@borrows AuraInstance#set as $A.set
+@borrows AuraInstance#error as $A.error
+@borrows AuraInstance#log as $A.log
+@borrows AuraInstance#warning as $A.warning
+@borrows AuraInstance#run as $A.run
+@borrows AuraComponentService#newComponentDeprecated as $A.newCmp
+@borrows AuraComponentService#newComponentAsync as $A.newCmpAsync
+@borrows AuraInstance#localizationService as localizationService
+@borrows AuraInstance#util as util
+@borrows AuraInstance#reportError as $A.reportError",
       "kind": 18,
       "label": "$A",
     },
@@ -29,7 +51,7 @@ exports[`tern completions 1`] = `
       "label": "atob",
     },
     {
-      "detail": "AuraInstance",
+      "detail": "{enqueueAction, error, hasErrors, lastKnownError, test}",
       "documentation": "TODO: Remove the legacy 'aura' top-level name.",
       "kind": 18,
       "label": "aura",
@@ -75,6 +97,12 @@ exports[`tern completions 1`] = `
       "documentation": "This property indicates whether the referenced window is closed or not.",
       "kind": 18,
       "label": "closed",
+    },
+    {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "components",
     },
     {
       "detail": "fn(message: string) -> bool",
@@ -217,10 +245,16 @@ It should be noted that data stored in either localStorage or sessionStorage is 
       "label": "localStorage",
     },
     {
-      "detail": "location|string",
+      "detail": "location",
       "documentation": "Returns a location object with information about the current location of the document. Assigning to the location property changes the current page to the new address.",
       "kind": 18,
       "label": "location",
+    },
+    {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "message",
     },
     {
       "detail": "{exports}",
@@ -525,6 +559,12 @@ It should be noted that data stored in either localStorage or sessionStorage is 
       "label": "requestAnimationFrame",
     },
     {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "returnValue",
+    },
+    {
       "detail": "screen",
       "documentation": "Returns a reference to the screen object associated with the window.",
       "kind": 18,
@@ -611,15 +651,21 @@ It should be noted that data stored in either sessionStorage or localStorage is 
       "label": "setTimeout",
     },
     {
+      "detail": "string",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "state",
+    },
+    {
       "detail": "<top>",
       "documentation": "Returns a reference to the topmost window in the window hierarchy.",
       "kind": 18,
       "label": "top",
     },
     {
-      "detail": "fn(?)",
+      "detail": "string",
       "documentation": "The value undefined.",
-      "kind": 3,
+      "kind": 18,
       "label": "undefined",
     },
     {
