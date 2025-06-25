@@ -69,6 +69,9 @@ const defaultConfig = {
     dependencyBudget: 20000,
 };
 
+const auraInstanceLastSort = (a: string, b: string): number =>
+    a.endsWith('AuraInstance.js') === b.endsWith('AuraInstance.js') ? 0 : a.endsWith('AuraInstance.js') ? 1 : -1;
+
 async function loadPlugins(): Promise<{ aura: true; modules: true; doc_comment: true }> {
     await import('./tern-aura');
     await import('../tern/plugin/modules');
@@ -103,14 +106,19 @@ async function ternInit(): Promise<void> {
         },
     });
     const resources = searchAuraResourcesPath(__dirname);
-    const allJsFiles = (await fs.promises.readdir(resources, { withFileTypes: true, recursive: true }))
+    (await fs.promises.readdir(resources, { withFileTypes: true, recursive: true }))
         .filter(dirent => dirent.isFile() && dirent.name.endsWith('.js'))
-        .map(dirent => path.join(dirent.parentPath, dirent.name));
-    // TODO: node 22 use object.groupBy to only traverse this once
-    allJsFiles.filter(file => !file.endsWith('AuraInstance.js')).map(file => ternServer.addFile(file, readFileSync(file, 'utf-8')));
-
-    // special handling for hacking one particular file that needs to go last
-    allJsFiles.filter(file => file.endsWith('AuraInstance.js')).map(file => readFileSync(file, 'utf-8').concat(`\nwindow['$A'] = new AuraInstance();\n`));
+        .map(dirent => path.join(dirent.parentPath, dirent.name))
+        // special handling for hacking one snowflake file that needs to go last
+        .sort(auraInstanceLastSort)
+        .map(file => ({
+            file,
+            contents: file.endsWith('AuraInstance.js')
+                ? // and the snowflake needs to me modified
+                  readFileSync(file, 'utf-8').concat(`\nwindow['$A'] = new AuraInstance();\n`)
+                : readFileSync(file, 'utf-8'),
+        }))
+        .map(({ file, contents }) => ternServer.addFile(file, contents));
 }
 
 const init = memoize(ternInit);
