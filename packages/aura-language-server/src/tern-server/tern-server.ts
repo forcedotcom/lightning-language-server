@@ -1,4 +1,4 @@
-import fs, { readFileSync, readdirSync, statSync } from 'fs';
+import fs, { readFileSync } from 'fs';
 import * as tern from '../tern/lib/tern';
 import path from 'path';
 import * as util from 'util';
@@ -6,6 +6,8 @@ import * as infer from '../tern/lib/infer';
 import LineColumnFinder from 'line-column';
 import { findPreviousWord, findPreviousLeftParan, countPreviousCommas } from './string-util';
 import URI from 'vscode-uri';
+import browser from '../tern/defs/browser.json';
+import ecmascript from '../tern/defs/ecmascript.json';
 
 import { memoize } from '@salesforce/lightning-lsp-common/lib/utils';
 import {
@@ -43,7 +45,7 @@ interface TernServer extends tern.Server {
      * The `callback` function will be called when the request completes. If an `error` occurred,
      * it will be passed as a first argument. Otherwise, the `response` (parsed) JSON object will be passed as second argument.
      *
-     * When the server hasn’t been configured to be asynchronous, the callback will be called before request returns.
+     * When the server hasn't been configured to be asynchronous, the callback will be called before request returns.
      */
     request(doc: any, callback: any): void;
 }
@@ -57,9 +59,6 @@ let ternServer: TernServer;
 let asyncTernRequest;
 let asyncFlush;
 
-const defaultLibs = ['browser', 'ecmascript'];
-const defaultPlugins = { modules: {}, aura: {}, doc_comment: {} };
-
 const defaultConfig = {
     ecmaVersion: 6,
     stripCRs: false,
@@ -70,107 +69,33 @@ const defaultConfig = {
     dependencyBudget: 20000,
 };
 
-function readJSON(fileName): any {
-    const file = fs.readFileSync(fileName, 'utf-8');
-    try {
-        return JSON.parse(file);
-    } catch (e) {
-        console.warn('Bad JSON in ' + fileName + ': ' + e.message);
-    }
+const auraInstanceLastSort = (a: string, b: string): number =>
+    a.endsWith('AuraInstance.js') === b.endsWith('AuraInstance.js') ? 0 : a.endsWith('AuraInstance.js') ? 1 : -1;
+
+async function loadPlugins(): Promise<{ aura: true; modules: true; doc_comment: true }> {
+    await import('./tern-aura');
+    await import('../tern/plugin/modules');
+    await import('../tern/plugin/doc_comment');
+
+    return {
+        aura: true,
+        modules: true,
+        doc_comment: true,
+    };
 }
 
-function findDefs(libs): any[] {
-    const ternlibpath = require.resolve('../tern/lib/tern');
-    const ternbasedir = path.join(ternlibpath, '..', '..');
-
-    const defs = [];
-    const src = libs.slice();
-    for (let file of src) {
-        console.log(`Loading support library: ${file}`);
-        if (!/\.json$/.test(file)) {
-            file = file + '.json';
-        }
-        const def = path.join(ternbasedir, 'defs', file);
-        if (fs.existsSync(def)) {
-            defs.push(readJSON(def));
-        } else {
-            console.log(`Not found: ${file}`);
-        }
+/** recursively search upward from the starting diretory.  Handling the is it a monorepo vs. packaged vs. bundled code  */
+const searchAuraResourcesPath = (dir: string): string => {
+    console.log(`aura-language-server: searching for resources/aura in ${dir}`);
+    if (fs.existsSync(path.join(dir, 'resources', 'aura'))) {
+        console.log('found resources/aura in', dir);
+        return path.join(dir, 'resources', 'aura');
     }
-    return defs;
-}
-
-async function loadLocal(plugin, rootPath): Promise<boolean> {
-    let found;
-    try {
-        // local resolution only here
-        found = require.resolve('./tern-' + plugin);
-    } catch (e) {
-        return false;
+    if (path.dirname(dir) === dir) {
+        throw new Error('No resources/aura directory found');
     }
-
-    const mod = await import(found);
-    if (mod.hasOwnProperty('initialize')) {
-        mod.initialize(rootPath);
-    }
-    return true;
-}
-
-async function loadBuiltIn(plugin: string, rootPath: string): Promise<boolean> {
-    const ternlibpath = require.resolve('../tern/lib/tern');
-    const ternbasedir = path.join(ternlibpath, '..', '..');
-
-    const def = path.join(ternbasedir, 'plugin', plugin);
-
-    let found: string;
-    try {
-        // local resolution only here
-        found = require.resolve(def);
-    } catch (e) {
-        process.stderr.write('Failed to find plugin ' + plugin + '.\n');
-        return false;
-    }
-
-    const mod = await import(found);
-    if (mod.hasOwnProperty('initialize')) {
-        mod.initialize(rootPath);
-    }
-    return true;
-}
-
-async function loadPlugins(plugins, rootPath): Promise<{}> {
-    const options = {};
-    for (const plugin of Object.keys(plugins)) {
-        const val = plugins[plugin];
-        if (!val) {
-            continue;
-        }
-
-        if (!(await loadLocal(plugin, rootPath))) {
-            if (!(await loadBuiltIn(plugin, rootPath))) {
-                process.stderr.write('Failed to find plugin ' + plugin + '.\n');
-            }
-        }
-
-        options[path.basename(plugin)] = true;
-    }
-
-    return options;
-}
-
-function* walkSync(dir: string): any {
-    const files = readdirSync(dir);
-
-    for (const file of files) {
-        const pathToFile = path.join(dir, file);
-        const isDirectory = statSync(pathToFile).isDirectory();
-        if (isDirectory) {
-            yield* walkSync(pathToFile);
-        } else {
-            yield pathToFile;
-        }
-    }
-}
+    return searchAuraResourcesPath(path.dirname(dir));
+};
 
 async function ternInit(): Promise<void> {
     await asyncTernRequest({
@@ -180,29 +105,27 @@ async function ternInit(): Promise<void> {
             // shouldFilter: true,
         },
     });
-    const resources = path.join(__dirname, '..', '..', 'resources', 'aura');
-    const found = [...walkSync(resources)];
-    let [lastFile, lastText] = [undefined, undefined];
-    for (const file of found) {
-        if (file.endsWith('.js')) {
-            const data = readFileSync(file, 'utf-8');
-            // HACK HACK HACK - glue it all together baby!
-            if (file.endsWith('AuraInstance.js')) {
-                lastFile = file;
-                lastText = data.concat(`\nwindow['$A'] = new AuraInstance();\n`);
-            } else {
-                ternServer.addFile(file, data);
-            }
-        }
-    }
-    ternServer.addFile(lastFile, lastText);
+    const resources = searchAuraResourcesPath(__dirname);
+    (await fs.promises.readdir(resources, { withFileTypes: true, recursive: true }))
+        .filter(dirent => dirent.isFile() && dirent.name.endsWith('.js'))
+        .map(dirent => path.join(dirent.parentPath, dirent.name))
+        // special handling for hacking one snowflake file that needs to go last
+        .sort(auraInstanceLastSort)
+        .map(file => ({
+            file,
+            contents: file.endsWith('AuraInstance.js')
+                ? // and the snowflake needs to me modified
+                  readFileSync(file, 'utf-8').concat(`\nwindow['$A'] = new AuraInstance();\n`)
+                : readFileSync(file, 'utf-8'),
+        }))
+        .map(({ file, contents }) => ternServer.addFile(file, contents));
 }
 
 const init = memoize(ternInit);
 
 export async function startServer(rootPath: string, wsroot: string): tern.Server {
-    const defs = findDefs(defaultLibs);
-    const plugins = await loadPlugins(defaultPlugins, rootPath);
+    const defs = [browser, ecmascript];
+    const plugins = await loadPlugins();
     const config: tern.ConstructorOptions = {
         ...defaultConfig,
         defs,
@@ -239,6 +162,12 @@ function fileToUri(file: string): string {
     }
 }
 
+function uriToFile(uri: string): string {
+    const parsedUri = URI.parse(uri);
+    // paths from tests can be relative or absolute
+    return parsedUri.scheme ? parsedUri.fsPath : uri;
+}
+
 function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
     return {
         start: tern2lspPos(start),
@@ -251,10 +180,6 @@ function tern2lspLocation({ file, start, end }: { file: string; start: tern.Posi
         uri: fileToUri(file),
         range: tern2lspRange({ start, end }),
     };
-}
-
-function uriToFile(uri: string): string {
-    return URI.parse(uri).fsPath;
 }
 
 async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> {
