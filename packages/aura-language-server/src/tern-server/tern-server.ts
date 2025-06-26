@@ -164,18 +164,8 @@ function fileToUri(file: string): string {
 
 function uriToFile(uri: string): string {
     const parsedUri = URI.parse(uri);
-    if (parsedUri.scheme) {
-        return parsedUri.fsPath;
-    }
-
-    // Handle relative path strings from tests
-    if (path.isAbsolute(uri)) {
-        return uri;
-    }
-
-    // For relative paths, we need to return the path as Tern expects it
-    // The test provides workspace-relative paths, so return them as-is
-    return uri;
+    // paths from tests can be relative or absolute
+    return parsedUri.scheme ? parsedUri.fsPath : uri;
 }
 
 function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
