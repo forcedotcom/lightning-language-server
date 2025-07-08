@@ -20,7 +20,7 @@ it('can map new metadata to old metadata', async () => {
                 fileName: 'metadata.js',
                 source: content,
             },
-        ],
+        ], npmModuleMapping: {}
     };
 
     const modernMetadata = collectBundleMetadata(newMetadataOpts);
@@ -51,7 +51,7 @@ it('Should handle mapping when there is a property with only a setter', async ()
                 fileName: 'nogetter.js',
                 source: content,
             },
-        ],
+        ], npmModuleMapping: {}
     };
 
     const modernMetadata = collectBundleMetadata(newMetadataOpts);

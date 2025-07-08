@@ -77,6 +77,12 @@ exports[`tern completions 1`] = `
       "label": "closed",
     },
     {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "components",
+    },
+    {
       "detail": "fn(message: string) -> bool",
       "documentation": "Displays a modal dialog with a message and two buttons, OK and Cancel.",
       "kind": 3,
@@ -221,6 +227,12 @@ It should be noted that data stored in either localStorage or sessionStorage is 
       "documentation": "Returns a location object with information about the current location of the document. Assigning to the location property changes the current page to the new address.",
       "kind": 18,
       "label": "location",
+    },
+    {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "message",
     },
     {
       "detail": "{exports}",
@@ -525,6 +537,12 @@ It should be noted that data stored in either localStorage or sessionStorage is 
       "label": "requestAnimationFrame",
     },
     {
+      "detail": "?",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "returnValue",
+    },
+    {
       "detail": "screen",
       "documentation": "Returns a reference to the screen object associated with the window.",
       "kind": 18,
@@ -609,6 +627,12 @@ It should be noted that data stored in either sessionStorage or localStorage is 
       "documentation": "Calls a function or executes a code snippet after specified delay.",
       "kind": 3,
       "label": "setTimeout",
+    },
+    {
+      "detail": "string",
+      "documentation": undefined,
+      "kind": 18,
+      "label": "state",
     },
     {
       "detail": "<top>",

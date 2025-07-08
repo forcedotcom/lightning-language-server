@@ -3,7 +3,7 @@ import * as infer from '../tern/lib/infer';
 import * as tern from '../tern/lib/tern';
 import * as walk from 'acorn-walk';
 import * as fs from 'fs';
-import * as path from 'path';
+import defs from './aura_types.json';
 
 const WG_DEFAULT_EXPORT = 95;
 let server: any = {};
@@ -133,12 +133,6 @@ function readFileAsync(filename, c): void {
     readFile(filename).then(function(contents) {
         c(null, contents);
     });
-}
-
-function loadDefs(): void {
-    let defs = fs.readFileSync(path.join(__dirname, 'aura_types.json'), 'utf8');
-    defs = JSON.parse(defs);
-    server.addDefs(defs);
 }
 
 function findAndBindComponent(type, server, cx, infer): void {
@@ -411,7 +405,7 @@ tern.registerPlugin('aura', function(s, options) {
     });
 
     _debug('IDE mode');
-    loadDefs();
+    server.addDefs(defs);
 
     _debug(new Date().toISOString() + ' Done loading!');
 });

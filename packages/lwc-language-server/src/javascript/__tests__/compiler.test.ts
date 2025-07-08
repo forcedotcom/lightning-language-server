@@ -70,7 +70,6 @@ it('returns empty metadata for a script without a clear main component class', a
 
 it('returns metadata for a script with one component class, even when not exported', async () => {
     const result = await compileSource(codeWithoutDefaultExportSingleClass, 'foo.js');
-    console.log(result);
     expect(result.metadata?.decorators).toHaveLength(1);
     expect(result.metadata?.classMembers).toHaveLength(1);
     expect(result.metadata?.exports).toHaveLength(0);
@@ -146,6 +145,7 @@ it('mapLwcMetadataToInternal returns expected javascript metadata', async () => 
             fileName: 'metadata.js',
             source: content,
         }],
+        npmModuleMapping: {}
     };
 
     const modernMetadata = collectBundleMetadata(options);
