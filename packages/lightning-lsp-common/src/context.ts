@@ -74,7 +74,7 @@ function getSfdxPackageDirs(sfdxProjectConfig: SfdxProjectConfig): string[] {
  */
 async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: string[]; aura: string[] }> {
     console.log('findNamespaceRoots called with root:', root, 'maxDepth:', maxDepth);
-    
+
     const roots: { lwc: string[]; aura: string[] } = {
         lwc: [],
         aura: [],
@@ -116,7 +116,10 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
                 console.log('Checking component path:', componentPath);
 
                 try {
-                    const files = await utils.glob(componentPath, { cwd: subdir });
+                    // Use the full path pattern instead of cwd to avoid Windows issues
+                    const pattern = componentPath.replace(/\\/g, '/'); // Normalize for glob
+                    console.log('Glob pattern:', pattern);
+                    const files = await utils.glob(pattern);
                     console.log(`Files found for ${ext}:`, files);
                     if (files.length > 0) {
                         console.log('Found Aura component, returning true');
@@ -134,7 +137,7 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
 
     async function traverse(candidate: string, depth: number): Promise<void> {
         console.log('traverse called with candidate:', candidate, 'depth:', depth);
-        
+
         if (--depth < 0) {
             console.log('Depth limit reached, returning');
             return;
@@ -158,14 +161,14 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
 
         const subdirs = await findSubdirectories(candidate);
         console.log('Subdirectories found for', candidate, ':', subdirs);
-        
+
         // Is a root if we have a folder called lwc
         const isDirLWC = isModuleRoot(subdirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
         console.log('isDirLWC result:', isDirLWC);
-        
+
         const isAura = await isAuraRoot(subdirs);
         console.log('isAura result:', isAura);
-        
+
         if (isAura) {
             console.log('Adding aura root:', path.resolve(candidate));
             roots.aura.push(path.resolve(candidate));
@@ -188,7 +191,7 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
     } else {
         console.log('Root does not exist:', root);
     }
-    
+
     console.log('findNamespaceRoots returning:', roots);
     return roots;
 }
@@ -197,7 +200,12 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    const promises = AURA_EXTENSIONS.map(async (ext) => await utils.glob(path.join(namespaceRoot, '*', `*${ext}`), { cwd: namespaceRoot }));
+    const promises = AURA_EXTENSIONS.map(async (ext) => {
+        // Use full path pattern instead of cwd to avoid Windows issues
+        const pattern = path.join(namespaceRoot, '*', `*${ext}`).replace(/\\/g, '/');
+        console.log('findAuraMarkupIn pattern:', pattern);
+        return await utils.glob(pattern);
+    });
     const results = await Promise.all(promises);
     return results.flat();
 }
