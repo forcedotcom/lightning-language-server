@@ -81,15 +81,8 @@ export async function containsDeletedLwcWatchedDirectory(context: WorkspaceConte
             const { dir, name, ext } = parse(event.uri);
             const folder = basename(dir);
             const parentFolder = basename(dirname(dir));
-            if (
-                // LWC component
-                (/.*(.ts|.js)$/.test(ext) && folder === name && parentFolder === 'lwc') ||
-                // Folder deletion, subdirectory of lwc or lwc directory itself
-                // When there is no extension the name is the folder name and
-                // folder becomes the parent folder
-                // ex: /path/to/some/dir, name => dir, folder => some
-                (!ext && (folder === 'lwc' || name === 'lwc'))
-            ) {
+            // LWC component OR folder deletion, subdirectory of lwc or lwc directory itself
+            if (((ext.endsWith('.ts') || ext.endsWith('.js')) && folder === name && parentFolder === 'lwc') || (!ext && (folder === 'lwc' || name === 'lwc'))) {
                 return true;
             }
         }

@@ -31,7 +31,6 @@
     "acorn": "^6.0.0",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
-    "bs-logger": "^0.2.6",
     "change-case": "^3.1.0",
     "enhanced-resolve": "^2.2.2",
     "fs-extra": "^11.3.0",

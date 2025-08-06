@@ -1,6 +1,6 @@
 import AuraIndexer from '../aura-indexer/indexer';
 import { TagInfo } from '@salesforce/lightning-lsp-common';
-import { IHTMLDataProvider } from 'vscode-html-languageservice';
+import { IAttributeData, IHTMLDataProvider, IValueData } from 'vscode-html-languageservice';
 
 let indexer: AuraIndexer;
 
@@ -21,23 +21,19 @@ export function setIndexer(idx: AuraIndexer): void {
     indexer = idx;
 }
 
-function getTagsData(): { name: string; description?: string; attributes: any[] }[] {
-    const tags: { name: string; description?: string; attributes: any[] }[] = [];
-    for (const [tag, tagInfo] of getAuraTags()) {
-        tags.push({
-            name: tag,
-            description: tagInfo.getHover(),
-            attributes: tagInfo.attributes.map(attr => ({
-                name: attr.name,
-                description: attr.name, // Use name as description since AttributeInfo doesn't have description
-                valueSet: attr.type
-            }))
-        });
-    }
-    return tags;
+function getTagsData(): { name: string; description?: string; attributes: IAttributeData[] }[] {
+    return Array.from(getAuraTags()).map(([tag, tagInfo]) => ({
+        name: tag,
+        description: tagInfo.getHover(),
+        attributes: tagInfo.attributes.map(attr => ({
+            name: attr.name,
+            description: attr.name,
+            valueSet: attr.type
+        }))
+    }));
 }
 
-function getAttributesData(tag: string): any[] {
+function getAttributesData(tag: string): IAttributeData[] {
     const cTag = getAuraByTag(tag);
     if (cTag) {
         return cTag.attributes.map(attr => ({
@@ -49,7 +45,7 @@ function getAttributesData(tag: string): any[] {
     return [];
 }
 
-function getValuesData(tag: string, attribute: string): any[] {
+function getValuesData(tag: string, attribute: string): IValueData[] {
     // TODO provide suggestions by consulting shapeService
     return [];
 }

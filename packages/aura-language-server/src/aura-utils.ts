@@ -11,6 +11,41 @@ const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '
 
 const RESOURCES_DIR = 'resources';
 
+/**
+ * Regex pattern to match Aura expression syntax in HTML templates.
+ *
+ * This pattern identifies Aura expressions that follow the format:
+ * - {!v.property} - View/Component properties
+ * - {!m.data} - Model data
+ * - {!c.method} - Controller methods/properties
+ * - {!#v.booleanValue} - Boolean expressions
+ * - {!!v.negatedValue} - Negated expressions
+ *
+ * Pattern breakdown:
+ * - ['"]? - Optional quotes at start/end
+ * - \s* - Optional whitespace
+ * - { - Opening brace
+ * - [!#] - Either ! or # (expression operators)
+ * - \s* - Optional whitespace
+ * - [!]? - Optional ! (negation)
+ * - [vmc] - One of v, m, or c (expression types)
+ * - \. - Literal dot
+ * - (\w*) - One or more word characters (first part)
+ * - (\.?\w*)* - Zero or more optional dots + word characters
+ * - \s* - Optional whitespace
+ * - } - Closing brace
+ *
+ * Examples matched:
+ * - {!v.account.Name}
+ * - {!m.data.value}
+ * - {!c.controllerMethod}
+ * - {!#v.booleanValue}
+ * - {!!v.negatedValue}
+ * - "{!v.property}"
+ * - '{!v.property}'
+ */
+const AURA_EXPRESSION_REGEX = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/;
+
 export function isAuraMarkup(textDocument: TextDocument): boolean {
     const fileExt = utils.getExtension(textDocument);
     return AURA_EXTENSIONS.includes(fileExt);
@@ -44,9 +79,11 @@ export function stripQuotes(str: string | null) {
     }
     return str;
 }
+
 export function hasQuotes(str: string) {
-    return (str.charAt(0) === '"' && str.charAt(str.length - 1) === '"') || (str.charAt(0) === "'" && str.charAt(str.length - 1) === "'");
+    return (str.at(0) === '"' && str.at(-1) === '"') || (str.at(0) === "'" && str.at(-1) === "'");
 }
+
 export function getTagNameRange(document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null {
     const scanner = createScanner(document.getText(), startOffset);
     let token = scanner.scan();
@@ -151,8 +188,7 @@ export function getAuraBindingValue(document: TextDocument, position: Position, 
             return null;
         }
         const valueTrimmed = value.trim();
-        const valuePattern = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/g;
-        const match = valuePattern.exec(valueTrimmed);
+        const match = AURA_EXPRESSION_REGEX.exec(valueTrimmed);
         if (match) {
             const property = match[1];
             return property;
@@ -170,11 +206,10 @@ export function getAuraBindingValue(document: TextDocument, position: Position, 
                 };
                 const curContent = document.getText(range);
                 const relativeOffset = offset - scanner.getTokenOffset();
-                let match;
-                const valuePattern = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/g;
-                while ((match = valuePattern.exec(curContent))) {
-                    const start = valuePattern.lastIndex - match[0].length;
-                    const end = valuePattern.lastIndex - 1;
+                const match = AURA_EXPRESSION_REGEX.exec(curContent);
+                if (match) {
+                    const start = match.index;
+                    const end = match.index + match[0].length - 1;
                     if (start <= relativeOffset && relativeOffset <= end) {
                         // this just gives us the match within the full regular expression match
                         // we want to make sure we're only on the left most property following

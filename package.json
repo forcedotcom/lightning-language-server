@@ -79,11 +79,5 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "dependencies": {
-    "expand-range": "^2.0.2",
-    "filename-regex": "^2.0.1",
-    "fs-exists-sync": "^0.1.0",
-    "is-posix-bracket": "^0.1.1"
   }
 }

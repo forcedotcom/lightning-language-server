@@ -463,7 +463,7 @@ export default class Server {
                 const match = findDynamicContent(content, relativeOffset);
 
                 if (match) {
-                    const item = iterators.find((i) => i.name === match) || null;
+                    const item = iterators.find((i) => i.name === match) ?? null;
 
                     return {
                         type: Token.DynamicContent,

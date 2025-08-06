@@ -75,15 +75,11 @@ export default class Server {
     async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         const { workspaceFolders } = params;
         this.workspaceFolders = workspaceFolders;
-        this.workspaceRoots = [];
-        
-        for (const folder of workspaceFolders) {
-            this.workspaceRoots.push(path.resolve(URI.parse(folder.uri).fsPath));
-        }
+        this.workspaceRoots = workspaceFolders.map(folder => path.resolve(URI.parse(folder.uri).fsPath));
 
         try {
             if (this.workspaceRoots.length === 0) {
-                console.warn(`No workspace found`);
+                console.warn('No workspace found');
                 return { capabilities: {} };
             }
 
@@ -247,17 +243,15 @@ export default class Server {
         if (await this.context.isAuraMarkup(document)) {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
 
-            let def = (this.htmlLS as any).findDefinition(document, textDocumentPosition.position, htmlDocument);
-            if (!def) {
-                def = getAuraBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
-                if (!def) {
-                    const valueProperty = getAuraBindingValue(document, textDocumentPosition.position, htmlDocument);
-                    if (valueProperty) {
-                        def = this.findJavascriptProperty(valueProperty, textDocumentPosition);
-                    }
-                }
+            const def = getAuraBindingTemplateDeclaration(document, textDocumentPosition.position, htmlDocument);
+            if (def) {
+                return def;
             }
-            return def;
+
+            const valueProperty = getAuraBindingValue(document, textDocumentPosition.position, htmlDocument);
+            if (valueProperty) {
+                return this.findJavascriptProperty(valueProperty, textDocumentPosition);
+            }
         }
         
         if (await this.context.isAuraJavascript(document)) {

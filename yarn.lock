@@ -5739,14 +5739,6 @@ expand-range@^1.8.1:
   dependencies:
     fill-range "^2.1.0"
 
-expand-range@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/expand-range/-/expand-range-2.0.2.tgz#7d67230abce7b1e620c0961ff0d6acca10733a2c"
-  integrity sha512-dyIpKoZzI/fcRCNYloYzHNmR+QsDHwZxCoPHpt5M6AupG3l0Ty1cQ6Bl+/g2IoOFu9qDiy3mneUGHel9w6XuBQ==
-  dependencies:
-    extend-shallow "^2.0.1"
-    fill-range "^5.0.0"
-
 expand-tilde@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/expand-tilde/-/expand-tilde-1.2.2.tgz#0b81eba897e5a3d31d1c3d102f8f01441e559449"
@@ -5932,7 +5924,7 @@ filelist@^1.0.4:
   dependencies:
     minimatch "^5.0.1"
 
-filename-regex@^2.0.0, filename-regex@^2.0.1:
+filename-regex@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha512-BTCqyBaWBTsauvnHiE8i562+EdJj+oUpkqWp2R1iCoR8f6oo8STRu3of7WJJ0TqWtxN50a5YFpzYK4Jj9esYfQ==
@@ -5957,16 +5949,6 @@ fill-range@^4.0.0:
     is-number "^3.0.0"
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
-
-fill-range@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-5.0.0.tgz#c75d61ddaf3205412a43549f0d63b8a15aa7c9e0"
-  integrity sha512-df1KCjiiQ8GoKIe6n2jLknXEoE51D7faMl4CEyu5dHCkVG3fkQUW3mI2x9zPpZ/eqH5Y7c8fno1BXbCmKzQQgA==
-  dependencies:
-    extend-shallow "^2.0.1"
-    is-number "^4.0.0"
-    repeat-string "^1.6.1"
-    to-regex-range "^2.1.1"
 
 fill-range@^7.1.1:
   version "7.1.1"
@@ -7395,7 +7377,7 @@ is-plain-object@^5.0.0:
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-5.0.0.tgz#4427f50ab3429e9025ea7d52e9043a9ef4159344"
   integrity sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==
 
-is-posix-bracket@^0.1.0, is-posix-bracket@^0.1.1:
+is-posix-bracket@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/is-posix-bracket/-/is-posix-bracket-0.1.1.tgz#3334dc79774368e92f016e6fbc0a88f5cd6e6bc4"
   integrity sha512-Yu68oeXJ7LeWNmZ3Zov/xg/oDBnBK2RNxwYY1ilNJX+tKKZqgPK+qOn/Gs9jEu66KDY9Netf5XLKNGzas/vPfQ==
@@ -11960,7 +11942,7 @@ to-object-path@^0.3.0:
   dependencies:
     kind-of "^3.0.2"
 
-to-regex-range@^2.1.0, to-regex-range@^2.1.1:
+to-regex-range@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/to-regex-range/-/to-regex-range-2.1.1.tgz#7c80c17b9dfebe599e27367e0d4dd5590141db38"
   integrity sha512-ZZWNfCjUokXXDGXFpZehJIkZqq91BcULFq/Pi7M5i4JnxXdhMKAK682z8bCW3o8Hj1wuuzoKcW3DfVzaP6VuNg==

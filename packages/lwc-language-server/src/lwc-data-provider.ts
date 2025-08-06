@@ -30,13 +30,11 @@ export class LWCDataProvider implements IHTMLDataProvider {
     }
 
     provideTags(): ITagData[] {
-        const customTags = this.indexer.customData.map((tag) => {
-            return {
-                name: tag.lwcName,
-                description: tag.description,
-                attributes: tag.attributes,
-            };
-        });
+        const customTags = this.indexer.customData.map((tag) => ({
+            name: tag.lwcName,
+            description: tag.description,
+            attributes: tag.attributes,
+        }));
         return [...this._standardTags, ...customTags];
     }
     provideAttributes(tagName: string): IAttributeData[] {

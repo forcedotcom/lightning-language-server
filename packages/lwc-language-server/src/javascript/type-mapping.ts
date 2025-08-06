@@ -260,7 +260,7 @@ function getMembers(classObj: Class): InternalClassMember[] {
     // that they appeared in the component code. Since the new metadata exposes this information
     // separately, we need to combine & reorder to match the old behavior.
     const members = [...properties, ...methods];
-    members.sort((memberA, memberB) => memberA.loc!.start.line - memberB.loc!.start.line);
+    members.sort((memberA, memberB) => memberA.loc?.start.line - memberB.loc?.start.line);
     return members;
 }
 
