@@ -152,7 +152,9 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    return await Promise.all(AURA_EXTENSIONS.map(async (ext) => await utils.glob(path.join(namespaceRoot, '*', `*${ext}`), { cwd: namespaceRoot })));
+    const promises = AURA_EXTENSIONS.map(async (ext) => await utils.glob(path.join(namespaceRoot, '*', `*${ext}`), { cwd: namespaceRoot }));
+    const results = await Promise.all(promises);
+    return results.flat();
 }
 
 async function findCoreESLint(): Promise<string> {
