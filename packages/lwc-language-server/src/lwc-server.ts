@@ -32,7 +32,6 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { Metadata } from './decorators';
 import { WorkspaceContext, interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
 
 import ComponentIndexer from './component-indexer';
@@ -106,7 +105,7 @@ export default class Server {
 
     async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         this.workspaceFolders = params.workspaceFolders;
-        this.workspaceRoots = this.workspaceFolders.map(folder => URI.parse(folder.uri).fsPath);
+        this.workspaceRoots = this.workspaceFolders.map((folder) => URI.parse(folder.uri).fsPath);
         this.context = new WorkspaceContext(this.workspaceRoots);
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.lwcDataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
@@ -176,7 +175,7 @@ export default class Server {
             }
         } else if (await this.context.isLWCJavascript(doc)) {
             if (this.shouldCompleteJavascript(params)) {
-                const customTags = this.componentIndexer.customData.map(tag => {
+                const customTags = this.componentIndexer.customData.map((tag) => {
                     return {
                         label: tag.lwcTypingsName,
                         kind: CompletionItemKind.Folder,
@@ -224,10 +223,10 @@ export default class Server {
 
     private findBindItems(docBasename: string): CompletionItem[] {
         const customTags: CompletionItem[] = [];
-        this.componentIndexer.customData.forEach(t => {
-            if (t.name === docBasename) {
-                t.classMembers.forEach(cm => {
-                    const bindName = `${t.name}.${cm.name}`;
+        this.componentIndexer.customData.forEach((tag) => {
+            if (tag.name === docBasename) {
+                tag.classMembers.forEach((cm) => {
+                    const bindName = `${tag.name}.${cm.name}`;
                     const kind = cm.type === 'method' ? CompletionItemKind.Function : CompletionItemKind.Property;
                     const detail = cm.decorator ? `@${cm.decorator}` : '';
                     customTags.push({ label: cm.name, kind, documentation: bindName, detail, sortText: bindName });
@@ -331,12 +330,10 @@ export default class Server {
 
     async onDidSave(change: TextDocumentChangeEvent): Promise<void> {
         const { document } = change;
-        const { uri } = document;
         if (await this.context.isLWCJavascript(document)) {
-            const doc = await javascriptCompileDocument(document);
-            const metadata: Metadata = doc.metadata;
+            const { metadata } = await javascriptCompileDocument(document);
             if (metadata) {
-                const tag = this.componentIndexer.findTagByURI(uri);
+                const tag: Tag = this.componentIndexer.findTagByURI(document.uri);
                 if (tag) {
                     tag.updateMetadata(metadata);
                 }
@@ -345,11 +342,23 @@ export default class Server {
     }
 
     onShutdown(): void {
+        // Persist custom components for faster startup on next session
         this.componentIndexer.persistCustomComponents();
+
+        this.connection.sendNotification(ShowMessageNotification.type, {
+            type: MessageType.Info,
+            message: 'LWC Language Server shutting down',
+        });
     }
 
     onExit(): void {
+        // Persist custom components for faster startup on next session
         this.componentIndexer.persistCustomComponents();
+
+        this.connection.sendNotification(ShowMessageNotification.type, {
+            type: MessageType.Info,
+            message: 'LWC Language Server exiting',
+        });
     }
 
     onDefinition(params: TextDocumentPositionParams): Location[] {
@@ -438,7 +447,7 @@ export default class Server {
             case TokenType.AttributeValue: {
                 const match = propertyRegex.exec(content);
                 if (match) {
-                    const item = iterators.find(i => i.name === match.groups.property) || null;
+                    const item = iterators.find((i) => i.name === match.groups.property) || null;
                     return {
                         type: Token.DynamicAttributeValue,
                         name: match.groups.property,
@@ -454,7 +463,7 @@ export default class Server {
                 const match = findDynamicContent(content, relativeOffset);
 
                 if (match) {
-                    const item = iterators.find(i => i.name === match) || null;
+                    const item = iterators.find((i) => i.name === match) || null;
 
                     return {
                         type: Token.DynamicContent,

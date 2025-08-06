@@ -17,7 +17,7 @@ real.WorkspaceContext.prototype.isLWC = (): boolean => {
 };
 const realWS = new real.WorkspaceContext('');
 realWS.type = WorkspaceType.SFDX;
-// @ts-ignore
+// @ts-expect-error - Mock implementation
 WorkspaceContext.mockImplementation(() => {
     return realWS;
 });
@@ -85,7 +85,7 @@ it('appendLineIfMissing()', async () => {
     tmp.setGracefulCleanup();
 
     // creates with line if file doesn't exist
-    expect(file).not.toExist();
+    expect(fs.existsSync(file)).toBeFalsy();
     await utils.appendLineIfMissing(file, 'line 1');
     expect(fs.readFileSync(file, 'utf8')).toBe('line 1\n');
 

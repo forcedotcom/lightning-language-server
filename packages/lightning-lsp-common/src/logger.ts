@@ -7,7 +7,7 @@ export function interceptConsoleLogger(connection: IConnection): void {
     }
     const intercept = (method: string): void => {
         const original = console[method];
-        console[method] = function(...args: any): void {
+        console[method] = function (...args: any): void {
             if (connection) {
                 const remote: any = connection.console;
                 remote[method].apply(connection.console, args);

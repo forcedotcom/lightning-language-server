@@ -3,7 +3,7 @@ import { collectBundleMetadata, BundleConfig, ScriptFile } from '@lwc/metadata';
 import { transform } from '@lwc/old-compiler';
 import { CompilerOptions as OldCompilerOptions } from '@lwc/old-compiler/dist/types/compiler/options';
 import { mapLwcMetadataToInternal } from '../type-mapping';
-import { Metadata } from '../../decorators';
+import { Metadata } from '@salesforce/lightning-lsp-common';
 import * as fs from 'fs-extra';
 
 it('can map new metadata to old metadata', async () => {
@@ -20,7 +20,8 @@ it('can map new metadata to old metadata', async () => {
                 fileName: 'metadata.js',
                 source: content,
             },
-        ], npmModuleMapping: {}
+        ],
+        npmModuleMapping: {},
     };
 
     const modernMetadata = collectBundleMetadata(newMetadataOpts);
@@ -51,7 +52,8 @@ it('Should handle mapping when there is a property with only a setter', async ()
                 fileName: 'nogetter.js',
                 source: content,
             },
-        ], npmModuleMapping: {}
+        ],
+        npmModuleMapping: {},
     };
 
     const modernMetadata = collectBundleMetadata(newMetadataOpts);

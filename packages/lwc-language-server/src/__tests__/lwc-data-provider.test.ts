@@ -1,5 +1,5 @@
 import ComponentIndexer from '../component-indexer';
-import { ModuleExports, WireDecorator } from '../decorators';
+import { ModuleExports, WireDecorator } from '@salesforce/lightning-lsp-common';
 import { DataProviderAttributes, LWCDataProvider } from '../lwc-data-provider';
 import Tag, { TagAttrs } from '../tag';
 import * as path from 'path';
@@ -20,7 +20,7 @@ beforeEach(async () => {
 describe('provideValues()', () => {
     it('should return a list of values', () => {
         const values = provider.provideValues();
-        const names = values.map(value => value.name);
+        const names = values.map((value) => value.name);
         expect(values).not.toBeEmpty();
         expect(names).toInclude('info');
         expect(names).toInclude('iconName');

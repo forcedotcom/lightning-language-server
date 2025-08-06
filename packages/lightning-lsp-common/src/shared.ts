@@ -21,20 +21,6 @@ export enum WorkspaceType {
     CORE_PARTIAL,
     UNKNOWN,
 }
-export function isUnknown(type: WorkspaceType): boolean {
-    // what about core all or core single?
-    switch (type) {
-        case WorkspaceType.STANDARD:
-        case WorkspaceType.MONOREPO_LWC:
-        case WorkspaceType.MONOREPO:
-        case WorkspaceType.UNKNOWN:
-            return true;
-    }
-    return false;
-}
-export function isLWC(type: WorkspaceType): boolean {
-    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
-}
 
 export function getSfdxProjectFile(root: string): string {
     return path.join(root, SFDX_PROJECT);
@@ -66,7 +52,7 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
             const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             const allDependencies = [...dependencies, ...devDependencies];
-            const hasLWCdependencies = allDependencies.some(key => {
+            const hasLWCdependencies = allDependencies.some((key) => {
                 return key.startsWith('@lwc/') || key === 'lwc';
             });
 

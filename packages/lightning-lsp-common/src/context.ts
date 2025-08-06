@@ -3,7 +3,7 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { lt } from 'semver';
 import { TextDocument } from 'vscode-languageserver';
-// @ts-ignore
+// @ts-expect-error - lodash.templatesettings module
 import templateSettings from 'lodash.templatesettings';
 import template from 'lodash.template';
 import { parse } from 'properties';
@@ -63,7 +63,7 @@ async function readSfdxProjectConfig(root: string): Promise<SfdxProjectConfig> {
 }
 
 function getSfdxPackageDirs(sfdxProjectConfig: SfdxProjectConfig): string[] {
-    return sfdxProjectConfig.packageDirectories.map(packageDir => packageDir.path);
+    return sfdxProjectConfig.packageDirectories.map((packageDir) => packageDir.path);
 }
 
 /**

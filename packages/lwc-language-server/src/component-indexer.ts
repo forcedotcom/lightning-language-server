@@ -32,7 +32,7 @@ export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
 }
 
 export function unIndexedFiles(entries: Entry[], tags: Tag[]): Entry[] {
-    return entries.filter(entry => !tags.some(tag => tagEqualsFile(tag, entry)));
+    return entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
 }
 
 export function ensureDirectoryExists(filePath: string): void {
@@ -98,7 +98,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByURI(uri: string): Tag | null {
         const uriText = uri.replace('.html', '.js');
-        return Array.from(this.tags.values()).find(tag => tag.uri === uriText) || null;
+        return Array.from(this.tags.values()).find((tag) => tag.uri === uriText) || null;
     }
 
     loadTagsFromIndex(): void {
@@ -109,7 +109,7 @@ export default class ComponentIndexer extends BaseIndexer {
             if (shouldInit) {
                 const indexJsonString: string = fsExtra.readFileSync(indexPath, 'utf8');
                 const index: object[] = JSON.parse(indexJsonString);
-                index.forEach(data => {
+                index.forEach((data) => {
                     const info = new Tag(data);
                     this.tags.set(info.name, info);
                 });
@@ -196,28 +196,28 @@ export default class ComponentIndexer extends BaseIndexer {
     get staleTags(): Tag[] {
         const { componentEntries } = this;
 
-        return this.customData.filter(tag => {
-            return !componentEntries.some(entry => entry.path === tag.file);
+        return this.customData.filter((tag) => {
+            return !componentEntries.some((entry) => entry.path === tag.file);
         });
     }
 
     async init(): Promise<void> {
         this.loadTagsFromIndex();
-        const promises = this.unIndexedFiles.map(entry => Tag.fromFile(entry.path, entry.stats.mtime));
+        const promises = this.unIndexedFiles.map((entry) => Tag.fromFile(entry.path, entry.stats.mtime));
         const tags = await Promise.all(promises);
-        tags.filter(Boolean).forEach(tag => {
+        tags.filter(Boolean).forEach((tag) => {
             this.tags.set(tag.name, tag);
         });
 
-        this.staleTags.forEach(tag => this.tags.delete(tag.name));
+        this.staleTags.forEach((tag) => this.tags.delete(tag.name));
         this.persistCustomComponents();
     }
 
     async reindex(): Promise<void> {
-        const promises = this.componentEntries.map(entry => Tag.fromFile(entry.path));
+        const promises = this.componentEntries.map((entry) => Tag.fromFile(entry.path));
         const tags = await Promise.all(promises);
         this.tags.clear();
-        tags.forEach(tag => {
+        tags.forEach((tag) => {
             this.tags.set(tag.name, tag);
         });
     }
