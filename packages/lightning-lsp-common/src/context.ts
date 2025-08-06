@@ -93,10 +93,18 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
         for (const subdir of subdirs) {
             // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
-            const componentPath = path.join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
-            const files = await utils.glob(componentPath, { cwd: subdir });
-            if (files.length > 0) {
-                return true;
+            const extensions = ['.app', '.cmp', '.intf', '.evt', '.lib'];
+
+            for (const ext of extensions) {
+                const componentPath = path.join(subdir, basename + ext);
+                try {
+                    const files = await utils.glob(componentPath, { cwd: subdir });
+                    if (files.length > 0) {
+                        return true;
+                    }
+                } catch (error) {
+                    // Continue to next extension if this one fails
+                }
             }
         }
         return false;
@@ -149,8 +157,32 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    const files = await utils.glob(path.join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
-    return files;
+    // Use a more Windows-compatible approach by searching for each extension separately
+    const extensions = ['.app', '.cmp', '.intf', '.evt', '.lib'];
+    const allFiles: string[] = [];
+
+    for (const ext of extensions) {
+        const pattern = path.join(namespaceRoot, '*', `*${ext}`);
+        try {
+            const files = await utils.glob(pattern, { cwd: namespaceRoot });
+            allFiles.push(...files);
+        } catch (error) {
+            // If glob fails, fall back to the original pattern
+            console.warn(`Glob pattern failed for ${ext}:`, error);
+        }
+    }
+
+    // If no files found with individual patterns, try the original pattern as fallback
+    if (allFiles.length === 0) {
+        try {
+            const files = await utils.glob(path.join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
+            allFiles.push(...files);
+        } catch (error) {
+            console.warn('Fallback glob pattern also failed:', error);
+        }
+    }
+
+    return allFiles;
 }
 
 async function findCoreESLint(): Promise<string> {
