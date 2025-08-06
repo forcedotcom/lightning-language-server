@@ -25,7 +25,7 @@ export interface Indexer {
     resetIndex(): void;
 }
 
-const AURA_EXTENSIONS = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
+const AURA_EXTENSIONS = ['.app', '.cmp', '.intf', '.evt', '.lib'];
 
 async function findSubdirectories(dir: string): Promise<string[]> {
     const subdirs: string[] = [];
@@ -73,21 +73,27 @@ function getSfdxPackageDirs(sfdxProjectConfig: SfdxProjectConfig): string[] {
  * @return module namespaces root folders found inside 'root'
  */
 async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: string[]; aura: string[] }> {
+    console.log('findNamespaceRoots called with root:', root, 'maxDepth:', maxDepth);
+    
     const roots: { lwc: string[]; aura: string[] } = {
         lwc: [],
         aura: [],
     };
 
     function isModuleRoot(subdirs: string[]): boolean {
+        console.log('isModuleRoot called with subdirs:', subdirs);
         for (const subdir of subdirs) {
             // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
             const modulePath = path.join(subdir, basename + '.js');
+            console.log('Checking module path:', modulePath);
             if (fs.existsSync(modulePath)) {
+                console.log('Found module, returning true');
                 // TODO: check contents for: from 'lwc'?
                 return true;
             }
         }
+        console.log('No modules found, returning false');
         return false;
     }
 
@@ -96,17 +102,41 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
      * @returns true if any subdir matches a name/name.js with name.js being a module
      */
     async function isAuraRoot(subdirs: string[]): Promise<boolean> {
-        return subdirs.some((subdir) => {
+        console.log('isAuraRoot called with subdirs:', subdirs);
+
+        for (const subdir of subdirs) {
+            console.log('Checking subdir:', subdir);
+
+            // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
-            return AURA_EXTENSIONS.some((ext) => {
+            console.log('Basename:', basename);
+
+            for (const ext of AURA_EXTENSIONS) {
                 const componentPath = path.join(subdir, basename + ext);
-                return fs.existsSync(componentPath);
-            });
-        });
+                console.log('Checking component path:', componentPath);
+
+                try {
+                    const files = await utils.glob(componentPath, { cwd: subdir });
+                    console.log(`Files found for ${ext}:`, files);
+                    if (files.length > 0) {
+                        console.log('Found Aura component, returning true');
+                        return true;
+                    }
+                } catch (error) {
+                    console.log(`Error checking ${ext}:`, error);
+                    // Continue to next extension if this one fails
+                }
+            }
+        }
+        console.log('No Aura components found, returning false');
+        return false;
     }
 
     async function traverse(candidate: string, depth: number): Promise<void> {
+        console.log('traverse called with candidate:', candidate, 'depth:', depth);
+        
         if (--depth < 0) {
+            console.log('Depth limit reached, returning');
             return;
         }
 
@@ -120,22 +150,32 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
             filename === 'repository' ||
             filename === 'git'
         ) {
+            console.log('Skipping directory:', filename);
             return;
         }
 
         // module_root/name/name.js
 
         const subdirs = await findSubdirectories(candidate);
+        console.log('Subdirectories found for', candidate, ':', subdirs);
+        
         // Is a root if we have a folder called lwc
         const isDirLWC = isModuleRoot(subdirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
+        console.log('isDirLWC result:', isDirLWC);
+        
         const isAura = await isAuraRoot(subdirs);
+        console.log('isAura result:', isAura);
+        
         if (isAura) {
+            console.log('Adding aura root:', path.resolve(candidate));
             roots.aura.push(path.resolve(candidate));
         }
         if (isDirLWC && !isAura) {
+            console.log('Adding lwc root:', path.resolve(candidate));
             roots.lwc.push(path.resolve(candidate));
         }
         if (!isDirLWC && !isAura) {
+            console.log('Not a root, traversing subdirectories');
             for (const subdir of subdirs) {
                 await traverse(subdir, depth);
             }
@@ -143,8 +183,13 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
     }
 
     if (fs.existsSync(root)) {
+        console.log('Root exists, starting traversal');
         await traverse(root, maxDepth);
+    } else {
+        console.log('Root does not exist:', root);
     }
+    
+    console.log('findNamespaceRoots returning:', roots);
     return roots;
 }
 
@@ -192,6 +237,7 @@ export class WorkspaceContext {
 
     private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
     private initSfdxProjectConfigCache: () => Promise<SfdxProjectConfig>;
+    private AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
     /**
      * @param workspaceRoots
@@ -236,16 +282,24 @@ export class WorkspaceContext {
     }
 
     public async findAllAuraMarkup(): Promise<string[]> {
+        console.log('findAllAuraMarkup called');
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
+        console.log('Namespace roots found:', namespaceRoots);
+        console.log('Aura namespace roots:', namespaceRoots.aura);
+
         for (const namespaceRoot of namespaceRoots.aura) {
-            files.push(...(await findAuraMarkupIn(namespaceRoot)));
+            console.log('Processing aura namespace root:', namespaceRoot);
+            const markupFiles = await findAuraMarkupIn(namespaceRoot);
+            console.log('Markup files found in', namespaceRoot, ':', markupFiles);
+            files.push(...markupFiles);
         }
+        console.log('Total markup files found:', files);
         return files;
     }
 
     public async isAuraMarkup(document: TextDocument): Promise<boolean> {
-        return document.languageId === 'html' && AURA_EXTENSIONS.includes(utils.getExtension(document)) && (await this.isInsideAuraRoots(document));
+        return document.languageId === 'html' && this.AURA_EXTENSIONS.includes(utils.getExtension(document)) && (await this.isInsideAuraRoots(document));
     }
 
     public async isAuraJavascript(document: TextDocument): Promise<boolean> {
@@ -603,22 +657,31 @@ export class WorkspaceContext {
      * @returns string list of all lwc and aura namespace roots
      */
     private async findNamespaceRootsUsingType(): Promise<{ lwc: string[]; aura: string[] }> {
+        console.log('findNamespaceRootsUsingType called, workspace type:', this.type);
+        console.log('Workspace roots:', this.workspaceRoots);
+
         const roots: { lwc: string[]; aura: string[] } = {
             lwc: [],
             aura: [],
         };
         switch (this.type) {
             case WorkspaceType.SFDX:
+                console.log('Processing SFDX workspace type');
                 // optimization: search only inside package directories
                 const { packageDirectories } = await this.getSfdxProjectConfig();
+                console.log('Package directories:', packageDirectories);
                 for (const pkg of packageDirectories) {
                     const pkgDir = path.join(this.workspaceRoots[0], pkg.path);
+                    console.log('Processing package directory:', pkgDir);
                     const subroots = await findNamespaceRoots(pkgDir);
+                    console.log('Subroots found for', pkgDir, ':', subroots);
                     roots.lwc.push(...subroots.lwc);
                     roots.aura.push(...subroots.aura);
                 }
+                console.log('Final roots for SFDX:', roots);
                 return roots;
             case WorkspaceType.CORE_ALL:
+                console.log('Processing CORE_ALL workspace type');
                 // optimization: search only inside project/modules/
                 for (const project of await fs.readdir(this.workspaceRoots[0])) {
                     const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
@@ -634,6 +697,7 @@ export class WorkspaceContext {
                 }
                 return roots;
             case WorkspaceType.CORE_PARTIAL:
+                console.log('Processing CORE_PARTIAL workspace type');
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
@@ -652,16 +716,21 @@ export class WorkspaceContext {
             case WorkspaceType.STANDARD_LWC:
             case WorkspaceType.MONOREPO:
             case WorkspaceType.UNKNOWN: {
+                console.log('Processing STANDARD/STANDARD_LWC/MONOREPO/UNKNOWN workspace type');
                 let depth = 6;
                 if (this.type === WorkspaceType.MONOREPO) {
                     depth += 2;
                 }
+                console.log('Searching with depth:', depth);
                 const unknownroots = await findNamespaceRoots(this.workspaceRoots[0], depth);
+                console.log('Unknown roots found:', unknownroots);
                 roots.lwc.push(...unknownroots.lwc);
                 roots.aura.push(...unknownroots.aura);
+                console.log('Final roots for STANDARD/etc:', roots);
                 return roots;
             }
         }
+        console.log('No workspace type matched, returning empty roots');
         return roots;
     }
 
