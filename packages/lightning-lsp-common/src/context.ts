@@ -25,6 +25,8 @@ export interface Indexer {
     resetIndex(): void;
 }
 
+const AURA_EXTENSIONS = ['.app', '.cmp', '.intf', '.evt', '.lib'];
+
 async function findSubdirectories(dir: string): Promise<string[]> {
     const subdirs: string[] = [];
     const dirs = await fs.readdir(dir);
@@ -89,25 +91,18 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
         return false;
     }
 
+    /**
+     * @param subdirs
+     * @returns true if any subdir matches a name/name.js with name.js being a module
+     */
     async function isAuraRoot(subdirs: string[]): Promise<boolean> {
-        for (const subdir of subdirs) {
-            // Is a root if any subdir matches a name/name.js with name.js being a module
+        return subdirs.some((subdir) => {
             const basename = path.basename(subdir);
-            const extensions = ['.app', '.cmp', '.intf', '.evt', '.lib'];
-
-            for (const ext of extensions) {
+            return AURA_EXTENSIONS.some((ext) => {
                 const componentPath = path.join(subdir, basename + ext);
-                try {
-                    const files = await utils.glob(componentPath, { cwd: subdir });
-                    if (files.length > 0) {
-                        return true;
-                    }
-                } catch (error) {
-                    // Continue to next extension if this one fails
-                }
-            }
-        }
-        return false;
+                return fs.existsSync(componentPath);
+            });
+        });
     }
 
     async function traverse(candidate: string, depth: number): Promise<void> {
@@ -157,32 +152,7 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    // Use a more Windows-compatible approach by searching for each extension separately
-    const extensions = ['.app', '.cmp', '.intf', '.evt', '.lib'];
-    const allFiles: string[] = [];
-
-    for (const ext of extensions) {
-        const pattern = path.join(namespaceRoot, '*', `*${ext}`);
-        try {
-            const files = await utils.glob(pattern, { cwd: namespaceRoot });
-            allFiles.push(...files);
-        } catch (error) {
-            // If glob fails, fall back to the original pattern
-            console.warn(`Glob pattern failed for ${ext}:`, error);
-        }
-    }
-
-    // If no files found with individual patterns, try the original pattern as fallback
-    if (allFiles.length === 0) {
-        try {
-            const files = await utils.glob(path.join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
-            allFiles.push(...files);
-        } catch (error) {
-            console.warn('Fallback glob pattern also failed:', error);
-        }
-    }
-
-    return allFiles;
+    return AURA_EXTENSIONS.flatMap((ext) => utils.glob(path.join(namespaceRoot, '*', `*${ext}`), { cwd: namespaceRoot }));
 }
 
 async function findCoreESLint(): Promise<string> {
