@@ -25,7 +25,7 @@ export interface Indexer {
     resetIndex(): void;
 }
 
-const AURA_EXTENSIONS = ['.app', '.cmp', '.intf', '.evt', '.lib'];
+const AURA_EXTENSIONS = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 async function findSubdirectories(dir: string): Promise<string[]> {
     const subdirs: string[] = [];
@@ -192,7 +192,6 @@ export class WorkspaceContext {
 
     private findNamespaceRootsUsingTypeCache: () => Promise<{ lwc: string[]; aura: string[] }>;
     private initSfdxProjectConfigCache: () => Promise<SfdxProjectConfig>;
-    private AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
     /**
      * @param workspaceRoots
@@ -246,7 +245,7 @@ export class WorkspaceContext {
     }
 
     public async isAuraMarkup(document: TextDocument): Promise<boolean> {
-        return document.languageId === 'html' && this.AURA_EXTENSIONS.includes(utils.getExtension(document)) && (await this.isInsideAuraRoots(document));
+        return document.languageId === 'html' && AURA_EXTENSIONS.includes(utils.getExtension(document)) && (await this.isInsideAuraRoots(document));
     }
 
     public async isAuraJavascript(document: TextDocument): Promise<boolean> {
