@@ -7,7 +7,6 @@ import {
     InitializeParams,
     InitializeResult,
     TextDocumentPositionParams,
-    CompletionList,
     CompletionItem,
     DidChangeWatchedFilesParams,
     Hover,
@@ -21,7 +20,7 @@ import {
     WorkspaceFolder,
 } from 'vscode-languageserver';
 
-import { getLanguageService, LanguageService } from 'vscode-html-languageservice';
+import { getLanguageService, LanguageService, CompletionList } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
 import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
@@ -167,7 +166,7 @@ export default class Server {
                 isSfdxProject: this.context.type === WorkspaceType.SFDX,
                 useAttributeValueQuotes: true,
             });
-            return list as CompletionList;
+            return list;
         }
         
         if (await this.context.isAuraJavascript(document)) {

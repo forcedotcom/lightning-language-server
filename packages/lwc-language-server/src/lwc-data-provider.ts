@@ -15,7 +15,7 @@ export class LWCDataProvider implements IHTMLDataProvider {
 
     constructor(attributes?: DataProviderAttributes) {
         this.indexer = attributes.indexer;
-        const standardData = fs.readFileSync(join(__dirname, 'resources/standard-lwc.json'), 'utf-8');
+        const standardData = fs.readFileSync(join(__dirname, 'resources/transformed-lwc-standard.json'), 'utf-8');
         const standardJson = JSON.parse(standardData);
         this._standardTags = standardJson.tags;
         this._globalAttributes = standardJson.globalAttributes;

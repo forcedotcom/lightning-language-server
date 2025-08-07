@@ -6,7 +6,7 @@ import { createScanner } from 'vscode-html-languageservice/lib/umd/parser/htmlSc
 import { Position, Location } from 'vscode-languageserver-types';
 
 const AURA_STANDARD = 'aura-standard.json';
-const AURA_SYSTEM = 'aura-system.json';
+const AURA_SYSTEM = 'transformed-aura-system.json';
 const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 const RESOURCES_DIR = 'resources';
