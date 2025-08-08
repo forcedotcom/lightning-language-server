@@ -279,7 +279,7 @@ export default class Server {
                         this.auraIndexer.clearTagsforDirectory(dir, this.context.type === WorkspaceType.SFDX);
                     } else {
                         const file = toResolvedPath(event.uri);
-                        if (/.*(.app|.cmp|.intf|.evt|.lib)$/.test(file)) {
+                        if (file.endsWith('.app') || file.endsWith('.cmp') || file.endsWith('.intf') || file.endsWith('.evt') || file.endsWith('.lib')) {
                             await this.auraIndexer.indexFile(file, this.context.type === WorkspaceType.SFDX);
                         }
                     }

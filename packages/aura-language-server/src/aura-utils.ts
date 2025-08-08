@@ -166,77 +166,195 @@ export function getAuraBindingTemplateDeclaration(document: TextDocument, positi
 }
 
 /**
- * Parses attribute value or body text content looking for the active {PROPERTY.something} reference corresponding
- * to the position. It will only return the leading property name. i.e. PROPERTY
+ * Extracts the Aura binding value at the given position in an HTML document.
+ * 
+ * This function looks for Aura expressions like {!v.property} or {!c.method} 
+ * and returns the property/method name if the cursor is positioned within it.
+ * Examples:
+ * - Attribute: "<div value="{!v.account|.Name}"></div>" → returns "account"
+ * - Attribute: "<div value="{!v.account.Name|}"></div>" → returns "account" (cursor within property)
+ * - Attribute: "<div value="{!v.account.Name}"></div>" → returns "account" (first property only)
+ * - Attribute: "<div value="{!v.property}"></div>" → returns "property"
+ * - Attribute: "<div value="{!v.pr|operty}"></div>" → returns "property" (cursor within property)
+ * - Attribute: "<div value="{!v|.property}"></div>" → returns null
+ * - Content: "Hello {!v.account|.Name} world" → returns "account"
+ * - Content: "Hello {!v.accou|nt.Name} world" → returns "account" (cursor within property)
+ * - Content: "Hello {!v.account.Name|} world" → returns "account" (first property only)
+ * - Content: "Hello {!v.property|} world" → returns "property"
+ * - Content: "Hello {!v.pr|operty} world" → returns "property" (cursor within property)
+ * - Content: "Hello {!v|.property} world" → returns null 
+ * 
+ * @param document - The text document containing the Aura markup
+ * @param position - The cursor position to check
+ * @param htmlDocument - The parsed HTML document
+ * @returns The property/method name from the Aura expression, or null if not found
  */
 export function getAuraBindingValue(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null {
     const offset = document.offsetAt(position);
     const node = htmlDocument.findNodeAt(offset);
-    if (!node || !node.tag) {
+    
+    // Early return if we're not in a valid HTML tag
+    if (!node?.tag) {
         return null;
     }
 
-    // first look through attribute values
+    // First, check if we're inside an attribute value
+    const attributeValue = extractAuraExpressionFromAttribute(document, offset, node);
+    if (attributeValue) {
+        return attributeValue;
+    }
+
+    // If not in an attribute, check if we're in the body text content
+    return extractAuraExpressionFromContent(document, offset, node);
+}
+
+/**
+ * Extracts Aura expression from HTML attribute values.
+ * 
+ * This function extracts the property name from an Aura expression in an attribute value.
+ * It handles both simple properties and nested properties with multiple dots.
+ * 
+ * Examples:
+ * - Attribute: "<div value="{!v.account|.Name}"></div>" → returns "account"
+ * - Attribute: "<div value="{!v.account.Name|}"></div>" → returns "account" (cursor within property)
+ * - Attribute: "<div value="{!v.account.Name}"></div>" → returns "account" (first property only)
+ * - Attribute: "<div value="{!v.property}"></div>" → returns "property"
+ * - Attribute: "<div value="{!v.pr|operty}"></div>" → returns "property" (cursor within property)
+ * - Attribute: "<div value="{!v|.property}"></div>" → returns null
+ * 
+ * @param document - The text document
+ * @param offset - The cursor offset
+ * @param node - The HTML node to check
+ * @returns The property name from the Aura expression, or null if not found
+ */
+function extractAuraExpressionFromAttribute(document: TextDocument, offset: number, node: any): string | null {
     const attributeRange = getTagNameRange(document, offset, TokenType.AttributeValue, node.start);
-    if (attributeRange) {
-        const value = document.getText(attributeRange);
-        const valueRelativeOffset = offset - document.offsetAt(attributeRange.start);
-        const dotIndex = value.indexOf('.');
-        // make sure our position is AFTER the first dot before matching...
-        if (dotIndex !== -1 && valueRelativeOffset < dotIndex) {
-            // we're after the first dot, bail
-            return null;
-        }
-        const valueTrimmed = value.trim();
-        const match = AURA_EXPRESSION_REGEX.exec(valueTrimmed);
-        if (match) {
-            const property = match[1];
-            return property;
-        }
-    }
-    // try looking through body text...
     if (!attributeRange) {
-        const scanner = createScanner(document.getText(), node.start);
-        let token = scanner.scan();
-        while (token !== TokenType.EOS && scanner.getTokenEnd() <= node.end) {
-            if (token === TokenType.Content) {
-                const range = {
-                    start: document.positionAt(scanner.getTokenOffset()),
-                    end: document.positionAt(scanner.getTokenEnd()),
-                };
-                const curContent = document.getText(range);
-                const relativeOffset = offset - scanner.getTokenOffset();
-                const match = AURA_EXPRESSION_REGEX.exec(curContent);
-                if (match) {
-                    const start = match.index;
-                    const end = match.index + match[0].length - 1;
-                    if (start <= relativeOffset && relativeOffset <= end) {
-                        // this just gives us the match within the full regular expression match
-                        // we want to make sure we're only on the left most property following
-                        // the m, c, v character.
-                        const dotIndex = curContent.indexOf('.', start);
-                        if (dotIndex !== -1) {
-                            const nextDotIndex = curContent.indexOf('.', dotIndex + 1);
-                            if (nextDotIndex !== -1) {
-                                if (relativeOffset > dotIndex && relativeOffset < nextDotIndex) {
-                                    return match[1];
-                                }
-                            } else {
-                                if (relativeOffset > dotIndex) {
-                                    return match[1];
-                                }
-                            }
-                        } else {
-                            return match[1];
-                        }
-                        if (dotIndex === -1) {
-                            return match[1];
-                        }
-                    }
-                }
+        return null;
+    }
+
+    const attributeValue = document.getText(attributeRange);
+    const valueRelativeOffset = offset - document.offsetAt(attributeRange.start);
+    
+    // Check if cursor is positioned after the first dot in the expression
+    // This ensures we're in the property part, not the expression type (v, m, c)
+    const firstDotIndex = attributeValue.indexOf('.');
+    if (firstDotIndex !== -1 && valueRelativeOffset < firstDotIndex) {
+        return null;
+    }
+    
+    // Extract the property name from the Aura expression
+    const expressionMatch = AURA_EXPRESSION_REGEX.exec(attributeValue.trim());
+    return expressionMatch?.[1] ?? null;
+}
+
+/**
+ * Extracts Aura expression from HTML body text content.
+ * 
+ * This function extracts the property name from an Aura expression in the body text content.
+ * It handles both simple properties and nested properties with multiple dots.
+ * 
+ * Examples:
+ * - Content: "Hello {!v.account|.Name} world" → returns "account"
+ * - Content: "Hello {!v.accou|nt.Name} world" → returns "account" (cursor within property)
+ * - Content: "Hello {!v.account.Name|} world" → returns "account" (first property only)
+ * - Content: "Hello {!v.property|} world" → returns "property"
+ * - Content: "Hello {!v.pr|operty} world" → returns "property" (cursor within property)
+ * - Content: "Hello {!v|.property} world" → returns null
+ * 
+ * @param document - The text document
+ * @param offset - The cursor offset
+ * @param node - The HTML node to check
+ * @returns The property name from the Aura expression, or null if not found
+ */
+function extractAuraExpressionFromContent(document: TextDocument, offset: number, node: any): string | null {
+    const scanner = createScanner(document.getText(), node.start);
+    let token = scanner.scan();
+    
+    while (token !== TokenType.EOS && scanner.getTokenEnd() <= node.end) {
+        if (token === TokenType.Content) {
+            const contentRange = {
+                start: document.positionAt(scanner.getTokenOffset()),
+                end: document.positionAt(scanner.getTokenEnd()),
+            };
+            
+            const content = document.getText(contentRange);
+            const relativeOffset = offset - scanner.getTokenOffset();
+            
+            const expressionMatch = AURA_EXPRESSION_REGEX.exec(content);
+            if (!expressionMatch) {
+                token = scanner.scan();
+                continue;
             }
-            token = scanner.scan();
+            
+            // Check if cursor is within the matched Aura expression
+            const expressionStart = expressionMatch.index;
+            // expressionMatch[0] is the full expression, so we need to subtract 1 to account for the closing brace
+            const expressionEnd = expressionMatch.index + expressionMatch[0].length - 1;
+            
+            if (relativeOffset < expressionStart || relativeOffset > expressionEnd) {
+                token = scanner.scan();
+                continue;
+            }
+            
+            // Extract property name based on cursor position relative to dots
+            return extractPropertyNameFromExpression(content, relativeOffset, expressionStart, expressionEnd);
+        }
+        token = scanner.scan();
+    }
+    
+    return null;
+}
+
+/**
+ * Extracts the property name from an Aura expression based on cursor position.
+ * 
+ * This function determines which property name to return based on where the cursor
+ * is positioned within the Aura expression. It handles both simple properties and
+ * nested properties with multiple dots.
+ * 
+ * Examples:
+ * - Content: "Hello {!v.account|.Name} world" → returns "account"
+ * - Content: "Hello {!v.accou|nt.Name} world" → returns "account" (cursor within property)
+ * - Content: "Hello {!v.account.Name|} world" → returns "account" (first property only)
+ * - Content: "Hello {!v.property|} world" → returns "property"
+ * - Content: "Hello {!v.pr|operty} world" → returns "property" (cursor within property)
+ * - Content: "Hello {!v|.property} world" → returns null
+ * 
+ * @param content - The text content containing the expression
+ * @param relativeOffset - The cursor offset relative to the content start
+ * @param expressionStart - The start index of the Aura expression
+ * @param expressionEnd - The end index of the Aura expression
+ * @returns The property name, or null if cursor is not in a valid position
+ */
+function extractPropertyNameFromExpression(content: string, relativeOffset: number, expressionStart: number, expressionEnd: number): string | null {
+    const firstDotIndex = content.indexOf('.', expressionStart);
+    
+    // If no dot found, return null
+    if (firstDotIndex === -1) {
+        return null;
+    }
+    
+    const secondDotIndex = content.indexOf('.', firstDotIndex + 1);
+    
+    // Check if cursor is positioned after the first dot
+    if (relativeOffset > firstDotIndex) {
+        // If there's a second dot, cursor must be between first and second dot
+        if (secondDotIndex !== -1 && secondDotIndex <= expressionEnd) {
+            if (relativeOffset < secondDotIndex) {
+                // Extract just the first property name (before the second dot)
+                const propertyStart = firstDotIndex + 1;
+                return content.substring(propertyStart, secondDotIndex);
+            }
+        } else {
+            // No second dot, cursor is after first dot - extract everything after first dot
+            // but stop at the closing brace
+            const propertyStart = firstDotIndex + 1;
+            const closingBraceIndex = content.indexOf('}', propertyStart);
+            const propertyEnd = closingBraceIndex !== -1 ? closingBraceIndex : expressionEnd;
+            return content.substring(propertyStart, propertyEnd);
         }
     }
+    
     return null;
 }
