@@ -200,7 +200,7 @@ export function getAuraBindingValue(document: TextDocument, position: Position, 
 
     // First, check if we're inside an attribute value
     const attributeValue = extractAuraExpressionFromAttribute(document, offset, node);
-    if (attributeValue) {
+    if (attributeValue !== null) {
         return attributeValue;
     }
 
