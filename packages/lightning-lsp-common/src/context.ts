@@ -3,7 +3,7 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { lt } from 'semver';
 import { TextDocument } from 'vscode-languageserver';
-// @ts-ignore
+// @ts-expect-error - lodash.templatesettings module
 import templateSettings from 'lodash.templatesettings';
 import template from 'lodash.template';
 import { parse } from 'properties';
@@ -24,6 +24,8 @@ export interface Indexer {
     configureAndIndex(): Promise<void>;
     resetIndex(): void;
 }
+
+const AURA_EXTENSIONS = ['.app', '.cmp', '.intf', '.evt', '.lib'];
 
 async function findSubdirectories(dir: string): Promise<string[]> {
     const subdirs: string[] = [];
@@ -63,7 +65,7 @@ async function readSfdxProjectConfig(root: string): Promise<SfdxProjectConfig> {
 }
 
 function getSfdxPackageDirs(sfdxProjectConfig: SfdxProjectConfig): string[] {
-    return sfdxProjectConfig.packageDirectories.map(packageDir => packageDir.path);
+    return sfdxProjectConfig.packageDirectories.map((packageDir) => packageDir.path);
 }
 
 /**
@@ -89,14 +91,28 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
         return false;
     }
 
+    /**
+     * @param subdirs
+     * @returns true if any subdir matches a name/name.js with name.js being a module
+     */
     async function isAuraRoot(subdirs: string[]): Promise<boolean> {
         for (const subdir of subdirs) {
             // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
-            const componentPath = path.join(subdir, basename + '@(.app|.cmp|.intf|.evt|.lib)');
-            const files = await utils.glob(componentPath, { cwd: subdir });
-            if (files.length > 0) {
-                return true;
+
+            for (const ext of AURA_EXTENSIONS) {
+                const componentPath = path.join(subdir, basename + ext);
+
+                try {
+                    // Use the full path pattern instead of cwd to avoid Windows issues
+                    const pattern = componentPath.replace(/\\/g, '/'); // Normalize for glob
+                    const files = await utils.glob(pattern);
+                    if (files.length > 0) {
+                        return true;
+                    }
+                } catch (error) {
+                    // Continue to next extension if this one fails
+                }
             }
         }
         return false;
@@ -149,8 +165,13 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
  * @return list of .js modules inside namespaceRoot folder
  */
 async function findAuraMarkupIn(namespaceRoot: string): Promise<string[]> {
-    const files = await utils.glob(path.join(namespaceRoot, '*', '*@(.app|.cmp|.intf|.evt|.lib)'), { cwd: namespaceRoot });
-    return files;
+    const promises = AURA_EXTENSIONS.map(async (ext) => {
+        // Use full path pattern instead of cwd to avoid Windows issues
+        const pattern = path.join(namespaceRoot, '*', `*${ext}`).replace(/\\/g, '/');
+        return await utils.glob(pattern);
+    });
+    const results = await Promise.all(promises);
+    return results.flat();
 }
 
 async function findCoreESLint(): Promise<string> {
@@ -235,8 +256,10 @@ export class WorkspaceContext {
     public async findAllAuraMarkup(): Promise<string[]> {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
+
         for (const namespaceRoot of namespaceRoots.aura) {
-            files.push(...(await findAuraMarkupIn(namespaceRoot)));
+            const markupFiles = await findAuraMarkupIn(namespaceRoot);
+            files.push(...markupFiles);
         }
         return files;
     }

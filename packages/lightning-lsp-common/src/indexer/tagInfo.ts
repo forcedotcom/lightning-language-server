@@ -53,7 +53,7 @@ export class TagInfo {
             retVal += '\n';
         }
 
-        const methods = (this.methods && this.methods.filter(m => m.decorator === 'api')) || [];
+        const methods = (this.methods && this.methods.filter((m) => m.decorator === 'api')) || [];
         if (methods.length > 0) {
             retVal += this.documentation + '\n### Methods\n';
             for (const info of methods) {

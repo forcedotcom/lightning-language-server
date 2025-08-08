@@ -1,13 +1,5 @@
-import {
-    Class,
-    ClassMethod,
-    ClassProperty,
-    ScriptFile,
-    WireDecorator,
-    LwcDecorator,
-    SourceLocation,
-    Value,
-} from '@lwc/metadata';
+import { Class, ClassMethod, ClassProperty, ScriptFile, WireDecorator, LwcDecorator, SourceLocation, Value } from '@lwc/metadata';
+
 import {
     Metadata as InternalMetadata,
     ClassMember as InternalClassMember,
@@ -20,7 +12,7 @@ import {
     TrackDecoratorTarget,
     WireDecoratorTarget,
     ClassMemberPropertyValue,
-} from '../decorators';
+} from '@salesforce/lightning-lsp-common';
 
 type InternalDecorator = InternalApiDecorator | InternalTrackDecorator | InternalWireDecorator;
 // This can be removed once @lwc/metadata exposes `Export` and `DataProperty` types
@@ -28,9 +20,9 @@ type LwcExport = ScriptFile['exports'][0];
 type DataProperty = ClassProperty['dataProperty'];
 
 const decoratorTypeMap = {
-    'Api': 'api',
-    'Track': 'track',
-    'Wire': 'wire',
+    Api: 'api',
+    Track: 'track',
+    Wire: 'wire',
 } as const;
 
 type DecoratorKeyType = keyof typeof decoratorTypeMap;
@@ -65,21 +57,15 @@ function externalToInternalLoc(ext?: SourceLocation): InternalLocation | undefin
     };
 }
 
-function assertSingleDecorator(
-    decorators: LwcDecorator[],
-    member: ClassProperty | ClassMethod,
-): asserts decorators is [LwcDecorator] {
+function assertSingleDecorator(decorators: LwcDecorator[], member: ClassProperty | ClassMethod): asserts decorators is [LwcDecorator] {
     if (decorators.length && decorators.length > 1) {
         throw new Error(`Unexpected number of decorators in ${member.name}: ${member.decorators.length}`);
     }
 }
 
-function getDecorator(
-    decorators: LwcDecorator[],
-    member: ClassProperty | ClassMethod,
-): LwcDecorator | null {
+function getDecorator(decorators: LwcDecorator[], member: ClassProperty | ClassMethod): LwcDecorator | null {
     assertSingleDecorator(decorators, member);
-    return decorators[0] ?? null; 
+    return decorators[0] ?? null;
 }
 
 function dataPropertyToPropValue(decoratorType: DecoratorValType, extDataProp?: DataProperty): ClassMemberPropertyValue | undefined {
@@ -95,11 +81,7 @@ function dataPropertyToPropValue(decoratorType: DecoratorValType, extDataProp?: 
  * extremely quirky, and depends significantly on what type of decorator is applied
  * to the initialized property.
  */
-function externalToInternalPropValue(
-    decoratorType: DecoratorValType,
-    initialValue: Value,
-    isWireParam: boolean = false
-): ClassMemberPropertyValue | undefined {
+function externalToInternalPropValue(decoratorType: DecoratorValType, initialValue: Value, isWireParam = false): ClassMemberPropertyValue | undefined {
     switch (initialValue.type) {
         case 'Array':
             // Underlying types were unified in @lwc/metadata that were not unified
@@ -109,22 +91,18 @@ function externalToInternalPropValue(
             if (isWireParam) {
                 return {
                     type: 'array',
-                    value: initialValue.value.map(
-                        el => el.type === 'ImportedValue'
-                         ? undefined
-                         : el.value
-                    ),
+                    value: initialValue.value.map((el) => (el.type === 'ImportedValue' ? undefined : el.value)),
                 };
             }
 
             // In a bizarre twist, Values of array elements are included in the metadata, even
             // though their non-array counterparts are excluded!
-            return decoratorType !== 'api' ? undefined : {
-                type: 'array',
-                value: initialValue.value
-                    .map((el) => externalToInternalPropValue(decoratorType, el))
-                    .filter(Boolean),
-            };
+            return decoratorType !== 'api'
+                ? undefined
+                : {
+                      type: 'array',
+                      value: initialValue.value.map((el) => externalToInternalPropValue(decoratorType, el)).filter(Boolean),
+                  };
 
         case 'Object':
             if (isWireParam) {
@@ -138,10 +116,9 @@ function externalToInternalPropValue(
             return {
                 type: 'object',
                 value: Object.fromEntries(
-                    Object.entries(initialValue.value)
-                        .map(([key, val]) => {
-                            return [key, externalToInternalPropValue(decoratorType, val)];
-                        })
+                    Object.entries(initialValue.value).map(([key, val]) => {
+                        return [key, externalToInternalPropValue(decoratorType, val)];
+                    }),
                 ),
             };
 
@@ -167,25 +144,31 @@ function externalToInternalPropValue(
 
         case 'Number':
             // A value isn't reported in the old metadata for numbers (unless in an Array!)
-            return decoratorType !== 'api' && !isWireParam ? undefined : {
-                type: 'number',
-                value: initialValue.value,
-            };
+            return decoratorType !== 'api' && !isWireParam
+                ? undefined
+                : {
+                      type: 'number',
+                      value: initialValue.value,
+                  };
 
         case 'String':
             // A value isn't reported in the old metadata for strings.
-            return decoratorType === 'track' ? undefined : {
-                type: 'string',
-                value: initialValue.value,
-            };
+            return decoratorType === 'track'
+                ? undefined
+                : {
+                      type: 'string',
+                      value: initialValue.value,
+                  };
 
         case 'Undefined':
             // Who knows why the old metadata treats @api differently from @wire
             // and @track here...
-            return decoratorType !== 'api' ? undefined : {
-                type: 'unresolved',
-                value: undefined,
-            };
+            return decoratorType !== 'api'
+                ? undefined
+                : {
+                      type: 'unresolved',
+                      value: undefined,
+                  };
 
         case 'Unresolved':
             return {
@@ -197,7 +180,7 @@ function externalToInternalPropValue(
 
 /**
  * This transforms information about class properties from the old to the
- * new format. 
+ * new format.
  */
 function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | null {
     if (propertyObj.decorators.length > 1) {
@@ -218,16 +201,16 @@ function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | nu
     );
 
     // Note there can only be a getter or only a setter, both are not required.
-    // Use the getter if available, or the setter if there is no getter.  
+    // Use the getter if available, or the setter if there is no getter.
     let loc: SourceLocation;
     if (propertyObj.propertyType === 'accessor') {
         if (propertyObj.getter) {
-            loc = propertyObj.getter.location
+            loc = propertyObj.getter.location;
         } else if (propertyObj.setter) {
-            loc = propertyObj.setter.location
+            loc = propertyObj.setter.location;
         }
-     } else {
-        loc = propertyObj?.dataProperty.location
+    } else {
+        loc = propertyObj?.dataProperty.location;
     }
     return stripKeysWithUndefinedVals({
         name: propertyObj.name,
@@ -241,7 +224,7 @@ function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | nu
 
 /**
  * This transforms information about class methods from the old to the
- * new format. 
+ * new format.
  */
 function getMemberMethod(methodObj: ClassMethod): InternalClassMember | null {
     if (methodObj.decorators.length > 1) {
@@ -267,7 +250,7 @@ function getMemberMethod(methodObj: ClassMethod): InternalClassMember | null {
 
 /**
  * This transforms information about class properties & methods from the old
- * to the new format. 
+ * to the new format.
  */
 function getMembers(classObj: Class): InternalClassMember[] {
     const properties: InternalClassMember[] = classObj.properties.map(getMemberProperty).filter(Boolean);
@@ -277,7 +260,7 @@ function getMembers(classObj: Class): InternalClassMember[] {
     // that they appeared in the component code. Since the new metadata exposes this information
     // separately, we need to combine & reorder to match the old behavior.
     const members = [...properties, ...methods];
-    members.sort((memberA, memberB) => memberA.loc!.start.line - memberB.loc!.start.line);
+    members.sort((memberA, memberB) => memberA.loc?.start.line - memberB.loc?.start.line);
     return members;
 }
 
@@ -293,11 +276,11 @@ function getDecoratedApiMethod(method: ClassMethod): ApiDecoratorTarget {
  *   {
  *     key: value
  *   }
- *   
+ *
  * The value can either be a raw string (like 'foobar') or they can reference
  * some internal Salesforce data property (like '$searchString'). The distinguishing
  * characteristic is the presence of the dollar sign.
- * 
+ *
  * This function collects metadata about both types of params and returns them.
  */
 function getWireParams(decorator: WireDecorator) {
@@ -307,12 +290,12 @@ function getWireParams(decorator: WireDecorator) {
         staticObj = Object.fromEntries(
             Object.entries(decorator.adapterConfig.static).map(([key, staticParam]) => {
                 return [key, externalToInternalPropValue('wire', staticParam.value, true)];
-            })
+            }),
         );
         params = Object.fromEntries(
             Object.entries(decorator.adapterConfig.reactive).map(([key, { classProperty }]) => {
                 return [key, classProperty];
-            })
+            }),
         );
     }
     return {
@@ -343,9 +326,9 @@ function getDecoratedWiredMethod(method: ClassMethod, decorator: WireDecorator):
 }
 
 function getDecoratedMethods(methods: ClassMethod[]): {
-    wiredMethods: WireDecoratorTarget[],
-    apiMethods:  ApiDecoratorTarget[],
-    methodLocs: Map<string, number>,
+    wiredMethods: WireDecoratorTarget[];
+    apiMethods: ApiDecoratorTarget[];
+    methodLocs: Map<string, number>;
 } {
     const wiredMethods: WireDecoratorTarget[] = [];
     const apiMethods: ApiDecoratorTarget[] = [];
@@ -427,10 +410,10 @@ function getPropLoc(prop: ClassProperty): number | undefined {
 }
 
 function getDecoratedProperties(properties: ClassProperty[]): {
-    wiredProperties: WireDecoratorTarget[],
-    trackedProperties: TrackDecoratorTarget[],
-    apiProperties: ApiDecoratorTarget[],
-    propLocs: Map<string, number>,
+    wiredProperties: WireDecoratorTarget[];
+    trackedProperties: TrackDecoratorTarget[];
+    apiProperties: ApiDecoratorTarget[];
+    propLocs: Map<string, number>;
 } {
     const wiredProperties: WireDecoratorTarget[] = [];
     const trackedProperties: TrackDecoratorTarget[] = [];
@@ -459,7 +442,7 @@ function getDecoratedProperties(properties: ClassProperty[]): {
         trackedProperties,
         apiProperties,
         propLocs,
-    }   
+    };
 }
 
 /**
@@ -469,15 +452,12 @@ function getDecoratedProperties(properties: ClassProperty[]): {
  * in separate data-structures. In order to map the new metadata to the old,
  * it is necessary to combine properties & methods in a single array and
  * then re-order by their original location in the code.
- * 
+ *
  * However, their original locations are not present in the output
  * data-structure. So we collect the locations separately and then correlate
  * property/method names to their locations using this Map.
  */
-function sortDecorators<T extends { name: string }>(
-    decorators: T[],
-    locations: Map<string, number>,
-): T[] {
+function sortDecorators<T extends { name: string }>(decorators: T[], locations: Map<string, number>): T[] {
     return decorators.concat().sort((a: T, b: T) => {
         return locations.get(a.name) - locations.get(b.name);
     });
@@ -490,33 +470,32 @@ function getDecorators(classObj: Class): InternalDecorator[] {
         // Note: There is no such thing as a tracked method.
         methodLocs,
     } = getDecoratedMethods(classObj.methods);
-    const {
-        wiredProperties,
-        trackedProperties,
-        apiProperties,
-        propLocs,
-    } = getDecoratedProperties(classObj.properties);
+    const { wiredProperties, trackedProperties, apiProperties, propLocs } = getDecoratedProperties(classObj.properties);
 
     const allLocations: Map<string, number> = new Map([...methodLocs, ...propLocs]);
 
-    const wire: InternalWireDecorator = (wiredMethods.length || wiredProperties.length) ? {
-        type: 'wire',
-        targets: sortDecorators([...wiredProperties, ...wiredMethods], allLocations),
-    } : null;
-    const track: InternalTrackDecorator = trackedProperties.length ? {
-        type: 'track',
-        targets: trackedProperties,
-    } : null;
-    const api: InternalApiDecorator = (apiMethods.length || apiProperties.length) ? {
-        type: 'api',
-        targets: sortDecorators([...apiProperties, ...apiMethods], allLocations),
-    } : null;
+    const wire: InternalWireDecorator =
+        wiredMethods.length || wiredProperties.length
+            ? {
+                  type: 'wire',
+                  targets: sortDecorators([...wiredProperties, ...wiredMethods], allLocations),
+              }
+            : null;
+    const track: InternalTrackDecorator = trackedProperties.length
+        ? {
+              type: 'track',
+              targets: trackedProperties,
+          }
+        : null;
+    const api: InternalApiDecorator =
+        apiMethods.length || apiProperties.length
+            ? {
+                  type: 'api',
+                  targets: sortDecorators([...apiProperties, ...apiMethods], allLocations),
+              }
+            : null;
 
-    return [
-        api,
-        wire,
-        track,
-    ].filter(Boolean);
+    return [api, wire, track].filter(Boolean);
 }
 
 function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
@@ -524,13 +503,13 @@ function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
         if (lwcExport.namedExports) {
             return lwcExport.namedExports.map((namedExport) =>
                 namedExport.exportedName === '*'
-                    ? {
-                        type: 'ExportAllDeclaration',
-                    } as InternalModuleExports
-                    : {
-                        type: 'ExportNamedDeclaration',
-                        value: namedExport.exportedName,
-                    } as InternalModuleExports
+                    ? ({
+                          type: 'ExportAllDeclaration',
+                      } as InternalModuleExports)
+                    : ({
+                          type: 'ExportNamedDeclaration',
+                          value: namedExport.exportedName,
+                      } as InternalModuleExports),
             );
         } else if (lwcExport.defaultExport) {
             return {
@@ -551,8 +530,8 @@ function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
 export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata {
     let mainClassObj;
     if (lwcMeta.mainClass) {
-        mainClassObj = lwcMeta.classes.find(classObj => {
-            return classObj.id == lwcMeta.mainClass.refId;
+        mainClassObj = lwcMeta.classes.find((classObj) => {
+            return classObj.id === lwcMeta.mainClass.refId;
         });
     } else if (lwcMeta.classes.length === 1) {
         mainClassObj = lwcMeta.classes[0];
@@ -575,7 +554,7 @@ export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata 
         decorators: getDecorators(mainClassObj),
         classMembers: getMembers(mainClassObj),
         declarationLoc,
-        doc: (mainClassObj?.__internal__doc ?? "").trim(),
+        doc: (mainClassObj?.__internal__doc ?? '').trim(),
         exports: getExports(lwcMeta.exports),
     };
 

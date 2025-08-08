@@ -7,8 +7,7 @@ import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { ClassMember, Metadata } from '../decorators';
-import { AttributeInfo, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, ClassMember, Decorator as DecoratorType, MemberType, Metadata } from '@salesforce/lightning-lsp-common';
 import commentParser from 'comment-parser';
 
 export interface CompilerResult {
@@ -147,7 +146,7 @@ export async function compileSource(source: string, fileName = 'foo.js'): Promis
                 source,
             },
         ],
-        npmModuleMapping: {}
+        npmModuleMapping: {},
     };
     const modernMetadata = collectBundleMetadata(options);
     if (modernMetadata.diagnostics.length) {

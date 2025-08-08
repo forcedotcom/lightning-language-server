@@ -6,14 +6,22 @@ import { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
 import * as componentUtil from './component-util';
 import {
-    getLanguageService,
-    LanguageService,
-    ICompletionParticipant,
-    HtmlContentContext,
-    HtmlAttributeValueContext,
-} from './html-language-service/htmlLanguageService';
-import { IHTMLTagProvider } from './html-language-service/parser/htmlTags';
-import { parse, Node } from './html-language-service/parser/htmlParser';
+    Metadata,
+    ApiDecorator,
+    TrackDecorator,
+    WireDecorator,
+    ClassMember,
+    ModuleExports,
+    Location,
+    Position,
+    DecoratorTargetType,
+    DecoratorTargetProperty,
+    DecoratorTargetMethod,
+    ApiDecoratorTarget,
+    TrackDecoratorTarget,
+    WireDecoratorTarget,
+    ClassMemberPropertyValue,
+} from './decorators';
 
 export {
     WorkspaceContext,
@@ -26,12 +34,19 @@ export {
     Decorator,
     MemberType,
     interceptConsoleLogger,
-    getLanguageService,
-    LanguageService,
-    IHTMLTagProvider,
-    parse,
-    Node,
-    ICompletionParticipant,
-    HtmlContentContext,
-    HtmlAttributeValueContext,
+    Metadata,
+    ApiDecorator,
+    TrackDecorator,
+    WireDecorator,
+    ClassMember,
+    ModuleExports,
+    Location,
+    Position,
+    DecoratorTargetType,
+    DecoratorTargetProperty,
+    DecoratorTargetMethod,
+    ApiDecoratorTarget,
+    TrackDecoratorTarget,
+    WireDecoratorTarget,
+    ClassMemberPropertyValue,
 };

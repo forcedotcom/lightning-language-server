@@ -79,7 +79,7 @@ describe('Tag', () => {
             it('returns a range for the component', () => {
                 const range = {
                     end: { character: 1, line: 79 },
-                    start: { character: 0, line: 7 }
+                    start: { character: 0, line: 7 },
                 };
                 expect(tag.range).toEqual(range);
             });

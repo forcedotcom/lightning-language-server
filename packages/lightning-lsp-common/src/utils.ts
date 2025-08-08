@@ -80,16 +80,10 @@ export async function containsDeletedLwcWatchedDirectory(context: WorkspaceConte
         if (event.type === FileChangeType.Deleted && insideLwcWatchedDirectory) {
             const { dir, name, ext } = parse(event.uri);
             const folder = basename(dir);
-            const parentFolder= basename(dirname(dir));
-            if (
-                // LWC component
-                (/.*(.ts|.js)$/.test(ext) && folder === name && parentFolder === 'lwc') || 
-                // Folder deletion, subdirectory of lwc or lwc directory itself
-                // When there is no extension the name is the folder name and 
-                // folder becomes the parent folder
-                // ex: /path/to/some/dir, name => dir, folder => some
-                (!ext && (folder === 'lwc' || name === 'lwc'))) {
-                return true
+            const parentFolder = basename(dirname(dir));
+            // LWC component OR folder deletion, subdirectory of lwc or lwc directory itself
+            if (((ext.endsWith('.ts') || ext.endsWith('.js')) && folder === name && parentFolder === 'lwc') || (!ext && (folder === 'lwc' || name === 'lwc'))) {
+                return true;
             }
         }
     }
@@ -140,10 +134,6 @@ export function getBasename(textDocument: TextDocument): string {
     return filePath ? basename(filePath, ext) : '';
 }
 
-export function getResourcePath(resourceName: string): string {
-    return join(__dirname, RESOURCES_DIR, resourceName);
-}
-
 export function getSfdxResource(resourceName: string): string {
     return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
 }
@@ -178,7 +168,7 @@ export function deepMerge(to: object, from: object): boolean {
             // assign 'from' array values to the 'to' array (create array if 'to' is a scalar)
             const toArray = Array.isArray(toVal) ? (toVal as any[]) : ((to as any)[key] = [toVal]);
             for (const e of fromVal as any[]) {
-                if (!toArray.some(value => equal(value, e))) {
+                if (!toArray.some((value) => equal(value, e))) {
                     toArray.push(e);
                     modified = true;
                 }

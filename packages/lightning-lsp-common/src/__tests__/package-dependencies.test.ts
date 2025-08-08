@@ -32,7 +32,7 @@ if (fs.existsSync(monorepoConfigPath)) {
             const matches = glob.sync(packageGlob, {
                 cwd: monorepoRootPath,
             });
-            matches.forEach(match => {
+            matches.forEach((match) => {
                 const peerPackageJsonPath = path.join(monorepoRootPath, match, 'package.json');
                 const peerPackageJson = readJsonFile(peerPackageJsonPath);
                 if (peerPackageJson.name !== packageJson.name) {
@@ -49,7 +49,7 @@ describe(`package.json dependencies for ${packageJson.name}`, () => {
     let testMatchFound = false;
 
     for (const [name, versionRange] of Object.entries(dependencies)) {
-        checkedPackagePatterns.forEach(pattern => {
+        checkedPackagePatterns.forEach((pattern) => {
             if (pattern.test(name)) {
                 it(`should use a strict version for dependency ${name}`, () => {
                     expect(versionRange.trim().startsWith('^')).toEqual(false);
@@ -63,7 +63,7 @@ describe(`package.json dependencies for ${packageJson.name}`, () => {
     }
 
     for (const [name, versionRange] of Object.entries(devDependencies)) {
-        checkedPackagePatterns.forEach(pattern => {
+        checkedPackagePatterns.forEach((pattern) => {
             if (pattern.test(name)) {
                 it(`should use a strict version for devDependency ${name}`, () => {
                     expect(versionRange.trim().startsWith('^')).toEqual(false);

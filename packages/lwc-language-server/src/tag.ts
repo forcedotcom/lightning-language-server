@@ -8,7 +8,7 @@ import { paramCase } from 'change-case';
 import { URI } from 'vscode-uri';
 import * as path from 'path';
 import { Location, Position, Range } from 'vscode-languageserver';
-import { Metadata, ClassMember } from './decorators';
+import { Metadata, ClassMember } from '@salesforce/lightning-lsp-common';
 import { AttributeInfo } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 export type TagAttrs = {
@@ -69,7 +69,7 @@ export default class Tag implements ITagData {
 
     get description(): string {
         const docs: string[] = [this.documentation, this.attributeDocs, this.methodDocs];
-        return docs.filter(item => item !== null).join('\n');
+        return docs.filter((item) => item !== null).join('\n');
     }
 
     get name(): string {
@@ -97,7 +97,7 @@ export default class Tag implements ITagData {
     }
 
     attribute(name: string): AttributeInfo | null {
-        return this.attributes.find(attr => attr.name === name) || null;
+        return this.attributes.find((attr) => attr.name === name) || null;
     }
 
     get documentation(): string {
@@ -117,7 +117,7 @@ export default class Tag implements ITagData {
     }
 
     classMember(name: string): ClassMember | null {
-        return this.classMembers?.find(item => item.name === name) || null;
+        return this.classMembers?.find((item) => item.name === name) || null;
     }
 
     classMemberLocation(name: string): Location | null {
@@ -174,7 +174,7 @@ export default class Tag implements ITagData {
     }
 
     get apiMethods(): ClassMember[] {
-        return this.methods.filter(method => method.decorator === 'api');
+        return this.methods.filter((method) => method.decorator === 'api');
     }
 
     get range(): Range {

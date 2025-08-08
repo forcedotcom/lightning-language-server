@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 function getComponentLibraryLink(name) {
@@ -33,12 +35,12 @@ function getAttributeMarkdown(attribute) {
 }
 
 // read old file
-const lwcStandard = path.join(__dirname, '..', 'src', 'resources', 'lwc-standard.json');
+const lwcStandard = path.join(__dirname, '..', 'src', 'build-time-resources', 'lwc-standard.json');
 const f = fs.readFileSync(lwcStandard, { encoding: 'utf-8' });
 const data = JSON.parse(f.toString());
 
 // create tags from old file
-const tags = Object.keys(data).map(key => {
+const tags = Object.keys(data).map((key) => {
     const tag = data[key];
     return {
         name: key,
@@ -50,7 +52,7 @@ const tags = Object.keys(data).map(key => {
     };
 });
 
-// make globalAttribute changes here, not in standard-lwc.json as they'll be overwritten
+// make globalAttribute changes here, not in transformed-lwc-standard.json as they'll be overwritten
 const globalAttributes = [
     {
         name: 'for:each',
@@ -84,7 +86,8 @@ const globalAttributes = [
     },
     {
         name: 'if:true',
-        description: 'Renders the element or template if the expression value is truthy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
+        description:
+            'Renders the element or template if the expression value is truthy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
         references: [
             {
                 name: 'Salesforce',
@@ -94,7 +97,8 @@ const globalAttributes = [
     },
     {
         name: 'if:false',
-        description: 'Renders the element or template if the expression value is falsy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
+        description:
+            'Renders the element or template if the expression value is falsy. This directive is deprecated and no longer recommended. It may be removed in the future. Use lwc:if, lwc:elseif, and lwc:else instead.',
         references: [
             {
                 name: 'Salesforce',
@@ -136,8 +140,7 @@ const globalAttributes = [
         name: 'iterator:it',
         description: {
             kind: 'markdown',
-            value:
-                'Bind the current iteration item to an identifier. Contains properties (`value`, `index`, `first`, `last`) that let you apply special behaviors to certain items.',
+            value: 'Bind the current iteration item to an identifier. Contains properties (`value`, `index`, `first`, `last`) that let you apply special behaviors to certain items.',
         },
         references: [
             {
@@ -154,7 +157,7 @@ const newJson = {
     globalAttributes,
 };
 
-const standardLWC = path.join(__dirname, '..', 'src', 'resources', 'standard-lwc.json');
-fs.writeFileSync(standardLWC, JSON.stringify(newJson, null, 2));
+const transformedLWC = path.join(__dirname, '..', 'src', 'resources', 'transformed-lwc-standard.json');
+fs.writeFileSync(transformedLWC, JSON.stringify(newJson, null, 2));
 
-console.log('done building standard-lwc.json');
+console.log('done building transformed-lwc-standard.json');

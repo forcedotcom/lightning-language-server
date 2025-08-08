@@ -39,8 +39,7 @@ describe('indexer parsing content', () => {
         context.addIndexingProvider({ name: 'aura', indexer: auraIndexer });
 
         let markup = await context.findAllAuraMarkup();
-        markup = markup.map(p => normalize(full, p));
-        markup = markup.sort();
+        markup = markup.map(p => normalize(full, p)).sort();
         expect(markup).toMatchSnapshot();
         const tags = auraIndexer.getAuraTags();
         tags.forEach(taginfo => {

@@ -1,4 +1,4 @@
-import { WorkspaceContext, shared, Indexer, TagInfo, utils, AttributeInfo, componentUtil, parse, Node } from '@salesforce/lightning-lsp-common';
+import { WorkspaceContext, shared, Indexer, TagInfo, utils, AttributeInfo, componentUtil } from '@salesforce/lightning-lsp-common';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs-extra';
@@ -6,6 +6,8 @@ import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import EventsEmitter from 'events';
 import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
+import { parse } from '../aura-utils';
+import { Node } from 'vscode-html-languageservice';
 
 const { WorkspaceType } = shared;
 

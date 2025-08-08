@@ -10,7 +10,3 @@ if (shell.exec('node scripts/copy_typings.js').code !== 0) {
 
 //Copy src/resources into lib/
 shell.cp('-R', 'src/resources', 'lib/');
-
-// Copy Html Language Service files
-// Copy static assets
-shell.cp('-R', 'src/html-language-service/beautify', 'lib/html-language-service/beautify');
