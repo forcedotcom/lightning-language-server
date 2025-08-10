@@ -1,4 +1,4 @@
-// NOTE: This script is not used in the build process, but needs to be run manually to update the aura-system.json file
+// NOTE: This script is not used in the build.js, but needs to be run manually to update the aura-system.json file
 const fs = require('fs');
 const path = require('path');
 

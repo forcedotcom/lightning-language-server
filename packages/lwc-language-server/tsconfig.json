@@ -18,6 +18,7 @@
         "pretty": true,
         "declaration": true,
         "esModuleInterop": true,
+        "skipLibCheck": true,
     },
 
     "include": [

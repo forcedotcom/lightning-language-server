@@ -98,6 +98,13 @@ describe('handlers', () => {
         ],
     };
 
+    // Helper function to initialize server and get completion labels
+    const getCompletionLabels = async (params: CompletionParams): Promise<string[]> => {
+        await server.onInitialize(initializeParams);
+        const completions = await server.onCompletion(params);
+        return completions.items.map((item) => item.label);
+    };
+
     describe('#onCompletion', () => {
         it('should return a list of available completion items in a javascript file', async () => {
             const params: CompletionParams = {
@@ -112,9 +119,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map((item) => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toBeArrayOfSize(8);
             expect(labels).toInclude('c/todo_util');
             expect(labels).toInclude('c/todo_item');
@@ -147,9 +152,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map((item) => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
             expect(labels).toInclude('lightning-icon');
@@ -170,9 +173,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map((item) => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toBeArrayOfSize(21);
             expect(labels).toInclude('handleToggleAll');
             expect(labels).toInclude('handleClearCompleted');
@@ -187,9 +188,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map((item) => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('handleToggleAll');
             expect(labels).toInclude('handleClearCompleted');
             expect(labels).toInclude('has5Todos_today');
@@ -205,9 +204,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map((item) => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('c:todoItem');
             expect(labels).toInclude('c:todo');
             expect(labels).not.toInclude('div');

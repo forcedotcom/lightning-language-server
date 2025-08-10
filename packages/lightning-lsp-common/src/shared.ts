@@ -22,6 +22,10 @@ export enum WorkspaceType {
     UNKNOWN,
 }
 
+export function isLWC(type: WorkspaceType): boolean {
+    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
+}
+
 export function getSfdxProjectFile(root: string): string {
     return path.join(root, SFDX_PROJECT);
 }
