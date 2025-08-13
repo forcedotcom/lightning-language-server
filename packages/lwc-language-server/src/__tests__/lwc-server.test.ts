@@ -98,6 +98,13 @@ describe('handlers', () => {
         ],
     };
 
+    // Helper function to initialize server and get completion labels
+    const getCompletionLabels = async (params: CompletionParams): Promise<string[]> => {
+        await server.onInitialize(initializeParams);
+        const completions = await server.onCompletion(params);
+        return completions.items.map((item) => item.label);
+    };
+
     describe('#onCompletion', () => {
         it('should return a list of available completion items in a javascript file', async () => {
             const params: CompletionParams = {
@@ -112,9 +119,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map(item => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toBeArrayOfSize(8);
             expect(labels).toInclude('c/todo_util');
             expect(labels).toInclude('c/todo_item');
@@ -147,9 +152,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map(item => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('c-todo_item');
             expect(labels).toInclude('c-todo');
             expect(labels).toInclude('lightning-icon');
@@ -170,9 +173,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map(item => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toBeArrayOfSize(21);
             expect(labels).toInclude('handleToggleAll');
             expect(labels).toInclude('handleClearCompleted');
@@ -187,9 +188,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map(item => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('handleToggleAll');
             expect(labels).toInclude('handleClearCompleted');
             expect(labels).toInclude('has5Todos_today');
@@ -205,9 +204,7 @@ describe('handlers', () => {
                 },
             };
 
-            await server.onInitialize(initializeParams);
-            const completions = await server.onCompletion(params);
-            const labels = completions.items.map(item => item.label);
+            const labels = await getCompletionLabels(params);
             expect(labels).toInclude('c:todoItem');
             expect(labels).toInclude('c:todo');
             expect(labels).not.toInclude('div');
@@ -279,7 +276,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.componentIndexer.init();
             const locations: Location[] = server.onDefinition(params);
-            const uris = locations.map(item => item.uri);
+            const uris = locations.map((item) => item.uri);
             expect(locations.length).toEqual(2);
             expect(uris[0]).toContain('todo_item/todo_item.js');
             expect(uris[1]).toContain('todo_item/todo_item.html');
@@ -344,7 +341,7 @@ describe('handlers', () => {
             // Clean up after each test run
             fsExtra.removeSync(baseTsconfigPath);
             const tsconfigPaths = getTsConfigPaths();
-            tsconfigPaths.forEach(tsconfigPath => fsExtra.removeSync(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
             mockTypeScriptSupportConfig = false;
         });
 
@@ -398,12 +395,12 @@ describe('handlers', () => {
             // Clean up after each test run
             fsExtra.removeSync(baseTsconfigPath);
             const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
-            tsconfigPaths.forEach(tsconfigPath => fsExtra.removeSync(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
             fsExtra.removeSync(watchedFileDir);
             mockTypeScriptSupportConfig = false;
         });
 
-        ['.js', '.ts'].forEach(ext => {
+        ['.js', '.ts'].forEach((ext) => {
             it(`updates tsconfig.sfdx.json path mapping when ${ext} file created`, async () => {
                 // Enable feature flag
                 mockTypeScriptSupportConfig = true;
@@ -511,8 +508,8 @@ describe('handlers', () => {
             });
         });
 
-        ['.html', '.css', '.js-meta.xml', '.txt'].forEach(ext => {
-            [FileChangeType.Created, FileChangeType.Changed, FileChangeType.Deleted].forEach(type => {
+        ['.html', '.css', '.js-meta.xml', '.txt'].forEach((ext) => {
+            [FileChangeType.Created, FileChangeType.Changed, FileChangeType.Deleted].forEach((type) => {
                 it(`no path mapping updates made for ${ext} on ${type} event`, async () => {
                     const lwcComponentPath = path.resolve(watchedFileDir, `newlyAddedFile.ts`);
                     const nonJsOrTsFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);

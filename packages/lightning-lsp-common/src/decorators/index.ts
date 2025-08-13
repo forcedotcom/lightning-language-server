@@ -46,6 +46,7 @@ export interface WireDecoratorTarget {
     params: { [name: string]: string };
     static: any;
     type: DecoratorTargetType;
+    adapter?: unknown;
 }
 
 export interface ClassMember {

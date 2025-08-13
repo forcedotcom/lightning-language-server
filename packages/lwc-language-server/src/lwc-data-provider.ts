@@ -15,7 +15,7 @@ export class LWCDataProvider implements IHTMLDataProvider {
 
     constructor(attributes?: DataProviderAttributes) {
         this.indexer = attributes.indexer;
-        const standardData = fs.readFileSync(join(__dirname, 'resources/standard-lwc.json'), 'utf-8');
+        const standardData = fs.readFileSync(join(__dirname, 'resources/transformed-lwc-standard.json'), 'utf-8');
         const standardJson = JSON.parse(standardData);
         this._standardTags = standardJson.tags;
         this._globalAttributes = standardJson.globalAttributes;
@@ -30,23 +30,21 @@ export class LWCDataProvider implements IHTMLDataProvider {
     }
 
     provideTags(): ITagData[] {
-        const customTags = this.indexer.customData.map(tag => {
-            return {
-                name: tag.lwcName,
-                description: tag.description,
-                attributes: tag.attributes,
-            };
-        });
+        const customTags = this.indexer.customData.map((tag) => ({
+            name: tag.lwcName,
+            description: tag.description,
+            attributes: tag.attributes,
+        }));
         return [...this._standardTags, ...customTags];
     }
     provideAttributes(tagName: string): IAttributeData[] {
-        const tag = this.provideTags().find(t => t.name === tagName);
+        const tag = this.provideTags().find((t) => t.name === tagName);
         return [...this._globalAttributes, ...(tag?.attributes || [])];
     }
     provideValues(): IValueData[] {
         const values: IValueData[] = [];
-        this.indexer.customData.forEach(t => {
-            t.classMembers?.forEach(cm => {
+        this.indexer.customData.forEach((t) => {
+            t.classMembers?.forEach((cm) => {
                 const bindName = `${t.name}.${cm.name}`;
                 values.push({ name: cm.name, description: `${bindName}` });
             });
