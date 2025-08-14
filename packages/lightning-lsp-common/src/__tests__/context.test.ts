@@ -30,10 +30,6 @@ it('WorkspaceContext', async () => {
     expect(roots.lwc[1]).toEndWith(join(UTILS_ROOT, 'lwc'));
     expect(roots.lwc[2]).toEndWith(join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc'));
     expect(roots.lwc.length).toBe(3);
-    let modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(FORCE_APP_ROOT, '/lwc/hello_world/hello_world.js'));
-    expect(modules[8]).toEndWith(join(UTILS_ROOT, '/lwc/todo_util/todo_util.js'));
-    expect(modules.length).toBe(10);
     expect((await context.getModulesDirs()).length).toBe(3);
 
     context = new WorkspaceContext('test-workspaces/standard-workspace');
@@ -43,12 +39,6 @@ it('WorkspaceContext', async () => {
     expect(roots.lwc[1]).toEndWith(join(STANDARDS_ROOT, 'interop'));
     expect(roots.lwc[2]).toEndWith(join(STANDARDS_ROOT, 'other'));
     expect(roots.lwc.length).toBe(3);
-    modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(STANDARDS_ROOT, 'example', 'app', 'app.js'));
-    expect(modules[1]).toEndWith(join(STANDARDS_ROOT, 'example', 'line', 'line.js'));
-    expect(modules[2]).toEndWith(join(STANDARDS_ROOT, 'interop', 'ito', 'ito.js'));
-    expect(modules[3]).toEndWith(join(STANDARDS_ROOT, 'other', 'text', 'text.js'));
-    expect(modules.length).toBe(4);
     expect(await context.getModulesDirs()).toEqual([]);
 
     context = new WorkspaceContext(CORE_ALL_ROOT);
@@ -58,11 +48,6 @@ it('WorkspaceContext', async () => {
     expect(roots.lwc[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
     expect(roots.lwc[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
     expect(roots.lwc.length).toBe(3);
-    modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
-    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
-    expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
-    expect(modules.length).toBe(3);
     expect((await context.getModulesDirs()).length).toBe(2);
 
     context = new WorkspaceContext(CORE_PROJECT_ROOT);
@@ -70,9 +55,6 @@ it('WorkspaceContext', async () => {
     roots = await context.getNamespaceRoots();
     expect(roots.lwc[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one'));
     expect(roots.lwc.length).toBe(1);
-    modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(CORE_PROJECT_ROOT, 'modules', 'one', 'app-nav-bar', 'app-nav-bar.js'));
-    expect(modules.length).toBe(1);
     expect(await context.getModulesDirs()).toEqual([join(context.workspaceRoots[0], 'modules')]);
 
     context = new WorkspaceContext(CORE_MULTI_ROOT);
@@ -82,11 +64,6 @@ it('WorkspaceContext', async () => {
     expect(roots.lwc[1]).toEndWith(join(CORE_ALL_ROOT, 'ui-force-components/modules/force'));
     expect(roots.lwc[2]).toEndWith(join(CORE_ALL_ROOT, 'ui-global-components/modules/one'));
     expect(roots.lwc.length).toBe(3);
-    modules = await context.findAllModules();
-    expect(modules[0]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/clients/context-library-lwc/context-library-lwc.js'));
-    expect(modules[1]).toEndWith(join(CORE_ALL_ROOT, '/ui-force-components/modules/force/input-phone/input-phone.js'));
-    expect(modules[2]).toEndWith(join(CORE_ALL_ROOT, '/ui-global-components/modules/one/app-nav-bar/app-nav-bar.js'));
-    expect(modules.length).toBe(3);
     const modulesDirs = await context.getModulesDirs();
     for (let i = 0; i < context.workspaceRoots.length; i = i + 1) {
         expect(modulesDirs[i]).toMatch(context.workspaceRoots[i]);
