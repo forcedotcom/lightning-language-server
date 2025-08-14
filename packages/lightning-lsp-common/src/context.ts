@@ -241,18 +241,6 @@ export class WorkspaceContext {
         return this.indexers.get(name);
     }
 
-    /**
-     * @return all the .js module files in the workspace
-     */
-    public async findAllModules(): Promise<string[]> {
-        const files: string[] = [];
-        const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
-        for (const namespaceRoot of namespaceRoots.lwc) {
-            files.push(...(await findModulesIn(namespaceRoot)));
-        }
-        return files;
-    }
-
     public async findAllAuraMarkup(): Promise<string[]> {
         const files: string[] = [];
         const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
