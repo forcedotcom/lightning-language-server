@@ -51,9 +51,9 @@ describe('ComponentIndexer', () => {
                     'force-app/main/default/lwc/utils/utils.js',
                     'utils/meta/lwc/todo_util/todo_util.js',
                     'utils/meta/lwc/todo_utils/todo_utils.js',
-                ].map(item => path.join(componentIndexer.workspaceRoot, item));
+                ].map((item) => path.join(componentIndexer.workspaceRoot, item));
 
-                const paths = componentIndexer.componentEntries.map(entry => path.resolve(entry.path)).sort();
+                const paths = componentIndexer.componentEntries.map((entry) => path.resolve(entry.path)).sort();
 
                 expect(paths).toEqual(expectedComponents.sort());
                 expect(paths).not.toContain(path.join('force-app', 'main', 'default', 'lwc', 'import_relative', 'messages.js'));
@@ -159,8 +159,8 @@ describe('ComponentIndexer', () => {
                         compilerOptions: {
                             target: 'ESNext',
                             paths: {
-                                // @ts-ignore
-                                'c/*': [],
+                                // Provide an explicit type for the property to avoid implicit 'any[]' type error
+                                'c/*': [] as string[],
                             },
                         },
                     };

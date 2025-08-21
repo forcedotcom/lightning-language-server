@@ -7,7 +7,6 @@ import ejs from 'ejs';
 import { parse } from 'properties';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
-import { componentUtil } from './index';
 
 export interface SfdxPackageDirectoryConfig {
     path: string;

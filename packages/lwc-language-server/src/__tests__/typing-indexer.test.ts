@@ -10,10 +10,10 @@ const typingIndexer: TypingIndexer = new TypingIndexer({
 // jest and ts-jest. Solution adapted from Jest docs here:
 // https://jestjs.io/docs/jest-object
 jest.mock('fs-extra', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('fs-extra'),
-  };
+    return {
+        __esModule: true,
+        ...jest.requireActual('fs-extra'),
+    };
 });
 
 describe('TypingIndexer', () => {
@@ -34,7 +34,7 @@ describe('TypingIndexer', () => {
             typingIndexer.createNewMetaTypings();
             const filepaths: string[] = ['Channel1.messageChannel.d.ts', 'bike_assets.resource.d.ts', 'logo.asset.d.ts', 'todocss.resource.d.ts'];
 
-            filepaths.forEach(filepath => {
+            filepaths.forEach((filepath) => {
                 filepath = path.join(typingIndexer.typingsBaseDir, filepath);
                 expect(fsExtra.pathExistsSync(filepath)).toBeTrue();
             });
@@ -76,10 +76,9 @@ describe('TypingIndexer', () => {
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
 `;
             jest.spyOn(fsExtra, 'readFileSync').mockReturnValue(Buffer.from(xmlDocument));
-            jest.spyOn(typingIndexer, 'customLabelFiles', 'get')
-                .mockReturnValue([
-                    '/foo/bar/test-workspaces/sfdx-workspace/utils/meta/labels/CustomLabels.labels-meta.xml'
-                ]);
+            jest.spyOn(typingIndexer, 'customLabelFiles', 'get').mockReturnValue([
+                '/foo/bar/test-workspaces/sfdx-workspace/utils/meta/labels/CustomLabels.labels-meta.xml',
+            ]);
 
             const fileWriter = jest.spyOn(fsExtra, 'writeFileSync');
             await typingIndexer.saveCustomLabelTypings();
@@ -98,7 +97,7 @@ describe('TypingIndexer', () => {
                 '../../test-workspaces/sfdx-workspace/force-app/main/default/staticresources/todocss.resource-meta.xml',
                 '../../test-workspaces/sfdx-workspace/utils/meta/staticresources/todoutil.resource-meta.xml',
             ]
-                .map(filename => path.resolve(filename))
+                .map((filename) => path.resolve(filename))
                 .sort();
 
             expect(metaFilePaths).toEqual(expectedMetaFilePaths);
@@ -116,7 +115,7 @@ describe('TypingIndexer', () => {
                 '.sfdx/typings/lwc/Channel1.messageChannel.d.ts',
                 '.sfdx/typings/lwc/bike_assets.resource.d.ts',
                 '.sfdx/typings/lwc/todocss.resource.d.ts',
-            ].map(item => path.resolve(`${typingIndexer.workspaceRoot}/${item}`));
+            ].map((item) => path.resolve(`${typingIndexer.workspaceRoot}/${item}`));
 
             expectedMetaFileTypingPaths.forEach((filePath: string) => {
                 fsExtra.writeFileSync(filePath, 'foobar');
@@ -124,7 +123,7 @@ describe('TypingIndexer', () => {
 
             const metaFilePaths: string[] = typingIndexer.metaTypings;
 
-            expectedMetaFileTypingPaths.forEach(expectedPath => {
+            expectedMetaFileTypingPaths.forEach((expectedPath) => {
                 expect(metaFilePaths).toContain(expectedPath);
             });
         });

@@ -12,23 +12,23 @@ let shouldFilter = false;
 /* this is necessary to inform the parameter types of the controller when
     the helper method is deleted */
 const ForAllProps_Purgeable = infer.constraint({
-    construct: function(c) {
+    construct: function (c) {
         this.c = c;
     },
-    addType: function(type) {
+    addType: function (type) {
         if (!(type instanceof infer.Obj)) {
             return;
         }
         type.forAllProps(this.c);
     },
-    purge: function(test) {
+    purge: function (test) {
         if (this.sources) {
             for (let i = 0; i < this.sources.length; i++) {
                 this.sources[i].purge(test);
             }
         }
     },
-    addSource: function(source) {
+    addSource: function (source) {
         if (!this.sources) {
             this.sources = [];
         }
@@ -130,7 +130,7 @@ function unloadDefs(): void {
 }
 
 function readFileAsync(filename, c): void {
-    readFile(filename).then(function(contents) {
+    readFile(filename).then(function (contents) {
         c(null, contents);
     });
 }
@@ -164,8 +164,8 @@ function findAndBindHelper(type, server, modules, file): void {
     const hp = helper.getProp(bn);
     if (!hp.getType()) {
         // this handles new props added to the helper...
-        helper.on('addType', function(helperType, val) {
-            const p = new ForAllProps_Purgeable(function(prop, val, local) {
+        helper.on('addType', function (helperType, val) {
+            const p = new ForAllProps_Purgeable(function (prop, val, local) {
                 if (bn === prop) {
                     val.propagate(type);
                 }
@@ -176,7 +176,7 @@ function findAndBindHelper(type, server, modules, file): void {
     } else {
         // now we need to handle there were changes to the .cmp,
         // but not the helper,
-        const p = new ForAllProps_Purgeable(function(prop, val, local) {
+        const p = new ForAllProps_Purgeable(function (prop, val, local) {
             if (bn === prop) {
                 val.propagate(type);
             }
@@ -219,7 +219,7 @@ async function connectModule(file, out): Promise<void> {
     _debug('Starting... ' + file.name);
     if (/Helper.js$/.test(file.name)) {
         // need to reestablish server context after awaits
-        infer.withContext(server.cx, function() {
+        infer.withContext(server.cx, function () {
             _debug('Process helper exports ' + file.name);
             let outObj;
             if (!out.getType()) {
@@ -236,7 +236,7 @@ async function connectModule(file, out): Promise<void> {
                 walk.simple(
                     file.ast,
                     {
-                        ObjectExpression: function(node, state) {
+                        ObjectExpression: function (node, state) {
                             const parent = infer.parentNode(node, file.ast);
                             const grand = infer.parentNode(parent, file.ast);
                             if (grand.type === 'Program') {
@@ -299,10 +299,10 @@ async function connectModule(file, out): Promise<void> {
         } catch (ignore) {}
     }
     // reestablish scope after awaits
-    infer.withContext(server.cx, function() {
+    infer.withContext(server.cx, function () {
         _debug('Fixing scopes...' + file.name);
         walk.simple(file.ast, {
-            ObjectExpression: function(node, state) {
+            ObjectExpression: function (node, state) {
                 const parent = infer.parentNode(node, file.ast);
                 const grand = infer.parentNode(parent, file.ast);
                 if (grand.type === 'Program') {
@@ -356,7 +356,7 @@ async function connectModule(file, out): Promise<void> {
     server.finishAsyncAction();
 }
 
-tern.registerPlugin('aura', function(s, options) {
+tern.registerPlugin('aura', function (s, options) {
     server = s;
     if (!server.options.async) {
         throw Error('Server must be async');
@@ -368,7 +368,7 @@ tern.registerPlugin('aura', function(s, options) {
     server.mod.modules.resolvers.push(resolver);
     let currentQuery;
 
-    server.on('completion', function(file, query) {
+    server.on('completion', function (file, query) {
         // don't hijack the request to retrieve the standard completions
         if (currentQuery === query) {
             return;
@@ -381,12 +381,12 @@ tern.registerPlugin('aura', function(s, options) {
             {
                 query: query,
             },
-            function(err, result) {
+            function (err, result) {
                 if (err) {
                     _debug(err);
                 }
                 if (shouldFilter) {
-                    result.completions = result.completions.filter(function(completion, index, array) {
+                    result.completions = result.completions.filter(function (completion, index, array) {
                         const accepted =
                             (completion.doc && completion.doc.indexOf('@platform') !== -1 && completion.origin === 'Aura') || completion.origin !== 'Aura';
                         if (accepted && completion.doc) {
@@ -411,7 +411,7 @@ tern.registerPlugin('aura', function(s, options) {
 });
 
 tern.defineQueryType('ideInit', {
-    run: function(server, query) {
+    run: function (server, query) {
         if (query.unloadDefs) {
             unloadDefs();
             _debug('Unloaded default Aura defs');
@@ -425,16 +425,16 @@ tern.defineQueryType('ideInit', {
 });
 
 tern.defineQueryType('cleanup-file', {
-    run: function(server, query) {
+    run: function (server, query) {
         const files = query.files;
-        files.forEach(function(f) {
+        files.forEach(function (f) {
             let ff = f;
             if (ff.startsWith('/')) {
                 ff = ff.slice(1);
             }
             const m = server.mod.modules.modules[ff];
             if (m) {
-                m.purge(function(type) {
+                m.purge(function (type) {
                     if (type instanceof ForAllProps_Purgeable) {
                         return false;
                     } else {
@@ -453,7 +453,7 @@ tern.defineQueryType('cleanup-file', {
 
 tern.defineQueryType('guess-types', {
     takesFile: true,
-    run: function(server, query, file) {
+    run: function (server, query, file) {
         if (!query.end) {
             throw ternError('missing .query.end field');
         }
@@ -486,7 +486,7 @@ tern.defineQueryType('guess-types', {
 
 tern.defineQueryType('reset', {
     takesFile: false,
-    run: function(server, query, file) {
+    run: function (server, query, file) {
         server.reset();
         return 'OK';
     },

@@ -25,26 +25,27 @@ function getTagsData(): { name: string; description?: string; attributes: IAttri
     return Array.from(getAuraTags()).map(([tag, tagInfo]) => ({
         name: tag,
         description: tagInfo.getHover(),
-        attributes: tagInfo.attributes.map(attr => ({
+        attributes: tagInfo.attributes.map((attr) => ({
             name: attr.name,
             description: attr.name,
-            valueSet: attr.type
-        }))
+            valueSet: attr.type,
+        })),
     }));
 }
 
 function getAttributesData(tag: string): IAttributeData[] {
     const cTag = getAuraByTag(tag);
     if (cTag) {
-        return cTag.attributes.map(attr => ({
+        return cTag.attributes.map((attr) => ({
             name: attr.name,
             description: attr.name,
-            valueSet: attr.type
+            valueSet: attr.type,
         }));
     }
     return [];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getValuesData(tag: string, attribute: string): IValueData[] {
     // TODO provide suggestions by consulting shapeService
     return [];
@@ -56,6 +57,6 @@ export function getAuraTagProvider(): IHTMLDataProvider {
         isApplicable: (languageId): boolean => languageId === 'html',
         provideTags: getTagsData,
         provideAttributes: getAttributesData,
-        provideValues: getValuesData
+        provideValues: getValuesData,
     };
 }

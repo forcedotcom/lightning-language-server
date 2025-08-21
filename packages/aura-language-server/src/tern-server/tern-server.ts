@@ -107,11 +107,11 @@ async function ternInit(): Promise<void> {
     });
     const resources = searchAuraResourcesPath(__dirname);
     (await fs.promises.readdir(resources, { withFileTypes: true, recursive: true }))
-        .filter(dirent => dirent.isFile() && dirent.name.endsWith('.js'))
-        .map(dirent => path.join(dirent.parentPath, dirent.name))
+        .filter((dirent) => dirent.isFile() && dirent.name.endsWith('.js'))
+        .map((dirent) => path.join(dirent.parentPath, dirent.name))
         // special handling for hacking one snowflake file that needs to go last
         .sort(auraInstanceLastSort)
-        .map(file => ({
+        .map((file) => ({
             file,
             contents: file.endsWith('AuraInstance.js')
                 ? // and the snowflake needs to me modified
@@ -219,7 +219,7 @@ export const onCompletion = async (completionParams: CompletionParams): Promise<
             expandWordForward: true,
             caseInsensitive: true,
         });
-        const items: CompletionItem[] = completions.map(completion => {
+        const items: CompletionItem[] = completions.map((completion) => {
             let kind = 18;
             if (completion.type && completion.type.startsWith('fn')) {
                 kind = 3;
@@ -331,7 +331,7 @@ export const onReferences = async (reference: ReferenceParams): Promise<Location
     await asyncFlush();
     const { refs } = await ternRequest(reference, 'refs');
     if (refs && refs.length > 0) {
-        return refs.map(ref => tern2lspLocation(ref));
+        return refs.map((ref) => tern2lspLocation(ref));
     }
 };
 
@@ -345,7 +345,7 @@ export const onSignatureHelp = async (signatureParams: TextDocumentPositionParam
         await asyncFlush();
         const files = ternServer.files;
         const fileName = ternServer.normalizeFilename(uriToFile(uri));
-        const file = files.find(f => f.name === fileName);
+        const file = files.find((f) => f.name === fileName);
 
         const contents = file.text;
 

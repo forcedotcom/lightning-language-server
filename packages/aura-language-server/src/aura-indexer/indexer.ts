@@ -82,14 +82,14 @@ export default class AuraIndexer implements Indexer {
         }
 
         const attributeInfos = tags
-            .filter(tag => tag.tag.startsWith('aura:attribute'))
+            .filter((tag) => tag.tag.startsWith('aura:attribute'))
             .filter(
-                node =>
+                (node) =>
                     (node.parent && (node.parent.tag === 'aura:application' || node.parent.tag === 'aura:component')) ||
                     node.parent.tag === 'aura:event' ||
                     node.parent.tag === 'aura:interface',
             )
-            .map(node => {
+            .map((node) => {
                 const attributes = node.attributes || {};
                 const documentation = this.trimQuotes(attributes.description);
                 const jsName = this.trimQuotes(attributes.name);
