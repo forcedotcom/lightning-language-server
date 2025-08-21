@@ -12,7 +12,7 @@ enum DiagnosticLevel {
     /** Linting error with warning level, usage of an API to be deprecated */
     Warning = 2,
     /** Logging messages */
-    Log = 3
+    Log = 3,
 }
 
 const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
@@ -35,7 +35,7 @@ function lintTypos(document: TextDocument): Diagnostic[] {
     const errors: Diagnostic[] = [];
 
     lines.forEach((line, idx) => {
-        TYPOS.forEach(typo => {
+        TYPOS.forEach((typo) => {
             const idxTypo = line.indexOf(typo);
             if (idxTypo > -1) {
                 errors.push({
@@ -61,7 +61,7 @@ export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
     const fileName = filePath.base;
     const { warnings } = templateCompiler(source, fileName, {});
 
-    let warningsLwc: Diagnostic[] = warnings.map(warning => {
+    let warningsLwc: Diagnostic[] = warnings.map((warning) => {
         const { start = 0, length = 0 } = warning.location || { start: 0, length: 0 };
 
         return {

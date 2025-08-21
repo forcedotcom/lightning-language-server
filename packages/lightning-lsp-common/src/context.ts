@@ -3,13 +3,10 @@ import { homedir } from 'os';
 import * as path from 'path';
 import { lt } from 'semver';
 import { TextDocument } from 'vscode-languageserver';
-// @ts-expect-error - lodash.templatesettings module
-import templateSettings from 'lodash.templatesettings';
-import template from 'lodash.template';
+import ejs from 'ejs';
 import { parse } from 'properties';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
-import { componentUtil } from './index';
 
 export interface SfdxPackageDirectoryConfig {
     path: string;
@@ -37,23 +34,6 @@ async function findSubdirectories(dir: string): Promise<string[]> {
         }
     }
     return subdirs;
-}
-
-/**
- * @return list of .js modules inside namespaceRoot folder
- */
-async function findModulesIn(namespaceRoot: string): Promise<string[]> {
-    const files: string[] = [];
-    const subdirs = await findSubdirectories(namespaceRoot);
-    for (const subdir of subdirs) {
-        const basename = path.basename(subdir);
-        const modulePath = path.join(subdir, basename + '.js');
-        if ((await fs.pathExists(modulePath)) && componentUtil.isJSComponent(modulePath)) {
-            // TODO: check contents for: from 'lwc'?
-            files.push(modulePath);
-        }
-    }
-    return files;
 }
 
 async function readSfdxProjectConfig(root: string): Promise<SfdxProjectConfig> {
@@ -565,9 +545,9 @@ export class WorkspaceContext {
             p4_user?: string;
         },
     ): string {
-        templateSettings.interpolate = /\${([\s\S]+?)}/g;
-        const compiled = template(templateString);
-        return compiled(variableMap);
+        // Convert ${variable} syntax to EJS <%= variable %> syntax
+        const ejsTemplate = templateString.replace(/\${([\s\S]+?)}/g, '<%= $1 %>');
+        return ejs.render(ejsTemplate, variableMap);
     }
 
     /**

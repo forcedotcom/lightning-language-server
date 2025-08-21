@@ -162,7 +162,7 @@ describe('getAuraBindingValue', () => {
             const stringWithCursor = '<div value="{!v.|}"></div>';
             const cursorPosition = findCursorPosition(stringWithCursor);
             const result = getBindingValue(content, 0, cursorPosition); // Position: <div value="{!v.|}"></div>
-            expect(result).toBe("");
+            expect(result).toBe('');
         });
 
         it('should extract property when cursor is within property name in attribute', () => {
@@ -249,4 +249,4 @@ describe('getAuraBindingValue', () => {
             expect(result).toBe('isHidden');
         });
     });
-}); 
+});

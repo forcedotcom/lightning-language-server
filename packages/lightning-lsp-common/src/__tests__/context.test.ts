@@ -107,6 +107,31 @@ it('isLWCTemplate()', async () => {
     expect(await context.isLWCTemplate(document)).toBeTruthy();
 });
 
+it('processTemplate() with EJS', async () => {
+    const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
+
+    const templateString = `
+{
+  "compilerOptions": {
+    "baseUrl": "\${project_root}",
+    "paths": {
+      "@/*": ["\${project_root}/src/*"]
+    }
+  }
+}`;
+
+    const variableMap = {
+        project_root: '/path/to/project',
+    };
+
+    // Access the private method using any type
+    const result = (context as any).processTemplate(templateString, variableMap);
+
+    expect(result).toContain('"baseUrl": "/path/to/project"');
+    expect(result).toContain('"@/*": ["/path/to/project/src/*"]');
+    expect(result).not.toContain('${project_root}');
+});
+
 it('isLWCJavascript()', async () => {
     const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 

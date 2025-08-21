@@ -90,7 +90,7 @@ it('displays an error for a component with other errors', async () => {
         end: {
             line: 4,
             character: MAX_32BIT_INTEGER,
-        }
+        },
     });
 });
 
@@ -141,11 +141,13 @@ it('mapLwcMetadataToInternal returns expected javascript metadata', async () => 
         name: 'metadata',
         namespace: 'x',
         namespaceMapping: {},
-        files: [{
-            fileName: 'metadata.js',
-            source: content,
-        }],
-        npmModuleMapping: {}
+        files: [
+            {
+                fileName: 'metadata.js',
+                source: content,
+            },
+        ],
+        npmModuleMapping: {},
     };
 
     const modernMetadata = collectBundleMetadata(options);
@@ -155,7 +157,7 @@ it('mapLwcMetadataToInternal returns expected javascript metadata', async () => 
     expect(metadata.doc).toBe('* Foo doc');
     expect(metadata.declarationLoc).toEqual({
         start: { column: 0, line: 8 },
-        end: { column: 1, line: 80 }
+        end: { column: 1, line: 80 },
     });
 
     expect(getPublicReactiveProperties(metadata)).toMatchObject([
@@ -171,34 +173,29 @@ it('mapLwcMetadataToInternal returns expected javascript metadata', async () => 
         { name: 'superComplex' },
     ]);
     expect(properties).toMatchObject([
-      { name: 'todo' },
-      { name: 'index' },
-      { name: 'initializedAsApiNumber' },
-      { name: 'initializedAsTrackNumber' },
-      { name: 'indexSameLine' },
-      { name: 'initializedWithImportedVal' },
-      { name: 'arrOfStuff' },
-      { name: 'trackedPrivateIndex' },
-      { name: 'stringVal' },
-      { name: 'trackedThing' },
-      { name: 'trackedArr' },
-      { name: 'callback' },
-      { name: 'fooNull' },
-      { name: 'superComplex' },
-      { name: 'wiredProperty' },
-      { name: 'wiredPropertyWithNestedParam' },
-      { name: 'wiredPropertyWithNestedObjParam' },
-      { name: 'apexWiredProperty' },
-      { name: 'apexWiredInitVal' },
-      { name: 'apexWiredInitArr' },
-      { name: 'privateComputedValue' },
+        { name: 'todo' },
+        { name: 'index' },
+        { name: 'initializedAsApiNumber' },
+        { name: 'initializedAsTrackNumber' },
+        { name: 'indexSameLine' },
+        { name: 'initializedWithImportedVal' },
+        { name: 'arrOfStuff' },
+        { name: 'trackedPrivateIndex' },
+        { name: 'stringVal' },
+        { name: 'trackedThing' },
+        { name: 'trackedArr' },
+        { name: 'callback' },
+        { name: 'fooNull' },
+        { name: 'superComplex' },
+        { name: 'wiredProperty' },
+        { name: 'wiredPropertyWithNestedParam' },
+        { name: 'wiredPropertyWithNestedObjParam' },
+        { name: 'apexWiredProperty' },
+        { name: 'apexWiredInitVal' },
+        { name: 'apexWiredInitArr' },
+        { name: 'privateComputedValue' },
     ]);
-    expect(getMethods(metadata)).toMatchObject([
-        { name: 'onclickAction' },
-        { name: 'apiMethod' },
-        { name: 'myWiredMethod' },
-        { name: 'methodWithArguments' },
-    ]);
+    expect(getMethods(metadata)).toMatchObject([{ name: 'onclickAction' }, { name: 'apiMethod' }, { name: 'myWiredMethod' }, { name: 'methodWithArguments' }]);
 
     expect(getPrivateReactiveProperties(metadata)).toMatchObject([
         { name: 'initializedAsTrackNumber' },

@@ -50,7 +50,7 @@ export default class Server {
 
     constructor() {
         interceptConsoleLogger(this.connection);
-        
+
         this.connection.onInitialize(this.onInitialize.bind(this));
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
@@ -66,7 +66,7 @@ export default class Server {
         this.documents.onDidOpen(addFile);
         this.documents.onDidChangeContent(addFile);
         this.documents.onDidClose(delFile);
-        
+
         this.connection.onReferences(onReferences);
         this.connection.onSignatureHelp(onSignatureHelp);
     }
@@ -74,7 +74,7 @@ export default class Server {
     async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         const { workspaceFolders } = params;
         this.workspaceFolders = workspaceFolders;
-        this.workspaceRoots = workspaceFolders.map(folder => path.resolve(URI.parse(folder.uri).fsPath));
+        this.workspaceRoots = workspaceFolders.map((folder) => path.resolve(URI.parse(folder.uri).fsPath));
 
         try {
             if (this.workspaceRoots.length === 0) {
@@ -88,13 +88,13 @@ export default class Server {
             const startTime = process.hrtime();
 
             this.context = new WorkspaceContext(this.workspaceRoots);
-            
+
             if (this.context.type === WorkspaceType.CORE_PARTIAL) {
                 await startServer(path.join(this.workspaceRoots[0], '..'), path.join(this.workspaceRoots[0], '..'));
             } else {
                 await startServer(this.workspaceRoots[0], this.workspaceRoots[0]);
             }
-            
+
             this.context.configureProject();
 
             this.auraIndexer = new AuraIndexer(this.context);
@@ -103,9 +103,9 @@ export default class Server {
             this.setupIndexerEvents();
             this.startIndexing();
 
-            this.htmlLS = getLanguageService();     
+            this.htmlLS = getLanguageService();
             this.htmlLS.setDataProviders(true, [getAuraTagProvider()]);
-            
+
             console.info('... language server started in ' + utils.elapsedMillis(startTime));
 
             return {
@@ -138,11 +138,11 @@ export default class Server {
         this.auraIndexer.eventEmitter.on('set', (tag: TagInfo) => {
             this.connection.sendNotification(tagAdded, { taginfo: tag });
         });
-        
+
         this.auraIndexer.eventEmitter.on('delete', (tag: string) => {
             this.connection.sendNotification(tagDeleted, tag);
         });
-        
+
         this.auraIndexer.eventEmitter.on('clear', () => {
             this.connection.sendNotification(tagsCleared, undefined);
         });
@@ -158,7 +158,7 @@ export default class Server {
 
     async onCompletion(completionParams: CompletionParams): Promise<CompletionList> {
         const document = this.documents.get(completionParams.textDocument.uri);
-        
+
         if (await this.context.isAuraMarkup(document)) {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
 
@@ -168,11 +168,11 @@ export default class Server {
             });
             return list;
         }
-        
+
         if (await this.context.isAuraJavascript(document)) {
             return onCompletion(completionParams);
         }
-        
+
         return { isIncomplete: false, items: [] };
     }
 
@@ -182,27 +182,27 @@ export default class Server {
 
     async onHover(textDocumentPosition: TextDocumentPositionParams): Promise<Hover> {
         const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        
+
         if (await this.context.isAuraMarkup(document)) {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
             const hover = this.htmlLS.doHover(document, textDocumentPosition.position, htmlDocument);
             return hover;
         }
-        
+
         if (await this.context.isAuraJavascript(document)) {
             return onHover(textDocumentPosition);
         }
-        
+
         return null;
     }
 
     async onTypeDefinition(textDocumentPosition: TextDocumentPositionParams): Promise<Definition> {
         const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        
+
         if (await this.context.isAuraJavascript(document)) {
             return onTypeDefinition(textDocumentPosition);
         }
-        
+
         return null;
     }
 
@@ -213,7 +213,7 @@ export default class Server {
         const componentName = parsedPath.name;
         const namespace = path.basename(path.dirname(parsedPath.dir));
         const tag = this.auraIndexer.getAuraByTag(namespace + ':' + componentName);
-        
+
         if (tag) {
             // aura tag doesn't contain controller methods yet
             // but, if its not a v.value, its probably fine to just open the controller file
@@ -232,13 +232,13 @@ export default class Server {
                 },
             };
         }
-        
+
         return null;
     }
 
     async onDefinition(textDocumentPosition: TextDocumentPositionParams): Promise<Location> {
         const document = this.documents.get(textDocumentPosition.textDocument.uri);
-        
+
         if (await this.context.isAuraMarkup(document)) {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
 
@@ -252,11 +252,11 @@ export default class Server {
                 return this.findJavascriptProperty(valueProperty, textDocumentPosition);
             }
         }
-        
+
         if (await this.context.isAuraJavascript(document)) {
             return onDefinition(textDocumentPosition);
         }
-        
+
         return null;
     }
 
@@ -286,9 +286,9 @@ export default class Server {
                 }
             }
         } catch (e) {
-            this.connection.sendNotification(ShowMessageNotification.type, { 
-                type: MessageType.Error, 
-                message: `Error re-indexing workspace: ${e.message}` 
+            this.connection.sendNotification(ShowMessageNotification.type, {
+                type: MessageType.Error,
+                message: `Error re-indexing workspace: ${e.message}`,
             });
         }
     }
@@ -312,4 +312,4 @@ export default class Server {
     listen(): void {
         this.connection.listen();
     }
-} 
+}

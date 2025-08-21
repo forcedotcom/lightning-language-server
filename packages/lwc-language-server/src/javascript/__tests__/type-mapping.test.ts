@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { collectBundleMetadata, BundleConfig, ScriptFile } from '@lwc/metadata';
 import { transform } from '@lwc/old-compiler';
+// eslint-disable-next-line import/no-unresolved
 import { CompilerOptions as OldCompilerOptions } from '@lwc/old-compiler/dist/types/compiler/options';
 import { mapLwcMetadataToInternal } from '../type-mapping';
 import { Metadata } from '@salesforce/lightning-lsp-common';

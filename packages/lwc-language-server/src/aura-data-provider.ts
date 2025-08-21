@@ -21,7 +21,7 @@ export class AuraDataProvider implements IHTMLDataProvider {
         return this.activated;
     }
     provideTags(): ITagData[] {
-        return this.indexer.customData.map(tag => {
+        return this.indexer.customData.map((tag) => {
             return {
                 name: tag.auraName,
                 description: tag.description,
@@ -31,7 +31,7 @@ export class AuraDataProvider implements IHTMLDataProvider {
     }
     provideAttributes(tagName: string): IAttributeData[] {
         const tags = this.provideTags();
-        const tag = tags.find(t => t.name.toLowerCase() === tagName);
+        const tag = tags.find((t) => t.name.toLowerCase() === tagName);
         return tag?.attributes || [];
     }
     provideValues(): IValueData[] {
