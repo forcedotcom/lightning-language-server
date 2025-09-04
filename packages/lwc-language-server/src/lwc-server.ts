@@ -38,6 +38,7 @@ import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
 import Tag from './tag';
+import TSConfigPathIndexer from './typescript/tsconfig-path-indexer';
 import { URI } from 'vscode-uri';
 import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
 import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
@@ -86,6 +87,7 @@ export default class Server {
     languageService: LanguageService;
     auraDataProvider: AuraDataProvider;
     lwcDataProvider: LWCDataProvider;
+    tsconfigPathIndexer: TSConfigPathIndexer;
 
     constructor() {
         this.connection.onInitialize(this.onInitialize.bind(this));
@@ -111,6 +113,8 @@ export default class Server {
         this.lwcDataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
         this.auraDataProvider = new AuraDataProvider({ indexer: this.componentIndexer });
         this.typingIndexer = new TypingIndexer({ workspaceRoot: this.workspaceRoots[0] });
+        // For maintaining tsconfig.json file paths on core workspace
+        this.tsconfigPathIndexer = new TSConfigPathIndexer(this.workspaceRoots);
         this.languageService = getLanguageService({
             customDataProviders: [this.lwcDataProvider, this.auraDataProvider],
             useDefaultDataProvider: false,
@@ -119,6 +123,7 @@ export default class Server {
         await this.context.configureProject();
         await this.componentIndexer.init();
         this.typingIndexer.init();
+        await this.tsconfigPathIndexer.init();
 
         return this.capabilities;
     }
@@ -338,6 +343,9 @@ export default class Server {
                     tag.updateMetadata(metadata);
                 }
             }
+        } else if (await this.context.isLWCTypeScript(document)) {
+            // update tsconfig.json file paths when a TS file is saved
+            await this.tsconfigPathIndexer.updateTSConfigFileForDocument(document);
         }
     }
 

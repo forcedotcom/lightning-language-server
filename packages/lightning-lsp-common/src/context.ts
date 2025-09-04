@@ -62,8 +62,9 @@ async function findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: st
         for (const subdir of subdirs) {
             // Is a root if any subdir matches a name/name.js with name.js being a module
             const basename = path.basename(subdir);
-            const modulePath = path.join(subdir, basename + '.js');
-            if (fs.existsSync(modulePath)) {
+            const modulePathJs = path.join(subdir, basename + '.js');
+            const modulePathTs = path.join(subdir, basename + '.ts');
+            if (fs.existsSync(modulePathJs) || fs.existsSync(modulePathTs)) {
                 // TODO: check contents for: from 'lwc'?
                 return true;
             }
@@ -246,6 +247,14 @@ export class WorkspaceContext {
 
     public async isLWCJavascript(document: TextDocument): Promise<boolean> {
         return document.languageId === 'javascript' && (await this.isInsideModulesRoots(document));
+    }
+
+    public async isLWCTypeScript(document: TextDocument): Promise<boolean> {
+        return (
+            (this.type === WorkspaceType.CORE_ALL || this.type === WorkspaceType.CORE_PARTIAL) &&
+            document.languageId === 'typescript' &&
+            (await this.isInsideModulesRoots(document))
+        );
     }
 
     public async isInsideAuraRoots(document: TextDocument): Promise<boolean> {
