@@ -334,8 +334,8 @@ describe('handlers', () => {
     });
 
     describe('onInitialized()', () => {
-        const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
-        const getTsConfigPaths = (): string[] => sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+        const baseTsconfigPath = path.join(SFDX_WORKSPACE_ROOT, '.sfdx', 'tsconfig.sfdx.json');
+        const getTsConfigPaths = (): string[] => sync(path.join(SFDX_WORKSPACE_ROOT, '**', 'lwc', 'tsconfig.json'));
 
         beforeEach(async () => {
             // Clean up before each test run
@@ -388,8 +388,8 @@ describe('handlers', () => {
     });
 
     describe('onDidChangeWatchedFiles', () => {
-        const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
-        const watchedFileDir = SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/newlyAddedFile';
+        const baseTsconfigPath = path.join(SFDX_WORKSPACE_ROOT, '.sfdx', 'tsconfig.sfdx.json');
+        const watchedFileDir = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'newlyAddedFile');
 
         const getPathMappingKeys = (): string[] => {
             const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
@@ -403,7 +403,7 @@ describe('handlers', () => {
         afterEach(() => {
             // Clean up after each test run
             fsExtra.removeSync(baseTsconfigPath);
-            const tsconfigPaths = sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
+            const tsconfigPaths = sync(path.join(SFDX_WORKSPACE_ROOT, '**', 'lwc', 'tsconfig.json'));
             tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
             fsExtra.removeSync(watchedFileDir);
             mockTypeScriptSupportConfig = false;

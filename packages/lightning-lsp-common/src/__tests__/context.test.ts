@@ -75,13 +75,13 @@ describe('WorkspaceContext', () => {
     it('isInsideModulesRoots()', async () => {
         const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
-        let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+        let document = readAsTextDocument(join(FORCE_APP_ROOT, 'lwc', 'hello_world', 'hello_world.js'));
         expect(await context.isInsideModulesRoots(document)).toBeTruthy();
 
-        document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'aura', 'helloWorldApp', 'helloWorldApp.app'));
         expect(await context.isInsideModulesRoots(document)).toBeFalsy();
 
-        document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+        document = readAsTextDocument(join(UTILS_ROOT, 'lwc', 'todo_util', 'todo_util.js'));
         expect(await context.isInsideModulesRoots(document)).toBeTruthy();
     });
 
@@ -89,23 +89,23 @@ describe('WorkspaceContext', () => {
         const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
         // .js is not a template
-        let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+        let document = readAsTextDocument(join(FORCE_APP_ROOT, 'lwc', 'hello_world', 'hello_world.js'));
         expect(await context.isLWCTemplate(document)).toBeFalsy();
 
         // .html is a template
-        document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'lwc', 'hello_world', 'hello_world.html'));
         expect(await context.isLWCTemplate(document)).toBeTruthy();
 
         // aura cmps are not a template (sfdx assigns the 'html' language id to aura components)
-        document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'aura', 'helloWorldApp', 'helloWorldApp.app'));
         expect(await context.isLWCTemplate(document)).toBeFalsy();
 
         // html outside namespace roots is not a template
-        document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomHtmlInAuraFolder.html');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'aura', 'todoApp', 'randomHtmlInAuraFolder.html'));
         expect(await context.isLWCTemplate(document)).toBeFalsy();
 
         // .html in utils folder is a template
-        document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.html');
+        document = readAsTextDocument(join(UTILS_ROOT, 'lwc', 'todo_util', 'todo_util.html'));
         expect(await context.isLWCTemplate(document)).toBeTruthy();
     });
 
@@ -138,33 +138,33 @@ describe('WorkspaceContext', () => {
         const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
 
         // lwc .js
-        let document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.js');
+        let document = readAsTextDocument(join(FORCE_APP_ROOT, 'lwc', 'hello_world', 'hello_world.js'));
         expect(await context.isLWCJavascript(document)).toBeTruthy();
 
         // lwc .htm
-        document = readAsTextDocument(FORCE_APP_ROOT + '/lwc/hello_world/hello_world.html');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'lwc', 'hello_world', 'hello_world.html'));
         expect(await context.isLWCJavascript(document)).toBeFalsy();
 
         // aura cmps
-        document = readAsTextDocument(FORCE_APP_ROOT + '/aura/helloWorldApp/helloWorldApp.app');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'aura', 'helloWorldApp', 'helloWorldApp.app'));
         expect(await context.isLWCJavascript(document)).toBeFalsy();
 
         // .js outside namespace roots
-        document = readAsTextDocument(FORCE_APP_ROOT + '/aura/todoApp/randomJsInAuraFolder.js');
+        document = readAsTextDocument(join(FORCE_APP_ROOT, 'aura', 'todoApp', 'randomJsInAuraFolder.js'));
         expect(await context.isLWCJavascript(document)).toBeFalsy();
 
         // lwc .js in utils
-        document = readAsTextDocument(UTILS_ROOT + '/lwc/todo_util/todo_util.js');
+        document = readAsTextDocument(join(UTILS_ROOT, 'lwc', 'todo_util', 'todo_util.js'));
         expect(await context.isLWCJavascript(document)).toBeTruthy();
     });
 
     it('configureSfdxProject()', async () => {
         const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-        const jsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/jsconfig.json';
-        const jsconfigPathUtilsOrig = UTILS_ROOT + '/lwc/jsconfig-orig.json';
-        const jsconfigPathUtils = UTILS_ROOT + '/lwc/jsconfig.json';
-        const sfdxTypingsPath = 'test-workspaces/sfdx-workspace/.sfdx/typings/lwc';
-        const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+        const jsconfigPathForceApp = join(FORCE_APP_ROOT, 'lwc', 'jsconfig.json');
+        const jsconfigPathUtilsOrig = join(UTILS_ROOT, 'lwc', 'jsconfig-orig.json');
+        const jsconfigPathUtils = join(UTILS_ROOT, 'lwc', 'jsconfig.json');
+        const sfdxTypingsPath = join('test-workspaces', 'sfdx-workspace', '.sfdx', 'typings', 'lwc');
+        const forceignorePath = join('test-workspaces', 'sfdx-workspace', '.forceignore');
 
         // make sure no generated files are there from previous runs
         fs.removeSync(jsconfigPathForceApp);
@@ -344,11 +344,11 @@ function verifyCodeWorkspace(path: string) {
 
     it('configureProjectForTs()', async () => {
         const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-        const baseTsconfigPathForceApp = 'test-workspaces/sfdx-workspace/.sfdx/tsconfig.sfdx.json';
-        const tsconfigPathForceApp = FORCE_APP_ROOT + '/lwc/tsconfig.json';
-        const tsconfigPathUtils = UTILS_ROOT + '/lwc/tsconfig.json';
-        const tsconfigPathRegisteredEmpty = REGISTERED_EMPTY_FOLDER_ROOT + '/lwc/tsconfig.json';
-        const forceignorePath = 'test-workspaces/sfdx-workspace/.forceignore';
+        const baseTsconfigPathForceApp = join('test-workspaces', 'sfdx-workspace', '.sfdx', 'tsconfig.sfdx.json');
+        const tsconfigPathForceApp = join(FORCE_APP_ROOT, 'lwc', 'tsconfig.json');
+        const tsconfigPathUtils = join(UTILS_ROOT, 'lwc', 'tsconfig.json');
+        const tsconfigPathRegisteredEmpty = join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc', 'tsconfig.json');
+        const forceignorePath = join('test-workspaces', 'sfdx-workspace', '.forceignore');
 
         // configure and verify typings/jsconfig after configuration:
         await context.configureProjectForTs();
