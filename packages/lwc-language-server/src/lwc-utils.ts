@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
@@ -34,10 +34,10 @@ export function getComponentNameFromPath(filePath: string): string {
 export async function isLWCComponentDirectory(dirPath: string): Promise<boolean> {
     try {
         const files = await fs.readdir(dirPath);
-        const hasJS = files.some(file => file.endsWith('.js'));
-        const hasHTML = files.some(file => file.endsWith('.html'));
-        const hasTS = files.some(file => file.endsWith('.ts'));
-        
+        const hasJS = files.some((file) => file.endsWith('.js'));
+        const hasHTML = files.some((file) => file.endsWith('.html'));
+        const hasTS = files.some((file) => file.endsWith('.ts'));
+
         return (hasJS || hasTS) && hasHTML;
     } catch {
         return false;

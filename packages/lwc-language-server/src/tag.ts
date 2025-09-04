@@ -8,7 +8,8 @@ import { paramCase } from 'change-case';
 import { URI } from 'vscode-uri';
 import * as path from 'path';
 import { Location, Position, Range } from 'vscode-languageserver';
-import { Metadata, ClassMember } from '@salesforce/lightning-lsp-common';
+import { Metadata } from './decorators';
+import { ClassMember } from '@salesforce/lightning-lsp-common';
 import { AttributeInfo } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 export type TagAttrs = {

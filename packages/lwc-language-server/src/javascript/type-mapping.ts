@@ -1,18 +1,17 @@
 import { Class, ClassMethod, ClassProperty, ScriptFile, WireDecorator, LwcDecorator, SourceLocation, Value } from '@lwc/metadata';
 
+import { ClassMember as InternalClassMember, Location as InternalLocation } from '@salesforce/lightning-lsp-common';
 import {
     Metadata as InternalMetadata,
-    ClassMember as InternalClassMember,
     ModuleExports as InternalModuleExports,
     ApiDecorator as InternalApiDecorator,
     TrackDecorator as InternalTrackDecorator,
     WireDecorator as InternalWireDecorator,
-    Location as InternalLocation,
     ApiDecoratorTarget,
     TrackDecoratorTarget,
     WireDecoratorTarget,
     ClassMemberPropertyValue,
-} from '@salesforce/lightning-lsp-common';
+} from '../decorators';
 
 type InternalDecorator = InternalApiDecorator | InternalTrackDecorator | InternalWireDecorator;
 // This can be removed once @lwc/metadata exposes `Export` and `DataProperty` types

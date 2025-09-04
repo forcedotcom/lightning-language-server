@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
@@ -7,8 +7,7 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { BaseWorkspaceContext } from '@salesforce/lightning-lsp-common';
-import { WorkspaceType } from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, WorkspaceType } from '@salesforce/lightning-lsp-common';
 
 /**
  * Holds information and utility methods for an Aura workspace
@@ -148,7 +147,7 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                     dirs.push(subdir);
                 }
             }
-            
+
             // Is a root if we have a folder called lwc
             const isDirLWC = isModuleRoot(dirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
             if (isDirLWC) {

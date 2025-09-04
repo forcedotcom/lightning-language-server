@@ -17,7 +17,7 @@ function readJsonFile(jsonFilePath: string): any {
     }
 }
 
-    const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
+const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 const packageJson = readJsonFile(packageJsonPath);
 
 // if we're in a monorepo, find other packages in the monorepo and make sure

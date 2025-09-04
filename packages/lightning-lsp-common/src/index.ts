@@ -7,23 +7,7 @@ import { TagInfo } from './indexer/tagInfo';
 import { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
 
-import {
-    Metadata,
-    ApiDecorator,
-    TrackDecorator,
-    WireDecorator,
-    ClassMember,
-    ModuleExports,
-    Location,
-    Position,
-    DecoratorTargetType,
-    DecoratorTargetProperty,
-    DecoratorTargetMethod,
-    ApiDecoratorTarget,
-    TrackDecoratorTarget,
-    WireDecoratorTarget,
-    ClassMemberPropertyValue,
-} from './decorators';
+import { ClassMember, Location, Position, ClassMemberPropertyValue, DecoratorTargetType, DecoratorTargetProperty, DecoratorTargetMethod } from './decorators';
 
 export {
     BaseWorkspaceContext,
@@ -37,20 +21,12 @@ export {
     Decorator,
     MemberType,
     interceptConsoleLogger,
-    Metadata,
-    ApiDecorator,
-    TrackDecorator,
-    WireDecorator,
     ClassMember,
-    ModuleExports,
     Location,
     Position,
+    ClassMemberPropertyValue,
     DecoratorTargetType,
     DecoratorTargetProperty,
     DecoratorTargetMethod,
-    ApiDecoratorTarget,
-    TrackDecoratorTarget,
-    WireDecoratorTarget,
-    ClassMemberPropertyValue,
     AURA_EXTENSIONS,
 };

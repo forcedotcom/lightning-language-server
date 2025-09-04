@@ -7,7 +7,8 @@ import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { AttributeInfo, ClassMember, Decorator as DecoratorType, MemberType, Metadata } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, ClassMember, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
+import { Metadata } from '../decorators';
 import commentParser from 'comment-parser';
 
 export interface CompilerResult {

@@ -4,7 +4,7 @@ import { transform } from '@lwc/old-compiler';
 // eslint-disable-next-line import/no-unresolved
 import { CompilerOptions as OldCompilerOptions } from '@lwc/old-compiler/dist/types/compiler/options';
 import { mapLwcMetadataToInternal } from '../type-mapping';
-import { Metadata } from '@salesforce/lightning-lsp-common';
+import { Metadata } from '../decorators';
 import * as fs from 'fs-extra';
 
 it('can map new metadata to old metadata', async () => {
