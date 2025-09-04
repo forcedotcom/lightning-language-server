@@ -10977,8 +10977,6 @@ shelljs@0.7.6:
     interpret "^1.0.0"
     rechoir "^0.6.2"
 
-<<<<<<< Updated upstream
-=======
 shelljs@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.10.0.tgz#e3bbae99b0f3f0cc5dce05b46a346fae2090e883"
@@ -10987,7 +10985,6 @@ shelljs@^0.10.0:
     execa "^5.1.1"
     fast-glob "^3.3.2"
 
->>>>>>> Stashed changes
 shelljs@^0.8.5:
   version "0.8.5"
   resolved "https://registry.npmjs.org/shelljs/-/shelljs-0.8.5.tgz"
