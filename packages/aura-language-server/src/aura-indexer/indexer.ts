@@ -1,4 +1,5 @@
-import { WorkspaceContext, shared, Indexer, TagInfo, utils, AttributeInfo, componentUtil } from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, shared, Indexer, TagInfo, utils, AttributeInfo } from '@salesforce/lightning-lsp-common';
+import * as componentUtil from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs-extra';
@@ -14,14 +15,14 @@ const { WorkspaceType } = shared;
 export default class AuraIndexer implements Indexer {
     public readonly eventEmitter = new EventsEmitter();
 
-    private context: WorkspaceContext;
+    private context: BaseWorkspaceContext;
     private indexingTasks: Promise<void>;
 
     private AURA_TAGS: Map<string, TagInfo> = new Map();
     private AURA_EVENTS: Map<string, TagInfo> = new Map();
     private AURA_NAMESPACES: Set<string> = new Set();
 
-    constructor(context: WorkspaceContext) {
+    constructor(context: BaseWorkspaceContext) {
         this.context = context;
         this.context.addIndexingProvider({ name: 'aura', indexer: this });
     }

@@ -3,7 +3,7 @@ import { basename, extname, join, parse, relative, resolve, dirname } from 'path
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
-import { WorkspaceContext } from './context';
+import { BaseWorkspaceContext } from './base-context';
 import { WorkspaceType } from './shared';
 import { promisify } from 'util';
 import { Glob } from 'glob';
@@ -27,7 +27,7 @@ export function toResolvedPath(uri: string): string {
     return resolve(URI.parse(uri).fsPath);
 }
 
-function isLWCRootDirectory(context: WorkspaceContext, uri: string): boolean {
+function isLWCRootDirectory(context: BaseWorkspaceContext, uri: string): boolean {
     if (context.type === WorkspaceType.SFDX) {
         const file = toResolvedPath(uri);
         return file.endsWith('lwc');
@@ -35,7 +35,7 @@ function isLWCRootDirectory(context: WorkspaceContext, uri: string): boolean {
     return false;
 }
 
-function isAuraDirectory(context: WorkspaceContext, uri: string): boolean {
+function isAuraDirectory(context: BaseWorkspaceContext, uri: string): boolean {
     if (context.type === WorkspaceType.SFDX) {
         const file = toResolvedPath(uri);
         return file.endsWith('aura');
@@ -43,12 +43,12 @@ function isAuraDirectory(context: WorkspaceContext, uri: string): boolean {
     return false;
 }
 
-export async function isLWCWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
+export async function isLWCWatchedDirectory(context: BaseWorkspaceContext, uri: string): Promise<boolean> {
     const file = toResolvedPath(uri);
     return await context.isFileInsideModulesRoots(file);
 }
 
-export async function isAuraWatchedDirectory(context: WorkspaceContext, uri: string): Promise<boolean> {
+export async function isAuraWatchedDirectory(context: BaseWorkspaceContext, uri: string): Promise<boolean> {
     const file = toResolvedPath(uri);
     return await context.isFileInsideAuraRoots(file);
 }
@@ -57,7 +57,7 @@ export async function isAuraWatchedDirectory(context: WorkspaceContext, uri: str
  * @return true if changes include a directory delete
  */
 // TODO This is not waiting for the response of the promise isLWCWatchedDirectory, maybe we have the same problem on includesDeletedAuraWatchedDirectory
-export async function includesDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+export async function includesDeletedLwcWatchedDirectory(context: BaseWorkspaceContext, changes: FileEvent[]): Promise<boolean> {
     for (const event of changes) {
         if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && (await isLWCWatchedDirectory(context, event.uri))) {
             return true;
@@ -65,7 +65,7 @@ export async function includesDeletedLwcWatchedDirectory(context: WorkspaceConte
     }
     return false;
 }
-export async function includesDeletedAuraWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+export async function includesDeletedAuraWatchedDirectory(context: BaseWorkspaceContext, changes: FileEvent[]): Promise<boolean> {
     for (const event of changes) {
         if (event.type === FileChangeType.Deleted && event.uri.indexOf('.') === -1 && (await isAuraWatchedDirectory(context, event.uri))) {
             return true;
@@ -74,7 +74,7 @@ export async function includesDeletedAuraWatchedDirectory(context: WorkspaceCont
     return false;
 }
 
-export async function containsDeletedLwcWatchedDirectory(context: WorkspaceContext, changes: FileEvent[]): Promise<boolean> {
+export async function containsDeletedLwcWatchedDirectory(context: BaseWorkspaceContext, changes: FileEvent[]): Promise<boolean> {
     for (const event of changes) {
         const insideLwcWatchedDirectory = await isLWCWatchedDirectory(context, event.uri);
         if (event.type === FileChangeType.Deleted && insideLwcWatchedDirectory) {
@@ -90,7 +90,7 @@ export async function containsDeletedLwcWatchedDirectory(context: WorkspaceConte
     return false;
 }
 
-export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]): boolean {
+export function isLWCRootDirectoryCreated(context: BaseWorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
         if (event.type === FileChangeType.Created && isLWCRootDirectory(context, event.uri)) {
             return true;
@@ -99,7 +99,7 @@ export function isLWCRootDirectoryCreated(context: WorkspaceContext, changes: Fi
     return false;
 }
 
-export function isAuraRootDirectoryCreated(context: WorkspaceContext, changes: FileEvent[]): boolean {
+export function isAuraRootDirectoryCreated(context: BaseWorkspaceContext, changes: FileEvent[]): boolean {
     for (const event of changes) {
         if (event.type === FileChangeType.Created && isAuraDirectory(context, event.uri)) {
             return true;

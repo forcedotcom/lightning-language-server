@@ -10,7 +10,7 @@
     },
     "include": [
         "**/*",
-        "${project_root}/.sfdx/typings/lwc/**/*.d.ts"
+        "<%= project_root %>/.sfdx/typings/lwc/**/*.d.ts"
     ],
     "typeAcquisition": {
         "include": [

@@ -23,7 +23,8 @@ import {
 import { getLanguageService, LanguageService, CompletionList } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
-import { WorkspaceContext, utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
+import { utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
+import { AuraWorkspaceContext } from './context/aura-context';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
@@ -42,7 +43,7 @@ const tagsCleared: NotificationType<void, void> = new NotificationType<void, voi
 export default class Server {
     readonly connection: IConnection = createConnection();
     readonly documents: TextDocuments = new TextDocuments();
-    context: WorkspaceContext;
+    context: AuraWorkspaceContext;
     workspaceFolders: WorkspaceFolder[];
     workspaceRoots: string[];
     htmlLS: LanguageService;
@@ -87,7 +88,7 @@ export default class Server {
             }
             const startTime = process.hrtime();
 
-            this.context = new WorkspaceContext(this.workspaceRoots);
+            this.context = new AuraWorkspaceContext(this.workspaceRoots);
 
             if (this.context.type === WorkspaceType.CORE_PARTIAL) {
                 await startServer(path.join(this.workspaceRoots[0], '..'), path.join(this.workspaceRoots[0], '..'));

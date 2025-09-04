@@ -18,20 +18,20 @@ import { sync } from 'fast-glob';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
-const SFDX_WORKSPACE_ROOT = '../../test-workspaces/sfdx-workspace';
-const filename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/todo/todo.html');
+const SFDX_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', 'test-workspaces', 'sfdx-workspace');
+const filename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'todo', 'todo.html');
 const uri = URI.file(filename).toString();
 const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
 
-const jsFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/todo/todo.js');
+const jsFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'todo', 'todo.js');
 const jsUri = URI.file(jsFilename).toString();
 const jsDocument: TextDocument = TextDocument.create(uri, 'javascript', 0, fsExtra.readFileSync(jsFilename).toString());
 
-const auraFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/aura/todoApp/todoApp.app');
+const auraFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'aura', 'todoApp', 'todoApp.app');
 const auraUri = URI.file(auraFilename).toString();
 const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
 
-const hoverFilename = path.resolve(SFDX_WORKSPACE_ROOT + '/force-app/main/default/lwc/lightning_tree_example/lightning_tree_example.html');
+const hoverFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'lightning_tree_example', 'lightning_tree_example.html');
 const hoverUri = URI.file(hoverFilename).toString();
 const hoverDocument: TextDocument = TextDocument.create(hoverFilename, 'html', 0, fsExtra.readFileSync(hoverFilename).toString());
 
@@ -92,8 +92,8 @@ describe('handlers', () => {
         capabilities: {},
         workspaceFolders: [
             {
-                uri: URI.file(path.resolve(SFDX_WORKSPACE_ROOT)).toString(),
-                name: path.resolve(SFDX_WORKSPACE_ROOT),
+                uri: URI.file(SFDX_WORKSPACE_ROOT).toString(),
+                name: SFDX_WORKSPACE_ROOT,
             },
         ],
     };
@@ -337,6 +337,14 @@ describe('handlers', () => {
         const baseTsconfigPath = SFDX_WORKSPACE_ROOT + '/.sfdx/tsconfig.sfdx.json';
         const getTsConfigPaths = (): string[] => sync(SFDX_WORKSPACE_ROOT + '/**/lwc/tsconfig.json');
 
+        beforeEach(async () => {
+            // Clean up before each test run
+            fsExtra.removeSync(baseTsconfigPath);
+            const tsconfigPaths = getTsConfigPaths();
+            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
+            mockTypeScriptSupportConfig = false;
+        });
+
         afterEach(async () => {
             // Clean up after each test run
             fsExtra.removeSync(baseTsconfigPath);
@@ -362,7 +370,8 @@ describe('handlers', () => {
 
             expect(fsExtra.existsSync(baseTsconfigPath)).toBe(true);
             const tsconfigPaths = getTsConfigPaths();
-            // There are currently 3 lwc subdirectories under SFDX_WORKSPACE_ROOT
+            // There are currently 3 LWC directories under SFDX_WORKSPACE_ROOT
+            // (force-app/main/default/lwc, utils/meta/lwc, and registered-empty-folder/meta/lwc)
             expect(tsconfigPaths.length).toBe(3);
         });
 

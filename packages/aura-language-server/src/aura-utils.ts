@@ -1,5 +1,5 @@
 import { Range, TextDocument } from 'vscode-languageserver';
-import { utils } from '@salesforce/lightning-lsp-common';
+import { utils, AURA_EXTENSIONS } from '@salesforce/lightning-lsp-common';
 import { HTMLDocument, TokenType, getLanguageService } from 'vscode-html-languageservice';
 import { join } from 'path';
 import { createScanner } from 'vscode-html-languageservice/lib/umd/parser/htmlScanner';
@@ -7,7 +7,6 @@ import { Position, Location } from 'vscode-languageserver-types';
 
 const AURA_STANDARD = 'aura-standard.json';
 const AURA_SYSTEM = 'transformed-aura-system.json';
-const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 const RESOURCES_DIR = 'resources';
 

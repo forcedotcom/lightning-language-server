@@ -1,0 +1,24 @@
+{
+  "folders": [
+    {
+      "path": "test-workspaces/core-like-workspace/app/main/core/ui-force-components"
+    },
+    {
+      "path": "test-workspaces/core-like-workspace/app/main/core/ui-global-components"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [
+      "test-workspaces/core-like-workspace/app/main/core/ui-force-components",
+      "test-workspaces/core-like-workspace/app/main/core/ui-global-components"
+    ],
+    "eslint.nodePath": "~/tools/eslint-tool/1.0.3/node_modules",
+    "eslint.validate": [
+      "javascript",
+      "typescript"
+    ],
+    "eslint.options": {
+      "overrideConfigFile": "test-workspaces/core-like-workspace/app/main/core/ui-force-components/.eslintrc.json"
+    }
+  }
+}

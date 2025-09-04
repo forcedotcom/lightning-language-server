@@ -1,10 +1,12 @@
 import * as utils from './utils';
-import { WorkspaceContext, Indexer } from './context';
+import { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS } from './base-context';
+import { WorkspaceContext } from './context';
 import * as shared from './shared';
+import { WorkspaceType } from './shared';
 import { TagInfo } from './indexer/tagInfo';
 import { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
-import * as componentUtil from './component-util';
+
 import {
     Metadata,
     ApiDecorator,
@@ -24,11 +26,12 @@ import {
 } from './decorators';
 
 export {
+    BaseWorkspaceContext,
     WorkspaceContext,
     Indexer,
     utils,
-    componentUtil,
     shared,
+    WorkspaceType,
     TagInfo,
     AttributeInfo,
     Decorator,
@@ -49,4 +52,5 @@ export {
     TrackDecoratorTarget,
     WireDecoratorTarget,
     ClassMemberPropertyValue,
+    AURA_EXTENSIONS,
 };

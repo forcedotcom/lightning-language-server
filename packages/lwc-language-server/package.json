@@ -41,6 +41,7 @@
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.0",
     "normalize-path": "^3.0.0",
+    "shelljs": "^0.10.0",
     "vscode-html-languageservice": "^5.5.1",
     "vscode-languageserver": "^5.2.1",
     "vscode-uri": "^2.1.2",

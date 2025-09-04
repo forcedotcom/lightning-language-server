@@ -1,9 +1,9 @@
-import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
+import { AuraWorkspaceContext } from '../../context/aura-context';
 import { startServer, onCompletion, onHover, onDefinition, onReferences } from '../tern-server';
 
 it('tern completions', async () => {
     const ws = 'test-workspaces/sfdx-workspace';
-    const context = new WorkspaceContext(ws);
+    const context = new AuraWorkspaceContext(ws);
     await context.configureProject();
 
     await startServer(ws, ws);
