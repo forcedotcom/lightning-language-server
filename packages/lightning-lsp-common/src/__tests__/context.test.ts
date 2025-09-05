@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
 import '../../jest/matchers';
@@ -343,12 +343,12 @@ function verifyCodeWorkspace(path: string) {
     });
 
     it('configureProjectForTs()', async () => {
-        const context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-        const baseTsconfigPathForceApp = join('test-workspaces', 'sfdx-workspace', '.sfdx', 'tsconfig.sfdx.json');
-        const tsconfigPathForceApp = join(FORCE_APP_ROOT, 'lwc', 'tsconfig.json');
-        const tsconfigPathUtils = join(UTILS_ROOT, 'lwc', 'tsconfig.json');
-        const tsconfigPathRegisteredEmpty = join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc', 'tsconfig.json');
-        const forceignorePath = join('test-workspaces', 'sfdx-workspace', '.forceignore');
+        const context = new WorkspaceContext(resolve('test-workspaces/sfdx-workspace'));
+        const baseTsconfigPathForceApp = resolve(join('test-workspaces', 'sfdx-workspace', '.sfdx', 'tsconfig.sfdx.json'));
+        const tsconfigPathForceApp = resolve(join(FORCE_APP_ROOT, 'lwc', 'tsconfig.json'));
+        const tsconfigPathUtils = resolve(join(UTILS_ROOT, 'lwc', 'tsconfig.json'));
+        const tsconfigPathRegisteredEmpty = resolve(join(REGISTERED_EMPTY_FOLDER_ROOT, 'lwc', 'tsconfig.json'));
+        const forceignorePath = resolve(join('test-workspaces', 'sfdx-workspace', '.forceignore'));
 
         // configure and verify typings/jsconfig after configuration:
         await context.configureProjectForTs();

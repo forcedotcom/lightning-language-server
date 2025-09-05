@@ -49,18 +49,6 @@ function componentName(namespace: string, tag: string): string {
     return namespace + ':' + tag;
 }
 
-/**
- * @param file path to main .js/.html for component, i.e. card/card.js or card/card.html
- * @return module name, i.e. c/card or namespace/card, or null if not the .js/.html file for a component
- */
-export function moduleFromFile(file: string, sfdxProject: boolean): string {
-    return nameFromFile(file, sfdxProject, moduleName);
-}
-
-export function moduleFromDirectory(file: string, sfdxProject: boolean): string {
-    return nameFromDirectory(file, sfdxProject, moduleName);
-}
-
 export function componentFromFile(file: string, sfdxProject: boolean): string {
     return nameFromFile(file, sfdxProject, componentName);
 }
