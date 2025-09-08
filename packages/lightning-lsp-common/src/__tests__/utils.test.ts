@@ -2,7 +2,7 @@ import * as utils from '../utils';
 import * as tmp from 'tmp';
 import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
-import { WorkspaceContext } from '../context';
+import { WorkspaceContext } from './workspace-context';
 import { WorkspaceType } from '../shared';
 import * as fs from 'fs';
 import mockFs from 'mock-fs';

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { join } from 'path';
 import { removeFile, removeDir } from '../fs-utils';
-import { WorkspaceContext } from '../context';
+import { WorkspaceContext } from './workspace-context';
 import { WorkspaceType } from '../shared';
 import { processTemplate, getModulesDirs } from '../base-context';
 import '../../jest/matchers';

@@ -1,6 +1,5 @@
 import * as utils from './utils';
 import { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS } from './base-context';
-import { WorkspaceContext } from './context';
 import * as shared from './shared';
 import { WorkspaceType } from './shared';
 import { TagInfo } from './indexer/tagInfo';
@@ -13,7 +12,6 @@ import { ClassMember, Location, Position, ClassMemberPropertyValue, DecoratorTar
 
 export {
     BaseWorkspaceContext,
-    WorkspaceContext,
     Indexer,
     AURA_EXTENSIONS,
     utils,

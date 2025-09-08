@@ -7,10 +7,10 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { BaseWorkspaceContext } from './base-context';
-import { WorkspaceType } from './shared';
-import { findNamespaceRoots } from './namespace-utils';
-import { pathExists } from './fs-utils';
+import { BaseWorkspaceContext } from '../base-context';
+import { WorkspaceType } from '../shared';
+import { findNamespaceRoots } from '../namespace-utils';
+import { pathExists } from '../fs-utils';
 
 export class WorkspaceContext extends BaseWorkspaceContext {
     /**
