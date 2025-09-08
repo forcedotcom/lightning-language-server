@@ -15,25 +15,26 @@ import {
 
 import { URI } from 'vscode-uri';
 import { sync } from 'fast-glob';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs';
 import * as path from 'path';
+import { removeFile, removeDir } from '@salesforce/lightning-lsp-common';
 
 const SFDX_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', 'test-workspaces', 'sfdx-workspace');
 const filename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'todo', 'todo.html');
 const uri = URI.file(filename).toString();
-const document: TextDocument = TextDocument.create(uri, 'html', 0, fsExtra.readFileSync(filename).toString());
+const document: TextDocument = TextDocument.create(uri, 'html', 0, fs.readFileSync(filename).toString());
 
 const jsFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'todo', 'todo.js');
 const jsUri = URI.file(jsFilename).toString();
-const jsDocument: TextDocument = TextDocument.create(uri, 'javascript', 0, fsExtra.readFileSync(jsFilename).toString());
+const jsDocument: TextDocument = TextDocument.create(uri, 'javascript', 0, fs.readFileSync(jsFilename).toString());
 
 const auraFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'aura', 'todoApp', 'todoApp.app');
 const auraUri = URI.file(auraFilename).toString();
-const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fsExtra.readFileSync(auraFilename).toString());
+const auraDocument: TextDocument = TextDocument.create(auraFilename, 'html', 0, fs.readFileSync(auraFilename).toString());
 
 const hoverFilename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'lightning_tree_example', 'lightning_tree_example.html');
 const hoverUri = URI.file(hoverFilename).toString();
-const hoverDocument: TextDocument = TextDocument.create(hoverFilename, 'html', 0, fsExtra.readFileSync(hoverFilename).toString());
+const hoverDocument: TextDocument = TextDocument.create(hoverFilename, 'html', 0, fs.readFileSync(hoverFilename).toString());
 
 const server: Server = new Server();
 
@@ -339,17 +340,17 @@ describe('handlers', () => {
 
         beforeEach(async () => {
             // Clean up before each test run
-            fsExtra.removeSync(baseTsconfigPath);
+            removeFile(baseTsconfigPath);
             const tsconfigPaths = getTsConfigPaths();
-            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
             mockTypeScriptSupportConfig = false;
         });
 
         afterEach(async () => {
             // Clean up after each test run
-            fsExtra.removeSync(baseTsconfigPath);
+            removeFile(baseTsconfigPath);
             const tsconfigPaths = getTsConfigPaths();
-            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
             mockTypeScriptSupportConfig = false;
         });
 
@@ -357,7 +358,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.onInitialized();
 
-            expect(fsExtra.existsSync(baseTsconfigPath)).toBe(false);
+            expect(fs.existsSync(baseTsconfigPath)).toBe(false);
             const tsconfigPaths = getTsConfigPaths();
             expect(tsconfigPaths.length).toBe(0);
         });
@@ -368,7 +369,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.onInitialized();
 
-            expect(fsExtra.existsSync(baseTsconfigPath)).toBe(true);
+            expect(fs.existsSync(baseTsconfigPath)).toBe(true);
             const tsconfigPaths = getTsConfigPaths();
             // There are currently 3 LWC directories under SFDX_WORKSPACE_ROOT
             // (force-app/main/default/lwc, utils/meta/lwc, and registered-empty-folder/meta/lwc)
@@ -381,7 +382,7 @@ describe('handlers', () => {
             await server.onInitialize(initializeParams);
             await server.onInitialized();
 
-            const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
+            const sfdxTsConfig = JSON.parse(fs.readFileSync(baseTsconfigPath, 'utf8'));
             const pathMapping = Object.keys(sfdxTsConfig.compilerOptions.paths);
             expect(pathMapping.length).toEqual(11);
         });
@@ -392,7 +393,7 @@ describe('handlers', () => {
         const watchedFileDir = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'newlyAddedFile');
 
         const getPathMappingKeys = (): string[] => {
-            const sfdxTsConfig = fsExtra.readJsonSync(baseTsconfigPath);
+            const sfdxTsConfig = JSON.parse(fs.readFileSync(baseTsconfigPath, 'utf8'));
             return Object.keys(sfdxTsConfig.compilerOptions.paths);
         };
 
@@ -402,10 +403,10 @@ describe('handlers', () => {
 
         afterEach(() => {
             // Clean up after each test run
-            fsExtra.removeSync(baseTsconfigPath);
+            removeFile(baseTsconfigPath);
             const tsconfigPaths = sync(path.join(SFDX_WORKSPACE_ROOT, '**', 'lwc', 'tsconfig.json'));
-            tsconfigPaths.forEach((tsconfigPath) => fsExtra.removeSync(tsconfigPath));
-            fsExtra.removeSync(watchedFileDir);
+            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
+            removeDir(watchedFileDir);
             mockTypeScriptSupportConfig = false;
         });
 
@@ -421,7 +422,8 @@ describe('handlers', () => {
 
                 // Create files after initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
-                fsExtra.createFileSync(watchedFilePath);
+                fs.mkdirSync(path.dirname(watchedFilePath), { recursive: true });
+                fs.writeFileSync(watchedFilePath, '');
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -441,7 +443,8 @@ describe('handlers', () => {
             it(`removes tsconfig.sfdx.json path mapping when ${ext} files deleted`, async () => {
                 // Create files before initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
-                fsExtra.createFileSync(watchedFilePath);
+                fs.mkdirSync(path.dirname(watchedFilePath), { recursive: true });
+                fs.writeFileSync(watchedFilePath, '');
 
                 await server.onInitialize(initializeParams);
                 await server.onInitialized();
@@ -449,7 +452,7 @@ describe('handlers', () => {
                 const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
-                fsExtra.removeSync(watchedFilePath);
+                removeFile(watchedFilePath);
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -468,7 +471,8 @@ describe('handlers', () => {
             it(`no updates to tsconfig.sfdx.json path mapping when ${ext} files changed`, async () => {
                 // Create files before initialized
                 const watchedFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
-                fsExtra.createFileSync(watchedFilePath);
+                fs.mkdirSync(path.dirname(watchedFilePath), { recursive: true });
+                fs.writeFileSync(watchedFilePath, '');
 
                 await server.onInitialize(initializeParams);
                 await server.onInitialized();
@@ -476,7 +480,7 @@ describe('handlers', () => {
                 const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
-                fsExtra.removeSync(watchedFilePath);
+                removeFile(watchedFilePath);
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -500,7 +504,8 @@ describe('handlers', () => {
                 expect(initializedPathMapping.length).toEqual(11);
 
                 const watchedFilePath = path.resolve(watchedFileDir, '__tests__', 'newlyAddedFile', `newlyAddedFile${ext}`);
-                fsExtra.createFileSync(watchedFilePath);
+                fs.mkdirSync(path.dirname(watchedFilePath), { recursive: true });
+                fs.writeFileSync(watchedFilePath, '');
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -522,8 +527,10 @@ describe('handlers', () => {
                 it(`no path mapping updates made for ${ext} on ${type} event`, async () => {
                     const lwcComponentPath = path.resolve(watchedFileDir, `newlyAddedFile.ts`);
                     const nonJsOrTsFilePath = path.resolve(watchedFileDir, `newlyAddedFile${ext}`);
-                    fsExtra.createFileSync(lwcComponentPath);
-                    fsExtra.createFileSync(nonJsOrTsFilePath);
+                    fs.mkdirSync(path.dirname(lwcComponentPath), { recursive: true });
+                    fs.writeFileSync(lwcComponentPath, '');
+                    fs.mkdirSync(path.dirname(nonJsOrTsFilePath), { recursive: true });
+                    fs.writeFileSync(nonJsOrTsFilePath, '');
 
                     await server.onInitialize(initializeParams);
                     await server.onInitialized();
@@ -531,7 +538,7 @@ describe('handlers', () => {
                     const initializedPathMapping = getPathMappingKeys();
                     expect(initializedPathMapping.length).toEqual(12);
 
-                    fsExtra.removeSync(nonJsOrTsFilePath);
+                    removeFile(nonJsOrTsFilePath);
 
                     const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                         changes: [

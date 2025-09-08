@@ -43,8 +43,8 @@ import { URI } from 'vscode-uri';
 import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
 import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
 
-export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
-export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
+const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
+const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
 const { WorkspaceType } = shared;
 
@@ -64,7 +64,7 @@ type CursorInfo = {
     range?: any;
 };
 
-export function findDynamicContent(text: string, offset: number): any {
+export const findDynamicContent = (text: string, offset: number): any => {
     const regex = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
     let match = regex.exec(text);
     while (match && offset > match.index) {
@@ -74,7 +74,7 @@ export function findDynamicContent(text: string, offset: number): any {
         match = regex.exec(text);
     }
     return null;
-}
+};
 
 export default class Server {
     readonly connection: IConnection = createConnection();

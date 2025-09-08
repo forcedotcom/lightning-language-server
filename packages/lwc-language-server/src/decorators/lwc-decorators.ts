@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 
-import { ClassMember, Location, Position, DecoratorTargetType, DecoratorTargetProperty, DecoratorTargetMethod } from '@salesforce/lightning-lsp-common';
+import { ClassMember, Location, DecoratorTargetType, DecoratorTargetProperty } from '@salesforce/lightning-lsp-common';
 
 export interface Metadata {
     decorators: Array<ApiDecorator | TrackDecorator | WireDecorator>;
@@ -51,9 +51,6 @@ export interface WireDecoratorTarget {
     type: DecoratorTargetType;
     adapter?: unknown;
 }
-
-// Re-export the shared types for convenience
-export type { DecoratorTargetType, DecoratorTargetProperty, DecoratorTargetMethod };
 
 export interface ModuleExports {
     type: 'ExportNamedDeclaration' | 'ExportDefaultDeclaration' | 'ExportAllDeclaration';

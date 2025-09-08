@@ -1,6 +1,6 @@
 import { IAttributeData, ITagData, IValueData, IHTMLDataProvider } from 'vscode-html-languageservice';
 import ComponentIndexer from './component-indexer';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import { join } from 'path';
 
 export type DataProviderAttributes = {
@@ -26,7 +26,9 @@ export class LWCDataProvider implements IHTMLDataProvider {
             try {
                 standardData = fs.readFileSync(filePath, 'utf-8');
                 break;
-            } catch (error) { /* Continue */ }
+            } catch (error) {
+                /* Continue */
+            }
         }
         if (!standardData) {
             throw new Error(`Could not find transformed-lwc-standard.json in any of the expected locations: ${possiblePaths.join(', ')}`);

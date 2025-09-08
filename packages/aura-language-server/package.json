@@ -2,8 +2,8 @@
   "name": "@salesforce/aura-language-server",
   "version": "4.12.7",
   "description": "Language server for Aura components.",
-  "main": "lib/aura-indexer/indexer.js",
-  "typings": "lib/shared.d.ts",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -30,8 +30,6 @@
     "@salesforce/lightning-lsp-common": "4.12.7",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
-    "change-case": "^3.1.0",
-    "fs-extra": "^11.3.0",
     "line-column": "^1.0.2",
     "vscode-html-languageservice": "^5.0.0",
     "vscode-languageserver": "^5.2.1",
@@ -39,7 +37,6 @@
     "vscode-uri": "1.0.6"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
     "@types/glob": "^7.2.0",
     "@types/jest": "^29.5.14",
     "@types/mock-fs": "^4.13.4",

@@ -5,14 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
+import { promisify } from 'util';
 import * as path from 'path';
-import { BaseWorkspaceContext, WorkspaceType } from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, WorkspaceType, Indexer, AURA_EXTENSIONS, findNamespaceRoots, pathExists } from '@salesforce/lightning-lsp-common';
+import { TextDocument } from 'vscode-languageserver';
+
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
 
 /**
  * Holds information and utility methods for an Aura workspace
  */
 export class AuraWorkspaceContext extends BaseWorkspaceContext {
+    protected indexers: Map<string, Indexer> = new Map();
+
     /**
      * @param workspaceRoots
      * @return AuraWorkspaceContext representing the workspace with workspaceRoots
@@ -37,46 +44,49 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                     const utilsPath = path.join(root, 'utils', 'meta');
                     const registeredEmptyPath = path.join(root, 'registered-empty-folder', 'meta');
 
-                    if (await fs.pathExists(path.join(forceAppPath, 'lwc'))) {
+                    if (await pathExists(path.join(forceAppPath, 'lwc'))) {
                         roots.lwc.push(path.join(forceAppPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(utilsPath, 'lwc'))) {
+                    if (await pathExists(path.join(utilsPath, 'lwc'))) {
                         roots.lwc.push(path.join(utilsPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(registeredEmptyPath, 'lwc'))) {
+                    if (await pathExists(path.join(registeredEmptyPath, 'lwc'))) {
                         roots.lwc.push(path.join(registeredEmptyPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(forceAppPath, 'aura'))) {
+                    if (await pathExists(path.join(forceAppPath, 'aura'))) {
                         roots.aura.push(path.join(forceAppPath, 'aura'));
                     }
                 }
                 return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
-                for (const project of await fs.readdir(this.workspaceRoots[0])) {
-                    const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
-                    if (await fs.pathExists(modulesDir)) {
-                        const subroots = await this.findNamespaceRoots(modulesDir, 2);
-                        roots.lwc.push(...subroots.lwc);
-                    }
-                    const auraDir = path.join(this.workspaceRoots[0], project, 'components');
-                    if (await fs.pathExists(auraDir)) {
-                        const subroots = await this.findNamespaceRoots(auraDir, 2);
-                        roots.aura.push(...subroots.lwc);
-                    }
-                }
+                const projects = await readdir(this.workspaceRoots[0]);
+                await Promise.all(
+                    projects.map(async (project) => {
+                        const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
+                        if (await pathExists(modulesDir)) {
+                            const subroots = await findNamespaceRoots(modulesDir, 2);
+                            roots.lwc.push(...subroots.lwc);
+                        }
+                        const auraDir = path.join(this.workspaceRoots[0], project, 'components');
+                        if (await pathExists(auraDir)) {
+                            const subroots = await findNamespaceRoots(auraDir, 2);
+                            roots.aura.push(...subroots.lwc);
+                        }
+                    }),
+                );
                 return roots;
             case WorkspaceType.CORE_PARTIAL:
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
-                    if (await fs.pathExists(modulesDir)) {
-                        const subroots = await this.findNamespaceRoots(path.join(ws, 'modules'), 2);
+                    if (await pathExists(modulesDir)) {
+                        const subroots = await findNamespaceRoots(path.join(ws, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }
                     const auraDir = path.join(ws, 'components');
-                    if (await fs.pathExists(auraDir)) {
-                        const subroots = await this.findNamespaceRoots(path.join(ws, 'components'), 2);
+                    if (await pathExists(auraDir)) {
+                        const subroots = await findNamespaceRoots(path.join(ws, 'components'), 2);
                         roots.aura.push(...subroots.lwc);
                     }
                 }
@@ -89,7 +99,7 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                 if (this.type === WorkspaceType.MONOREPO) {
                     depth += 2;
                 }
-                const unknownroots = await this.findNamespaceRoots(this.workspaceRoots[0], depth);
+                const unknownroots = await findNamespaceRoots(this.workspaceRoots[0], depth);
                 roots.lwc.push(...unknownroots.lwc);
                 roots.aura.push(...unknownroots.aura);
                 return roots;
@@ -98,70 +108,44 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
         return roots;
     }
 
-    /**
-     * Helper method to find namespace roots within a directory
-     */
-    private async findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: string[]; aura: string[] }> {
-        const roots: { lwc: string[]; aura: string[] } = {
-            lwc: [],
-            aura: [],
-        };
+    public async findAllAuraMarkup(): Promise<string[]> {
+        const files: string[] = [];
+        const namespaceRoots = await this.findNamespaceRootsUsingTypeCache();
 
-        function isModuleRoot(subdirs: string[]): boolean {
-            for (const subdir of subdirs) {
-                // Is a root if any subdir matches a name/name.js with name.js being a module
-                const basename = path.basename(subdir);
-                const modulePath = path.join(subdir, basename + '.js');
-                if (fs.existsSync(modulePath)) {
-                    // TODO: check contents for: from 'lwc'?
-                    return true;
-                }
-            }
-            return false;
+        for (const namespaceRoot of namespaceRoots.aura) {
+            const markupFiles = await findAuraMarkupIn(namespaceRoot);
+            files.push(...markupFiles);
         }
+        return files;
+    }
 
-        async function traverse(candidate: string, depth: number): Promise<void> {
-            if (--depth < 0) {
-                return;
-            }
+    public getIndexingProvider(name: string): Indexer {
+        return this.indexers.get(name);
+    }
 
-            // skip traversing node_modules and similar
-            const filename = path.basename(candidate);
-            if (
-                filename === 'node_modules' ||
-                filename === 'bin' ||
-                filename === 'target' ||
-                filename === 'jest-modules' ||
-                filename === 'repository' ||
-                filename === 'git'
-            ) {
-                return;
-            }
+    public addIndexingProvider(provider: { name: string; indexer: Indexer }): void {
+        this.indexers.set(provider.name, provider.indexer);
+    }
 
-            // module_root/name/name.js
-            const subdirs = await fs.readdir(candidate);
-            const dirs = [];
-            for (const file of subdirs) {
-                const subdir = path.join(candidate, file);
-                if ((await fs.stat(subdir)).isDirectory()) {
-                    dirs.push(subdir);
-                }
-            }
-
-            // Is a root if we have a folder called lwc
-            const isDirLWC = isModuleRoot(dirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
-            if (isDirLWC) {
-                roots.lwc.push(path.resolve(candidate));
-            } else {
-                for (const subdir of dirs) {
-                    await traverse(subdir, depth);
-                }
-            }
-        }
-
-        if (fs.existsSync(root)) {
-            await traverse(root, maxDepth);
-        }
-        return roots;
+    public async isAuraJavascript(document: TextDocument): Promise<boolean> {
+        return document.languageId === 'javascript' && (await this.isInsideAuraRoots(document));
     }
 }
+
+const findAuraMarkupIn = async (namespaceRoot: string): Promise<string[]> => {
+    const files: string[] = [];
+    const dirs = await readdir(namespaceRoot);
+    for (const dir of dirs) {
+        const componentDir = path.join(namespaceRoot, dir);
+        const statResult = await stat(componentDir);
+        if (statResult.isDirectory()) {
+            for (const ext of AURA_EXTENSIONS) {
+                const markupFile = path.join(componentDir, dir + ext);
+                if (await pathExists(markupFile)) {
+                    files.push(markupFile);
+                }
+            }
+        }
+    }
+    return files;
+};

@@ -10,7 +10,7 @@ function splitPath(filePath: path.ParsedPath): string[] {
     return pathElements;
 }
 
-function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
+export function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = splitPath(filePath);
@@ -22,7 +22,7 @@ function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string,
     return null;
 }
 
-function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
+export function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
     const filePath = path.parse(file);
     if (sfdxProject) {
         return converter('c', filePath.name);
@@ -32,7 +32,7 @@ function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: st
     }
 }
 
-function moduleName(namespace: string, tag: string): string {
+export function moduleName(namespace: string, tag: string): string {
     if (namespace === 'interop') {
         // treat interop as lightning, i.e. needed when using extension with lightning-global
         // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
@@ -55,14 +55,4 @@ export function componentFromFile(file: string, sfdxProject: boolean): string {
 
 export function componentFromDirectory(file: string, sfdxProject: boolean): string {
     return nameFromDirectory(file, sfdxProject, componentName);
-}
-
-/**
- * @return true if file is the main .js file for a component
- */
-export function isJSComponent(file: string): boolean {
-    if (!file.toLowerCase().endsWith('.js')) {
-        return false;
-    }
-    return nameFromFile(file, true, moduleName) !== null;
 }

@@ -3,18 +3,40 @@ import { TextDocument } from 'vscode-languageserver';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../../constants';
 import { collectBundleMetadata, BundleConfig, ScriptFile } from '@lwc/metadata';
 import { mapLwcMetadataToInternal } from '../type-mapping';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 
-import {
-    compileDocument,
-    compileFile,
-    compileSource,
-    getApiMethods,
-    getMethods,
-    getPrivateReactiveProperties,
-    getProperties,
-    getPublicReactiveProperties,
-} from '../compiler';
+import { compileDocument, compileSource, getMethods, getProperties, getClassMembers } from '../compiler';
+import { ClassMember } from '@salesforce/lightning-lsp-common';
+import { Metadata } from '../../decorators';
+
+const getDecoratorsTargets = (metadata: Metadata, elementType: string, targetType: string): ClassMember[] => {
+    const props: ClassMember[] = [];
+    if (metadata.decorators) {
+        for (const element of metadata.decorators) {
+            if (element.type === elementType) {
+                for (const target of element.targets) {
+                    if (target.type === targetType) {
+                        props.push(target);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return props;
+};
+
+const getPublicReactiveProperties = (metadata: Metadata): ClassMember[] => {
+    return getClassMembers(metadata, 'property', 'api');
+};
+
+const getPrivateReactiveProperties = (metadata: Metadata): ClassMember[] => {
+    return getDecoratorsTargets(metadata, 'track', 'property');
+};
+
+const getApiMethods = (metadata: Metadata): ClassMember[] => {
+    return getDecoratorsTargets(metadata, 'api', 'method');
+};
 
 const codeOk = `
 import { LightningElement } from 'lwc';
@@ -235,13 +257,6 @@ it('use compileDocument()', async () => {
 
     const document = TextDocument.create('file:///foo.js', 'javascript', 0, content);
     const { metadata } = await compileDocument(document);
-    const publicProperties = getPublicReactiveProperties(metadata);
-    expect(publicProperties).toMatchObject([{ name: 'index' }]);
-});
-
-it('use compileFile()', async () => {
-    const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'foo.js');
-    const { metadata } = await compileFile(filepath);
     const publicProperties = getPublicReactiveProperties(metadata);
     expect(publicProperties).toMatchObject([{ name: 'index' }]);
 });

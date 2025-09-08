@@ -5,9 +5,43 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import * as path from 'path';
-import { BaseWorkspaceContext, WorkspaceType } from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, WorkspaceType, findNamespaceRoots, utils, pathExists, ensureDirSync } from '@salesforce/lightning-lsp-common';
+import { processTemplate, getModulesDirs } from '@salesforce/lightning-lsp-common/src/base-context';
+import { TextDocument } from 'vscode-languageserver';
+
+const updateConfigFile = (filePath: string, content: string): void => {
+    const dir = path.dirname(filePath);
+    ensureDirSync(dir);
+    fs.writeFileSync(filePath, content);
+};
+
+const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
+    let forceignoreContent = '';
+    if (await pathExists(forceignorePath)) {
+        forceignoreContent = await fs.promises.readFile(forceignorePath, 'utf8');
+    }
+
+    // Add standard forceignore patterns for JavaScript projects
+    if (!forceignoreContent.includes('**/jsconfig.json')) {
+        forceignoreContent += '\n**/jsconfig.json';
+    }
+    if (!forceignoreContent.includes('**/.eslintrc.json')) {
+        forceignoreContent += '\n**/.eslintrc.json';
+    }
+
+    if (addTsConfig && !forceignoreContent.includes('**/tsconfig.json')) {
+        forceignoreContent += '\n**/tsconfig.json';
+    }
+
+    if (addTsConfig && !forceignoreContent.includes('**/*.ts')) {
+        forceignoreContent += '\n**/*.ts';
+    }
+
+    // Always write the forceignore file, even if it's empty
+    await fs.promises.writeFile(forceignorePath, forceignoreContent.trim());
+};
 
 /**
  * Holds information and utility methods for a LWC workspace
@@ -37,26 +71,26 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                     const utilsPath = path.join(root, 'utils', 'meta');
                     const registeredEmptyPath = path.join(root, 'registered-empty-folder', 'meta');
 
-                    if (await fs.pathExists(path.join(forceAppPath, 'lwc'))) {
+                    if (await pathExists(path.join(forceAppPath, 'lwc'))) {
                         roots.lwc.push(path.join(forceAppPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(utilsPath, 'lwc'))) {
+                    if (await pathExists(path.join(utilsPath, 'lwc'))) {
                         roots.lwc.push(path.join(utilsPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(registeredEmptyPath, 'lwc'))) {
+                    if (await pathExists(path.join(registeredEmptyPath, 'lwc'))) {
                         roots.lwc.push(path.join(registeredEmptyPath, 'lwc'));
                     }
-                    if (await fs.pathExists(path.join(forceAppPath, 'aura'))) {
+                    if (await pathExists(path.join(forceAppPath, 'aura'))) {
                         roots.aura.push(path.join(forceAppPath, 'aura'));
                     }
                 }
                 return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
-                for (const project of await fs.readdir(this.workspaceRoots[0])) {
+                for (const project of await fs.promises.readdir(this.workspaceRoots[0])) {
                     const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
-                    if (await fs.pathExists(modulesDir)) {
-                        const subroots = await this.findNamespaceRoots(modulesDir, 2);
+                    if (await pathExists(modulesDir)) {
+                        const subroots = await findNamespaceRoots(modulesDir, 2);
                         roots.lwc.push(...subroots.lwc);
                     }
                 }
@@ -65,8 +99,8 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
-                    if (await fs.pathExists(modulesDir)) {
-                        const subroots = await this.findNamespaceRoots(path.join(ws, 'modules'), 2);
+                    if (await pathExists(modulesDir)) {
+                        const subroots = await findNamespaceRoots(path.join(ws, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }
                 }
@@ -79,7 +113,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                 if (this.type === WorkspaceType.MONOREPO) {
                     depth += 2;
                 }
-                const unknownroots = await this.findNamespaceRoots(this.workspaceRoots[0], depth);
+                const unknownroots = await findNamespaceRoots(this.workspaceRoots[0], depth);
                 roots.lwc.push(...unknownroots.lwc);
                 roots.aura.push(...unknownroots.aura);
                 return roots;
@@ -89,69 +123,69 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
     }
 
     /**
-     * Helper method to find namespace roots within a directory
+     * Updates the namespace root type cache
      */
-    private async findNamespaceRoots(root: string, maxDepth = 5): Promise<{ lwc: string[]; aura: string[] }> {
-        const roots: { lwc: string[]; aura: string[] } = {
-            lwc: [],
-            aura: [],
-        };
+    public async updateNamespaceRootTypeCache(): Promise<void> {
+        this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
+    }
 
-        function isModuleRoot(subdirs: string[]): boolean {
-            for (const subdir of subdirs) {
-                // Is a root if any subdir matches a name/name.js with name.js being a module
-                const basename = path.basename(subdir);
-                const modulePath = path.join(subdir, basename + '.js');
-                if (fs.existsSync(modulePath)) {
-                    // TODO: check contents for: from 'lwc'?
-                    return true;
-                }
-            }
-            return false;
+    /**
+     * Configures LWC project to support TypeScript
+     */
+    public async configureProjectForTs(): Promise<void> {
+        try {
+            // TODO: This should be moved into configureProject after dev preview
+            await this.writeTsconfigJson();
+        } catch (error) {
+            console.error('configureProjectForTs: Error occurred:', error);
+            throw error;
         }
+    }
 
-        async function traverse(candidate: string, depth: number): Promise<void> {
-            if (--depth < 0) {
-                return;
-            }
+    /**
+     * Writes TypeScript configuration files for the project
+     */
+    protected async writeTsconfigJson(): Promise<void> {
+        switch (this.type) {
+            case WorkspaceType.SFDX:
+                // Write tsconfig.sfdx.json first
+                const baseTsConfigPath = path.join(this.workspaceRoots[0], '.sfdx', 'tsconfig.sfdx.json');
 
-            // skip traversing node_modules and similar
-            const filename = path.basename(candidate);
-            if (
-                filename === 'node_modules' ||
-                filename === 'bin' ||
-                filename === 'target' ||
-                filename === 'jest-modules' ||
-                filename === 'repository' ||
-                filename === 'git'
-            ) {
-                return;
-            }
-
-            // module_root/name/name.js
-            const subdirs = await fs.readdir(candidate);
-            const dirs = [];
-            for (const file of subdirs) {
-                const subdir = path.join(candidate, file);
-                if ((await fs.stat(subdir)).isDirectory()) {
-                    dirs.push(subdir);
+                try {
+                    const baseTsConfig = await fs.promises.readFile(utils.getSfdxResource('tsconfig-sfdx.base.json'), 'utf8');
+                    updateConfigFile(baseTsConfigPath, baseTsConfig);
+                } catch (error) {
+                    console.error('writeTsconfigJson: Error reading/writing base tsconfig:', error);
+                    throw error;
                 }
-            }
 
-            // Is a root if we have a folder called lwc
-            const isDirLWC = isModuleRoot(dirs) || (!path.parse(candidate).ext && path.parse(candidate).name === 'lwc');
-            if (isDirLWC) {
-                roots.lwc.push(path.resolve(candidate));
-            } else {
-                for (const subdir of dirs) {
-                    await traverse(subdir, depth);
+                // Write to the tsconfig.json in each module subdirectory
+                let tsConfigTemplate: string;
+                try {
+                    tsConfigTemplate = await fs.promises.readFile(utils.getSfdxResource('tsconfig-sfdx.json'), 'utf8');
+                } catch (error) {
+                    console.error('writeTsconfigJson: Error reading tsconfig template:', error);
+                    throw error;
                 }
-            }
-        }
 
-        if (fs.existsSync(root)) {
-            await traverse(root, maxDepth);
+                const forceignore = path.join(this.workspaceRoots[0], '.forceignore');
+                // TODO: We should only be looking through modules that have TS files
+                const modulesDirs = await getModulesDirs(this.type, this.workspaceRoots, this.initSfdxProjectConfigCache.bind(this));
+
+                for (const modulesDir of modulesDirs) {
+                    const tsConfigPath = path.join(modulesDir, 'tsconfig.json');
+                    const relativeWorkspaceRoot = utils.relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
+                    const tsConfigContent = processTemplate(tsConfigTemplate, { project_root: relativeWorkspaceRoot });
+                    updateConfigFile(tsConfigPath, tsConfigContent);
+                    await updateForceIgnoreFile(forceignore, true);
+                }
+                break;
+            default:
+                break;
         }
-        return roots;
+    }
+
+    public async isLWCJavascript(document: TextDocument): Promise<boolean> {
+        return document.languageId === 'javascript' && (await this.isInsideModulesRoots(document));
     }
 }

@@ -1,7 +1,7 @@
 import * as glob from 'fast-glob';
 import normalize from 'normalize-path';
 import * as path from 'path';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs';
 import Typing from './typing';
 import BaseIndexer from './base-indexer';
 import { detectWorkspaceHelper, WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
@@ -12,10 +12,10 @@ type BaseIndexerAttributes = {
     workspaceRoot: string;
 };
 
-export function pathBasename(filename: string): string {
+export const pathBasename = (filename: string): string => {
     const parsedPath: string = path.parse(filename).base;
     return basenameRegex.exec(parsedPath).groups.name;
-}
+};
 
 export default class TypingIndexer extends BaseIndexer {
     readonly typingsBaseDir: string;
@@ -55,30 +55,36 @@ export default class TypingIndexer extends BaseIndexer {
     }
 
     createNewMetaTypings(): void {
-        fsExtra.ensureDirSync(this.typingsBaseDir);
+        fs.mkdirSync(this.typingsBaseDir, { recursive: true });
         const newFiles = TypingIndexer.diff(this.metaFiles, this.metaTypings);
         newFiles.forEach(async (filename: string) => {
             const typing = Typing.fromMeta(filename);
             const filePath = path.join(this.typingsBaseDir, typing.fileName);
-            fsExtra.writeFileSync(filePath, typing.declaration);
+            fs.writeFileSync(filePath, typing.declaration);
         });
     }
 
     deleteStaleMetaTypings(): void {
         const staleTypings = TypingIndexer.diff(this.metaTypings, this.metaFiles);
-        staleTypings.forEach((filename: string) => fsExtra.removeSync(filename));
+        staleTypings.forEach((filename: string) => {
+            if (fs.existsSync(filename)) {
+                fs.unlinkSync(filename);
+            }
+        });
     }
 
     async saveCustomLabelTypings(): Promise<void> {
-        fsExtra.ensureDirSync(this.typingsBaseDir);
-        const typings = this.customLabelFiles.map((filename) => {
-            const data = fsExtra.readFileSync(filename);
-            return Typing.declarationsFromCustomLabels(data);
-        });
+        fs.mkdirSync(this.typingsBaseDir, { recursive: true });
+        const typings = this.customLabelFiles
+            .filter((filename) => fs.existsSync(filename))
+            .map((filename) => {
+                const data = fs.readFileSync(filename);
+                return Typing.declarationsFromCustomLabels(data);
+            });
         const typingContent = await Promise.all(typings);
         const fileContent = typingContent.join('\n');
         if (fileContent.length !== 0) {
-            fsExtra.writeFileSync(this.customLabelTypings, fileContent);
+            fs.writeFileSync(this.customLabelTypings, fileContent);
         }
     }
 

@@ -5,7 +5,7 @@ import { transform } from '@lwc/old-compiler';
 import { CompilerOptions as OldCompilerOptions } from '@lwc/old-compiler/dist/types/compiler/options';
 import { mapLwcMetadataToInternal } from '../type-mapping';
 import { Metadata } from '../../decorators';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 
 it('can map new metadata to old metadata', async () => {
     const filepath = path.join('src', 'javascript', '__tests__', 'fixtures', 'metadata.js');

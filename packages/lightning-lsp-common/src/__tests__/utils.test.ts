@@ -4,7 +4,7 @@ import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from '../context';
 import { WorkspaceType } from '../shared';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import mockFs from 'mock-fs';
 
 describe('utils', () => {
