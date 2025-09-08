@@ -1,5 +1,5 @@
 import * as utils from './utils';
-import { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS } from './base-context';
+import { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS, processTemplate, getModulesDirs } from './base-context';
 import * as shared from './shared';
 import { WorkspaceType } from './shared';
 import { TagInfo } from './indexer/tagInfo';
@@ -28,6 +28,8 @@ export {
     ensureDirSync,
     removeFile,
     removeDir,
+    processTemplate,
+    getModulesDirs,
     ClassMember,
     Location,
     Position,

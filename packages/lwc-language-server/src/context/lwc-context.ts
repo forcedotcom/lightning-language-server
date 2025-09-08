@@ -7,8 +7,16 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { BaseWorkspaceContext, WorkspaceType, findNamespaceRoots, utils, pathExists, ensureDirSync } from '@salesforce/lightning-lsp-common';
-import { processTemplate, getModulesDirs } from '@salesforce/lightning-lsp-common/src/base-context';
+import {
+    BaseWorkspaceContext,
+    WorkspaceType,
+    findNamespaceRoots,
+    utils,
+    pathExists,
+    ensureDirSync,
+    processTemplate,
+    getModulesDirs,
+} from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
 
 const updateConfigFile = (filePath: string, content: string): void => {
