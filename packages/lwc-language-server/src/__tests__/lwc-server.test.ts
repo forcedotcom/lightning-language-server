@@ -364,10 +364,13 @@ describe('handlers', () => {
         });
 
         it('initializes tsconfig when salesforcedx-vscode-lwc.preview.typeScriptSupport = true', async () => {
+            // Create a new server instance to avoid state issues
+            const testServer = new Server();
+
             // Enable feature flag
             mockTypeScriptSupportConfig = true;
-            await server.onInitialize(initializeParams);
-            await server.onInitialized();
+            await testServer.onInitialize(initializeParams);
+            await testServer.onInitialized();
 
             expect(fs.existsSync(baseTsconfigPath)).toBe(true);
             const tsconfigPaths = getTsConfigPaths();
