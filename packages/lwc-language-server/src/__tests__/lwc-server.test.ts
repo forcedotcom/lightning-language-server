@@ -55,7 +55,9 @@ jest.mock('vscode-languageserver', () => {
                 onShutdown: (): boolean => true,
                 onDefinition: (): boolean => true,
                 workspace: {
-                    getConfiguration: (): boolean => mockTypeScriptSupportConfig,
+                    getConfiguration: (): boolean => {
+                        return mockTypeScriptSupportConfig;
+                    },
                 },
             };
         }),
