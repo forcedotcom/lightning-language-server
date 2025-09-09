@@ -396,11 +396,16 @@ describe('handlers', () => {
                 console.log('getSfdxProjectConfig returned:', sfdxConfig);
                 console.log('packageDirectories:', sfdxConfig.packageDirectories);
 
+                console.log('About to call getModulesDirs with:');
+                console.log('  context.type:', context.type);
+                console.log('  context.workspaceRoots:', context.workspaceRoots);
+
                 const modulesDirs = await getModulesDirs(context.type, context.workspaceRoots, context.initSfdxProjectConfigCache.bind(context));
                 console.log('getModulesDirs returned:', modulesDirs);
                 console.log('getModulesDirs length:', modulesDirs.length);
             } catch (error) {
                 console.log('Error calling getModulesDirs:', error);
+                console.log('Error stack:', error.stack);
             }
 
             expect(fs.existsSync(baseTsconfigPath)).toBe(true);
