@@ -387,6 +387,22 @@ describe('handlers', () => {
             await testServer.onInitialized();
             console.log('onInitialized completed');
 
+            // Debug: Check what getModulesDirs returns
+            try {
+                const { getModulesDirs } = require('@salesforce/lightning-lsp-common');
+
+                // First, check what getSfdxProjectConfig returns
+                const sfdxConfig = await context.initSfdxProjectConfigCache();
+                console.log('getSfdxProjectConfig returned:', sfdxConfig);
+                console.log('packageDirectories:', sfdxConfig.packageDirectories);
+
+                const modulesDirs = await getModulesDirs(context.type, context.workspaceRoots, context.initSfdxProjectConfigCache.bind(context));
+                console.log('getModulesDirs returned:', modulesDirs);
+                console.log('getModulesDirs length:', modulesDirs.length);
+            } catch (error) {
+                console.log('Error calling getModulesDirs:', error);
+            }
+
             expect(fs.existsSync(baseTsconfigPath)).toBe(true);
             const tsconfigPaths = getTsConfigPaths();
 
