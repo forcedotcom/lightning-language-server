@@ -20,9 +20,13 @@ import {
 import { TextDocument } from 'vscode-languageserver';
 
 const updateConfigFile = (filePath: string, content: string): void => {
+    console.log('updateConfigFile: Starting with filePath:', filePath);
     const dir = path.dirname(filePath);
+    console.log('updateConfigFile: Directory:', dir);
     ensureDirSync(dir);
+    console.log('updateConfigFile: Directory ensured, about to write file');
     fs.writeFileSync(filePath, content);
+    console.log('updateConfigFile: File written successfully:', filePath);
 };
 
 const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
@@ -179,13 +183,25 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                 const forceignore = path.join(this.workspaceRoots[0], '.forceignore');
                 // TODO: We should only be looking through modules that have TS files
                 const modulesDirs = await getModulesDirs(this.type, this.workspaceRoots, this.initSfdxProjectConfigCache.bind(this));
+                console.log('writeTsconfigJson: modulesDirs found:', modulesDirs);
+                console.log('writeTsconfigJson: modulesDirs length:', modulesDirs.length);
 
                 for (const modulesDir of modulesDirs) {
                     const tsConfigPath = path.join(modulesDir, 'tsconfig.json');
+                    console.log('writeTsconfigJson: Processing modulesDir:', modulesDir);
+                    console.log('writeTsconfigJson: tsConfigPath:', tsConfigPath);
+
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
+                    console.log('writeTsconfigJson: relativeWorkspaceRoot:', relativeWorkspaceRoot);
+
                     const tsConfigContent = processTemplate(tsConfigTemplate, { project_root: relativeWorkspaceRoot });
+                    console.log('writeTsconfigJson: About to call updateConfigFile for:', tsConfigPath);
+
                     updateConfigFile(tsConfigPath, tsConfigContent);
+                    console.log('writeTsconfigJson: updateConfigFile completed for:', tsConfigPath);
+
                     await updateForceIgnoreFile(forceignore, true);
+                    console.log('writeTsconfigJson: updateForceIgnoreFile completed');
                 }
                 break;
             default:
