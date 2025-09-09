@@ -6,13 +6,9 @@
  */
 
 import * as fs from 'fs';
-import { promisify } from 'util';
 import * as path from 'path';
 import { BaseWorkspaceContext, WorkspaceType, Indexer, AURA_EXTENSIONS, findNamespaceRoots, pathExists } from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
-
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
 
 /**
  * Holds information and utility methods for an Aura workspace
@@ -60,7 +56,7 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                 return roots;
             case WorkspaceType.CORE_ALL:
                 // optimization: search only inside project/modules/
-                const projects = await readdir(this.workspaceRoots[0]);
+                const projects = await fs.promises.readdir(this.workspaceRoots[0]);
                 await Promise.all(
                     projects.map(async (project) => {
                         const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
@@ -134,10 +130,10 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
 
 const findAuraMarkupIn = async (namespaceRoot: string): Promise<string[]> => {
     const files: string[] = [];
-    const dirs = await readdir(namespaceRoot);
+    const dirs = await fs.promises.readdir(namespaceRoot);
     for (const dir of dirs) {
         const componentDir = path.join(namespaceRoot, dir);
-        const statResult = await stat(componentDir);
+        const statResult = await fs.promises.stat(componentDir);
         if (statResult.isDirectory()) {
             for (const ext of AURA_EXTENSIONS) {
                 const markupFile = path.join(componentDir, dir + ext);

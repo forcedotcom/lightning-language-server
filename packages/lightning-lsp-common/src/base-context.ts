@@ -51,7 +51,7 @@ const updateConfigFile = (filePath: string, content: string): void => {
     fs.writeFileSync(filePath, content);
 };
 
-const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
+export const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
     let forceignoreContent = '';
     if (await pathExists(forceignorePath)) {
         forceignoreContent = await fs.promises.readFile(forceignorePath, 'utf8');

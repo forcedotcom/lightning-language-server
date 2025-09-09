@@ -5,12 +5,8 @@ import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { BaseWorkspaceContext } from './base-context';
 import { WorkspaceType } from './shared';
-import { promisify } from 'util';
-import { Glob } from 'glob';
 import * as jsonc from 'jsonc-parser';
 import { pathExists } from './fs-utils';
-
-export const glob = promisify(Glob);
 
 const RESOURCES_DIR = 'resources';
 

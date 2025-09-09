@@ -16,6 +16,7 @@ import {
     ensureDirSync,
     processTemplate,
     getModulesDirs,
+    updateForceIgnoreFile,
 } from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
 
@@ -23,32 +24,6 @@ const updateConfigFile = (filePath: string, content: string): void => {
     const dir = path.dirname(filePath);
     ensureDirSync(dir);
     fs.writeFileSync(filePath, content);
-};
-
-const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
-    let forceignoreContent = '';
-    if (await pathExists(forceignorePath)) {
-        forceignoreContent = await fs.promises.readFile(forceignorePath, 'utf8');
-    }
-
-    // Add standard forceignore patterns for JavaScript projects
-    if (!forceignoreContent.includes('**/jsconfig.json')) {
-        forceignoreContent += '\n**/jsconfig.json';
-    }
-    if (!forceignoreContent.includes('**/.eslintrc.json')) {
-        forceignoreContent += '\n**/.eslintrc.json';
-    }
-
-    if (addTsConfig && !forceignoreContent.includes('**/tsconfig.json')) {
-        forceignoreContent += '\n**/tsconfig.json';
-    }
-
-    if (addTsConfig && !forceignoreContent.includes('**/*.ts')) {
-        forceignoreContent += '\n**/*.ts';
-    }
-
-    // Always write the forceignore file, even if it's empty
-    await fs.promises.writeFile(forceignorePath, forceignoreContent.trim());
 };
 
 /**

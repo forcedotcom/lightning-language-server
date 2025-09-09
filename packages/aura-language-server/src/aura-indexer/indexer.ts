@@ -1,5 +1,5 @@
 import { shared, Indexer, TagInfo, utils, AttributeInfo } from '@salesforce/lightning-lsp-common';
-import * as componentUtil from '../util/component-util';
+import { componentFromFile, componentFromDirectory } from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
 import * as fs from 'fs';
@@ -57,7 +57,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     public clearTagsforDirectory(directory: string, sfdxProject: boolean): void {
-        const name = componentUtil.componentFromDirectory(directory, sfdxProject);
+        const name = componentFromDirectory(directory, sfdxProject);
         this.deleteCustomTag(name);
     }
 
@@ -135,7 +135,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     private clearTagsforFile(file: string, sfdxProject: boolean): void {
-        const name = componentUtil.componentFromFile(file, sfdxProject);
+        const name = componentFromFile(file, sfdxProject);
         this.deleteCustomTag(name);
     }
 
@@ -258,7 +258,7 @@ export default class AuraIndexer implements Indexer {
                 },
             },
         };
-        const name = componentUtil.componentFromFile(file, sfdxProject);
+        const name = componentFromFile(file, sfdxProject);
         const info = new TagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
         return info;
     }

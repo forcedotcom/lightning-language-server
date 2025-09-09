@@ -1,16 +1,16 @@
 import * as path from 'path';
 
 // TODO investigate more why this happens
-function splitPath(filePath: path.ParsedPath): string[] {
+const splitPath = (filePath: path.ParsedPath): string[] => {
     let pathElements = filePath.dir.split(path.sep);
     // Somehow on windows paths are occassionally using forward slash
     if (path.sep === '\\' && filePath.dir.indexOf('\\') === -1) {
         pathElements = filePath.dir.split('/');
     }
     return pathElements;
-}
+};
 
-export function nameFromFile(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
+export const nameFromFile = (file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string => {
     const filePath = path.parse(file);
     const fileName = filePath.name;
     const pathElements = splitPath(filePath);
@@ -20,9 +20,9 @@ export function nameFromFile(file: string, sfdxProject: boolean, converter: (a: 
         return converter(namespace, parentDirName);
     }
     return null;
-}
+};
 
-export function nameFromDirectory(file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string {
+export const nameFromDirectory = (file: string, sfdxProject: boolean, converter: (a: string, b: string) => string): string => {
     const filePath = path.parse(file);
     if (sfdxProject) {
         return converter('c', filePath.name);
@@ -30,9 +30,9 @@ export function nameFromDirectory(file: string, sfdxProject: boolean, converter:
         // TODO verify
         return converter(splitPath(filePath).pop(), filePath.name);
     }
-}
+};
 
-export function moduleName(namespace: string, tag: string): string {
+export const moduleName = (namespace: string, tag: string): string => {
     if (namespace === 'interop') {
         // treat interop as lightning, i.e. needed when using extension with lightning-global
         // TODO: worth to add WorkspaceType.LIGHTNING_GLOBAL?
@@ -43,16 +43,16 @@ export function moduleName(namespace: string, tag: string): string {
     return namespace + '/' + tag;
     // TODO confirm we shouldn't be doing this anymore
     // + decamelize(tag, '-');
-}
+};
 
-function componentName(namespace: string, tag: string): string {
+const componentName = (namespace: string, tag: string): string => {
     return namespace + ':' + tag;
-}
+};
 
-export function componentFromFile(file: string, sfdxProject: boolean): string {
+export const componentFromFile = (file: string, sfdxProject: boolean): string => {
     return nameFromFile(file, sfdxProject, componentName);
-}
+};
 
-export function componentFromDirectory(file: string, sfdxProject: boolean): string {
+export const componentFromDirectory = (file: string, sfdxProject: boolean): string => {
     return nameFromDirectory(file, sfdxProject, componentName);
-}
+};
