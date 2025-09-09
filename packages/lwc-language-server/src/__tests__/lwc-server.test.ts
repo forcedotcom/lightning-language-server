@@ -338,7 +338,14 @@ describe('handlers', () => {
 
     describe('onInitialized()', () => {
         const baseTsconfigPath = path.join(SFDX_WORKSPACE_ROOT, '.sfdx', 'tsconfig.sfdx.json');
-        const getTsConfigPaths = (): string[] => sync(path.join(SFDX_WORKSPACE_ROOT, '**', 'lwc', 'tsconfig.json'));
+        const getTsConfigPaths = (): string[] => {
+            // Use posix-style path separators for glob patterns to ensure cross-platform compatibility
+            const pattern = path.posix.join(SFDX_WORKSPACE_ROOT.replace(/\\/g, '/'), '**', 'lwc', 'tsconfig.json');
+            console.log('getTsConfigPaths: pattern:', pattern);
+            const result = sync(pattern);
+            console.log('getTsConfigPaths: result:', result);
+            return result;
+        };
 
         beforeEach(async () => {
             // Clean up before each test run
