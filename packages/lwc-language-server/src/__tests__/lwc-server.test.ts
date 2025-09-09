@@ -341,10 +341,7 @@ describe('handlers', () => {
         const getTsConfigPaths = (): string[] => {
             // Use posix-style path separators for glob patterns to ensure cross-platform compatibility
             const pattern = path.posix.join(SFDX_WORKSPACE_ROOT.replace(/\\/g, '/'), '**', 'lwc', 'tsconfig.json');
-            console.log('getTsConfigPaths: pattern:', pattern);
-            const result = sync(pattern);
-            console.log('getTsConfigPaths: result:', result);
-            return result;
+            return sync(pattern);
         };
 
         beforeEach(async () => {
@@ -378,69 +375,11 @@ describe('handlers', () => {
 
             // Enable feature flag
             mockTypeScriptSupportConfig = true;
-            console.log('mockTypeScriptSupportConfig set to:', mockTypeScriptSupportConfig);
             await testServer.onInitialize(initializeParams);
-            console.log('Server initialized, calling onInitialized...');
-
-            // Debug: Check if the server's context is properly initialized
-            const context = testServer.context;
-            if (context) {
-                console.log('Server context type:', context.type);
-                console.log('Server workspace roots:', context.workspaceRoots);
-            } else {
-                console.log('Server context is null/undefined');
-            }
-
             await testServer.onInitialized();
-            console.log('onInitialized completed');
-
-            // Debug: Check what getModulesDirs returns
-            try {
-                const { getModulesDirs } = require('@salesforce/lightning-lsp-common');
-
-                // First, check what getSfdxProjectConfig returns
-                const sfdxConfig = await context.initSfdxProjectConfigCache();
-                console.log('getSfdxProjectConfig returned:', sfdxConfig);
-                console.log('packageDirectories:', sfdxConfig.packageDirectories);
-
-                console.log('About to call getModulesDirs with:');
-                console.log('  context.type:', context.type);
-                console.log('  context.workspaceRoots:', context.workspaceRoots);
-
-                const modulesDirs = await getModulesDirs(context.type, context.workspaceRoots, context.initSfdxProjectConfigCache.bind(context));
-                console.log('getModulesDirs returned:', modulesDirs);
-                console.log('getModulesDirs length:', modulesDirs.length);
-            } catch (error) {
-                console.log('Error calling getModulesDirs:', error);
-                console.log('Error stack:', error.stack);
-            }
 
             expect(fs.existsSync(baseTsconfigPath)).toBe(true);
             const tsconfigPaths = getTsConfigPaths();
-
-            // Debug information for CI
-            console.log('Debug info:');
-            console.log('SFDX_WORKSPACE_ROOT:', SFDX_WORKSPACE_ROOT);
-            console.log('SFDX_WORKSPACE_ROOT exists:', fs.existsSync(SFDX_WORKSPACE_ROOT));
-            console.log('baseTsconfigPath:', baseTsconfigPath);
-            console.log('baseTsconfigPath exists:', fs.existsSync(baseTsconfigPath));
-            console.log('tsconfigPaths found:', tsconfigPaths);
-            console.log('tsconfigPaths length:', tsconfigPaths.length);
-
-            // Check if sfdx-project.json exists
-            const sfdxProjectPath = path.join(SFDX_WORKSPACE_ROOT, 'sfdx-project.json');
-            console.log('sfdx-project.json path:', sfdxProjectPath);
-            console.log('sfdx-project.json exists:', fs.existsSync(sfdxProjectPath));
-
-            // Check if the expected directories exist
-            const expectedDirs = [
-                path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc'),
-                path.join(SFDX_WORKSPACE_ROOT, 'utils', 'meta', 'lwc'),
-                path.join(SFDX_WORKSPACE_ROOT, 'registered-empty-folder', 'meta', 'lwc'),
-            ];
-            expectedDirs.forEach((dir, index) => {
-                console.log(`Expected dir ${index + 1}: ${dir} exists: ${fs.existsSync(dir)}`);
-            });
 
             // There are currently 3 LWC directories under SFDX_WORKSPACE_ROOT
             // (force-app/main/default/lwc, utils/meta/lwc, and registered-empty-folder/meta/lwc)
