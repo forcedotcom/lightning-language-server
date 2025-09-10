@@ -12,7 +12,6 @@ import { TextDocument } from 'vscode-languageserver';
 import ejs from 'ejs';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
-import * as fs from 'fs';
 
 export const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
