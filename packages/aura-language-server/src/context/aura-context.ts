@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { BaseWorkspaceContext, WorkspaceType, Indexer, AURA_EXTENSIONS, findNamespaceRoots, pathExists } from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, WorkspaceType, Indexer, AURA_EXTENSIONS, findNamespaceRoots } from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
 
 /**
@@ -40,16 +40,16 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                     const utilsPath = path.join(root, 'utils', 'meta');
                     const registeredEmptyPath = path.join(root, 'registered-empty-folder', 'meta');
 
-                    if (await pathExists(path.join(forceAppPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(forceAppPath, 'lwc'))) {
                         roots.lwc.push(path.join(forceAppPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(utilsPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(utilsPath, 'lwc'))) {
                         roots.lwc.push(path.join(utilsPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(registeredEmptyPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(registeredEmptyPath, 'lwc'))) {
                         roots.lwc.push(path.join(registeredEmptyPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(forceAppPath, 'aura'))) {
+                    if (await fs.existsSync(path.join(forceAppPath, 'aura'))) {
                         roots.aura.push(path.join(forceAppPath, 'aura'));
                     }
                 }
@@ -60,12 +60,12 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                 await Promise.all(
                     projects.map(async (project) => {
                         const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
-                        if (await pathExists(modulesDir)) {
+                        if (await fs.existsSync(modulesDir)) {
                             const subroots = await findNamespaceRoots(modulesDir, 2);
                             roots.lwc.push(...subroots.lwc);
                         }
                         const auraDir = path.join(this.workspaceRoots[0], project, 'components');
-                        if (await pathExists(auraDir)) {
+                        if (await fs.existsSync(auraDir)) {
                             const subroots = await findNamespaceRoots(auraDir, 2);
                             roots.aura.push(...subroots.lwc);
                         }
@@ -76,12 +76,12 @@ export class AuraWorkspaceContext extends BaseWorkspaceContext {
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
-                    if (await pathExists(modulesDir)) {
+                    if (await fs.existsSync(modulesDir)) {
                         const subroots = await findNamespaceRoots(path.join(ws, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }
                     const auraDir = path.join(ws, 'components');
-                    if (await pathExists(auraDir)) {
+                    if (await fs.existsSync(auraDir)) {
                         const subroots = await findNamespaceRoots(path.join(ws, 'components'), 2);
                         roots.aura.push(...subroots.lwc);
                     }
@@ -137,7 +137,7 @@ const findAuraMarkupIn = async (namespaceRoot: string): Promise<string[]> => {
         if (statResult.isDirectory()) {
             for (const ext of AURA_EXTENSIONS) {
                 const markupFile = path.join(componentDir, dir + ext);
-                if (await pathExists(markupFile)) {
+                if (await fs.existsSync(markupFile)) {
                     files.push(markupFile);
                 }
             }

@@ -10,7 +10,6 @@ import * as path from 'path';
 import { BaseWorkspaceContext } from '../base-context';
 import { WorkspaceType } from '../shared';
 import { findNamespaceRoots } from '../namespace-utils';
-import { pathExists } from '../fs-utils';
 
 export class WorkspaceContext extends BaseWorkspaceContext {
     /**
@@ -29,16 +28,16 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                     const utilsPath = path.join(root, 'utils', 'meta');
                     const registeredEmptyPath = path.join(root, 'registered-empty-folder', 'meta');
 
-                    if (await pathExists(path.join(forceAppPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(forceAppPath, 'lwc'))) {
                         roots.lwc.push(path.join(forceAppPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(utilsPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(utilsPath, 'lwc'))) {
                         roots.lwc.push(path.join(utilsPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(registeredEmptyPath, 'lwc'))) {
+                    if (await fs.existsSync(path.join(registeredEmptyPath, 'lwc'))) {
                         roots.lwc.push(path.join(registeredEmptyPath, 'lwc'));
                     }
-                    if (await pathExists(path.join(forceAppPath, 'aura'))) {
+                    if (await fs.existsSync(path.join(forceAppPath, 'aura'))) {
                         roots.aura.push(path.join(forceAppPath, 'aura'));
                     }
                 }
@@ -47,7 +46,7 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                 // optimization: search only inside project/modules/
                 for (const project of await fs.promises.readdir(this.workspaceRoots[0])) {
                     const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
-                    if (await pathExists(modulesDir)) {
+                    if (await fs.existsSync(modulesDir)) {
                         const subroots = await findNamespaceRoots(modulesDir, 2);
                         roots.lwc.push(...subroots.lwc);
                     }
@@ -57,7 +56,7 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
-                    if (await pathExists(modulesDir)) {
+                    if (await fs.existsSync(modulesDir)) {
                         const subroots = await findNamespaceRoots(path.join(ws, 'modules'), 2);
                         roots.lwc.push(...subroots.lwc);
                     }

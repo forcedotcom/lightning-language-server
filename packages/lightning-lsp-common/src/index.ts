@@ -6,7 +6,6 @@ import { TagInfo } from './indexer/tagInfo';
 import { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
 import { findNamespaceRoots } from './namespace-utils';
-import { pathExists } from './fs-utils';
 
 import { ClassMember, Location, Position, ClassMemberPropertyValue, DecoratorTargetType, DecoratorTargetProperty, DecoratorTargetMethod } from './decorators';
 
@@ -23,7 +22,6 @@ export {
     MemberType,
     interceptConsoleLogger,
     findNamespaceRoots,
-    pathExists,
     processTemplate,
     getModulesDirs,
     updateForceIgnoreFile,

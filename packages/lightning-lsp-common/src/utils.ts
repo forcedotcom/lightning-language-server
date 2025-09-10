@@ -6,7 +6,6 @@ import equal from 'deep-equal';
 import { BaseWorkspaceContext } from './base-context';
 import { WorkspaceType } from './shared';
 import * as jsonc from 'jsonc-parser';
-import { pathExists } from './fs-utils';
 
 const RESOURCES_DIR = 'resources';
 
@@ -141,7 +140,7 @@ export const getCoreResource = (resourceName: string): string => {
 };
 
 export const appendLineIfMissing = async (file: string, line: string): Promise<void> => {
-    if (!pathExists(file)) {
+    if (!fs.existsSync(file)) {
         return fs.promises.writeFile(file, line + '\n');
     } else if (!(await fileContainsLine(file, line))) {
         return fs.promises.appendFile(file, '\n' + line + '\n');
