@@ -1,5 +1,4 @@
 import { Range, TextDocument } from 'vscode-languageserver';
-import { utils } from '@salesforce/lightning-lsp-common';
 import { HTMLDocument, TokenType, getLanguageService } from 'vscode-html-languageservice';
 import { join } from 'path';
 import { createScanner } from 'vscode-html-languageservice/lib/umd/parser/htmlScanner';
@@ -7,7 +6,6 @@ import { Position, Location } from 'vscode-languageserver-types';
 
 const AURA_STANDARD = 'aura-standard.json';
 const AURA_SYSTEM = 'transformed-aura-system.json';
-const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
 const RESOURCES_DIR = 'resources';
 
@@ -46,11 +44,6 @@ const RESOURCES_DIR = 'resources';
  */
 const AURA_EXPRESSION_REGEX = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/;
 
-export function isAuraMarkup(textDocument: TextDocument): boolean {
-    const fileExt = utils.getExtension(textDocument);
-    return AURA_EXTENSIONS.includes(fileExt);
-}
-
 export function getAuraStandardResourcePath(): string {
     return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
 }
@@ -66,7 +59,7 @@ export function parse(input: string): HTMLDocument {
     return languageService.parseHTMLDocument(mockDocument);
 }
 
-export function stripQuotes(str: string | null) {
+function stripQuotes(str: string | null) {
     if (!str) {
         return str;
     }
@@ -79,11 +72,11 @@ export function stripQuotes(str: string | null) {
     return str;
 }
 
-export function hasQuotes(str: string) {
+function hasQuotes(str: string) {
     return (str.at(0) === '"' && str.at(-1) === '"') || (str.at(0) === "'" && str.at(-1) === "'");
 }
 
-export function getTagNameRange(document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null {
+function getTagNameRange(document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null {
     const scanner = createScanner(document.getText(), startOffset);
     let token = scanner.scan();
     while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || (scanner.getTokenEnd() === offset && token !== tokenType))) {
@@ -95,7 +88,7 @@ export function getTagNameRange(document: TextDocument, offset: number, tokenTyp
     return null;
 }
 
-export function getAttributeRange(document: TextDocument, attributeName: string, startOffset: number, endOffset: number): Range | null {
+function getAttributeRange(document: TextDocument, attributeName: string, startOffset: number, endOffset: number): Range | null {
     const scanner = createScanner(document.getText(), startOffset);
     let token = scanner.scan();
     while (token !== TokenType.EOS && scanner.getTokenEnd() < endOffset) {

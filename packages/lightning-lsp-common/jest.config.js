@@ -9,7 +9,7 @@ module.exports = {
     "js",
     "json"
   ],
-  setupFilesAfterEnv: ["<rootDir>/jest/matchers.ts", "jest-extended"],
+  setupFilesAfterEnv: ["<rootDir>/jest/matchers.ts", "jest-extended", "<rootDir>/jest.setup.js"],
   testEnvironmentOptions: {
     url: 'http://localhost/',
   }

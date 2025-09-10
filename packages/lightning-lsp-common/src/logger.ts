@@ -1,6 +1,13 @@
 import { IConnection } from 'vscode-languageserver';
 
-export function interceptConsoleLogger(connection: IConnection): void {
+/**
+ * Intercepts global console logging methods and redirects them to the LSP connection.
+ * This allows language server log messages to appear in the client's output panel
+ * (e.g., VS Code's Output view) instead of the server's local console.
+ *
+ * @param connection - The LSP connection to redirect console output to
+ */
+export const interceptConsoleLogger = (connection: IConnection): void => {
     const console: any = global.console;
     if (!console) {
         return;
@@ -20,4 +27,4 @@ export function interceptConsoleLogger(connection: IConnection): void {
     for (const method of methods) {
         intercept(method);
     }
-}
+};

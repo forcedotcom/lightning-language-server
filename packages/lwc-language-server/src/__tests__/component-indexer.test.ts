@@ -5,7 +5,7 @@ import * as path from 'path';
 import { URI } from 'vscode-uri';
 import { shared } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
-import { readJsonSync, removeSync, writeJsonSync } from 'fs-extra';
+import * as fs from 'fs';
 
 const { WorkspaceType } = shared;
 const workspaceRoot: string = path.resolve('../../test-workspaces/sfdx-workspace');
@@ -165,16 +165,16 @@ describe('ComponentIndexer', () => {
                         },
                     };
                     const sfdxPath = path.resolve('../../test-workspaces/sfdx-workspace/.sfdx/tsconfig.sfdx.json');
-                    writeJsonSync(sfdxPath, tsconfigTemplate);
+                    fs.writeFileSync(sfdxPath, JSON.stringify(tsconfigTemplate, null, 4));
 
                     componentIndexer.updateSfdxTsConfigPath();
 
-                    const tsconfig = readJsonSync(sfdxPath);
+                    const tsconfig = JSON.parse(fs.readFileSync(sfdxPath, 'utf8'));
                     const tsconfigPathMapping = tsconfig.compilerOptions.paths;
                     expect(tsconfigPathMapping).toEqual(expectedComponents);
 
                     // Clean-up test files
-                    removeSync(sfdxPath);
+                    fs.rmSync(sfdxPath, { recursive: true, force: true });
                 });
             });
         });

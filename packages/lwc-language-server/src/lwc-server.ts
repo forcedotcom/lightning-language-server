@@ -32,7 +32,8 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { WorkspaceContext, interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
+import { interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
+import { LWCWorkspaceContext } from './context/lwc-context';
 
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
@@ -42,8 +43,8 @@ import { URI } from 'vscode-uri';
 import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
 import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
 
-export const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
-export const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
+const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
+const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
 const { WorkspaceType } = shared;
 
@@ -63,7 +64,7 @@ type CursorInfo = {
     range?: any;
 };
 
-export function findDynamicContent(text: string, offset: number): any {
+export const findDynamicContent = (text: string, offset: number): any => {
     const regex = new RegExp(/\{(?<property>\w+)\.*|\:*\w+\}/, 'g');
     let match = regex.exec(text);
     while (match && offset > match.index) {
@@ -73,12 +74,12 @@ export function findDynamicContent(text: string, offset: number): any {
         match = regex.exec(text);
     }
     return null;
-}
+};
 
 export default class Server {
     readonly connection: IConnection = createConnection();
     readonly documents: TextDocuments = new TextDocuments();
-    context: WorkspaceContext;
+    context: LWCWorkspaceContext;
     workspaceFolders: WorkspaceFolder[];
     workspaceRoots: string[];
     componentIndexer: ComponentIndexer;
@@ -106,7 +107,7 @@ export default class Server {
     async onInitialize(params: InitializeParams): Promise<InitializeResult> {
         this.workspaceFolders = params.workspaceFolders;
         this.workspaceRoots = this.workspaceFolders.map((folder) => URI.parse(folder.uri).fsPath);
-        this.context = new WorkspaceContext(this.workspaceRoots);
+        this.context = new LWCWorkspaceContext(this.workspaceRoots);
         this.componentIndexer = new ComponentIndexer({ workspaceRoot: this.workspaceRoots[0] });
         this.lwcDataProvider = new LWCDataProvider({ indexer: this.componentIndexer });
         this.auraDataProvider = new AuraDataProvider({ indexer: this.componentIndexer });
@@ -145,7 +146,12 @@ export default class Server {
     async onInitialized(): Promise<void> {
         const hasTsEnabled = await this.isTsSupportEnabled();
         if (hasTsEnabled) {
-            await this.context.configureProjectForTs();
+            try {
+                await this.context.configureProjectForTs();
+            } catch (error) {
+                console.error('onInitialized: Error in configureProjectForTs:', error);
+                throw error;
+            }
             this.componentIndexer.updateSfdxTsConfigPath();
         }
     }

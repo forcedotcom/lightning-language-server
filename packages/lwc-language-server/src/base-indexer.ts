@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs';
 export default class BaseIndexer {
     readonly workspaceRoot: string;
     constructor(attributes: { workspaceRoot: string }) {
@@ -8,7 +8,7 @@ export default class BaseIndexer {
 
     sfdxConfig(root: string): any {
         const filename: string = path.join(root, 'sfdx-project.json');
-        const data: string = fsExtra.readFileSync(filename).toString();
+        const data: string = fs.readFileSync(filename).toString();
 
         return JSON.parse(data);
     }

@@ -1,21 +1,21 @@
 import { SourceLocation } from 'babel-types';
 import * as path from 'path';
-import * as fs from 'fs-extra';
 import { Diagnostic, DiagnosticSeverity, Location, Position, Range, TextDocument } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { AttributeInfo, ClassMember, Decorator as DecoratorType, MemberType, Metadata } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, ClassMember, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
+import { Metadata } from '../decorators';
 import commentParser from 'comment-parser';
 
-export interface CompilerResult {
+interface CompilerResult {
     diagnostics?: Diagnostic[]; // NOTE: vscode Diagnostic, not lwc Diagnostic
     metadata?: Metadata;
 }
 
-function getClassMembers(metadata: Metadata, memberType: string, memberDecorator?: string): ClassMember[] {
+export function getClassMembers(metadata: Metadata, memberType: string, memberDecorator?: string): ClassMember[] {
     const members: ClassMember[] = [];
     if (metadata.classMembers) {
         for (const member of metadata.classMembers) {
@@ -27,35 +27,6 @@ function getClassMembers(metadata: Metadata, memberType: string, memberDecorator
         }
     }
     return members;
-}
-
-function getDecoratorsTargets(metadata: Metadata, elementType: string, targetType: string): ClassMember[] {
-    const props: ClassMember[] = [];
-    if (metadata.decorators) {
-        for (const element of metadata.decorators) {
-            if (element.type === elementType) {
-                for (const target of element.targets) {
-                    if (target.type === targetType) {
-                        props.push(target);
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return props;
-}
-
-export function getPublicReactiveProperties(metadata: Metadata): ClassMember[] {
-    return getClassMembers(metadata, 'property', 'api');
-}
-
-export function getPrivateReactiveProperties(metadata: Metadata): ClassMember[] {
-    return getDecoratorsTargets(metadata, 'track', 'property');
-}
-
-export function getApiMethods(metadata: Metadata): ClassMember[] {
-    return getDecoratorsTargets(metadata, 'api', 'method');
 }
 
 export function getProperties(metadata: Metadata): ClassMember[] {
@@ -82,7 +53,7 @@ function patchComments(metadata: Metadata): void {
     }
 }
 
-export function extractLocationFromBabelError(message: string): any {
+function extractLocationFromBabelError(message: string): any {
     const m = message.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
     const startLine = m.indexOf('\n> ') + 3;
     const line = parseInt(m.substring(startLine, m.indexOf(' | ', startLine)), 10);
@@ -93,7 +64,7 @@ export function extractLocationFromBabelError(message: string): any {
     return location;
 }
 
-export function extractMessageFromBabelError(message: string): string {
+function extractMessageFromBabelError(message: string): string {
     const start = message.indexOf(': ') + 2;
     const end = message.indexOf('\n', start);
     return message.substring(start, end);
@@ -169,13 +140,6 @@ export async function compileDocument(document: TextDocument): Promise<CompilerR
     const filePath = path.parse(file);
     const fileName = filePath.base;
     return compileSource(document.getText(), fileName);
-}
-
-export async function compileFile(file: string): Promise<CompilerResult> {
-    const filePath = path.parse(file);
-    const fileName = filePath.base;
-    const data = await fs.readFile(file, 'utf-8');
-    return compileSource(data, fileName);
 }
 
 export function toVSCodeRange(babelRange: SourceLocation): Range {

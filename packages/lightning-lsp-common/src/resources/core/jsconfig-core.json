@@ -4,7 +4,7 @@
     },
     "include": [
         "**/*",
-        "${project_root}/.vscode/typings/lwc/**/*.d.ts"
+        "<%= project_root %>/.vscode/typings/lwc/**/*.d.ts"
     ],
     "typeAcquisition": {
         "include": [

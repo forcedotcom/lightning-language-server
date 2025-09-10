@@ -72,7 +72,7 @@ const defaultConfig = {
 const auraInstanceLastSort = (a: string, b: string): number =>
     a.endsWith('AuraInstance.js') === b.endsWith('AuraInstance.js') ? 0 : a.endsWith('AuraInstance.js') ? 1 : -1;
 
-async function loadPlugins(): Promise<{ aura: true; modules: true; doc_comment: true }> {
+const loadPlugins = async (): Promise<{ aura: true; modules: true; doc_comment: true }> => {
     await import('./tern-aura');
     await import('../tern/plugin/modules');
     await import('../tern/plugin/doc_comment');
@@ -82,7 +82,7 @@ async function loadPlugins(): Promise<{ aura: true; modules: true; doc_comment: 
         modules: true,
         doc_comment: true,
     };
-}
+};
 
 /** recursively search upward from the starting diretory.  Handling the is it a monorepo vs. packaged vs. bundled code  */
 const searchAuraResourcesPath = (dir: string): string => {
@@ -97,7 +97,7 @@ const searchAuraResourcesPath = (dir: string): string => {
     return searchAuraResourcesPath(path.dirname(dir));
 };
 
-async function ternInit(): Promise<void> {
+const ternInit = async (): Promise<void> => {
     await asyncTernRequest({
         query: {
             type: 'ideInit',
@@ -119,11 +119,11 @@ async function ternInit(): Promise<void> {
                 : readFileSync(file, 'utf-8'),
         }))
         .map(({ file, contents }) => ternServer.addFile(file, contents));
-}
+};
 
 const init = memoize(ternInit);
 
-export async function startServer(rootPath: string, wsroot: string): tern.Server {
+export const startServer = async (rootPath: string, wsroot: string): Promise<tern.Server> => {
     const defs = [browser, ecmascript];
     const plugins = await loadPlugins();
     const config: tern.ConstructorOptions = {
@@ -144,45 +144,45 @@ export async function startServer(rootPath: string, wsroot: string): tern.Server
     init();
 
     return ternServer;
-}
+};
 
-function lsp2ternPos({ line, character }: { line: number; character: number }): tern.Position {
+const lsp2ternPos = ({ line, character }: { line: number; character: number }): tern.Position => {
     return { line, ch: character };
-}
+};
 
-function tern2lspPos({ line, ch }: { line: number; ch: number }): Position {
+const tern2lspPos = ({ line, ch }: { line: number; ch: number }): Position => {
     return { line, character: ch };
-}
+};
 
-function fileToUri(file: string): string {
+const fileToUri = (file: string): string => {
     if (path.isAbsolute(file)) {
         return URI.file(file).toString();
     } else {
         return URI.file(path.join(theRootPath, file)).toString();
     }
-}
+};
 
-function uriToFile(uri: string): string {
+const uriToFile = (uri: string): string => {
     const parsedUri = URI.parse(uri);
     // paths from tests can be relative or absolute
     return parsedUri.scheme ? parsedUri.fsPath : uri;
-}
+};
 
-function tern2lspRange({ start, end }: { start: tern.Position; end: tern.Position }): Range {
+const tern2lspRange = ({ start, end }: { start: tern.Position; end: tern.Position }): Range => {
     return {
         start: tern2lspPos(start),
         end: tern2lspPos(end),
     };
-}
+};
 
-function tern2lspLocation({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location {
+const tern2lspLocation = ({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location => {
     return {
         uri: fileToUri(file),
         range: tern2lspRange({ start, end }),
     };
-}
+};
 
-async function ternRequest(event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> {
+const ternRequest = async (event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> => {
     return await asyncTernRequest({
         query: {
             type,
@@ -192,7 +192,7 @@ async function ternRequest(event: TextDocumentPositionParams, type: string, opti
             ...options,
         },
     });
-}
+};
 
 export const addFile = (event: TextDocumentChangeEvent): void => {
     const { document } = event;

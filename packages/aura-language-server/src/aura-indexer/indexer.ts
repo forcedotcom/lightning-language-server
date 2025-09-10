@@ -1,27 +1,29 @@
-import { WorkspaceContext, shared, Indexer, TagInfo, utils, AttributeInfo, componentUtil } from '@salesforce/lightning-lsp-common';
+import { shared, Indexer, TagInfo, utils, AttributeInfo } from '@salesforce/lightning-lsp-common';
+import { componentFromFile, componentFromDirectory } from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import EventsEmitter from 'events';
 import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 import { parse } from '../aura-utils';
 import { Node } from 'vscode-html-languageservice';
+import { AuraWorkspaceContext } from '../context/aura-context';
 
 const { WorkspaceType } = shared;
 
 export default class AuraIndexer implements Indexer {
     public readonly eventEmitter = new EventsEmitter();
 
-    private context: WorkspaceContext;
+    private context: AuraWorkspaceContext;
     private indexingTasks: Promise<void>;
 
     private AURA_TAGS: Map<string, TagInfo> = new Map();
     private AURA_EVENTS: Map<string, TagInfo> = new Map();
     private AURA_NAMESPACES: Set<string> = new Set();
 
-    constructor(context: WorkspaceContext) {
+    constructor(context: AuraWorkspaceContext) {
         this.context = context;
         this.context.addIndexingProvider({ name: 'aura', indexer: this });
     }
@@ -55,7 +57,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     public clearTagsforDirectory(directory: string, sfdxProject: boolean): void {
-        const name = componentUtil.componentFromDirectory(directory, sfdxProject);
+        const name = componentFromDirectory(directory, sfdxProject);
         this.deleteCustomTag(name);
     }
 
@@ -64,7 +66,7 @@ export default class AuraIndexer implements Indexer {
             this.clearTagsforFile(file, sfdxProject);
             return;
         }
-        const markup = await fs.readFile(file, 'utf-8');
+        const markup = await fs.promises.readFile(file, 'utf-8');
         const result = parse(markup);
         const tags = [];
         for (const root of result.roots) {
@@ -133,7 +135,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     private clearTagsforFile(file: string, sfdxProject: boolean): void {
-        const name = componentUtil.componentFromFile(file, sfdxProject);
+        const name = componentFromFile(file, sfdxProject);
         this.deleteCustomTag(name);
     }
 
@@ -163,7 +165,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     private async loadSystemTags(): Promise<void> {
-        const data = await fs.readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
+        const data = await fs.promises.readFile(auraUtils.getAuraSystemResourcePath(), 'utf-8');
         const auraSystem = JSON.parse(data);
         for (const tag in auraSystem) {
             if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
@@ -185,7 +187,7 @@ export default class AuraIndexer implements Indexer {
     }
 
     private async loadStandardComponents(): Promise<void> {
-        const data = await fs.readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
+        const data = await fs.promises.readFile(auraUtils.getAuraStandardResourcePath(), 'utf-8');
         const auraStandard = JSON.parse(data);
         for (const tag in auraStandard) {
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
@@ -256,7 +258,7 @@ export default class AuraIndexer implements Indexer {
                 },
             },
         };
-        const name = componentUtil.componentFromFile(file, sfdxProject);
+        const name = componentFromFile(file, sfdxProject);
         const info = new TagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
         return info;
     }

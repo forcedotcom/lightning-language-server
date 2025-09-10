@@ -1,6 +1,6 @@
 import { compileSource, extractAttributes, getProperties, getMethods, toVSCodeRange } from './javascript/compiler';
 import { ITagData } from 'vscode-html-languageservice';
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import * as glob from 'fast-glob';
 import camelcase from 'camelcase';
 import { paramCase } from 'change-case';
@@ -8,7 +8,8 @@ import { paramCase } from 'change-case';
 import { URI } from 'vscode-uri';
 import * as path from 'path';
 import { Location, Position, Range } from 'vscode-languageserver';
-import { Metadata, ClassMember } from '@salesforce/lightning-lsp-common';
+import { Metadata } from './decorators';
+import { ClassMember } from '@salesforce/lightning-lsp-common';
 import { AttributeInfo } from '@salesforce/lightning-lsp-common/lib/indexer/attributeInfo';
 
 export type TagAttrs = {
@@ -17,7 +18,7 @@ export type TagAttrs = {
     updatedAt?: Date;
 };
 
-function attributeDoc(attribute: AttributeInfo): string {
+const attributeDoc = (attribute: AttributeInfo): string => {
     const { name, type, documentation } = attribute;
 
     if (name && type && documentation) {
@@ -33,9 +34,9 @@ function attributeDoc(attribute: AttributeInfo): string {
     }
 
     return '';
-}
+};
 
-function methodDoc(method: ClassMember): string {
+const methodDoc = (method: ClassMember): string => {
     const { name, doc } = method;
 
     if (name && doc) {
@@ -45,7 +46,7 @@ function methodDoc(method: ClassMember): string {
         return `- **${name}()**`;
     }
     return '';
-}
+};
 
 export default class Tag implements ITagData {
     public file: string;
@@ -221,7 +222,7 @@ export default class Tag implements ITagData {
         }
         const filePath = path.parse(file);
         const fileName = filePath.base;
-        const data = await fs.readFile(file, 'utf-8');
+        const data = await fs.promises.readFile(file, 'utf-8');
         if (!(data.includes(`from "lwc"`) || data.includes(`from 'lwc'`))) {
             return null;
         }

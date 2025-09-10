@@ -1,4 +1,4 @@
-import { WorkspaceContext } from '@salesforce/lightning-lsp-common';
+import { AuraWorkspaceContext } from '../../context/aura-context';
 import AuraIndexer from '../indexer';
 import * as path from 'path';
 import mockFs from 'mock-fs';
@@ -32,7 +32,7 @@ describe('indexer parsing content', () => {
         const ws = 'test-workspaces/sfdx-workspace';
         const full = path.resolve(ws);
 
-        const context = new WorkspaceContext(ws);
+        const context = new AuraWorkspaceContext(ws);
         await context.configureProject();
         const auraIndexer = new AuraIndexer(context);
         await auraIndexer.configureAndIndex();
@@ -67,7 +67,7 @@ describe('indexer parsing content', () => {
 
     it('should index a valid aura component', async () => {
         const ws = 'test-workspaces/sfdx-workspace';
-        const context = new WorkspaceContext(ws);
+        const context = new AuraWorkspaceContext(ws);
         await context.configureProject();
         const auraIndexer = new AuraIndexer(context);
         await auraIndexer.configureAndIndex();
@@ -88,7 +88,7 @@ describe('indexer parsing content', () => {
 
     xit('should handle indexing an invalid aura component', async () => {
         const ws = 'test-workspaces/sfdx-workspace';
-        const context = new WorkspaceContext(ws);
+        const context = new AuraWorkspaceContext(ws);
         await context.configureProject();
         const auraIndexer = new AuraIndexer(context);
         await auraIndexer.configureAndIndex();

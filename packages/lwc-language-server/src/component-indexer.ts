@@ -3,7 +3,6 @@ import * as path from 'path';
 import { shared, utils } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
-import * as fsExtra from 'fs-extra';
 import * as fs from 'fs';
 import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
@@ -22,26 +21,16 @@ type TsConfigPaths = {
     [key: string]: string[];
 };
 
-export enum DelimiterType {
-    Aura = ':',
-    LWC = '-',
-}
+const AURA_DELIMITER = ':';
+const LWC_DELIMITER = '-';
 
-export function tagEqualsFile(tag: Tag, entry: Entry): boolean {
+const tagEqualsFile = (tag: Tag, entry: Entry): boolean => {
     return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
-}
+};
 
-export function unIndexedFiles(entries: Entry[], tags: Tag[]): Entry[] {
+export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => {
     return entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
-}
-
-export function ensureDirectoryExists(filePath: string): void {
-    if (fs.existsSync(filePath)) {
-        return;
-    }
-    ensureDirectoryExists(path.dirname(filePath));
-    fs.mkdirSync(filePath);
-}
+};
 
 export default class ComponentIndexer extends BaseIndexer {
     readonly workspaceType: number;
@@ -85,9 +74,9 @@ export default class ComponentIndexer extends BaseIndexer {
         try {
             const matches = componentPrefixRegex.exec(query);
             const { delimiter, name } = matches?.groups;
-            if (delimiter === DelimiterType.Aura && !/[-_]+/.test(name)) {
+            if (delimiter === AURA_DELIMITER && !/[-_]+/.test(name)) {
                 return this.tags.get(name) || this.tags.get(snakeCase(name)) || null;
-            } else if (delimiter === DelimiterType.LWC) {
+            } else if (delimiter === LWC_DELIMITER) {
                 return this.tags.get(name) || this.tags.get(camelcase(name)) || null;
             }
             return this.tags.get(query) || null;
@@ -104,10 +93,10 @@ export default class ComponentIndexer extends BaseIndexer {
     loadTagsFromIndex(): void {
         try {
             const indexPath: string = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
-            const shouldInit: boolean = fsExtra.existsSync(indexPath);
+            const shouldInit: boolean = fs.existsSync(indexPath);
 
             if (shouldInit) {
-                const indexJsonString: string = fsExtra.readFileSync(indexPath, 'utf8');
+                const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
                 const index: object[] = JSON.parse(indexJsonString);
                 index.forEach((data) => {
                     const info = new Tag(data);
@@ -121,9 +110,9 @@ export default class ComponentIndexer extends BaseIndexer {
 
     persistCustomComponents(): void {
         const indexPath = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
-        ensureDirectoryExists(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
+        fs.mkdirSync(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH), { recursive: true });
         const indexJsonString = JSON.stringify(this.customData);
-        fsExtra.writeFileSync(indexPath, indexJsonString);
+        fs.writeFileSync(indexPath, indexJsonString);
     }
 
     insertSfdxTsConfigPath(filePaths: string[]): void {

@@ -1,5 +1,5 @@
 import ComponentIndexer from '../component-indexer';
-import { ModuleExports, WireDecorator } from '@salesforce/lightning-lsp-common';
+import { ModuleExports, WireDecorator } from '../decorators';
 import { DataProviderAttributes, LWCDataProvider } from '../lwc-data-provider';
 import Tag, { TagAttrs } from '../tag';
 import * as path from 'path';

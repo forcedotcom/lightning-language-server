@@ -1,52 +1,35 @@
 import * as utils from './utils';
-import { WorkspaceContext, Indexer } from './context';
+import { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS, processTemplate, getModulesDirs, updateForceIgnoreFile } from './base-context';
 import * as shared from './shared';
+import { WorkspaceType } from './shared';
 import { TagInfo } from './indexer/tagInfo';
 import { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 import { interceptConsoleLogger } from './logger';
-import * as componentUtil from './component-util';
-import {
-    Metadata,
-    ApiDecorator,
-    TrackDecorator,
-    WireDecorator,
-    ClassMember,
-    ModuleExports,
-    Location,
-    Position,
-    DecoratorTargetType,
-    DecoratorTargetProperty,
-    DecoratorTargetMethod,
-    ApiDecoratorTarget,
-    TrackDecoratorTarget,
-    WireDecoratorTarget,
-    ClassMemberPropertyValue,
-} from './decorators';
+import { findNamespaceRoots } from './namespace-utils';
+
+import { ClassMember, Location, Position, ClassMemberPropertyValue, DecoratorTargetType, DecoratorTargetProperty, DecoratorTargetMethod } from './decorators';
 
 export {
-    WorkspaceContext,
+    BaseWorkspaceContext,
     Indexer,
+    AURA_EXTENSIONS,
     utils,
-    componentUtil,
     shared,
+    WorkspaceType,
     TagInfo,
     AttributeInfo,
     Decorator,
     MemberType,
     interceptConsoleLogger,
-    Metadata,
-    ApiDecorator,
-    TrackDecorator,
-    WireDecorator,
+    findNamespaceRoots,
+    processTemplate,
+    getModulesDirs,
+    updateForceIgnoreFile,
     ClassMember,
-    ModuleExports,
     Location,
     Position,
+    ClassMemberPropertyValue,
     DecoratorTargetType,
     DecoratorTargetProperty,
     DecoratorTargetMethod,
-    ApiDecoratorTarget,
-    TrackDecoratorTarget,
-    WireDecoratorTarget,
-    ClassMemberPropertyValue,
 };

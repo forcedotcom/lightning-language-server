@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "/Users/madhur.shrivastava/lightning-language-server/test-workspaces/sfdx-workspace"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [
+      "/Users/madhur.shrivastava/lightning-language-server/test-workspaces/sfdx-workspace"
+    ],
+    "eslint.nodePath": "~/tools/eslint-tool/1.0.3/node_modules",
+    "eslint.validate": [
+      "javascript",
+      "typescript"
+    ],
+    "eslint.options": {
+      "overrideConfigFile": "/Users/madhur.shrivastava/lightning-language-server/test-workspaces/sfdx-workspace/.eslintrc.json"
+    }
+  }
+}
