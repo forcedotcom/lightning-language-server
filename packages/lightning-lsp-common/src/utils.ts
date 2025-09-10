@@ -141,7 +141,7 @@ export const getCoreResource = (resourceName: string): string => {
 };
 
 export const appendLineIfMissing = async (file: string, line: string): Promise<void> => {
-    if (!(await pathExists(file))) {
+    if (!pathExists(file)) {
         return fs.promises.writeFile(file, line + '\n');
     } else if (!(await fileContainsLine(file, line))) {
         return fs.promises.appendFile(file, '\n' + line + '\n');

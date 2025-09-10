@@ -1,6 +1,6 @@
 import Tag from './tag';
 import * as path from 'path';
-import { shared, utils, ensureDirSync } from '@salesforce/lightning-lsp-common';
+import { shared, utils } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fs from 'fs';
@@ -110,7 +110,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     persistCustomComponents(): void {
         const indexPath = path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_FILE);
-        ensureDirSync(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH));
+        fs.mkdirSync(path.join(this.workspaceRoot, CUSTOM_COMPONENT_INDEX_PATH), { recursive: true });
         const indexJsonString = JSON.stringify(this.customData);
         fs.writeFileSync(indexPath, indexJsonString);
     }

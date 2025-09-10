@@ -17,7 +17,6 @@ import { URI } from 'vscode-uri';
 import { sync } from 'fast-glob';
 import * as fs from 'fs';
 import * as path from 'path';
-import { removeFile, removeDir } from '@salesforce/lightning-lsp-common';
 
 const SFDX_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', 'test-workspaces', 'sfdx-workspace');
 const filename = path.join(SFDX_WORKSPACE_ROOT, 'force-app', 'main', 'default', 'lwc', 'todo', 'todo.html');
@@ -346,17 +345,17 @@ describe('handlers', () => {
 
         beforeEach(async () => {
             // Clean up before each test run
-            removeFile(baseTsconfigPath);
+            fs.rmSync(baseTsconfigPath, { recursive: true, force: true });
             const tsconfigPaths = getTsConfigPaths();
-            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => fs.rmSync(tsconfigPath, { recursive: true, force: true }));
             mockTypeScriptSupportConfig = false;
         });
 
         afterEach(async () => {
             // Clean up after each test run
-            removeFile(baseTsconfigPath);
+            fs.rmSync(baseTsconfigPath, { recursive: true, force: true });
             const tsconfigPaths = getTsConfigPaths();
-            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
+            tsconfigPaths.forEach((tsconfigPath) => fs.rmSync(tsconfigPath, { recursive: true, force: true }));
             mockTypeScriptSupportConfig = false;
         });
 
@@ -413,10 +412,10 @@ describe('handlers', () => {
 
         afterEach(() => {
             // Clean up after each test run
-            removeFile(baseTsconfigPath);
+            fs.rmSync(baseTsconfigPath, { recursive: true, force: true });
             const tsconfigPaths = sync(path.join(SFDX_WORKSPACE_ROOT, '**', 'lwc', 'tsconfig.json'));
-            tsconfigPaths.forEach((tsconfigPath) => removeFile(tsconfigPath));
-            removeDir(watchedFileDir);
+            tsconfigPaths.forEach((tsconfigPath) => fs.rmSync(tsconfigPath, { recursive: true, force: true }));
+            fs.rmSync(watchedFileDir, { recursive: true, force: true });
             mockTypeScriptSupportConfig = false;
         });
 
@@ -462,7 +461,7 @@ describe('handlers', () => {
                 const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
-                removeFile(watchedFilePath);
+                fs.rmSync(watchedFilePath, { recursive: true, force: true });
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -490,7 +489,7 @@ describe('handlers', () => {
                 const initializedPathMapping = getPathMappingKeys();
                 expect(initializedPathMapping.length).toEqual(12);
 
-                removeFile(watchedFilePath);
+                fs.rmSync(watchedFilePath, { recursive: true, force: true });
 
                 const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                     changes: [
@@ -548,7 +547,7 @@ describe('handlers', () => {
                     const initializedPathMapping = getPathMappingKeys();
                     expect(initializedPathMapping.length).toEqual(12);
 
-                    removeFile(nonJsOrTsFilePath);
+                    fs.rmSync(nonJsOrTsFilePath, { recursive: true, force: true });
 
                     const didChangeWatchedFilesParams: DidChangeWatchedFilesParams = {
                         changes: [

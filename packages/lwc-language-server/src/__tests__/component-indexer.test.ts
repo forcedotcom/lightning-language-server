@@ -3,7 +3,7 @@ import Tag from '../tag';
 import { Entry } from 'fast-glob';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
-import { shared, removeFile } from '@salesforce/lightning-lsp-common';
+import { shared } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
 import * as fs from 'fs';
 
@@ -174,7 +174,7 @@ describe('ComponentIndexer', () => {
                     expect(tsconfigPathMapping).toEqual(expectedComponents);
 
                     // Clean-up test files
-                    removeFile(sfdxPath);
+                    fs.rmSync(sfdxPath, { recursive: true, force: true });
                 });
             });
         });

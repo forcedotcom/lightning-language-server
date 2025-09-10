@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { join } from 'path';
-import { removeFile, removeDir } from '../fs-utils';
 import { WorkspaceContext } from './workspace-context';
 import { WorkspaceType } from '../shared';
 import { processTemplate, getModulesDirs } from '../base-context';
@@ -117,10 +116,10 @@ describe('WorkspaceContext', () => {
         const forceignorePath = join('test-workspaces', 'sfdx-workspace', '.forceignore');
 
         // make sure no generated files are there from previous runs
-        removeFile(jsconfigPathForceApp);
+        fs.rmSync(jsconfigPathForceApp, { recursive: true, force: true });
         fs.copyFileSync(jsconfigPathUtilsOrig, jsconfigPathUtils);
-        removeFile(forceignorePath);
-        removeDir(sfdxTypingsPath);
+        fs.rmSync(forceignorePath, { recursive: true, force: true });
+        fs.rmSync(sfdxTypingsPath, { recursive: true, force: true });
 
         // verify typings/jsconfig after configuration:
 
@@ -176,14 +175,14 @@ describe('WorkspaceContext', () => {
         expect(jsconfig.include[0]).toBe('**/*');
         expect(jsconfig.include[1]).toBe('../../.vscode/typings/lwc/**/*.d.ts');
         expect(jsconfig.typeAcquisition).toEqual({ include: ['jest'] });
-        removeFile(jsconfigPath);
+        fs.rmSync(jsconfigPath, { recursive: true, force: true });
     };
 
     const verifyTypingsCore = (): void => {
         const typingsPath = CORE_ALL_ROOT + '/.vscode/typings/lwc';
         expect(typingsPath + '/engine.d.ts').toExist();
         expect(typingsPath + '/lds.d.ts').toExist();
-        removeDir(typingsPath);
+        fs.rmSync(typingsPath, { recursive: true, force: true });
     };
 
     const verifyCoreSettings = (settings: any): void => {
@@ -217,9 +216,9 @@ function verifyCodeWorkspace(path: string) {
         const settingsPath = CORE_PROJECT_ROOT + '/.vscode/settings.json';
 
         // make sure no generated files are there from previous runs
-        removeFile(jsconfigPath);
-        removeDir(typingsPath);
-        removeFile(settingsPath);
+        fs.rmSync(jsconfigPath, { recursive: true, force: true });
+        fs.rmSync(typingsPath, { recursive: true, force: true });
+        fs.rmSync(settingsPath, { recursive: true, force: true });
 
         // configure and verify typings/jsconfig after configuration:
         await context.configureProject();
@@ -241,11 +240,11 @@ function verifyCodeWorkspace(path: string) {
         const tsconfigPathForce = context.workspaceRoots[0] + '/tsconfig.json';
 
         // make sure no generated files are there from previous runs
-        removeFile(jsconfigPathGlobal);
-        removeFile(jsconfigPathForce);
-        removeFile(codeWorkspacePath);
-        removeFile(launchPath);
-        removeFile(tsconfigPathForce);
+        fs.rmSync(jsconfigPathGlobal, { recursive: true, force: true });
+        fs.rmSync(jsconfigPathForce, { recursive: true, force: true });
+        fs.rmSync(codeWorkspacePath, { recursive: true, force: true });
+        fs.rmSync(launchPath, { recursive: true, force: true });
+        fs.rmSync(tsconfigPathForce, { recursive: true, force: true });
 
         fs.writeFileSync(tsconfigPathForce, '');
 
@@ -258,7 +257,7 @@ function verifyCodeWorkspace(path: string) {
         expect(fs.existsSync(tsconfigPathForce)).not.toExist();
         verifyTypingsCore();
 
-        removeFile(tsconfigPathForce);
+        fs.rmSync(tsconfigPathForce, { recursive: true, force: true });
     });
 
     it('configureCoreAll()', async () => {
@@ -269,10 +268,10 @@ function verifyCodeWorkspace(path: string) {
         const launchPath = CORE_ALL_ROOT + '/.vscode/launch.json';
 
         // make sure no generated files are there from previous runs
-        removeFile(jsconfigPathGlobal);
-        removeFile(jsconfigPathForce);
-        removeFile(codeWorkspacePath);
-        removeFile(launchPath);
+        fs.rmSync(jsconfigPathGlobal, { recursive: true, force: true });
+        fs.rmSync(jsconfigPathForce, { recursive: true, force: true });
+        fs.rmSync(codeWorkspacePath, { recursive: true, force: true });
+        fs.rmSync(launchPath, { recursive: true, force: true });
 
         // configure and verify typings/jsconfig after configuration:
         await context.configureProject();

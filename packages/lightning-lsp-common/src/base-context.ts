@@ -12,7 +12,7 @@ import { TextDocument } from 'vscode-languageserver';
 import ejs from 'ejs';
 import { WorkspaceType, detectWorkspaceType, getSfdxProjectFile } from './shared';
 import * as utils from './utils';
-import { pathExists, ensureDir, ensureDirSync } from './fs-utils';
+import { pathExists } from './fs-utils';
 
 export const AURA_EXTENSIONS: string[] = ['.cmp', '.app', '.design', '.evt', '.intf', '.auradoc', '.tokens'];
 
@@ -47,13 +47,13 @@ const readSfdxProjectConfig = async (root: string): Promise<SfdxProjectConfig> =
 
 const updateConfigFile = (filePath: string, content: string): void => {
     const dir = path.dirname(filePath);
-    ensureDirSync(dir);
+    fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(filePath, content);
 };
 
 export const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig: boolean): Promise<void> => {
     let forceignoreContent = '';
-    if (await pathExists(forceignorePath)) {
+    if (pathExists(forceignorePath)) {
         forceignoreContent = await fs.promises.readFile(forceignorePath, 'utf8');
     }
 
@@ -80,7 +80,7 @@ export const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig
 const getESLintToolVersion = async (): Promise<string> => {
     const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
     const packageJsonPath = path.join(eslintToolDir, 'package.json');
-    if (await pathExists(packageJsonPath)) {
+    if (pathExists(packageJsonPath)) {
         const packageJson = JSON.parse(await fs.promises.readFile(packageJsonPath, 'utf8'));
         return packageJson.version;
     }
@@ -89,7 +89,7 @@ const getESLintToolVersion = async (): Promise<string> => {
 
 const findCoreESLint = async (): Promise<string> => {
     const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
-    if (!(await pathExists(eslintToolDir))) {
+    if (!pathExists(eslintToolDir)) {
         console.warn('core eslint-tool not installed: ' + eslintToolDir);
         // default
         return '~/tools/eslint-tool/1.0.3/node_modules';
@@ -119,13 +119,13 @@ export const getModulesDirs = async (
 
                 // Check for LWC components in new structure
                 const newLwcDir = path.join(newPkgDir, 'lwc');
-                if (await pathExists(newLwcDir)) {
+                if (pathExists(newLwcDir)) {
                     // Add the LWC directory itself, not individual components
                     modulesDirs.push(newLwcDir);
                 } else {
                     // Check for LWC components in old structure
                     const oldLwcDir = path.join(oldPkgDir, 'lwc');
-                    if (await pathExists(oldLwcDir)) {
+                    if (pathExists(oldLwcDir)) {
                         // Add the LWC directory itself, not individual components
                         modulesDirs.push(oldLwcDir);
                     }
@@ -139,7 +139,7 @@ export const getModulesDirs = async (
             // For CORE_ALL, return the modules directories for each project
             for (const project of await fs.promises.readdir(workspaceRoots[0])) {
                 const modulesDir = path.join(workspaceRoots[0], project, 'modules');
-                if (await pathExists(modulesDir)) {
+                if (pathExists(modulesDir)) {
                     modulesDirs.push(modulesDir);
                 }
             }
@@ -148,7 +148,7 @@ export const getModulesDirs = async (
             // For CORE_PARTIAL, return the modules directory for each workspace root
             for (const ws of workspaceRoots) {
                 const modulesDir = path.join(ws, 'modules');
-                if (await pathExists(modulesDir)) {
+                if (pathExists(modulesDir)) {
                     modulesDirs.push(modulesDir);
                 }
             }
@@ -290,7 +290,7 @@ export abstract class BaseWorkspaceContext {
 
             // Skip if tsconfig.json already exists
             const tsconfigPath = path.join(modulesDir, 'tsconfig.json');
-            if (await pathExists(tsconfigPath)) {
+            if (pathExists(tsconfigPath)) {
                 continue;
             }
 
@@ -298,7 +298,7 @@ export abstract class BaseWorkspaceContext {
                 let jsconfigContent: string;
 
                 // If jsconfig already exists, read and update it
-                if (await pathExists(jsconfigPath)) {
+                if (pathExists(jsconfigPath)) {
                     const existingConfig = JSON.parse(await fs.promises.readFile(jsconfigPath, 'utf8'));
                     const jsconfigTemplate = await fs.promises.readFile(utils.getSfdxResource('jsconfig-sfdx.json'), 'utf8');
                     const templateConfig = JSON.parse(jsconfigTemplate);
@@ -347,7 +347,7 @@ export abstract class BaseWorkspaceContext {
 
             // Skip if tsconfig.json already exists
             const tsconfigPath = path.join(modulesDir, 'tsconfig.json');
-            if (await pathExists(tsconfigPath)) {
+            if (pathExists(tsconfigPath)) {
                 // Remove tsconfig.json if it exists (as per test expectation)
                 fs.unlinkSync(tsconfigPath);
             }
@@ -395,7 +395,7 @@ export abstract class BaseWorkspaceContext {
 
     private async createTypingsFiles(typingsPath: string): Promise<void> {
         // Create the typings directory
-        await ensureDir(typingsPath);
+        fs.mkdirSync(typingsPath, { recursive: true });
 
         // Create basic typings files
         const engineTypings = `declare module '@salesforce/resourceUrl/*' {
