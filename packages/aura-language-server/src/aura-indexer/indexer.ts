@@ -1,4 +1,4 @@
-import { shared, Indexer, TagInfo, utils, AttributeInfo } from '@salesforce/lightning-lsp-common';
+import { Indexer, TagInfo, AttributeInfo, WorkspaceType, elapsedMillis } from '@salesforce/lightning-lsp-common';
 import { componentFromFile, componentFromDirectory } from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
@@ -10,8 +10,6 @@ import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 import { parse } from '../aura-utils';
 import { Node } from 'vscode-html-languageservice';
 import { AuraWorkspaceContext } from '../context/aura-context';
-
-const { WorkspaceType } = shared;
 
 export default class AuraIndexer implements Indexer {
     public readonly eventEmitter = new EventsEmitter();
@@ -131,7 +129,7 @@ export default class AuraIndexer implements Indexer {
                 console.log(`Error parsing markup from ${file}:`, e);
             }
         }
-        console.info(`Indexed ${markupfiles.length} files in ${utils.elapsedMillis(startTime)} ms`);
+        console.info(`Indexed ${markupfiles.length} files in ${elapsedMillis(startTime)} ms`);
     }
 
     private clearTagsforFile(file: string, sfdxProject: boolean): void {

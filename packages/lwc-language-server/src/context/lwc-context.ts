@@ -11,9 +11,11 @@ import {
     BaseWorkspaceContext,
     WorkspaceType,
     findNamespaceRoots,
-    utils,
     processTemplate,
     getModulesDirs,
+    memoize,
+    getSfdxResource,
+    relativePath,
     updateForceIgnoreFile,
 } from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
@@ -107,7 +109,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
      * Updates the namespace root type cache
      */
     public async updateNamespaceRootTypeCache(): Promise<void> {
-        this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
+        this.findNamespaceRootsUsingTypeCache = memoize(this.findNamespaceRootsUsingType.bind(this));
     }
 
     /**
@@ -133,7 +135,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                 const baseTsConfigPath = path.join(this.workspaceRoots[0], '.sfdx', 'tsconfig.sfdx.json');
 
                 try {
-                    const baseTsConfig = await fs.promises.readFile(utils.getSfdxResource('tsconfig-sfdx.base.json'), 'utf8');
+                    const baseTsConfig = await fs.promises.readFile(getSfdxResource('tsconfig-sfdx.base.json'), 'utf8');
                     updateConfigFile(baseTsConfigPath, baseTsConfig);
                 } catch (error) {
                     console.error('writeTsconfigJson: Error reading/writing base tsconfig:', error);
@@ -143,7 +145,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                 // Write to the tsconfig.json in each module subdirectory
                 let tsConfigTemplate: string;
                 try {
-                    tsConfigTemplate = await fs.promises.readFile(utils.getSfdxResource('tsconfig-sfdx.json'), 'utf8');
+                    tsConfigTemplate = await fs.promises.readFile(getSfdxResource('tsconfig-sfdx.json'), 'utf8');
                 } catch (error) {
                     console.error('writeTsconfigJson: Error reading tsconfig template:', error);
                     throw error;
@@ -155,7 +157,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
 
                 for (const modulesDir of modulesDirs) {
                     const tsConfigPath = path.join(modulesDir, 'tsconfig.json');
-                    const relativeWorkspaceRoot = utils.relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
+                    const relativeWorkspaceRoot = relativePath(path.dirname(tsConfigPath), this.workspaceRoots[0]);
                     const tsConfigContent = processTemplate(tsConfigTemplate, { project_root: relativeWorkspaceRoot });
                     updateConfigFile(tsConfigPath, tsConfigContent);
                     await updateForceIgnoreFile(forceignore, true);

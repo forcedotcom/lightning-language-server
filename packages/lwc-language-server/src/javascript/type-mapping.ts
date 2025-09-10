@@ -33,11 +33,11 @@ type DecoratorValType = (typeof decoratorTypeMap)[DecoratorKeyType];
  * the stripKeysWithUndefinedVals helper function removes any key/val pair where the
  * value is `undefined`.
  */
-function stripKeysWithUndefinedVals<T>(obj: T): T {
+const stripKeysWithUndefinedVals = <T>(obj: T): T => {
     return Object.fromEntries(Object.entries(obj).filter(([, val]) => val !== undefined)) as T;
-}
+};
 
-function externalToInternalLoc(ext?: SourceLocation): InternalLocation | undefined {
+const externalToInternalLoc = (ext?: SourceLocation): InternalLocation | undefined => {
     if (!ext) {
         return;
     }
@@ -54,25 +54,21 @@ function externalToInternalLoc(ext?: SourceLocation): InternalLocation | undefin
             column: ext.endColumn - 1,
         },
     };
-}
+};
 
-function assertSingleDecorator(decorators: LwcDecorator[], member: ClassProperty | ClassMethod): asserts decorators is [LwcDecorator] {
+const getDecorator = (decorators: LwcDecorator[], member: ClassProperty | ClassMethod): LwcDecorator | null => {
     if (decorators.length && decorators.length > 1) {
         throw new Error(`Unexpected number of decorators in ${member.name}: ${member.decorators.length}`);
     }
-}
-
-function getDecorator(decorators: LwcDecorator[], member: ClassProperty | ClassMethod): LwcDecorator | null {
-    assertSingleDecorator(decorators, member);
     return decorators[0] ?? null;
-}
+};
 
-function dataPropertyToPropValue(decoratorType: DecoratorValType, extDataProp?: DataProperty): ClassMemberPropertyValue | undefined {
+const dataPropertyToPropValue = (decoratorType: DecoratorValType, extDataProp?: DataProperty): ClassMemberPropertyValue | undefined => {
     if (!extDataProp) {
         return;
     }
     return externalToInternalPropValue(decoratorType, extDataProp.initialValue);
-}
+};
 
 /**
  * This function exposes metadata related to the initialized values of decorated
@@ -80,7 +76,7 @@ function dataPropertyToPropValue(decoratorType: DecoratorValType, extDataProp?: 
  * extremely quirky, and depends significantly on what type of decorator is applied
  * to the initialized property.
  */
-function externalToInternalPropValue(decoratorType: DecoratorValType, initialValue: Value, isWireParam = false): ClassMemberPropertyValue | undefined {
+const externalToInternalPropValue = (decoratorType: DecoratorValType, initialValue: Value, isWireParam = false): ClassMemberPropertyValue | undefined => {
     switch (initialValue.type) {
         case 'Array':
             // Underlying types were unified in @lwc/metadata that were not unified
@@ -175,13 +171,13 @@ function externalToInternalPropValue(decoratorType: DecoratorValType, initialVal
                 value: undefined,
             };
     }
-}
+};
 
 /**
  * This transforms information about class properties from the old to the
  * new format.
  */
-function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | null {
+const getMemberProperty = (propertyObj: ClassProperty): InternalClassMember | null => {
     if (propertyObj.decorators.length > 1) {
         throw new Error(`LWC language server does not support multiple decorators on property ${propertyObj.name}`);
     }
@@ -219,13 +215,13 @@ function getMemberProperty(propertyObj: ClassProperty): InternalClassMember | nu
         doc: propertyObj.__internal__doc,
         loc: externalToInternalLoc(loc),
     });
-}
+};
 
 /**
  * This transforms information about class methods from the old to the
  * new format.
  */
-function getMemberMethod(methodObj: ClassMethod): InternalClassMember | null {
+const getMemberMethod = (methodObj: ClassMethod): InternalClassMember | null => {
     if (methodObj.decorators.length > 1) {
         throw new Error(`LWC language server does not support multiple decorators on method ${methodObj.name}`);
     }
@@ -245,13 +241,13 @@ function getMemberMethod(methodObj: ClassMethod): InternalClassMember | null {
         doc: methodObj.__internal__doc,
         loc: externalToInternalLoc(methodObj.location),
     });
-}
+};
 
 /**
  * This transforms information about class properties & methods from the old
  * to the new format.
  */
-function getMembers(classObj: Class): InternalClassMember[] {
+const getMembers = (classObj: Class): InternalClassMember[] => {
     const properties: InternalClassMember[] = classObj.properties.map(getMemberProperty).filter(Boolean);
     const methods: InternalClassMember[] = classObj.methods.map(getMemberMethod).filter(Boolean);
 
@@ -261,14 +257,14 @@ function getMembers(classObj: Class): InternalClassMember[] {
     const members = [...properties, ...methods];
     members.sort((memberA, memberB) => memberA.loc?.start.line - memberB.loc?.start.line);
     return members;
-}
+};
 
-function getDecoratedApiMethod(method: ClassMethod): ApiDecoratorTarget {
+const getDecoratedApiMethod = (method: ClassMethod): ApiDecoratorTarget => {
     return {
         type: 'method',
         name: method.name,
     };
-}
+};
 
 /**
  * Wire adapters can have params passed to them. These params take the form:
@@ -282,7 +278,7 @@ function getDecoratedApiMethod(method: ClassMethod): ApiDecoratorTarget {
  *
  * This function collects metadata about both types of params and returns them.
  */
-function getWireParams(decorator: WireDecorator) {
+const getWireParams = (decorator: WireDecorator) => {
     let staticObj: Record<string, ClassMemberPropertyValue> = {};
     let params: Record<string, string> = {};
     if (decorator.adapterConfig) {
@@ -301,9 +297,9 @@ function getWireParams(decorator: WireDecorator) {
         staticObj,
         params,
     };
-}
+};
 
-function getDecoratedWiredMethod(method: ClassMethod, decorator: WireDecorator): WireDecoratorTarget {
+const getDecoratedWiredMethod = (method: ClassMethod, decorator: WireDecorator): WireDecoratorTarget => {
     const { staticObj, params } = getWireParams(decorator);
 
     const adapter = {
@@ -322,13 +318,15 @@ function getDecoratedWiredMethod(method: ClassMethod, decorator: WireDecorator):
         // the output exactly matches that of the old LWC compiler's metadata.
         adapter,
     };
-}
+};
 
-function getDecoratedMethods(methods: ClassMethod[]): {
+const getDecoratedMethods = (
+    methods: ClassMethod[],
+): {
     wiredMethods: WireDecoratorTarget[];
     apiMethods: ApiDecoratorTarget[];
     methodLocs: Map<string, number>;
-} {
+} => {
     const wiredMethods: WireDecoratorTarget[] = [];
     const apiMethods: ApiDecoratorTarget[] = [];
     const methodLocs: Map<string, number> = new Map();
@@ -356,17 +354,17 @@ function getDecoratedMethods(methods: ClassMethod[]): {
         apiMethods,
         methodLocs,
     };
-}
+};
 
-function getDecoratedApiProperty(prop: ClassProperty): ApiDecoratorTarget {
+const getDecoratedApiProperty = (prop: ClassProperty): ApiDecoratorTarget => {
     return stripKeysWithUndefinedVals({
         name: prop.name,
         type: 'property',
         value: dataPropertyToPropValue('api', prop.dataProperty),
     });
-}
+};
 
-function getDecoratedWiredProperty(prop: ClassProperty, decorator: WireDecorator): WireDecoratorTarget {
+const getDecoratedWiredProperty = (prop: ClassProperty, decorator: WireDecorator): WireDecoratorTarget => {
     const { staticObj, params } = getWireParams(decorator);
 
     const adapter = {
@@ -385,14 +383,14 @@ function getDecoratedWiredProperty(prop: ClassProperty, decorator: WireDecorator
         // the output exactly matches that of the old LWC compiler's metadata.
         adapter,
     };
-}
+};
 
-function getDecoratedTrackedProperty(prop: ClassProperty): TrackDecoratorTarget {
+const getDecoratedTrackedProperty = (prop: ClassProperty): TrackDecoratorTarget => {
     return {
         name: prop.name,
         type: 'property',
     };
-}
+};
 
 /**
  * In the old metadata, a single location was provided for a property. However,
@@ -401,19 +399,21 @@ function getDecoratedTrackedProperty(prop: ClassProperty): TrackDecoratorTarget 
  * the new metadata into the old, we choose here which location to report as
  * the "one true location" in the old metadata format.
  */
-function getPropLoc(prop: ClassProperty): number | undefined {
+const getPropLoc = (prop: ClassProperty): number | undefined => {
     const dataPropLoc = prop.dataProperty?.location?.start;
     const getterLoc = prop.getter?.location?.start;
     const setterLoc = prop.setter?.location?.start;
     return [dataPropLoc, getterLoc, setterLoc].sort()[0];
-}
+};
 
-function getDecoratedProperties(properties: ClassProperty[]): {
+const getDecoratedProperties = (
+    properties: ClassProperty[],
+): {
     wiredProperties: WireDecoratorTarget[];
     trackedProperties: TrackDecoratorTarget[];
     apiProperties: ApiDecoratorTarget[];
     propLocs: Map<string, number>;
-} {
+} => {
     const wiredProperties: WireDecoratorTarget[] = [];
     const trackedProperties: TrackDecoratorTarget[] = [];
     const apiProperties: ApiDecoratorTarget[] = [];
@@ -442,7 +442,7 @@ function getDecoratedProperties(properties: ClassProperty[]): {
         apiProperties,
         propLocs,
     };
-}
+};
 
 /**
  * In the old metadata, properties and methods were intermingled in a
@@ -456,13 +456,13 @@ function getDecoratedProperties(properties: ClassProperty[]): {
  * data-structure. So we collect the locations separately and then correlate
  * property/method names to their locations using this Map.
  */
-function sortDecorators<T extends { name: string }>(decorators: T[], locations: Map<string, number>): T[] {
+const sortDecorators = <T extends { name: string }>(decorators: T[], locations: Map<string, number>): T[] => {
     return decorators.concat().sort((a: T, b: T) => {
         return locations.get(a.name) - locations.get(b.name);
     });
-}
+};
 
-function getDecorators(classObj: Class): InternalDecorator[] {
+const getDecorators = (classObj: Class): InternalDecorator[] => {
     const {
         apiMethods,
         wiredMethods,
@@ -495,9 +495,9 @@ function getDecorators(classObj: Class): InternalDecorator[] {
             : null;
 
     return [api, wire, track].filter(Boolean);
-}
+};
 
-function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
+const getExports = (lwcExports: LwcExport[]): InternalModuleExports[] => {
     return lwcExports.flatMap((lwcExport) => {
         if (lwcExport.namedExports) {
             return lwcExport.namedExports.map((namedExport) =>
@@ -518,7 +518,7 @@ function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
             throw new Error('Unimplemented: no support for ExportAllDeclaration');
         }
     });
-}
+};
 
 /**
  * This function accepts metadata produced by @lwc/metadata's `collectBundleMetadata`
@@ -526,7 +526,7 @@ function getExports(lwcExports: LwcExport[]): InternalModuleExports[] {
  * ancient versions of the LWC compiler. That ancient metadata is used by the
  * LWC language server to analyze code in a user's IDE.
  */
-export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata {
+export const mapLwcMetadataToInternal = (lwcMeta: ScriptFile): InternalMetadata => {
     let mainClassObj;
     if (lwcMeta.mainClass) {
         mainClassObj = lwcMeta.classes.find((classObj) => {
@@ -558,4 +558,4 @@ export function mapLwcMetadataToInternal(lwcMeta: ScriptFile): InternalMetadata 
     };
 
     return internalMeta;
-}
+};

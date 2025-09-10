@@ -3,7 +3,41 @@
   "version": "4.12.8",
   "description": "Common components for lwc-language-server and aura-language-server.",
   "main": "lib/index.js",
+  "module": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./utils": {
+      "import": "./lib/utils.js",
+      "require": "./lib/utils.js",
+      "types": "./lib/utils.d.ts"
+    },
+    "./base-context": {
+      "import": "./lib/base-context.js",
+      "require": "./lib/base-context.js",
+      "types": "./lib/base-context.d.ts"
+    },
+    "./decorators": {
+      "import": "./lib/decorators/index.js",
+      "require": "./lib/decorators/index.js",
+      "types": "./lib/decorators/index.d.ts"
+    },
+    "./logger": {
+      "import": "./lib/logger.js",
+      "require": "./lib/logger.js",
+      "types": "./lib/logger.d.ts"
+    },
+    "./namespace-utils": {
+      "import": "./lib/namespace-utils.js",
+      "require": "./lib/namespace-utils.js",
+      "types": "./lib/namespace-utils.d.ts"
+    }
+  },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
