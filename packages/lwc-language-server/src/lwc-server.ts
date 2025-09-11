@@ -32,7 +32,15 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { interceptConsoleLogger, utils, shared, isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common';
+import {
+    interceptConsoleLogger,
+    WorkspaceType,
+    isLWCWatchedDirectory,
+    isLWCRootDirectoryCreated,
+    containsDeletedLwcWatchedDirectory,
+    toResolvedPath,
+    getBasename,
+} from '@salesforce/lightning-lsp-common';
 import { LWCWorkspaceContext } from './context/lwc-context';
 
 import ComponentIndexer from './component-indexer';
@@ -44,8 +52,6 @@ import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
 
 const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
-
-const { WorkspaceType } = shared;
 
 export enum Token {
     Tag = 'tag',
@@ -171,7 +177,7 @@ export default class Server {
             this.auraDataProvider.activated = false; // provide completions for lwc components in an Aura template
             this.lwcDataProvider.activated = true;
             if (this.shouldProvideBindingsInHTML(params)) {
-                const docBasename = utils.getBasename(doc);
+                const docBasename = getBasename(doc);
                 const customTags: CompletionItem[] = this.findBindItems(docBasename);
                 return {
                     isIncomplete: false,
@@ -292,12 +298,12 @@ export default class Server {
                 const hasTsEnabled = await this.isTsSupportEnabled();
                 if (hasTsEnabled) {
                     const { changes } = changeEvent;
-                    if (utils.isLWCRootDirectoryCreated(this.context, changes)) {
+                    if (isLWCRootDirectoryCreated(this.context, changes)) {
                         // LWC directory created
                         this.context.updateNamespaceRootTypeCache();
                         this.componentIndexer.updateSfdxTsConfigPath();
                     } else {
-                        const hasDeleteEvent = await utils.containsDeletedLwcWatchedDirectory(this.context, changes);
+                        const hasDeleteEvent = await containsDeletedLwcWatchedDirectory(this.context, changes);
                         if (hasDeleteEvent) {
                             // We need to scan the file system for deletion events as the change event does not include
                             // information about the files that were deleted.
@@ -308,7 +314,7 @@ export default class Server {
                                 const insideLwcWatchedDirectory = await isLWCWatchedDirectory(this.context, event.uri);
                                 if (event.type === FileChangeType.Created && insideLwcWatchedDirectory) {
                                     // File creation
-                                    const filePath = utils.toResolvedPath(event.uri);
+                                    const filePath = toResolvedPath(event.uri);
                                     const { dir, name: fileName, ext } = parse(filePath);
                                     const folderName = basename(dir);
                                     const parentFolder = basename(dirname(dir));

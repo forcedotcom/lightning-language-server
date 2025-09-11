@@ -1,6 +1,6 @@
 import { Tag, createTag, createTagFromFile, getTagName, getTagUri } from './tag';
 import * as path from 'path';
-import { shared, utils } from '@salesforce/lightning-lsp-common';
+import { detectWorkspaceHelper, WorkspaceType, readJsonSync, writeJsonSync } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fs from 'fs';
@@ -8,7 +8,6 @@ import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
 import { getWorkspaceRoot, getSfdxConfig, getSfdxPackageDirsPattern } from './base-indexer';
 
-const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_PATH = path.join('.sfdx', 'indexes', 'lwc');
 const CUSTOM_COMPONENT_INDEX_FILE = path.join(CUSTOM_COMPONENT_INDEX_PATH, 'custom-components.json');
 const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
@@ -128,7 +127,7 @@ export default class ComponentIndexer {
         const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
         if (fs.existsSync(sfdxTsConfigPath)) {
             try {
-                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                const sfdxTsConfig = readJsonSync(sfdxTsConfigPath);
                 for (const filePath of filePaths) {
                     const { dir, name: fileName } = path.parse(filePath);
                     const componentName = `c/${fileName}`;
@@ -139,7 +138,7 @@ export default class ComponentIndexer {
                         tsConfigFilePaths.push(componentFilePath);
                     }
                 }
-                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+                writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
             } catch (err) {
                 console.error(err);
             }
@@ -154,11 +153,11 @@ export default class ComponentIndexer {
         const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
         if (fs.existsSync(sfdxTsConfigPath)) {
             try {
-                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                const sfdxTsConfig = readJsonSync(sfdxTsConfigPath);
                 // The assumption here is that sfdxTsConfig will not be modified by the user as
                 // it is located in the .sfdx directory.
                 sfdxTsConfig.compilerOptions.paths = this.tsConfigPathMapping;
-                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+                writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
             } catch (err) {
                 console.error(err);
             }

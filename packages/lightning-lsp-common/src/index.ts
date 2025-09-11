@@ -23,18 +23,23 @@ export {
     writeJsonSync,
 } from './utils';
 
-// Re-export utils as a namespace
-export * as utils from './utils';
-
 // Re-export from base-context
 export { BaseWorkspaceContext, Indexer, AURA_EXTENSIONS, processTemplate, getModulesDirs, updateForceIgnoreFile } from './base-context';
 
 // Re-export from shared
-export * from './shared';
-export * as shared from './shared';
+export { WorkspaceType, isLWC, getSfdxProjectFile, detectWorkspaceHelper, detectWorkspaceType } from './shared';
 
 // Re-export from indexer
-export { TagInfo, createTagInfo, getAttributeInfo, getHover, getComponentLibraryLink, getAttributeMarkdown, getMethodMarkdown } from './indexer/tagInfo';
+export {
+    TagInfo,
+    createTagInfo,
+    getAttributeInfo,
+    getHover,
+    getComponentLibraryLink,
+    getAttributeMarkdown,
+    getMethodMarkdown,
+    TagType,
+} from './indexer/tagInfo';
 export { AttributeInfo, createAttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 
 // Re-export from other modules

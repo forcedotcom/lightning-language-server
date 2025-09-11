@@ -4,7 +4,7 @@ import * as path from 'path';
 import mockFs from 'mock-fs';
 import URI from 'vscode-uri';
 
-function normalize(start: string, p: string): string {
+const normalize = (start: string, p: string): string => {
     // Fix relative paths on windows
     if (start.indexOf('\\') !== -1) {
         start = start.replace(/\\/g, '/');
@@ -18,10 +18,11 @@ function normalize(start: string, p: string): string {
         return p.slice(start.length + 1);
     }
     return p;
-}
-function uriToFile(uri: string): string {
+};
+
+const uriToFile = (uri: string): string => {
     return URI.parse(uri).fsPath;
-}
+};
 
 describe('indexer parsing content', () => {
     afterEach(() => {
