@@ -34,8 +34,8 @@ export * from './shared';
 export * as shared from './shared';
 
 // Re-export from indexer
-export { TagInfo } from './indexer/tagInfo';
-export { AttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
+export { TagInfo, createTagInfo, getAttributeInfo, getHover, getComponentLibraryLink, getAttributeMarkdown, getMethodMarkdown } from './indexer/tagInfo';
+export { AttributeInfo, createAttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
 
 // Re-export from other modules
 export { interceptConsoleLogger } from './logger';

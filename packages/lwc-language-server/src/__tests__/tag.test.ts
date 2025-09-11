@@ -1,10 +1,29 @@
-import Tag from '../tag';
+import {
+    Tag,
+    createTag,
+    createTagFromFile,
+    getClassMembers,
+    getPublicAttributes,
+    getTagRange,
+    getTagUri,
+    getTagLocation,
+    getAllLocations,
+    getTagName,
+    getLwcTypingsName,
+    getAuraName,
+    getLwcName,
+    getAttribute,
+    getAttributeDocs,
+    getTagDescription,
+    findClassMember,
+    getClassMemberLocation,
+} from '../tag';
 
 describe('Tag', () => {
     const filepath = './src/javascript/__tests__/fixtures/metadata.js';
 
     describe('.new', () => {
-        const tag = new Tag({
+        const tag = createTag({
             file: filepath,
         });
 
@@ -15,7 +34,7 @@ describe('Tag', () => {
 
     describe('.fromFile', () => {
         it('creates a tag from a lwc .js file', async () => {
-            const tag: Tag = await Tag.fromFile(filepath);
+            const tag: Tag = await createTagFromFile(filepath);
 
             expect(tag.file).toEqual(filepath);
             expect(tag.metadata.decorators);
@@ -28,50 +47,42 @@ describe('Tag', () => {
         let tag: Tag;
 
         beforeEach(async () => {
-            tag = await Tag.fromFile(filepath);
+            tag = await createTagFromFile(filepath);
         });
 
         describe('#classMembers', () => {
             it('returns methods, properties, attributes. Everything defined on the component', () => {
-                expect(tag.classMembers).not.toBeEmpty();
-                expect(tag.classMembers[0].name).toEqual('todo');
-                expect(tag.classMembers[0].type).toEqual('property');
+                expect(getClassMembers(tag)).not.toBeEmpty();
+                expect(getClassMembers(tag)[0].name).toEqual('todo');
+                expect(getClassMembers(tag)[0].type).toEqual('property');
             });
         });
 
         describe('#classMember', () => {
             it('returns a classMember of a Tag by name', () => {
-                expect(tag.classMember('todo')).not.toBeNull();
-                expect(tag.classMember('index')).not.toBeNull();
-                expect(tag.classMember('foo')).toBeNull();
+                expect(findClassMember(tag, 'todo')).not.toBeNull();
+                expect(findClassMember(tag, 'index')).not.toBeNull();
+                expect(findClassMember(tag, 'foo')).toBeNull();
             });
         });
 
         describe('#classMemberLocation', () => {
             it('returns a classMember of a Tag by name', () => {
-                const location = tag.classMemberLocation('todo');
+                const location = getClassMemberLocation(tag, 'todo');
                 expect(location.uri).toContain('metadata.js');
                 expect(location.range.start.line).toEqual(9);
                 expect(location.range.start.character).toEqual(4);
 
-                expect(tag.classMemberLocation('index').uri).toContain('metadata.js');
-                expect(tag.classMemberLocation('foo')).toBeNull();
+                expect(getClassMemberLocation(tag, 'index').uri).toContain('metadata.js');
+                expect(getClassMemberLocation(tag, 'foo')).toBeNull();
             });
         });
 
         describe('#publicAttributes', () => {
             it('returns the public attributes', async () => {
-                expect(tag.publicAttributes[0].decorator);
-                expect(tag.publicAttributes[0].detail);
-                expect(tag.publicAttributes[0].location);
-            });
-        });
-
-        describe('#privateAttributes', () => {
-            it('returns the private attributes', async () => {
-                expect(tag.privateAttributes[0].decorator);
-                expect(tag.privateAttributes[0].detail);
-                expect(tag.privateAttributes[0].location);
+                expect(getPublicAttributes(tag)[0].decorator);
+                expect(getPublicAttributes(tag)[0].detail);
+                expect(getPublicAttributes(tag)[0].location);
             });
         });
 
@@ -81,71 +92,58 @@ describe('Tag', () => {
                     end: { character: 1, line: 79 },
                     start: { character: 0, line: 7 },
                 };
-                expect(tag.range).toEqual(range);
+                expect(getTagRange(tag)).toEqual(range);
             });
         });
 
         describe('#location', () => {
             it('returns a location for the component', () => {
                 const location = {
-                    range: tag.range,
-                    uri: tag.uri,
+                    range: getTagRange(tag),
+                    uri: getTagUri(tag),
                 };
-                expect(tag.location).toEqual(location);
+                expect(getTagLocation(tag)).toEqual(location);
             });
         });
 
         describe('#allLocations', () => {
             it('returns multiple files if present', () => {
-                const allLocations = tag.allLocations;
+                const allLocations = getAllLocations(tag);
                 expect(allLocations.length).toEqual(3);
-            });
-        });
-
-        describe('#properties', () => {
-            it('returns a properties for the component', () => {
-                expect(tag.properties[0].decorator).toEqual('api');
-                expect(tag.properties[0].name).toEqual('todo');
-            });
-        });
-
-        describe('#methods', () => {
-            it('returns a methods for the component', () => {
-                expect(tag.methods[0].name).toEqual('onclickAction');
             });
         });
 
         describe('#name', () => {
             it('returns the filename for the component', () => {
-                expect(tag.name).toEqual('metadata');
+                expect(getTagName(tag)).toEqual('metadata');
             });
         });
 
         describe('#lwcTypingsName', () => {
             it('returns the lwc import name for the component', () => {
-                expect(tag.lwcTypingsName).toEqual('c/metadata');
+                expect(getLwcTypingsName(tag)).toEqual('c/metadata');
             });
         });
 
         describe('#auraName', () => {
             it('returns the name for the lwc component when referenced in an aura component', () => {
-                expect(tag.auraName).toEqual('c:metadata');
+                expect(getAuraName(tag)).toEqual('c:metadata');
             });
         });
 
         describe('#lwcName', () => {
             it('returns the name for the component when referenced in another lwc component', () => {
-                expect(tag.lwcName).toEqual('c-metadata');
+                expect(getLwcName(tag)).toEqual('c-metadata');
             });
         });
 
         describe('#attribute', () => {
             it('finds the attribute by name', () => {
-                expect(tag.attribute('index'));
+                expect(getAttribute(tag, 'index'));
             });
 
             it('returns null when not found', () => {
-                expect(tag.attribute('foo')).toBeNull();
+                expect(getAttribute(tag, 'foo')).toBeNull();
             });
         });
 
@@ -163,7 +161,7 @@ describe('Tag', () => {
 - **foo-null**
 - **super-complex**`;
 
-                expect(tag.attributeDocs).toEqual(attributeDocs);
+                expect(getAttributeDocs(tag)).toEqual(attributeDocs);
             });
         });
 
@@ -181,7 +179,7 @@ describe('Tag', () => {
 - **foo-null**
 - **super-complex**`;
 
-                expect(tag.attributeDocs).toEqual(attributeDocs);
+                expect(getAttributeDocs(tag)).toEqual(attributeDocs);
             });
         });
 
@@ -201,7 +199,7 @@ describe('Tag', () => {
 - **super-complex**
 ### Methods
 - **apiMethod()**`;
-                expect(tag.description).toEqual(description);
+                expect(getTagDescription(tag)).toEqual(description);
             });
         });
     });
@@ -215,13 +213,13 @@ describe('Tag', () => {
         const fileWithErrors = './src/javascript/__tests__/fixtures/navmetadata.js';
 
         beforeEach(async () => {
-            tag = await Tag.fromFile(fileWithErrors);
+            tag = await createTagFromFile(fileWithErrors);
         });
 
         it('does not throw an error when finding a class member location without class members', () => {
             let exception;
             try {
-                tag.classMemberLocation('account');
+                getClassMemberLocation(tag, 'account');
             } catch (error) {
                 exception = error;
             }

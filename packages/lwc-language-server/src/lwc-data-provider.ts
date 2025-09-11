@@ -1,4 +1,5 @@
 import { IAttributeData, ITagData, IValueData, IHTMLDataProvider } from 'vscode-html-languageservice';
+import { getLwcName, getTagDescription, getPublicAttributes, getClassMembers, getTagName } from './tag';
 import ComponentIndexer from './component-indexer';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -48,9 +49,9 @@ export class LWCDataProvider implements IHTMLDataProvider {
 
     provideTags(): ITagData[] {
         const customTags = this.indexer.customData.map((tag) => ({
-            name: tag.lwcName,
-            description: tag.description,
-            attributes: tag.attributes,
+            name: getLwcName(tag),
+            description: getTagDescription(tag),
+            attributes: getPublicAttributes(tag),
         }));
         return [...this._standardTags, ...customTags];
     }
@@ -61,8 +62,8 @@ export class LWCDataProvider implements IHTMLDataProvider {
     provideValues(): IValueData[] {
         const values: IValueData[] = [];
         this.indexer.customData.forEach((t) => {
-            t.classMembers?.forEach((cm) => {
-                const bindName = `${t.name}.${cm.name}`;
+            getClassMembers(t).forEach((cm) => {
+                const bindName = `${getTagName(t)}.${cm.name}`;
                 values.push({ name: cm.name, description: `${bindName}` });
             });
         });
