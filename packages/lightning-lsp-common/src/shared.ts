@@ -4,49 +4,51 @@ import * as path from 'path';
 
 const SFDX_PROJECT = 'sfdx-project.json';
 
-export enum WorkspaceType {
+export const WorkspaceTypes = {
     /** standard workspace with a package.json but no lwc dependencies */
-    STANDARD,
+    STANDARD: 'STANDARD',
     /** standard workspace with a package.json and lwc dependencies */
-    STANDARD_LWC,
+    STANDARD_LWC: 'STANDARD_LWC',
     /** monorepo workspace, using monorepo strucutre */
-    MONOREPO,
+    MONOREPO: 'MONOREPO',
     /** monorepo workspace, using monorepo strucutre, and lwc dependencies */
-    MONOREPO_LWC,
+    MONOREPO_LWC: 'MONOREPO_LWC',
     /** sfdx workspace */
-    SFDX,
+    SFDX: 'SFDX',
     /** workspace including all core projects */
-    CORE_ALL,
+    CORE_ALL: 'CORE_ALL',
     /** workspace including only one or more core projects */
-    CORE_PARTIAL,
-    UNKNOWN,
-}
+    CORE_PARTIAL: 'CORE_PARTIAL',
+    UNKNOWN: 'UNKNOWN',
+};
 
-export function isLWC(type: WorkspaceType): boolean {
-    return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
-}
+export type WorkspaceType = (typeof WorkspaceTypes)[keyof typeof WorkspaceTypes];
 
-export function getSfdxProjectFile(root: string): string {
+export const isLWC = (type: WorkspaceType): boolean => {
+    return type === WorkspaceTypes.SFDX || type === WorkspaceTypes.STANDARD_LWC || type === WorkspaceTypes.CORE_ALL || type === WorkspaceTypes.CORE_PARTIAL;
+};
+
+export const getSfdxProjectFile = (root: string): string => {
     return path.join(root, SFDX_PROJECT);
-}
+};
 
 /**
  * @param root
  * @returns WorkspaceType for singular root
  */
-export function detectWorkspaceHelper(root: string): WorkspaceType {
+export const detectWorkspaceHelper = (root: string): WorkspaceType => {
     if (fs.existsSync(getSfdxProjectFile(root))) {
-        return WorkspaceType.SFDX;
+        return WorkspaceTypes.SFDX;
     }
     if (fs.existsSync(path.join(root, 'workspace-user.xml'))) {
-        return WorkspaceType.CORE_ALL;
+        return WorkspaceTypes.CORE_ALL;
     }
     if (fs.existsSync(path.join(root, '..', 'workspace-user.xml'))) {
-        return WorkspaceType.CORE_PARTIAL;
+        return WorkspaceTypes.CORE_PARTIAL;
     }
 
     if (fs.existsSync(path.join(root, 'lwc.config.json'))) {
-        return WorkspaceType.STANDARD_LWC;
+        return WorkspaceTypes.STANDARD_LWC;
     }
 
     const packageJson = path.join(root, 'package.json');
@@ -62,23 +64,23 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
 
             // any type of @lwc is a dependency
             if (hasLWCdependencies) {
-                return WorkspaceType.STANDARD_LWC;
+                return WorkspaceTypes.STANDARD_LWC;
             }
 
             // has any type of lwc configuration
             if (packageInfo.lwc) {
-                return WorkspaceType.STANDARD_LWC;
+                return WorkspaceTypes.STANDARD_LWC;
             }
 
             if (packageInfo.workspaces) {
-                return WorkspaceType.MONOREPO;
+                return WorkspaceTypes.MONOREPO;
             }
 
             if (fs.existsSync(path.join(root, 'lerna.json'))) {
-                return WorkspaceType.MONOREPO;
+                return WorkspaceTypes.MONOREPO;
             }
 
-            return WorkspaceType.STANDARD;
+            return WorkspaceTypes.STANDARD;
         } catch (e) {
             // Log error and fallback to setting workspace type to Unknown
             console.error(`Error encountered while trying to detect workspace type ${e}`);
@@ -86,23 +88,23 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
     }
 
     console.error('unknown workspace type:', root);
-    return WorkspaceType.UNKNOWN;
-}
+    return WorkspaceTypes.UNKNOWN;
+};
 
 /**
  * @param workspaceRoots
  * @returns WorkspaceType, actively not supporting workspaces of mixed type
  */
-export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
+export const detectWorkspaceType = (workspaceRoots: string[]): WorkspaceType => {
     if (workspaceRoots.length === 1) {
         return detectWorkspaceHelper(workspaceRoots[0]);
     }
     for (const root of workspaceRoots) {
         const type = detectWorkspaceHelper(root);
-        if (type !== WorkspaceType.CORE_PARTIAL) {
+        if (type !== WorkspaceTypes.CORE_PARTIAL) {
             console.error('unknown workspace type');
-            return WorkspaceType.UNKNOWN;
+            return WorkspaceTypes.UNKNOWN;
         }
     }
-    return WorkspaceType.CORE_PARTIAL;
-}
+    return WorkspaceTypes.CORE_PARTIAL;
+};

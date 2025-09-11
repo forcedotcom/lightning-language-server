@@ -2,11 +2,14 @@ import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '../decorators';
 
-export enum TagType {
-    STANDARD,
-    SYSTEM,
-    CUSTOM,
-}
+export const TagTypes = {
+    STANDARD: 'STANDARD',
+    SYSTEM: 'SYSTEM',
+    CUSTOM: 'CUSTOM',
+};
+
+type TagType = (typeof TagTypes)[keyof typeof TagTypes];
+
 export class TagInfo {
     constructor(
         public file: string,
@@ -44,7 +47,7 @@ export class TagInfo {
 
     public getHover(hideComponentLibraryLink?: boolean): string | null {
         let retVal = this.documentation + '\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
-        if (hideComponentLibraryLink || this.type === TagType.CUSTOM) {
+        if (hideComponentLibraryLink || this.type === TagTypes.CUSTOM) {
             retVal = this.documentation + '\n### Attributes\n';
         }
 

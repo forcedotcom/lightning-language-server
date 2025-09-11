@@ -4,7 +4,7 @@ import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { BaseWorkspaceContext } from './base-context';
-import { WorkspaceType } from './shared';
+import { WorkspaceTypes } from './shared';
 import * as jsonc from 'jsonc-parser';
 
 const RESOURCES_DIR = 'resources';
@@ -24,7 +24,7 @@ export const toResolvedPath = (uri: string): string => {
 };
 
 const isLWCRootDirectory = (context: BaseWorkspaceContext, uri: string): boolean => {
-    if (context.type === WorkspaceType.SFDX) {
+    if (context.type === WorkspaceTypes.SFDX) {
         const file = toResolvedPath(uri);
         return file.endsWith('lwc');
     }
@@ -32,7 +32,7 @@ const isLWCRootDirectory = (context: BaseWorkspaceContext, uri: string): boolean
 };
 
 const isAuraDirectory = (context: BaseWorkspaceContext, uri: string): boolean => {
-    if (context.type === WorkspaceType.SFDX) {
+    if (context.type === WorkspaceTypes.SFDX) {
         const file = toResolvedPath(uri);
         return file.endsWith('aura');
     }

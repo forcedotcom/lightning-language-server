@@ -4,31 +4,33 @@ import { Diagnostic, DiagnosticSeverity, Range, TextDocument } from 'vscode-lang
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
 
-enum DiagnosticLevel {
+const DiagnosticLevels = {
     /** Unexpected error, parsing error, bundling error */
-    Fatal = 0,
+    Fatal: 0,
     /** Linting error with error level, invalid external reference, invalid import, invalid transform */
-    Error = 1,
+    Error: 1,
     /** Linting error with warning level, usage of an API to be deprecated */
-    Warning = 2,
+    Warning: 2,
     /** Logging messages */
-    Log = 3,
-}
+    Log: 3,
+};
+
+type DiagnosticLevel = (typeof DiagnosticLevels)[keyof typeof DiagnosticLevels];
 
 const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
-    [DiagnosticLevel.Log, DiagnosticSeverity.Information],
-    [DiagnosticLevel.Warning, DiagnosticSeverity.Warning],
-    [DiagnosticLevel.Error, DiagnosticSeverity.Error],
-    [DiagnosticLevel.Fatal, DiagnosticSeverity.Error],
+    [DiagnosticLevels.Log, DiagnosticSeverity.Information],
+    [DiagnosticLevels.Warning, DiagnosticSeverity.Warning],
+    [DiagnosticLevels.Error, DiagnosticSeverity.Error],
+    [DiagnosticLevels.Fatal, DiagnosticSeverity.Error],
 ]);
 
 const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
 
-function toRange(textDocument: TextDocument, start: number, length: number): Range {
+const toRange = (textDocument: TextDocument, start: number, length: number): Range => {
     return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
-}
+};
 
-function lintTypos(document: TextDocument): Diagnostic[] {
+const lintTypos = (document: TextDocument): Diagnostic[] => {
     const source = document.getText();
     const lines = source.split(/\r?\n/g);
 
@@ -44,7 +46,7 @@ function lintTypos(document: TextDocument): Diagnostic[] {
                         end: { line: idx, character: idxTypo + typo.length },
                     },
                     message: `${typo} is not a valid namespace, sure you didn't mean "<lightning-"?`,
-                    severity: LEVEL_MAPPING.get(DiagnosticLevel.Error),
+                    severity: LEVEL_MAPPING.get(DiagnosticLevels.Error),
                     source: DIAGNOSTIC_SOURCE,
                 });
             }
@@ -52,7 +54,7 @@ function lintTypos(document: TextDocument): Diagnostic[] {
     });
 
     return errors;
-}
+};
 
 export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
     const source = document.getText();

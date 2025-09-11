@@ -1,5 +1,5 @@
 import mockFs from 'mock-fs';
-import { detectWorkspaceType, WorkspaceType } from '../shared';
+import { detectWorkspaceType, WorkspaceTypes } from '../shared';
 
 describe('detectWorkspaceType', () => {
     beforeAll(() => {
@@ -27,7 +27,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.SFDX);
+        expect(workspaceType).toEqual(WorkspaceTypes.SFDX);
     });
 
     test('when an lwc.config.json file is present, workspaceType is STANDARD_LWC', () => {
@@ -39,7 +39,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when workspace-user.xml file is present at the root, workspaceType is CORE_ALL', () => {
@@ -51,7 +51,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.CORE_ALL);
+        expect(workspaceType).toEqual(WorkspaceTypes.CORE_ALL);
     });
 
     test('when workspace-user.xml file is present at the parent of the root, workspaceType is CORE_PARTIAL', () => {
@@ -62,7 +62,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.CORE_PARTIAL);
+        expect(workspaceType).toEqual(WorkspaceTypes.CORE_PARTIAL);
     });
 
     test('when package.json dependencies includes @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
@@ -78,7 +78,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json dependencies includes @lwc/<anything>, workspaceType is STANDARD_LWC', () => {
@@ -94,7 +94,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json devDependencies includes @lwc/<anything>, workspaceType is STANDARD_LWC', () => {
@@ -110,7 +110,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
     test('when package.json dependencies includes @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
         mockFs({
@@ -125,7 +125,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json devDependencies include @lwc/engine-dom, workspaceType is STANDARD_LWC', () => {
@@ -140,7 +140,7 @@ describe('detectWorkspaceType', () => {
         });
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json dependencies includes `lwc`, workspaceType is STANDARD_LWC', () => {
@@ -156,7 +156,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json devDependencies include `lwc`, workspaceType is STANDARD_LWC', () => {
@@ -171,7 +171,7 @@ describe('detectWorkspaceType', () => {
         });
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json has `lwc` configuration', () => {
@@ -187,7 +187,7 @@ describe('detectWorkspaceType', () => {
         });
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD_LWC);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD_LWC);
     });
 
     test('when package.json specifies workspaces, workspaceType is MONOREPO', () => {
@@ -201,7 +201,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.MONOREPO);
+        expect(workspaceType).toEqual(WorkspaceTypes.MONOREPO);
     });
 
     test('when lerna.json exists in project, workspaceType is MONOREPO', () => {
@@ -214,7 +214,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.MONOREPO);
+        expect(workspaceType).toEqual(WorkspaceTypes.MONOREPO);
     });
 
     test('when package.json exists but no other conditions met, workspaceType is STANDARD', () => {
@@ -226,7 +226,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.STANDARD);
+        expect(workspaceType).toEqual(WorkspaceTypes.STANDARD);
     });
 
     test('when no package.json, workspace-user.xml or sfdx-project.json, workspaceType is UNKNOWN', () => {
@@ -238,7 +238,7 @@ describe('detectWorkspaceType', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir']);
 
-        expect(workspaceType).toEqual(WorkspaceType.UNKNOWN);
+        expect(workspaceType).toEqual(WorkspaceTypes.UNKNOWN);
     });
 });
 
@@ -260,7 +260,7 @@ describe('detectWorkspaceType with mutliroot', () => {
 
         const workspaceType = detectWorkspaceType(['workspacedir', 'workspacedir2']);
 
-        expect(workspaceType).toEqual(WorkspaceType.CORE_PARTIAL);
+        expect(workspaceType).toEqual(WorkspaceTypes.CORE_PARTIAL);
     });
 
     // TODO: This will be invalid once we fix the logic to resolve against multiple project types.
@@ -283,7 +283,7 @@ describe('detectWorkspaceType with mutliroot', () => {
 
         const workspaceType = detectWorkspaceType(['sfdx_workspace', 'core_all_workspace', 'standard_lwc_workspace']);
 
-        expect(workspaceType).toEqual(WorkspaceType.UNKNOWN);
+        expect(workspaceType).toEqual(WorkspaceTypes.UNKNOWN);
     });
 
     // TODO: This will be invalid once we fix the logic to resolve against multiple project types.
@@ -310,6 +310,6 @@ describe('detectWorkspaceType with mutliroot', () => {
 
         const workspaceType = detectWorkspaceType(['sfdx_workspace', 'core_all_workspace', 'standard_lwc_workspace', 'core_partial_workspace']);
 
-        expect(workspaceType).toEqual(WorkspaceType.UNKNOWN);
+        expect(workspaceType).toEqual(WorkspaceTypes.UNKNOWN);
     });
 });

@@ -3,7 +3,7 @@ import * as tmp from 'tmp';
 import { join, resolve } from 'path';
 import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { WorkspaceContext } from './workspace-context';
-import { WorkspaceType } from '../shared';
+import { WorkspaceTypes } from '../shared';
 import * as fs from 'fs';
 import mockFs from 'mock-fs';
 
@@ -22,7 +22,7 @@ describe('utils', () => {
             uri: 'file:///Users/user/test/dir/file.html',
         };
         const ctxt = new WorkspaceContext('');
-        ctxt.type = WorkspaceType.SFDX;
+        ctxt.type = WorkspaceTypes.SFDX;
         // Mock the isFileInsideModulesRoots method to return true for the test directory
         ctxt.isFileInsideModulesRoots = jest.fn().mockResolvedValue(true);
         expect(await utils.includesDeletedLwcWatchedDirectory(ctxt, [jsFileDeletedEvent, directoryDeletedEvent])).toBeTruthy();
@@ -48,7 +48,7 @@ describe('utils', () => {
             uri: 'file:///Users/user/test/dir/lwc',
         };
         const ctxt = new WorkspaceContext('');
-        ctxt.type = WorkspaceType.SFDX;
+        ctxt.type = WorkspaceTypes.SFDX;
         expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, noLwcFolderDeleted])).toBeFalsy();
         expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated])).toBeFalsy();
         expect(await utils.isLWCRootDirectoryCreated(ctxt, [noLwcFolderCreated, lwcFolderCreated])).toBeTruthy();

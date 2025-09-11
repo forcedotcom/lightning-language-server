@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { join } from 'path';
 import { WorkspaceContext } from './workspace-context';
-import { WorkspaceType } from '../shared';
+import { WorkspaceTypes } from '../shared';
 import { processTemplate, getModulesDirs } from '../base-context';
 import '../../jest/matchers';
 import { CORE_ALL_ROOT, CORE_PROJECT_ROOT, FORCE_APP_ROOT, UTILS_ROOT, readAsTextDocument, CORE_MULTI_ROOT } from './test-utils';
@@ -16,23 +16,23 @@ beforeAll(() => {
 describe('WorkspaceContext', () => {
     it('WorkspaceContext', async () => {
         let context = new WorkspaceContext('test-workspaces/sfdx-workspace');
-        expect(context.type).toBe(WorkspaceType.SFDX);
+        expect(context.type).toBe(WorkspaceTypes.SFDX);
         expect(context.workspaceRoots[0]).toBeAbsolutePath();
 
         expect((await getModulesDirs(context.type, context.workspaceRoots, (context as any).initSfdxProjectConfigCache.bind(context))).length).toBe(3);
 
         context = new WorkspaceContext('test-workspaces/standard-workspace');
-        expect(context.type).toBe(WorkspaceType.STANDARD_LWC);
+        expect(context.type).toBe(WorkspaceTypes.STANDARD_LWC);
 
         expect(await getModulesDirs(context.type, context.workspaceRoots, (context as any).initSfdxProjectConfigCache.bind(context))).toEqual([]);
 
         context = new WorkspaceContext(CORE_ALL_ROOT);
-        expect(context.type).toBe(WorkspaceType.CORE_ALL);
+        expect(context.type).toBe(WorkspaceTypes.CORE_ALL);
 
         expect((await getModulesDirs(context.type, context.workspaceRoots, (context as any).initSfdxProjectConfigCache.bind(context))).length).toBe(2);
 
         context = new WorkspaceContext(CORE_PROJECT_ROOT);
-        expect(context.type).toBe(WorkspaceType.CORE_PARTIAL);
+        expect(context.type).toBe(WorkspaceTypes.CORE_PARTIAL);
 
         expect(await getModulesDirs(context.type, context.workspaceRoots, (context as any).initSfdxProjectConfigCache.bind(context))).toEqual([
             join(context.workspaceRoots[0], 'modules'),

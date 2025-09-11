@@ -1,6 +1,6 @@
 import Tag from './tag';
 import * as path from 'path';
-import { shared, utils } from '@salesforce/lightning-lsp-common';
+import { shared, utils, WorkspaceType, WorkspaceTypes } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fs from 'fs';
@@ -8,7 +8,7 @@ import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
 import BaseIndexer from './base-indexer';
 
-const { detectWorkspaceHelper, WorkspaceType } = shared;
+const { detectWorkspaceHelper } = shared;
 const CUSTOM_COMPONENT_INDEX_PATH = path.join('.sfdx', 'indexes', 'lwc');
 const CUSTOM_COMPONENT_INDEX_FILE = path.join(CUSTOM_COMPONENT_INDEX_PATH, 'custom-components.json');
 const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
@@ -33,7 +33,7 @@ export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => {
 };
 
 export default class ComponentIndexer extends BaseIndexer {
-    readonly workspaceType: number;
+    readonly workspaceType: WorkspaceType;
     readonly tags: Map<string, Tag> = new Map();
 
     constructor(attributes: ComponentIndexerAttributes) {
@@ -44,7 +44,7 @@ export default class ComponentIndexer extends BaseIndexer {
     get componentEntries(): Entry[] {
         let files: Entry[] = [];
         switch (this.workspaceType) {
-            case WorkspaceType.SFDX:
+            case WorkspaceTypes.SFDX:
                 const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/**/*.js`);
                 files = sync(sfdxSource, {
                     stats: true,
@@ -158,7 +158,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     get tsConfigPathMapping(): TsConfigPaths {
         const files: TsConfigPaths = {};
-        if (this.workspaceType === WorkspaceType.SFDX) {
+        if (this.workspaceType === WorkspaceTypes.SFDX) {
             const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
             const filePaths = sync(sfdxSource, { stats: true });
             for (const filePath of filePaths) {

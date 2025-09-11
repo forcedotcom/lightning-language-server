@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import Typing from './typing';
 import BaseIndexer from './base-indexer';
-import { detectWorkspaceHelper, WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
+import { detectWorkspaceHelper, WorkspaceTypes, WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 
 const basenameRegex = new RegExp(/(?<name>[\w-_]+)\.[^\/]+$/);
 
@@ -34,20 +34,20 @@ export default class TypingIndexer extends BaseIndexer {
         this.projectType = detectWorkspaceHelper(attributes.workspaceRoot);
 
         switch (this.projectType) {
-            case WorkspaceType.SFDX:
+            case WorkspaceTypes.SFDX:
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_PARTIAL:
+            case WorkspaceTypes.CORE_PARTIAL:
                 this.typingsBaseDir = path.join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_ALL:
+            case WorkspaceTypes.CORE_ALL:
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
                 break;
         }
     }
 
     init(): void {
-        if (this.projectType === WorkspaceType.SFDX) {
+        if (this.projectType === WorkspaceTypes.SFDX) {
             this.createNewMetaTypings();
             this.deleteStaleMetaTypings();
             this.saveCustomLabelTypings();

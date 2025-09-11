@@ -32,7 +32,7 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
+import { interceptConsoleLogger, utils, WorkspaceTypes } from '@salesforce/lightning-lsp-common';
 import { LWCWorkspaceContext } from './context/lwc-context';
 
 import ComponentIndexer from './component-indexer';
@@ -46,20 +46,20 @@ import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/util
 const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
-const { WorkspaceType } = shared;
+export const Token = {
+    Tag: 'tag',
+    AttributeKey: 'attributeKey',
+    AttributeValue: 'attributeValue',
+    DynamicAttributeValue: 'dynamicAttributeValue',
+    Content: 'content',
+    DynamicContent: 'dynamicContent',
+};
 
-export enum Token {
-    Tag = 'tag',
-    AttributeKey = 'attributeKey',
-    AttributeValue = 'attributeValue',
-    DynamicAttributeValue = 'dynamicAttributeValue',
-    Content = 'content',
-    DynamicContent = 'dynamicContent',
-}
+export type TypeOfToken = (typeof Token)[keyof typeof Token];
 
 type CursorInfo = {
     name: string;
-    type: Token;
+    type: TypeOfToken;
     tag?: string;
     range?: any;
 };
@@ -288,7 +288,7 @@ export default class Server {
     // TODO: Once the LWC custom module resolution plugin has been developed in the language server
     // this can be removed.
     async onDidChangeWatchedFiles(changeEvent: DidChangeWatchedFilesParams): Promise<void> {
-        if (this.context.type === WorkspaceType.SFDX) {
+        if (this.context.type === WorkspaceTypes.SFDX) {
             try {
                 const hasTsEnabled = await this.isTsSupportEnabled();
                 if (hasTsEnabled) {

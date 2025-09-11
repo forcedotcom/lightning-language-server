@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { BaseWorkspaceContext } from '../base-context';
-import { WorkspaceType } from '../shared';
+import { WorkspaceTypes } from '../shared';
 import { findNamespaceRoots } from '../namespace-utils';
 
 export class WorkspaceContext extends BaseWorkspaceContext {
@@ -21,7 +21,7 @@ export class WorkspaceContext extends BaseWorkspaceContext {
             aura: [],
         };
         switch (this.type) {
-            case WorkspaceType.SFDX:
+            case WorkspaceTypes.SFDX:
                 // For SFDX workspaces, check for both lwc and aura directories
                 for (const root of this.workspaceRoots) {
                     const forceAppPath = path.join(root, 'force-app', 'main', 'default');
@@ -42,7 +42,7 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_ALL:
+            case WorkspaceTypes.CORE_ALL:
                 // optimization: search only inside project/modules/
                 for (const project of await fs.promises.readdir(this.workspaceRoots[0])) {
                     const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
@@ -52,7 +52,7 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_PARTIAL:
+            case WorkspaceTypes.CORE_PARTIAL:
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
@@ -62,12 +62,12 @@ export class WorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.STANDARD:
-            case WorkspaceType.STANDARD_LWC:
-            case WorkspaceType.MONOREPO:
-            case WorkspaceType.UNKNOWN: {
+            case WorkspaceTypes.STANDARD:
+            case WorkspaceTypes.STANDARD_LWC:
+            case WorkspaceTypes.MONOREPO:
+            case WorkspaceTypes.UNKNOWN: {
                 let depth = 6;
-                if (this.type === WorkspaceType.MONOREPO) {
+                if (this.type === WorkspaceTypes.MONOREPO) {
                     depth += 2;
                 }
                 const unknownroots = await findNamespaceRoots(this.workspaceRoots[0], depth);
