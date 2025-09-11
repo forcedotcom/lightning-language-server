@@ -3,25 +3,13 @@ import path from 'path';
 import { Diagnostic, DiagnosticSeverity, Range, TextDocument } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
-
-const DiagnosticLevels = {
-    /** Unexpected error, parsing error, bundling error */
-    Fatal: 0,
-    /** Linting error with error level, invalid external reference, invalid import, invalid transform */
-    Error: 1,
-    /** Linting error with warning level, usage of an API to be deprecated */
-    Warning: 2,
-    /** Logging messages */
-    Log: 3,
-};
-
-type DiagnosticLevel = (typeof DiagnosticLevels)[keyof typeof DiagnosticLevels];
+import { DiagnosticLevel } from '@lwc/errors';
 
 const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
-    [DiagnosticLevels.Log, DiagnosticSeverity.Information],
-    [DiagnosticLevels.Warning, DiagnosticSeverity.Warning],
-    [DiagnosticLevels.Error, DiagnosticSeverity.Error],
-    [DiagnosticLevels.Fatal, DiagnosticSeverity.Error],
+    [DiagnosticLevel.Log, DiagnosticSeverity.Information],
+    [DiagnosticLevel.Warning, DiagnosticSeverity.Warning],
+    [DiagnosticLevel.Error, DiagnosticSeverity.Error],
+    [DiagnosticLevel.Fatal, DiagnosticSeverity.Error],
 ]);
 
 const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
@@ -46,7 +34,7 @@ const lintTypos = (document: TextDocument): Diagnostic[] => {
                         end: { line: idx, character: idxTypo + typo.length },
                     },
                     message: `${typo} is not a valid namespace, sure you didn't mean "<lightning-"?`,
-                    severity: LEVEL_MAPPING.get(DiagnosticLevels.Error),
+                    severity: LEVEL_MAPPING.get(DiagnosticLevel.Error),
                     source: DIAGNOSTIC_SOURCE,
                 });
             }
