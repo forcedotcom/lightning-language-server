@@ -22,19 +22,19 @@ export enum WorkspaceType {
     UNKNOWN,
 }
 
-export function isLWC(type: WorkspaceType): boolean {
+export const isLWC = (type: WorkspaceType): boolean => {
     return type === WorkspaceType.SFDX || type === WorkspaceType.STANDARD_LWC || type === WorkspaceType.CORE_ALL || type === WorkspaceType.CORE_PARTIAL;
-}
+};
 
-export function getSfdxProjectFile(root: string): string {
+export const getSfdxProjectFile = (root: string): string => {
     return path.join(root, SFDX_PROJECT);
-}
+};
 
 /**
  * @param root
  * @returns WorkspaceType for singular root
  */
-export function detectWorkspaceHelper(root: string): WorkspaceType {
+export const detectWorkspaceHelper = (root: string): WorkspaceType => {
     if (fs.existsSync(getSfdxProjectFile(root))) {
         return WorkspaceType.SFDX;
     }
@@ -87,13 +87,13 @@ export function detectWorkspaceHelper(root: string): WorkspaceType {
 
     console.error('unknown workspace type:', root);
     return WorkspaceType.UNKNOWN;
-}
+};
 
 /**
  * @param workspaceRoots
  * @returns WorkspaceType, actively not supporting workspaces of mixed type
  */
-export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
+export const detectWorkspaceType = (workspaceRoots: string[]): WorkspaceType => {
     if (workspaceRoots.length === 1) {
         return detectWorkspaceHelper(workspaceRoots[0]);
     }
@@ -105,4 +105,4 @@ export function detectWorkspaceType(workspaceRoots: string[]): WorkspaceType {
         }
     }
     return WorkspaceType.CORE_PARTIAL;
-}
+};

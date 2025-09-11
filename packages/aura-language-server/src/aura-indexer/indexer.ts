@@ -1,4 +1,4 @@
-import { Indexer, TagInfo, createTagInfo, createAttributeInfo, WorkspaceType, elapsedMillis } from '@salesforce/lightning-lsp-common';
+import { Indexer, TagInfo, createTagInfo, createAttributeInfo, WorkspaceType, elapsedMillis, TagType } from '@salesforce/lightning-lsp-common';
 import { componentFromFile, componentFromDirectory } from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import LineColumnFinder from 'line-column';
 import URI from 'vscode-uri';
 import EventsEmitter from 'events';
-import { TagType } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 import { parse } from '../aura-utils';
 import { Node } from 'vscode-html-languageservice';
 import { AuraWorkspaceContext } from '../context/aura-context';

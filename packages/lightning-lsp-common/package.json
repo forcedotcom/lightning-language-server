@@ -36,6 +36,16 @@
       "import": "./lib/namespace-utils.js",
       "require": "./lib/namespace-utils.js",
       "types": "./lib/namespace-utils.d.ts"
+    },
+    "./indexer/attributeInfo": {
+      "import": "./lib/indexer/attributeInfo.js",
+      "require": "./lib/indexer/attributeInfo.js",
+      "types": "./lib/indexer/attributeInfo.d.ts"
+    },
+    "./indexer/tagInfo": {
+      "import": "./lib/indexer/tagInfo.js",
+      "require": "./lib/indexer/tagInfo.js",
+      "types": "./lib/indexer/tagInfo.d.ts"
     }
   },
   "license": "BSD-3-Clause",
