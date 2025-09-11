@@ -3,7 +3,6 @@ import AuraIndexer from '../indexer';
 import * as path from 'path';
 import mockFs from 'mock-fs';
 import URI from 'vscode-uri';
-import { TagTypes } from '@salesforce/lightning-lsp-common/lib/indexer/tagInfo';
 
 const normalize = (start: string, p: string): string => {
     // Fix relative paths on windows
@@ -80,7 +79,7 @@ describe('indexer parsing content', () => {
         expect(tagInfo).toBeObject();
         expect(tagInfo.name).toEqual('c:wireLdsCmp');
         expect(tagInfo.file).toEndWith('wireLdsCmp.cmp');
-        expect(tagInfo.type).toEqual(TagTypes.CUSTOM);
+        expect(tagInfo.type).toEqual('CUSTOM');
         expect(tagInfo.lwc).toEqual(false);
         expect(tagInfo.location).toBeObject();
         expect(tagInfo.location.uri).toEndWith('wireLdsCmp.cmp');

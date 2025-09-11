@@ -1,6 +1,6 @@
 import Tag from './tag';
 import * as path from 'path';
-import { shared, utils, WorkspaceType, WorkspaceTypes } from '@salesforce/lightning-lsp-common';
+import { shared, utils, WorkspaceType } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fs from 'fs';
@@ -44,7 +44,7 @@ export default class ComponentIndexer extends BaseIndexer {
     get componentEntries(): Entry[] {
         let files: Entry[] = [];
         switch (this.workspaceType) {
-            case WorkspaceTypes.SFDX:
+            case 'SFDX':
                 const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/**/*.js`);
                 files = sync(sfdxSource, {
                     stats: true,
@@ -158,7 +158,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     get tsConfigPathMapping(): TsConfigPaths {
         const files: TsConfigPaths = {};
-        if (this.workspaceType === WorkspaceTypes.SFDX) {
+        if (this.workspaceType === 'SFDX') {
             const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
             const filePaths = sync(sfdxSource, { stats: true });
             for (const filePath of filePaths) {

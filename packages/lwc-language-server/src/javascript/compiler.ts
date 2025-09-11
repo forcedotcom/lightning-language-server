@@ -6,7 +6,7 @@ import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { AttributeInfo, ClassMember, Decorators, MemberTypes } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, ClassMember } from '@salesforce/lightning-lsp-common';
 import { Metadata } from '../decorators';
 import commentParser from 'comment-parser';
 
@@ -155,14 +155,14 @@ export const extractAttributes = (metadata: Metadata, uri: string): { privateAtt
             const location = Location.create(uri, toVSCodeRange(x.loc));
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-            const memberType = x.type === 'property' ? MemberTypes.PROPERTY : MemberTypes.METHOD;
-            publicAttributes.push(new AttributeInfo(name, x.doc, memberType, Decorators.API, undefined, location, 'LWC custom attribute'));
+            const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
+            publicAttributes.push(new AttributeInfo(name, x.doc, memberType, 'API', undefined, location, 'LWC custom attribute'));
         } else {
             const location = Location.create(uri, toVSCodeRange(x.loc));
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-            const memberType = x.type === 'property' ? MemberTypes.PROPERTY : MemberTypes.METHOD;
-            const decorator = x.decorator === 'track' ? Decorators.TRACK : undefined;
+            const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
+            const decorator = x.decorator === 'track' ? 'TRACK' : undefined;
             privateAttributes.push(new AttributeInfo(name, x.doc, memberType, decorator, undefined, location, 'LWC custom attribute'));
         }
     }

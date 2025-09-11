@@ -3,7 +3,6 @@ import Tag from '../tag';
 import { Entry } from 'fast-glob';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
-import { WorkspaceTypes } from '@salesforce/lightning-lsp-common';
 import { Stats, Dirent } from 'fs';
 import * as fs from 'fs';
 
@@ -25,7 +24,7 @@ describe('ComponentIndexer', () => {
         it('initializes with the root of a workspace', () => {
             const expectedPath: string = path.resolve('../../test-workspaces/sfdx-workspace');
             expect(componentIndexer.workspaceRoot).toEqual(expectedPath);
-            expect(componentIndexer.workspaceType).toEqual(WorkspaceTypes.SFDX);
+            expect(componentIndexer.workspaceType).toEqual('SFDX');
         });
     });
 

@@ -32,7 +32,7 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { interceptConsoleLogger, utils, WorkspaceTypes } from '@salesforce/lightning-lsp-common';
+import { interceptConsoleLogger, utils } from '@salesforce/lightning-lsp-common';
 import { LWCWorkspaceContext } from './context/lwc-context';
 
 import ComponentIndexer from './component-indexer';
@@ -46,20 +46,11 @@ import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/util
 const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
-export const Token = {
-    Tag: 'tag',
-    AttributeKey: 'attributeKey',
-    AttributeValue: 'attributeValue',
-    DynamicAttributeValue: 'dynamicAttributeValue',
-    Content: 'content',
-    DynamicContent: 'dynamicContent',
-};
-
-export type TypeOfToken = (typeof Token)[keyof typeof Token];
+export type Token = 'tag' | 'attributeKey' | 'attributeValue' | 'dynamicAttributeValue' | 'content' | 'dynamicContent';
 
 type CursorInfo = {
     name: string;
-    type: TypeOfToken;
+    type: Token;
     tag?: string;
     range?: any;
 };
@@ -288,7 +279,7 @@ export default class Server {
     // TODO: Once the LWC custom module resolution plugin has been developed in the language server
     // this can be removed.
     async onDidChangeWatchedFiles(changeEvent: DidChangeWatchedFilesParams): Promise<void> {
-        if (this.context.type === WorkspaceTypes.SFDX) {
+        if (this.context.type === 'SFDX') {
             try {
                 const hasTsEnabled = await this.isTsSupportEnabled();
                 if (hasTsEnabled) {
@@ -377,17 +368,17 @@ export default class Server {
         const tag = this.componentIndexer.findTagByName(cursorInfo.tag);
 
         switch (cursorInfo.type) {
-            case Token.Tag:
+            case 'tag':
                 return tag?.allLocations || [];
 
-            case Token.AttributeKey:
+            case 'attributeKey':
                 const attr = tag?.attribute(cursorInfo.name);
                 if (attr) {
                     return [attr.location];
                 }
 
-            case Token.DynamicContent:
-            case Token.DynamicAttributeValue:
+            case 'dynamicContent':
+            case 'dynamicAttributeValue':
                 const { uri } = params.textDocument;
                 if (cursorInfo.range) {
                     return [Location.create(uri, cursorInfo.range)];
@@ -445,23 +436,23 @@ export default class Server {
         switch (token) {
             case TokenType.StartTag:
             case TokenType.EndTag: {
-                return { type: Token.Tag, name: tag, tag };
+                return { type: 'tag', name: tag, tag };
             }
             case TokenType.AttributeName: {
-                return { type: Token.AttributeKey, tag, name: content };
+                return { type: 'attributeKey', tag, name: content };
             }
             case TokenType.AttributeValue: {
                 const match = propertyRegex.exec(content);
                 if (match) {
                     const item = iterators.find((i) => i.name === match.groups.property) || null;
                     return {
-                        type: Token.DynamicAttributeValue,
+                        type: 'dynamicAttributeValue',
                         name: match.groups.property,
                         range: item?.range,
                         tag,
                     };
                 } else {
-                    return { type: Token.AttributeValue, name: content, tag };
+                    return { type: 'attributeValue', name: content, tag };
                 }
             }
             case TokenType.Content: {
@@ -472,14 +463,14 @@ export default class Server {
                     const item = iterators.find((i) => i.name === match) ?? null;
 
                     return {
-                        type: Token.DynamicContent,
+                        type: 'dynamicContent',
                         name: match,
                         range: item?.range,
                         tag,
                     };
                 } else {
                     return {
-                        type: Token.Content,
+                        type: 'content',
                         tag,
                         name: content,
                     };
