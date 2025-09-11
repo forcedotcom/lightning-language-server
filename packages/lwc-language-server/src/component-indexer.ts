@@ -1,14 +1,13 @@
-import Tag from './tag';
+import { Tag, createTag, createTagFromFile, getTagName, getTagUri } from './tag';
 import * as path from 'path';
-import { shared, utils } from '@salesforce/lightning-lsp-common';
+import { detectWorkspaceHelper, WorkspaceType, readJsonSync, writeJsonSync } from '@salesforce/lightning-lsp-common';
 import { Entry, sync } from 'fast-glob';
 import normalize from 'normalize-path';
 import * as fs from 'fs';
 import { snakeCase } from 'change-case';
 import camelcase from 'camelcase';
-import BaseIndexer from './base-indexer';
+import { getWorkspaceRoot, getSfdxConfig, getSfdxPackageDirsPattern } from './base-indexer';
 
-const { detectWorkspaceHelper, WorkspaceType } = shared;
 const CUSTOM_COMPONENT_INDEX_PATH = path.join('.sfdx', 'indexes', 'lwc');
 const CUSTOM_COMPONENT_INDEX_FILE = path.join(CUSTOM_COMPONENT_INDEX_PATH, 'custom-components.json');
 const componentPrefixRegex = new RegExp(/^(?<type>c|lightning|interop){0,1}(?<delimiter>:|-{0,1})(?<name>[\w\-]+)$/);
@@ -32,13 +31,22 @@ export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => {
     return entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
 };
 
-export default class ComponentIndexer extends BaseIndexer {
+export default class ComponentIndexer {
+    readonly workspaceRoot: string;
     readonly workspaceType: number;
     readonly tags: Map<string, Tag> = new Map();
 
     constructor(attributes: ComponentIndexerAttributes) {
-        super(attributes);
+        this.workspaceRoot = getWorkspaceRoot(attributes.workspaceRoot);
         this.workspaceType = detectWorkspaceHelper(attributes.workspaceRoot);
+    }
+
+    sfdxConfig(root: string): any {
+        return getSfdxConfig(root);
+    }
+
+    get sfdxPackageDirsPattern(): string {
+        return getSfdxPackageDirsPattern(this.workspaceRoot);
     }
 
     get componentEntries(): Entry[] {
@@ -87,7 +95,7 @@ export default class ComponentIndexer extends BaseIndexer {
 
     findTagByURI(uri: string): Tag | null {
         const uriText = uri.replace('.html', '.js');
-        return Array.from(this.tags.values()).find((tag) => tag.uri === uriText) || null;
+        return Array.from(this.tags.values()).find((tag) => getTagUri(tag) === uriText) || null;
     }
 
     loadTagsFromIndex(): void {
@@ -99,8 +107,8 @@ export default class ComponentIndexer extends BaseIndexer {
                 const indexJsonString: string = fs.readFileSync(indexPath, 'utf8');
                 const index: object[] = JSON.parse(indexJsonString);
                 index.forEach((data) => {
-                    const info = new Tag(data);
-                    this.tags.set(info.name, info);
+                    const info = createTag(data);
+                    this.tags.set(getTagName(info), info);
                 });
             }
         } catch (err) {
@@ -119,7 +127,7 @@ export default class ComponentIndexer extends BaseIndexer {
         const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
         if (fs.existsSync(sfdxTsConfigPath)) {
             try {
-                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                const sfdxTsConfig = readJsonSync(sfdxTsConfigPath);
                 for (const filePath of filePaths) {
                     const { dir, name: fileName } = path.parse(filePath);
                     const componentName = `c/${fileName}`;
@@ -130,7 +138,7 @@ export default class ComponentIndexer extends BaseIndexer {
                         tsConfigFilePaths.push(componentFilePath);
                     }
                 }
-                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+                writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
             } catch (err) {
                 console.error(err);
             }
@@ -145,11 +153,11 @@ export default class ComponentIndexer extends BaseIndexer {
         const sfdxTsConfigPath = normalize(`${this.workspaceRoot}/.sfdx/tsconfig.sfdx.json`);
         if (fs.existsSync(sfdxTsConfigPath)) {
             try {
-                const sfdxTsConfig = utils.readJsonSync(sfdxTsConfigPath);
+                const sfdxTsConfig = readJsonSync(sfdxTsConfigPath);
                 // The assumption here is that sfdxTsConfig will not be modified by the user as
                 // it is located in the .sfdx directory.
                 sfdxTsConfig.compilerOptions.paths = this.tsConfigPathMapping;
-                utils.writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
+                writeJsonSync(sfdxTsConfigPath, sfdxTsConfig);
             } catch (err) {
                 console.error(err);
             }
@@ -192,22 +200,22 @@ export default class ComponentIndexer extends BaseIndexer {
 
     async init(): Promise<void> {
         this.loadTagsFromIndex();
-        const promises = this.unIndexedFiles.map((entry) => Tag.fromFile(entry.path, entry.stats.mtime));
+        const promises = this.unIndexedFiles.map((entry) => createTagFromFile(entry.path, entry.stats.mtime));
         const tags = await Promise.all(promises);
         tags.filter(Boolean).forEach((tag) => {
-            this.tags.set(tag.name, tag);
+            this.tags.set(getTagName(tag), tag);
         });
 
-        this.staleTags.forEach((tag) => this.tags.delete(tag.name));
+        this.staleTags.forEach((tag) => this.tags.delete(getTagName(tag)));
         this.persistCustomComponents();
     }
 
     async reindex(): Promise<void> {
-        const promises = this.componentEntries.map((entry) => Tag.fromFile(entry.path));
+        const promises = this.componentEntries.map((entry) => createTagFromFile(entry.path));
         const tags = await Promise.all(promises);
         this.tags.clear();
         tags.forEach((tag) => {
-            this.tags.set(tag.name, tag);
+            this.tags.set(getTagName(tag), tag);
         });
     }
 }
