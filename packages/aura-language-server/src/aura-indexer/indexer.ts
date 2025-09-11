@@ -1,4 +1,4 @@
-import { Indexer, TagInfo, AttributeInfo, WorkspaceType, elapsedMillis } from '@salesforce/lightning-lsp-common';
+import { Indexer, TagInfo, createTagInfo, createAttributeInfo, WorkspaceType, elapsedMillis } from '@salesforce/lightning-lsp-common';
 import { componentFromFile, componentFromDirectory } from '../util/component-util';
 import { Location } from 'vscode-languageserver';
 import * as auraUtils from '../aura-utils';
@@ -111,7 +111,7 @@ export default class AuraIndexer implements Indexer {
                     },
                 };
 
-                return new AttributeInfo(jsName, documentation, undefined, undefined, type, location);
+                return createAttributeInfo(jsName, documentation, undefined, undefined, type, location);
             });
         tagInfo.attributes = attributeInfos;
         this.setCustomTag(tagInfo);
@@ -168,11 +168,11 @@ export default class AuraIndexer implements Indexer {
         for (const tag in auraSystem) {
             if (auraSystem.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraSystem[tag];
-                const info = new TagInfo(null, TagType.SYSTEM, false, []);
+                const info = createTagInfo(null, TagType.SYSTEM, false, []);
                 if (tagObj.attributes) {
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
-                        info.attributes.push(new AttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
+                        info.attributes.push(createAttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
                     }
                 }
                 info.documentation = tagObj.description;
@@ -190,14 +190,14 @@ export default class AuraIndexer implements Indexer {
         for (const tag in auraStandard) {
             if (auraStandard.hasOwnProperty(tag) && typeof tag === 'string') {
                 const tagObj = auraStandard[tag];
-                const info = new TagInfo(null, TagType.STANDARD, false, []);
+                const info = createTagInfo(null, TagType.STANDARD, false, []);
                 if (tagObj.attributes) {
                     tagObj.attributes.sort((a, b) => {
                         return a.name.localeCompare(b.name);
                     });
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
-                        info.attributes.push(new AttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
+                        info.attributes.push(createAttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));
                     }
                 }
                 info.documentation = tagObj.description;
@@ -257,7 +257,7 @@ export default class AuraIndexer implements Indexer {
             },
         };
         const name = componentFromFile(file, sfdxProject);
-        const info = new TagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
+        const info = createTagInfo(file, TagType.CUSTOM, false, [], location, documentation, name, 'c');
         return info;
     }
 }

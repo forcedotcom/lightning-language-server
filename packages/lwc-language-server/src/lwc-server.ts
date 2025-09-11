@@ -32,16 +32,15 @@ import { basename, dirname, parse } from 'path';
 import { compileDocument as javascriptCompileDocument } from './javascript/compiler';
 import { AuraDataProvider } from './aura-data-provider';
 import { LWCDataProvider } from './lwc-data-provider';
-import { interceptConsoleLogger, utils, shared } from '@salesforce/lightning-lsp-common';
+import { interceptConsoleLogger, utils, shared, isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common';
 import { LWCWorkspaceContext } from './context/lwc-context';
 
 import ComponentIndexer from './component-indexer';
 import TypingIndexer from './typing-indexer';
 import templateLinter from './template/linter';
-import Tag from './tag';
+import { Tag, getTagName, getLwcTypingsName, getClassMembers, getAttribute, getAllLocations, updateTagMetadata, getClassMemberLocation } from './tag';
 import { URI } from 'vscode-uri';
 import { TYPESCRIPT_SUPPORT_SETTING } from './constants';
-import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/utils';
 
 const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
@@ -183,7 +182,7 @@ export default class Server {
             if (this.shouldCompleteJavascript(params)) {
                 const customTags = this.componentIndexer.customData.map((tag) => {
                     return {
-                        label: tag.lwcTypingsName,
+                        label: getLwcTypingsName(tag),
                         kind: CompletionItemKind.Folder,
                     };
                 });
@@ -230,9 +229,9 @@ export default class Server {
     private findBindItems(docBasename: string): CompletionItem[] {
         const customTags: CompletionItem[] = [];
         this.componentIndexer.customData.forEach((tag) => {
-            if (tag.name === docBasename) {
-                tag.classMembers.forEach((cm) => {
-                    const bindName = `${tag.name}.${cm.name}`;
+            if (getTagName(tag) === docBasename) {
+                getClassMembers(tag).forEach((cm) => {
+                    const bindName = `${getTagName(tag)}.${cm.name}`;
                     const kind = cm.type === 'method' ? CompletionItemKind.Function : CompletionItemKind.Property;
                     const detail = cm.decorator ? `@${cm.decorator}` : '';
                     customTags.push({ label: cm.name, kind, documentation: bindName, detail, sortText: bindName });
@@ -279,7 +278,7 @@ export default class Server {
             if (metadata) {
                 const tag: Tag = this.componentIndexer.findTagByURI(uri);
                 if (tag) {
-                    tag.updateMetadata(metadata);
+                    updateTagMetadata(tag, metadata);
                 }
             }
         }
@@ -341,7 +340,7 @@ export default class Server {
             if (metadata) {
                 const tag: Tag = this.componentIndexer.findTagByURI(document.uri);
                 if (tag) {
-                    tag.updateMetadata(metadata);
+                    updateTagMetadata(tag, metadata);
                 }
             }
         }
@@ -378,10 +377,10 @@ export default class Server {
 
         switch (cursorInfo.type) {
             case Token.Tag:
-                return tag?.allLocations || [];
+                return tag ? getAllLocations(tag) : [];
 
             case Token.AttributeKey:
-                const attr = tag?.attribute(cursorInfo.name);
+                const attr = tag ? getAttribute(tag, cursorInfo.name) : null;
                 if (attr) {
                     return [attr.location];
                 }
@@ -393,7 +392,7 @@ export default class Server {
                     return [Location.create(uri, cursorInfo.range)];
                 } else {
                     const component: Tag = this.componentIndexer.findTagByURI(uri);
-                    const location = component?.classMemberLocation(cursorInfo.name);
+                    const location = component ? getClassMemberLocation(component, cursorInfo.name) : null;
                     if (location) {
                         return [location];
                     }
