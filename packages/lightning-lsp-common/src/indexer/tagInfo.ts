@@ -2,7 +2,7 @@ import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '../decorators';
 
-export type TagType = 'STANDARD' | 'SYSTEM' | 'CUSTOM';
+type TagType = 'STANDARD' | 'SYSTEM' | 'CUSTOM';
 
 export class TagInfo {
     constructor(

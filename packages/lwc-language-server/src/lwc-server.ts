@@ -46,7 +46,7 @@ import { isLWCWatchedDirectory } from '@salesforce/lightning-lsp-common/lib/util
 const propertyRegex = new RegExp(/\{(?<property>\w+)\.*.*\}/);
 const iteratorRegex = new RegExp(/iterator:(?<name>\w+)/);
 
-export type Token = 'tag' | 'attributeKey' | 'attributeValue' | 'dynamicAttributeValue' | 'content' | 'dynamicContent';
+type Token = 'tag' | 'attributeKey' | 'attributeValue' | 'dynamicAttributeValue' | 'content' | 'dynamicContent';
 
 type CursorInfo = {
     name: string;
