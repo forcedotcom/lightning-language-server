@@ -28,6 +28,7 @@
   "dependencies": {
     "@lwc/compiler": "8.16.0",
     "@lwc/engine-dom": "8.16.0",
+    "@lwc/errors": "8.16.0",
     "@lwc/metadata": "12.2.0",
     "@lwc/template-compiler": "8.16.0",
     "@salesforce/apex": "0.0.21",

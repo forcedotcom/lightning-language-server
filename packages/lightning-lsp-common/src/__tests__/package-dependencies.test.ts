@@ -9,14 +9,13 @@ import glob from 'glob';
 
 const checkedPackagePatterns: RegExp[] = [/^@salesforce/i, /^@lwc/i];
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function readJsonFile(jsonFilePath: string) {
+const readJsonFile = (jsonFilePath: string) => {
     try {
         return JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     } catch (e) {
         throw new Error(`Error reading json file from ${jsonFilePath}: ${e}`);
     }
-}
+};
 
 const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 const packageJson = readJsonFile(packageJsonPath);

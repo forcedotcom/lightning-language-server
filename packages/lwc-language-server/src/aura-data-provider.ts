@@ -21,13 +21,11 @@ export class AuraDataProvider implements IHTMLDataProvider {
         return this.activated;
     }
     provideTags(): ITagData[] {
-        return this.indexer.customData.map((tag) => {
-            return {
-                name: tag.auraName,
-                description: tag.description,
-                attributes: tag.attributes,
-            };
-        });
+        return this.indexer.customData.map((tag) => ({
+            name: tag.auraName,
+            description: tag.description,
+            attributes: tag.attributes,
+        }));
     }
     provideAttributes(tagName: string): IAttributeData[] {
         const tags = this.provideTags();

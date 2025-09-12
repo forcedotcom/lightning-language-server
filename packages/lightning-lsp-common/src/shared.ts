@@ -6,13 +6,9 @@ const SFDX_PROJECT = 'sfdx-project.json';
 
 export type WorkspaceType = 'STANDARD' | 'STANDARD_LWC' | 'MONOREPO' | 'MONOREPO_LWC' | 'SFDX' | 'CORE_ALL' | 'CORE_PARTIAL' | 'UNKNOWN';
 
-export const isLWC = (type: WorkspaceType): boolean => {
-    return type === 'SFDX' || type === 'STANDARD_LWC' || type === 'CORE_ALL' || type === 'CORE_PARTIAL';
-};
+export const isLWC = (type: WorkspaceType): boolean => type === 'SFDX' || type === 'STANDARD_LWC' || type === 'CORE_ALL' || type === 'CORE_PARTIAL';
 
-export const getSfdxProjectFile = (root: string): string => {
-    return path.join(root, SFDX_PROJECT);
-};
+export const getSfdxProjectFile = (root: string): string => path.join(root, SFDX_PROJECT);
 
 /**
  * @param root
@@ -40,9 +36,7 @@ export const detectWorkspaceHelper = (root: string): WorkspaceType => {
             const dependencies = Object.keys(packageInfo.dependencies || {});
             const devDependencies = Object.keys(packageInfo.devDependencies || {});
             const allDependencies = [...dependencies, ...devDependencies];
-            const hasLWCdependencies = allDependencies.some((key) => {
-                return key.startsWith('@lwc/') || key === 'lwc';
-            });
+            const hasLWCdependencies = allDependencies.some((key) => key.startsWith('@lwc/') || key === 'lwc');
 
             // any type of @lwc is a dependency
             if (hasLWCdependencies) {

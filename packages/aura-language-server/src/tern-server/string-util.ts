@@ -1,4 +1,4 @@
-function isAlphaNumberic(code: number): boolean {
+const isAlphaNumberic = (code: number): boolean => {
     if (code > 47 && code < 58) {
         // numeric
         return true;
@@ -12,9 +12,9 @@ function isAlphaNumberic(code: number): boolean {
         return true;
     }
     return false;
-}
+};
 
-export function findWord(str: string, offset: number): { start: number; end: number } {
+export const findWord = (str: string, offset: number): { start: number; end: number } => {
     let start = -1;
     let end = -1;
 
@@ -55,8 +55,9 @@ export function findWord(str: string, offset: number): { start: number; end: num
             end,
         };
     }
-}
-export function countPreviousCommas(str: string, offset: number): number {
+};
+
+export const countPreviousCommas = (str: string, offset: number): number => {
     let commas = 0;
     let pos: number = offset;
     let c: number;
@@ -72,8 +73,9 @@ export function countPreviousCommas(str: string, offset: number): number {
         --pos;
     }
     return commas;
-}
-export function findPreviousLeftParan(str: string, offset: number): number {
+};
+
+export const findPreviousLeftParan = (str: string, offset: number): number => {
     let start = -1;
     let pos: number = offset;
     let c: number;
@@ -89,9 +91,9 @@ export function findPreviousLeftParan(str: string, offset: number): number {
         --pos;
     }
     return start;
-}
+};
 
-export function findPreviousWord(str: string, offset: number): { start: number; end: number } {
+export const findPreviousWord = (str: string, offset: number): { start: number; end: number } => {
     let start = -1;
     let end = -1;
 
@@ -142,4 +144,4 @@ export function findPreviousWord(str: string, offset: number): { start: number; 
     if (start > -1 && end > -1) {
         return { start, end: end - boundaryOffset };
     }
-}
+};

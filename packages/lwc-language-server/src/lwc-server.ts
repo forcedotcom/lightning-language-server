@@ -172,12 +172,10 @@ export default class Server {
             }
         } else if (await this.context.isLWCJavascript(doc)) {
             if (this.shouldCompleteJavascript(params)) {
-                const customTags = this.componentIndexer.customData.map((tag) => {
-                    return {
-                        label: tag.lwcTypingsName,
-                        kind: CompletionItemKind.Folder,
-                    };
-                });
+                const customTags = this.componentIndexer.customData.map((tag) => ({
+                    label: tag.lwcTypingsName,
+                    kind: CompletionItemKind.Folder,
+                }));
 
                 return {
                     isIncomplete: false,

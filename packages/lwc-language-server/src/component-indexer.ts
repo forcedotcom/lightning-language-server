@@ -24,13 +24,9 @@ type TsConfigPaths = {
 const AURA_DELIMITER = ':';
 const LWC_DELIMITER = '-';
 
-const tagEqualsFile = (tag: Tag, entry: Entry): boolean => {
-    return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
-};
+const tagEqualsFile = (tag: Tag, entry: Entry): boolean => tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
 
-export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => {
-    return entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
-};
+export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
 
 export default class ComponentIndexer extends BaseIndexer {
     readonly workspaceType: WorkspaceType;
@@ -185,9 +181,7 @@ export default class ComponentIndexer extends BaseIndexer {
     get staleTags(): Tag[] {
         const { componentEntries } = this;
 
-        return this.customData.filter((tag) => {
-            return !componentEntries.some((entry) => entry.path === tag.file);
-        });
+        return this.customData.filter((tag) => !componentEntries.some((entry) => entry.path === tag.file));
     }
 
     async init(): Promise<void> {

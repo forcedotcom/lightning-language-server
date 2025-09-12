@@ -98,9 +98,7 @@ const findCoreESLint = async (): Promise<string> => {
 };
 
 // exported for testing
-export const processTemplate = (template: string, data: any): string => {
-    return ejs.render(template, data);
-};
+export const processTemplate = (template: string, data: any): string => ejs.render(template, data);
 
 export const getModulesDirs = async (
     workspaceType: WorkspaceType,
@@ -304,9 +302,9 @@ export abstract class BaseWorkspaceContext {
 
                     // Merge existing config with template config
                     const relativeWorkspaceRoot = utils.relativePath(path.dirname(jsconfigPath), this.workspaceRoots[0]);
-                    const processedTemplateInclude = templateConfig.include.map((include: string) => {
-                        return include.replace('<%= project_root %>', relativeWorkspaceRoot);
-                    });
+                    const processedTemplateInclude = templateConfig.include.map((include: string) =>
+                        include.replace('<%= project_root %>', relativeWorkspaceRoot),
+                    );
 
                     const mergedConfig = {
                         ...existingConfig,

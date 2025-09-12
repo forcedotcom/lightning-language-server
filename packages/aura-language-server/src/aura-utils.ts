@@ -44,13 +44,9 @@ const RESOURCES_DIR = 'resources';
  */
 const AURA_EXPRESSION_REGEX = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/;
 
-export const getAuraStandardResourcePath = (): string => {
-    return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
-};
+export const getAuraStandardResourcePath = (): string => join(__dirname, RESOURCES_DIR, AURA_STANDARD);
 
-export const getAuraSystemResourcePath = (): string => {
-    return join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
-};
+export const getAuraSystemResourcePath = (): string => join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
 
 // Create a parse function that works with the new API
 export const parse = (input: string): HTMLDocument => {
@@ -72,9 +68,7 @@ const stripQuotes = (str: string | null): string | null => {
     return str;
 };
 
-const hasQuotes = (str: string): boolean => {
-    return (str.at(0) === '"' && str.at(-1) === '"') || (str.at(0) === "'" && str.at(-1) === "'");
-};
+const hasQuotes = (str: string): boolean => (str.at(0) === '"' && str.at(-1) === '"') || (str.at(0) === "'" && str.at(-1) === "'");
 
 const getTagNameRange = (document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null => {
     const scanner = createScanner(document.getText(), startOffset);

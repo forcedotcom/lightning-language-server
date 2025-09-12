@@ -3,7 +3,7 @@ import * as path from 'path';
 
 const metaRegex = new RegExp(/(?<name>[\w-\.]+)\.(?<type>\w.+)-meta$/);
 
-function declaration(type: string, name: string): string {
+const declaration = (type: string, name: string): string => {
     let modulePath: string;
     switch (type) {
         case 'asset':
@@ -26,7 +26,7 @@ function declaration(type: string, name: string): string {
     var ${name}: string;
     export default ${name};
 }`;
-}
+};
 
 export default class Typing {
     private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
@@ -58,9 +58,7 @@ export default class Typing {
         if (doc.CustomLabels === undefined || doc.CustomLabels.labels === undefined) {
             return '';
         }
-        const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => {
-            return declaration('customLabel', label.fullName[0]);
-        });
+        const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => declaration('customLabel', label.fullName[0]));
 
         return declarations.join('\n');
     }

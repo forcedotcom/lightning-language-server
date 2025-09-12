@@ -191,9 +191,7 @@ export default class AuraIndexer implements Indexer {
                 const tagObj = auraStandard[tag];
                 const info = new TagInfo(null, 'STANDARD', false, []);
                 if (tagObj.attributes) {
-                    tagObj.attributes.sort((a, b) => {
-                        return a.name.localeCompare(b.name);
-                    });
+                    tagObj.attributes.sort((a, b) => a.name.localeCompare(b.name));
                     for (const a of tagObj.attributes) {
                         // TODO - could we use more in depth doc from component library here?
                         info.attributes.push(new AttributeInfo(a.name, a.description, undefined, undefined, a.type, undefined, 'Aura Attribute'));

@@ -20,9 +20,7 @@ const normalize = (start: string, p: string): string => {
     return p;
 };
 
-const uriToFile = (uri: string): string => {
-    return URI.parse(uri).fsPath;
-};
+const uriToFile = (uri: string): string => URI.parse(uri).fsPath;
 
 describe('indexer parsing content', () => {
     afterEach(() => {
