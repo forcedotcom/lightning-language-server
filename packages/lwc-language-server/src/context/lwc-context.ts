@@ -7,15 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-    BaseWorkspaceContext,
-    WorkspaceType,
-    findNamespaceRoots,
-    utils,
-    processTemplate,
-    getModulesDirs,
-    updateForceIgnoreFile,
-} from '@salesforce/lightning-lsp-common';
+import { BaseWorkspaceContext, findNamespaceRoots, utils, processTemplate, getModulesDirs, updateForceIgnoreFile } from '@salesforce/lightning-lsp-common';
 import { TextDocument } from 'vscode-languageserver';
 
 const updateConfigFile = (filePath: string, content: string): void => {
@@ -45,7 +37,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
             aura: [],
         };
         switch (this.type) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 // For SFDX workspaces, check for both lwc and aura directories
                 for (const root of this.workspaceRoots) {
                     const forceAppPath = path.join(root, 'force-app', 'main', 'default');
@@ -66,7 +58,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_ALL:
+            case 'CORE_ALL':
                 // optimization: search only inside project/modules/
                 for (const project of await fs.promises.readdir(this.workspaceRoots[0])) {
                     const modulesDir = path.join(this.workspaceRoots[0], project, 'modules');
@@ -76,7 +68,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.CORE_PARTIAL:
+            case 'CORE_PARTIAL':
                 // optimization: search only inside modules/
                 for (const ws of this.workspaceRoots) {
                     const modulesDir = path.join(ws, 'modules');
@@ -86,12 +78,12 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
                     }
                 }
                 return roots;
-            case WorkspaceType.STANDARD:
-            case WorkspaceType.STANDARD_LWC:
-            case WorkspaceType.MONOREPO:
-            case WorkspaceType.UNKNOWN: {
+            case 'STANDARD':
+            case 'STANDARD_LWC':
+            case 'MONOREPO':
+            case 'UNKNOWN': {
                 let depth = 6;
-                if (this.type === WorkspaceType.MONOREPO) {
+                if (this.type === 'MONOREPO') {
                     depth += 2;
                 }
                 const unknownroots = await findNamespaceRoots(this.workspaceRoots[0], depth);
@@ -128,7 +120,7 @@ export class LWCWorkspaceContext extends BaseWorkspaceContext {
      */
     protected async writeTsconfigJson(): Promise<void> {
         switch (this.type) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 // Write tsconfig.sfdx.json first
                 const baseTsConfigPath = path.join(this.workspaceRoots[0], '.sfdx', 'tsconfig.sfdx.json');
 

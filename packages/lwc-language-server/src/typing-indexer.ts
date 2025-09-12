@@ -34,20 +34,20 @@ export default class TypingIndexer extends BaseIndexer {
         this.projectType = detectWorkspaceHelper(attributes.workspaceRoot);
 
         switch (this.projectType) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_PARTIAL:
+            case 'CORE_PARTIAL':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_ALL:
+            case 'CORE_ALL':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
                 break;
         }
     }
 
     init(): void {
-        if (this.projectType === WorkspaceType.SFDX) {
+        if (this.projectType === 'SFDX') {
             this.createNewMetaTypings();
             this.deleteStaleMetaTypings();
             this.saveCustomLabelTypings();

@@ -3,17 +3,7 @@ import path from 'path';
 import { Diagnostic, DiagnosticSeverity, Range, TextDocument } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { DIAGNOSTIC_SOURCE } from '../constants';
-
-enum DiagnosticLevel {
-    /** Unexpected error, parsing error, bundling error */
-    Fatal = 0,
-    /** Linting error with error level, invalid external reference, invalid import, invalid transform */
-    Error = 1,
-    /** Linting error with warning level, usage of an API to be deprecated */
-    Warning = 2,
-    /** Logging messages */
-    Log = 3,
-}
+import { DiagnosticLevel } from '@lwc/errors';
 
 const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
     [DiagnosticLevel.Log, DiagnosticSeverity.Information],
@@ -24,11 +14,11 @@ const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
 
 const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
 
-function toRange(textDocument: TextDocument, start: number, length: number): Range {
+const toRange = (textDocument: TextDocument, start: number, length: number): Range => {
     return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
-}
+};
 
-function lintTypos(document: TextDocument): Diagnostic[] {
+const lintTypos = (document: TextDocument): Diagnostic[] => {
     const source = document.getText();
     const lines = source.split(/\r?\n/g);
 
@@ -52,7 +42,7 @@ function lintTypos(document: TextDocument): Diagnostic[] {
     });
 
     return errors;
-}
+};
 
 export default function lintLwcMarkup(document: TextDocument): Diagnostic[] {
     const source = document.getText();

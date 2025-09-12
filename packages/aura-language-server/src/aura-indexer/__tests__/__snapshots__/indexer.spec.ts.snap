@@ -132,7 +132,7 @@ Map {
     "name": "aura:application",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:attribute" => TagInfo {
     "attributes": [
@@ -199,7 +199,7 @@ Map {
     "name": "aura:attribute",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:component" => TagInfo {
     "attributes": [
@@ -221,7 +221,7 @@ Map {
     "name": "aura:component",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:dependency" => TagInfo {
     "attributes": [
@@ -261,7 +261,7 @@ Map {
     "name": "aura:dependency",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:event" => TagInfo {
     "attributes": [
@@ -319,7 +319,7 @@ Map {
     "name": "aura:event",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:expression" => TagInfo {
     "attributes": [
@@ -341,7 +341,7 @@ Map {
     "name": "aura:expression",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:handler" => TagInfo {
     "attributes": [
@@ -399,7 +399,7 @@ Map {
     "name": "aura:handler",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:html" => TagInfo {
     "attributes": [
@@ -439,7 +439,7 @@ Map {
     "name": "aura:html",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:if" => TagInfo {
     "attributes": [
@@ -479,7 +479,7 @@ Map {
     "name": "aura:if",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:interface" => TagInfo {
     "attributes": [
@@ -528,7 +528,7 @@ Map {
     "name": "aura:interface",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:iteration" => TagInfo {
     "attributes": [
@@ -613,7 +613,7 @@ Map {
     "name": "aura:iteration",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:method" => TagInfo {
     "attributes": [
@@ -662,7 +662,7 @@ Map {
     "name": "aura:method",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:registerEvent" => TagInfo {
     "attributes": [
@@ -702,7 +702,7 @@ Map {
     "name": "aura:registerEvent",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:renderIf" => TagInfo {
     "attributes": [
@@ -742,7 +742,7 @@ Map {
     "name": "aura:renderIf",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:rootComponent" => TagInfo {
     "attributes": [],
@@ -754,7 +754,7 @@ Map {
     "name": "aura:rootComponent",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:set" => TagInfo {
     "attributes": [
@@ -785,7 +785,7 @@ Map {
     "name": "aura:set",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "aura:template" => TagInfo {
     "attributes": [
@@ -879,7 +879,7 @@ Map {
     "name": "aura:template",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:text" => TagInfo {
     "attributes": [
@@ -901,7 +901,7 @@ Map {
     "name": "aura:text",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "aura:unescapedHtml" => TagInfo {
     "attributes": [
@@ -932,7 +932,7 @@ Map {
     "name": "aura:unescapedHtml",
     "namespace": "aura",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "c:helloWorldApp" => TagInfo {
     "attributes": [],
@@ -956,7 +956,7 @@ Map {
     "name": "c:helloWorldApp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "c:indexApp" => TagInfo {
     "attributes": [],
@@ -980,7 +980,7 @@ Map {
     "name": "c:indexApp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "c:lightningExamplesApp" => TagInfo {
     "attributes": [],
@@ -1004,7 +1004,7 @@ Map {
     "name": "c:lightningExamplesApp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "c:todoApp" => TagInfo {
     "attributes": [],
@@ -1028,7 +1028,7 @@ Map {
     "name": "c:todoApp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "c:wireLdsApp" => TagInfo {
     "attributes": [],
@@ -1052,7 +1052,7 @@ Map {
     "name": "c:wireLdsApp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "c:wireLdsCmp" => TagInfo {
     "attributes": [],
@@ -1076,7 +1076,7 @@ Map {
     "name": "c:wireLdsCmp",
     "namespace": "c",
     "properties": undefined,
-    "type": 2,
+    "type": "CUSTOM",
   },
   "clients:availableForMailAppAppPage" => TagInfo {
     "attributes": [],
@@ -1088,7 +1088,7 @@ Map {
     "name": "clients:availableForMailAppAppPage",
     "namespace": "clients",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "clients:hasEventContext" => TagInfo {
     "attributes": [
@@ -1119,7 +1119,7 @@ Map {
     "name": "clients:hasEventContext",
     "namespace": "clients",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "clients:hasItemContext" => TagInfo {
     "attributes": [
@@ -1177,7 +1177,7 @@ Map {
     "name": "clients:hasItemContext",
     "namespace": "clients",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "design:component" => TagInfo {
     "attributes": [
@@ -1199,7 +1199,7 @@ Map {
     "name": "design:component",
     "namespace": "aura",
     "properties": undefined,
-    "type": 1,
+    "type": "SYSTEM",
   },
   "flexipage:availableForAllPageTypes" => TagInfo {
     "attributes": [],
@@ -1211,7 +1211,7 @@ Map {
     "name": "flexipage:availableForAllPageTypes",
     "namespace": "flexipage",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "flexipage:availableForRecordHome" => TagInfo {
     "attributes": [],
@@ -1223,7 +1223,7 @@ Map {
     "name": "flexipage:availableForRecordHome",
     "namespace": "flexipage",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:appHostable" => TagInfo {
     "attributes": [],
@@ -1235,7 +1235,7 @@ Map {
     "name": "force:appHostable",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:canvasApp" => TagInfo {
     "attributes": [
@@ -1437,7 +1437,7 @@ Map {
     "name": "force:canvasApp",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:hasRecordId" => TagInfo {
     "attributes": [
@@ -1459,7 +1459,7 @@ Map {
     "name": "force:hasRecordId",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:hasSObjectName" => TagInfo {
     "attributes": [
@@ -1481,7 +1481,7 @@ Map {
     "name": "force:hasSObjectName",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:inputField" => TagInfo {
     "attributes": [
@@ -1539,7 +1539,7 @@ Map {
     "name": "force:inputField",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:lightningQuickAction" => TagInfo {
     "attributes": [],
@@ -1551,7 +1551,7 @@ Map {
     "name": "force:lightningQuickAction",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:lightningQuickActionWithoutHeader" => TagInfo {
     "attributes": [],
@@ -1563,7 +1563,7 @@ Map {
     "name": "force:lightningQuickActionWithoutHeader",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:outputField" => TagInfo {
     "attributes": [
@@ -1603,7 +1603,7 @@ Map {
     "name": "force:outputField",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:recordData" => TagInfo {
     "attributes": [
@@ -1688,7 +1688,7 @@ Map {
     "name": "force:recordData",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:recordEdit" => TagInfo {
     "attributes": [
@@ -1719,7 +1719,7 @@ Map {
     "name": "force:recordEdit",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "force:recordView" => TagInfo {
     "attributes": [
@@ -1768,7 +1768,7 @@ Map {
     "name": "force:recordView",
     "namespace": "force",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceChatter:feed" => TagInfo {
     "attributes": [
@@ -1817,7 +1817,7 @@ Map {
     "name": "forceChatter:feed",
     "namespace": "forceChatter",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceChatter:fullFeed" => TagInfo {
     "attributes": [
@@ -1866,7 +1866,7 @@ Map {
     "name": "forceChatter:fullFeed",
     "namespace": "forceChatter",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceChatter:publisher" => TagInfo {
     "attributes": [
@@ -1906,7 +1906,7 @@ Map {
     "name": "forceChatter:publisher",
     "namespace": "forceChatter",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:appLauncher" => TagInfo {
     "attributes": [
@@ -1928,7 +1928,7 @@ Map {
     "name": "forceCommunity:appLauncher",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:availableForAllPageTypes" => TagInfo {
     "attributes": [],
@@ -1940,7 +1940,7 @@ Map {
     "name": "forceCommunity:availableForAllPageTypes",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:layout" => TagInfo {
     "attributes": [],
@@ -1952,7 +1952,7 @@ Map {
     "name": "forceCommunity:layout",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:navigationMenuBase" => TagInfo {
     "attributes": [
@@ -1992,7 +1992,7 @@ Map {
     "name": "forceCommunity:navigationMenuBase",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:notifications" => TagInfo {
     "attributes": [
@@ -2014,7 +2014,7 @@ Map {
     "name": "forceCommunity:notifications",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:profileMenuInterface" => TagInfo {
     "attributes": [],
@@ -2026,7 +2026,7 @@ Map {
     "name": "forceCommunity:profileMenuInterface",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:routeLink" => TagInfo {
     "attributes": [
@@ -2102,7 +2102,7 @@ Map {
     "name": "forceCommunity:routeLink",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:searchInterface" => TagInfo {
     "attributes": [],
@@ -2114,7 +2114,7 @@ Map {
     "name": "forceCommunity:searchInterface",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:themeLayout" => TagInfo {
     "attributes": [],
@@ -2126,7 +2126,7 @@ Map {
     "name": "forceCommunity:themeLayout",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "forceCommunity:waveDashboard" => TagInfo {
     "attributes": [
@@ -2256,7 +2256,7 @@ Map {
     "name": "forceCommunity:waveDashboard",
     "namespace": "forceCommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:accordion" => TagInfo {
     "attributes": [
@@ -2323,7 +2323,7 @@ Map {
     "name": "lightning:accordion",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:accordionSection" => TagInfo {
     "attributes": [
@@ -2390,7 +2390,7 @@ Map {
     "name": "lightning:accordionSection",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:actionOverride" => TagInfo {
     "attributes": [],
@@ -2402,7 +2402,7 @@ Map {
     "name": "lightning:actionOverride",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:appHomeTemplate" => TagInfo {
     "attributes": [],
@@ -2414,7 +2414,7 @@ Map {
     "name": "lightning:appHomeTemplate",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:availableForChatterExtensionComposer" => TagInfo {
     "attributes": [],
@@ -2426,7 +2426,7 @@ Map {
     "name": "lightning:availableForChatterExtensionComposer",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:availableForChatterExtensionRenderer" => TagInfo {
     "attributes": [
@@ -2457,7 +2457,7 @@ Map {
     "name": "lightning:availableForChatterExtensionRenderer",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:availableForFlowActions" => TagInfo {
     "attributes": [
@@ -2479,7 +2479,7 @@ Map {
     "name": "lightning:availableForFlowActions",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:availableForFlowScreens" => TagInfo {
     "attributes": [
@@ -2528,7 +2528,7 @@ Map {
     "name": "lightning:availableForFlowScreens",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:avatar" => TagInfo {
     "attributes": [
@@ -2622,7 +2622,7 @@ Map {
     "name": "lightning:avatar",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:backgroundUtilityItem" => TagInfo {
     "attributes": [],
@@ -2634,7 +2634,7 @@ Map {
     "name": "lightning:backgroundUtilityItem",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:badge" => TagInfo {
     "attributes": [
@@ -2683,7 +2683,7 @@ Map {
     "name": "lightning:badge",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:breadcrumb" => TagInfo {
     "attributes": [
@@ -2759,7 +2759,7 @@ Map {
     "name": "lightning:breadcrumb",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:breadcrumbs" => TagInfo {
     "attributes": [
@@ -2799,7 +2799,7 @@ Map {
     "name": "lightning:breadcrumbs",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:button" => TagInfo {
     "attributes": [
@@ -3010,7 +3010,7 @@ Map {
     "name": "lightning:button",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:buttonGroup" => TagInfo {
     "attributes": [
@@ -3050,7 +3050,7 @@ Map {
     "name": "lightning:buttonGroup",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:buttonIcon" => TagInfo {
     "attributes": [
@@ -3279,7 +3279,7 @@ Map {
     "name": "lightning:buttonIcon",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:buttonIconStateful" => TagInfo {
     "attributes": [
@@ -3436,7 +3436,7 @@ Map {
     "name": "lightning:buttonIconStateful",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:buttonMenu" => TagInfo {
     "attributes": [
@@ -3665,7 +3665,7 @@ Map {
     "name": "lightning:buttonMenu",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:buttonStateful" => TagInfo {
     "attributes": [
@@ -3822,7 +3822,7 @@ Map {
     "name": "lightning:buttonStateful",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:card" => TagInfo {
     "attributes": [
@@ -3898,7 +3898,7 @@ Map {
     "name": "lightning:card",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:carousel" => TagInfo {
     "attributes": [
@@ -3965,7 +3965,7 @@ Map {
     "name": "lightning:carousel",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:checkboxGroup" => TagInfo {
     "attributes": [
@@ -4122,7 +4122,7 @@ Map {
     "name": "lightning:checkboxGroup",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:clickToDial" => TagInfo {
     "attributes": [
@@ -4189,7 +4189,7 @@ Map {
     "name": "lightning:clickToDial",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:combobox" => TagInfo {
     "attributes": [
@@ -4400,7 +4400,7 @@ Map {
     "name": "lightning:combobox",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:container" => TagInfo {
     "attributes": [
@@ -4467,7 +4467,7 @@ Map {
     "name": "lightning:container",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:conversationToolkitAPI" => TagInfo {
     "attributes": [
@@ -4489,7 +4489,7 @@ Map {
     "name": "lightning:conversationToolkitAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:datatable" => TagInfo {
     "attributes": [
@@ -4817,7 +4817,7 @@ Map {
     "name": "lightning:datatable",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:dualListbox" => TagInfo {
     "attributes": [
@@ -5118,7 +5118,7 @@ Map {
     "name": "lightning:dualListbox",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:dynamicIcon" => TagInfo {
     "attributes": [
@@ -5194,7 +5194,7 @@ Map {
     "name": "lightning:dynamicIcon",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:empApi" => TagInfo {
     "attributes": [
@@ -5216,7 +5216,7 @@ Map {
     "name": "lightning:empApi",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:fileCard" => TagInfo {
     "attributes": [
@@ -5265,7 +5265,7 @@ Map {
     "name": "lightning:fileCard",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:fileUpload" => TagInfo {
     "attributes": [
@@ -5368,7 +5368,7 @@ Map {
     "name": "lightning:fileUpload",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:flexipageRegionInfo" => TagInfo {
     "attributes": [
@@ -5399,7 +5399,7 @@ Map {
     "name": "lightning:flexipageRegionInfo",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:flow" => TagInfo {
     "attributes": [
@@ -5448,7 +5448,7 @@ Map {
     "name": "lightning:flow",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedAddress" => TagInfo {
     "attributes": [
@@ -5569,7 +5569,7 @@ Map {
     "name": "lightning:formattedAddress",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedDateTime" => TagInfo {
     "attributes": [
@@ -5717,7 +5717,7 @@ Map {
     "name": "lightning:formattedDateTime",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedEmail" => TagInfo {
     "attributes": [
@@ -5775,7 +5775,7 @@ Map {
     "name": "lightning:formattedEmail",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedLocation" => TagInfo {
     "attributes": [
@@ -5833,7 +5833,7 @@ Map {
     "name": "lightning:formattedLocation",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedName" => TagInfo {
     "attributes": [
@@ -5936,7 +5936,7 @@ Map {
     "name": "lightning:formattedName",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedNumber" => TagInfo {
     "attributes": [
@@ -6057,7 +6057,7 @@ Map {
     "name": "lightning:formattedNumber",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedPhone" => TagInfo {
     "attributes": [
@@ -6115,7 +6115,7 @@ Map {
     "name": "lightning:formattedPhone",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedRichText" => TagInfo {
     "attributes": [
@@ -6173,7 +6173,7 @@ Map {
     "name": "lightning:formattedRichText",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedText" => TagInfo {
     "attributes": [
@@ -6231,7 +6231,7 @@ Map {
     "name": "lightning:formattedText",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedTime" => TagInfo {
     "attributes": [
@@ -6280,7 +6280,7 @@ Map {
     "name": "lightning:formattedTime",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:formattedUrl" => TagInfo {
     "attributes": [
@@ -6356,7 +6356,7 @@ Map {
     "name": "lightning:formattedUrl",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:hasPageReference" => TagInfo {
     "attributes": [
@@ -6378,7 +6378,7 @@ Map {
     "name": "lightning:hasPageReference",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:helptext" => TagInfo {
     "attributes": [
@@ -6445,7 +6445,7 @@ Map {
     "name": "lightning:helptext",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:homeTemplate" => TagInfo {
     "attributes": [],
@@ -6457,7 +6457,7 @@ Map {
     "name": "lightning:homeTemplate",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:icon" => TagInfo {
     "attributes": [
@@ -6542,7 +6542,7 @@ Map {
     "name": "lightning:icon",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:input" => TagInfo {
     "attributes": [
@@ -7086,7 +7086,7 @@ Map {
     "name": "lightning:input",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:inputAddress" => TagInfo {
     "attributes": [
@@ -7324,7 +7324,7 @@ Map {
     "name": "lightning:inputAddress",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:inputField" => TagInfo {
     "attributes": [
@@ -7409,7 +7409,7 @@ Map {
     "name": "lightning:inputField",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:inputLocation" => TagInfo {
     "attributes": [
@@ -7548,7 +7548,7 @@ Map {
     "name": "lightning:inputLocation",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:inputName" => TagInfo {
     "attributes": [
@@ -7741,7 +7741,7 @@ Map {
     "name": "lightning:inputName",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:inputRichText" => TagInfo {
     "attributes": [
@@ -7943,7 +7943,7 @@ Map {
     "name": "lightning:inputRichText",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:insertImageButton" => TagInfo {
     "attributes": [
@@ -7965,7 +7965,7 @@ Map {
     "name": "lightning:insertImageButton",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:isUrlAddressable" => TagInfo {
     "attributes": [
@@ -7987,7 +7987,7 @@ Map {
     "name": "lightning:isUrlAddressable",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:layout" => TagInfo {
     "attributes": [
@@ -8063,7 +8063,7 @@ Map {
     "name": "lightning:layout",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:layoutItem" => TagInfo {
     "attributes": [
@@ -8166,7 +8166,7 @@ Map {
     "name": "lightning:layoutItem",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:listView" => TagInfo {
     "attributes": [
@@ -8251,7 +8251,7 @@ Map {
     "name": "lightning:listView",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:map" => TagInfo {
     "attributes": [
@@ -8363,7 +8363,7 @@ Map {
     "name": "lightning:map",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:menuItem" => TagInfo {
     "attributes": [
@@ -8538,7 +8538,7 @@ Map {
     "name": "lightning:menuItem",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:messageChannel" => TagInfo {
     "attributes": [
@@ -8587,7 +8587,7 @@ Map {
     "name": "lightning:messageChannel",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:navigation" => TagInfo {
     "attributes": [
@@ -8609,7 +8609,7 @@ Map {
     "name": "lightning:navigation",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:navigationItemAPI" => TagInfo {
     "attributes": [
@@ -8631,7 +8631,7 @@ Map {
     "name": "lightning:navigationItemAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:notificationsLibrary" => TagInfo {
     "attributes": [
@@ -8653,7 +8653,7 @@ Map {
     "name": "lightning:notificationsLibrary",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:omniToolkitAPI" => TagInfo {
     "attributes": [
@@ -8675,7 +8675,7 @@ Map {
     "name": "lightning:omniToolkitAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:outputField" => TagInfo {
     "attributes": [
@@ -8724,7 +8724,7 @@ Map {
     "name": "lightning:outputField",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:overlayLibrary" => TagInfo {
     "attributes": [
@@ -8746,7 +8746,7 @@ Map {
     "name": "lightning:overlayLibrary",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:pageReferenceUtils" => TagInfo {
     "attributes": [
@@ -8768,7 +8768,7 @@ Map {
     "name": "lightning:pageReferenceUtils",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:path" => TagInfo {
     "attributes": [
@@ -8826,7 +8826,7 @@ Map {
     "name": "lightning:path",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:picklistPath" => TagInfo {
     "attributes": [
@@ -8884,7 +8884,7 @@ Map {
     "name": "lightning:picklistPath",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:pill" => TagInfo {
     "attributes": [
@@ -8987,7 +8987,7 @@ Map {
     "name": "lightning:pill",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:pillContainer" => TagInfo {
     "attributes": [
@@ -9063,7 +9063,7 @@ Map {
     "name": "lightning:pillContainer",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:progressBar" => TagInfo {
     "attributes": [
@@ -9130,7 +9130,7 @@ Map {
     "name": "lightning:progressBar",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:progressIndicator" => TagInfo {
     "attributes": [
@@ -9206,7 +9206,7 @@ Map {
     "name": "lightning:progressIndicator",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:progressRing" => TagInfo {
     "attributes": [
@@ -9264,7 +9264,7 @@ Map {
     "name": "lightning:progressRing",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:quickActionAPI" => TagInfo {
     "attributes": [
@@ -9286,7 +9286,7 @@ Map {
     "name": "lightning:quickActionAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:quipCard" => TagInfo {
     "attributes": [
@@ -9317,7 +9317,7 @@ Map {
     "name": "lightning:quipCard",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:radioGroup" => TagInfo {
     "attributes": [
@@ -9501,7 +9501,7 @@ Map {
     "name": "lightning:radioGroup",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:recordEditForm" => TagInfo {
     "attributes": [
@@ -9604,7 +9604,7 @@ Map {
     "name": "lightning:recordEditForm",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:recordForm" => TagInfo {
     "attributes": [
@@ -9743,7 +9743,7 @@ Map {
     "name": "lightning:recordForm",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:recordHomeTemplate" => TagInfo {
     "attributes": [],
@@ -9755,7 +9755,7 @@ Map {
     "name": "lightning:recordHomeTemplate",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:recordViewForm" => TagInfo {
     "attributes": [
@@ -9813,7 +9813,7 @@ Map {
     "name": "lightning:recordViewForm",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:relativeDateTime" => TagInfo {
     "attributes": [
@@ -9862,7 +9862,7 @@ Map {
     "name": "lightning:relativeDateTime",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:select" => TagInfo {
     "attributes": [
@@ -10028,7 +10028,7 @@ Map {
     "name": "lightning:select",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:slider" => TagInfo {
     "attributes": [
@@ -10248,7 +10248,7 @@ Map {
     "name": "lightning:slider",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:spinner" => TagInfo {
     "attributes": [
@@ -10315,7 +10315,7 @@ Map {
     "name": "lightning:spinner",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:tab" => TagInfo {
     "attributes": [
@@ -10463,7 +10463,7 @@ Map {
     "name": "lightning:tab",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:tabset" => TagInfo {
     "attributes": [
@@ -10530,7 +10530,7 @@ Map {
     "name": "lightning:tabset",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:textarea" => TagInfo {
     "attributes": [
@@ -10750,7 +10750,7 @@ Map {
     "name": "lightning:textarea",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:tile" => TagInfo {
     "attributes": [
@@ -10817,7 +10817,7 @@ Map {
     "name": "lightning:tile",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:tree" => TagInfo {
     "attributes": [
@@ -10893,7 +10893,7 @@ Map {
     "name": "lightning:tree",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:treeGrid" => TagInfo {
     "attributes": [
@@ -11086,7 +11086,7 @@ Map {
     "name": "lightning:treeGrid",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:unsavedChanges" => TagInfo {
     "attributes": [
@@ -11135,7 +11135,7 @@ Map {
     "name": "lightning:unsavedChanges",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:utilityBarAPI" => TagInfo {
     "attributes": [
@@ -11157,7 +11157,7 @@ Map {
     "name": "lightning:utilityBarAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:utilityItem" => TagInfo {
     "attributes": [
@@ -11179,7 +11179,7 @@ Map {
     "name": "lightning:utilityItem",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigation" => TagInfo {
     "attributes": [
@@ -11273,7 +11273,7 @@ Map {
     "name": "lightning:verticalNavigation",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigationItem" => TagInfo {
     "attributes": [
@@ -11340,7 +11340,7 @@ Map {
     "name": "lightning:verticalNavigationItem",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigationItemBadge" => TagInfo {
     "attributes": [
@@ -11425,7 +11425,7 @@ Map {
     "name": "lightning:verticalNavigationItemBadge",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigationItemIcon" => TagInfo {
     "attributes": [
@@ -11501,7 +11501,7 @@ Map {
     "name": "lightning:verticalNavigationItemIcon",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigationOverflow" => TagInfo {
     "attributes": [
@@ -11541,7 +11541,7 @@ Map {
     "name": "lightning:verticalNavigationOverflow",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:verticalNavigationSection" => TagInfo {
     "attributes": [
@@ -11590,7 +11590,7 @@ Map {
     "name": "lightning:verticalNavigationSection",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightning:workspaceAPI" => TagInfo {
     "attributes": [
@@ -11612,7 +11612,7 @@ Map {
     "name": "lightning:workspaceAPI",
     "namespace": "lightning",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningcommunity:allowInRelaxedCSP" => TagInfo {
     "attributes": [],
@@ -11624,7 +11624,7 @@ Map {
     "name": "lightningcommunity:allowInRelaxedCSP",
     "namespace": "lightningcommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningcommunity:backButton" => TagInfo {
     "attributes": [
@@ -11673,7 +11673,7 @@ Map {
     "name": "lightningcommunity:backButton",
     "namespace": "lightningcommunity",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningsnapin:minimizedAPI" => TagInfo {
     "attributes": [
@@ -11695,7 +11695,7 @@ Map {
     "name": "lightningsnapin:minimizedAPI",
     "namespace": "lightningsnapin",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningsnapin:minimizedUI" => TagInfo {
     "attributes": [],
@@ -11707,7 +11707,7 @@ Map {
     "name": "lightningsnapin:minimizedUI",
     "namespace": "lightningsnapin",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningsnapin:prechatAPI" => TagInfo {
     "attributes": [
@@ -11729,7 +11729,7 @@ Map {
     "name": "lightningsnapin:prechatAPI",
     "namespace": "lightningsnapin",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningsnapin:prechatUI" => TagInfo {
     "attributes": [],
@@ -11741,7 +11741,7 @@ Map {
     "name": "lightningsnapin:prechatUI",
     "namespace": "lightningsnapin",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "lightningsnapin:settingsAPI" => TagInfo {
     "attributes": [
@@ -11763,7 +11763,7 @@ Map {
     "name": "lightningsnapin:settingsAPI",
     "namespace": "lightningsnapin",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ltng:allowGuestAccess" => TagInfo {
     "attributes": [],
@@ -11775,7 +11775,7 @@ Map {
     "name": "ltng:allowGuestAccess",
     "namespace": "ltng",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ltng:require" => TagInfo {
     "attributes": [
@@ -11815,7 +11815,7 @@ Map {
     "name": "ltng:require",
     "namespace": "ltng",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:actionMenuItem" => TagInfo {
     "attributes": [
@@ -11891,7 +11891,7 @@ Map {
     "name": "ui:actionMenuItem",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:button" => TagInfo {
     "attributes": [
@@ -11976,7 +11976,7 @@ Map {
     "name": "ui:button",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:checkboxMenuItem" => TagInfo {
     "attributes": [
@@ -12052,7 +12052,7 @@ Map {
     "name": "ui:checkboxMenuItem",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputCheckbox" => TagInfo {
     "attributes": [
@@ -12173,7 +12173,7 @@ Map {
     "name": "ui:inputCheckbox",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputCurrency" => TagInfo {
     "attributes": [
@@ -12312,7 +12312,7 @@ Map {
     "name": "ui:inputCurrency",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputDate" => TagInfo {
     "attributes": [
@@ -12442,7 +12442,7 @@ Map {
     "name": "ui:inputDate",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputDateTime" => TagInfo {
     "attributes": [
@@ -12572,7 +12572,7 @@ Map {
     "name": "ui:inputDateTime",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputDefaultError" => TagInfo {
     "attributes": [
@@ -12612,7 +12612,7 @@ Map {
     "name": "ui:inputDefaultError",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputEmail" => TagInfo {
     "attributes": [
@@ -12742,7 +12742,7 @@ Map {
     "name": "ui:inputEmail",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputNumber" => TagInfo {
     "attributes": [
@@ -12881,7 +12881,7 @@ Map {
     "name": "ui:inputNumber",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputPhone" => TagInfo {
     "attributes": [
@@ -13011,7 +13011,7 @@ Map {
     "name": "ui:inputPhone",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputRadio" => TagInfo {
     "attributes": [
@@ -13132,7 +13132,7 @@ Map {
     "name": "ui:inputRadio",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputRichText" => TagInfo {
     "attributes": [
@@ -13307,7 +13307,7 @@ Map {
     "name": "ui:inputRichText",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputSecret" => TagInfo {
     "attributes": [
@@ -13437,7 +13437,7 @@ Map {
     "name": "ui:inputSecret",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputSelect" => TagInfo {
     "attributes": [
@@ -13558,7 +13558,7 @@ Map {
     "name": "ui:inputSelect",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputSelectOption" => TagInfo {
     "attributes": [
@@ -13634,7 +13634,7 @@ Map {
     "name": "ui:inputSelectOption",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputText" => TagInfo {
     "attributes": [
@@ -13764,7 +13764,7 @@ Map {
     "name": "ui:inputText",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputTextArea" => TagInfo {
     "attributes": [
@@ -13921,7 +13921,7 @@ Map {
     "name": "ui:inputTextArea",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:inputURL" => TagInfo {
     "attributes": [
@@ -14051,7 +14051,7 @@ Map {
     "name": "ui:inputURL",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menu" => TagInfo {
     "attributes": [
@@ -14082,7 +14082,7 @@ Map {
     "name": "ui:menu",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menuItem" => TagInfo {
     "attributes": [
@@ -14158,7 +14158,7 @@ Map {
     "name": "ui:menuItem",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menuItemSeparator" => TagInfo {
     "attributes": [
@@ -14189,7 +14189,7 @@ Map {
     "name": "ui:menuItemSeparator",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menuList" => TagInfo {
     "attributes": [
@@ -14274,7 +14274,7 @@ Map {
     "name": "ui:menuList",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menuTrigger" => TagInfo {
     "attributes": [
@@ -14332,7 +14332,7 @@ Map {
     "name": "ui:menuTrigger",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:menuTriggerLink" => TagInfo {
     "attributes": [
@@ -14390,7 +14390,7 @@ Map {
     "name": "ui:menuTriggerLink",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:message" => TagInfo {
     "attributes": [
@@ -14448,7 +14448,7 @@ Map {
     "name": "ui:message",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputCheckbox" => TagInfo {
     "attributes": [
@@ -14506,7 +14506,7 @@ Map {
     "name": "ui:outputCheckbox",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputCurrency" => TagInfo {
     "attributes": [
@@ -14573,7 +14573,7 @@ Map {
     "name": "ui:outputCurrency",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputDate" => TagInfo {
     "attributes": [
@@ -14631,7 +14631,7 @@ Map {
     "name": "ui:outputDate",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputDateTime" => TagInfo {
     "attributes": [
@@ -14698,7 +14698,7 @@ Map {
     "name": "ui:outputDateTime",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputEmail" => TagInfo {
     "attributes": [
@@ -14738,7 +14738,7 @@ Map {
     "name": "ui:outputEmail",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputNumber" => TagInfo {
     "attributes": [
@@ -14787,7 +14787,7 @@ Map {
     "name": "ui:outputNumber",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputPhone" => TagInfo {
     "attributes": [
@@ -14827,7 +14827,7 @@ Map {
     "name": "ui:outputPhone",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputRichText" => TagInfo {
     "attributes": [
@@ -14876,7 +14876,7 @@ Map {
     "name": "ui:outputRichText",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputText" => TagInfo {
     "attributes": [
@@ -14925,7 +14925,7 @@ Map {
     "name": "ui:outputText",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputTextArea" => TagInfo {
     "attributes": [
@@ -14974,7 +14974,7 @@ Map {
     "name": "ui:outputTextArea",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:outputURL" => TagInfo {
     "attributes": [
@@ -15068,7 +15068,7 @@ Map {
     "name": "ui:outputURL",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:radioMenuItem" => TagInfo {
     "attributes": [
@@ -15144,7 +15144,7 @@ Map {
     "name": "ui:radioMenuItem",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:scrollerWrapper" => TagInfo {
     "attributes": [
@@ -15175,7 +15175,7 @@ Map {
     "name": "ui:scrollerWrapper",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "ui:spinner" => TagInfo {
     "attributes": [
@@ -15215,7 +15215,7 @@ Map {
     "name": "ui:spinner",
     "namespace": "ui",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "wave:sdk" => TagInfo {
     "attributes": [
@@ -15237,7 +15237,7 @@ Map {
     "name": "wave:sdk",
     "namespace": "wave",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
   "wave:waveDashboard" => TagInfo {
     "attributes": [
@@ -15376,7 +15376,7 @@ Map {
     "name": "wave:waveDashboard",
     "namespace": "wave",
     "properties": undefined,
-    "type": 0,
+    "type": "STANDARD",
   },
 }
 `;

@@ -109,7 +109,7 @@ export const getModulesDirs = async (
 ): Promise<string[]> => {
     const modulesDirs: string[] = [];
     switch (workspaceType) {
-        case WorkspaceType.SFDX:
+        case 'SFDX':
             const { packageDirectories } = await getSfdxProjectConfig();
             for (const pkg of packageDirectories) {
                 // Check both new SFDX structure (main/default) and old structure (meta)
@@ -134,7 +134,7 @@ export const getModulesDirs = async (
                 // and this method is primarily used for TypeScript configuration
             }
             break;
-        case WorkspaceType.CORE_ALL:
+        case 'CORE_ALL':
             // For CORE_ALL, return the modules directories for each project
             for (const project of await fs.promises.readdir(workspaceRoots[0])) {
                 const modulesDir = path.join(workspaceRoots[0], project, 'modules');
@@ -143,7 +143,7 @@ export const getModulesDirs = async (
                 }
             }
             break;
-        case WorkspaceType.CORE_PARTIAL:
+        case 'CORE_PARTIAL':
             // For CORE_PARTIAL, return the modules directory for each workspace root
             for (const ws of workspaceRoots) {
                 const modulesDir = path.join(ws, 'modules');
@@ -152,10 +152,10 @@ export const getModulesDirs = async (
                 }
             }
             break;
-        case WorkspaceType.STANDARD:
-        case WorkspaceType.STANDARD_LWC:
-        case WorkspaceType.MONOREPO:
-        case WorkspaceType.UNKNOWN:
+        case 'STANDARD':
+        case 'STANDARD_LWC':
+        case 'MONOREPO':
+        case 'UNKNOWN':
             // For standard workspaces, return empty array as they don't have modules directories
             break;
     }
@@ -182,7 +182,7 @@ export abstract class BaseWorkspaceContext {
 
         this.findNamespaceRootsUsingTypeCache = utils.memoize(this.findNamespaceRootsUsingType.bind(this));
         this.initSfdxProjectConfigCache = utils.memoize(this.initSfdxProject.bind(this));
-        if (this.type === WorkspaceType.SFDX) {
+        if (this.type === 'SFDX') {
             this.initSfdxProjectConfigCache();
         }
     }
@@ -268,11 +268,11 @@ export abstract class BaseWorkspaceContext {
 
     private async writeJsconfigJson(): Promise<void> {
         switch (this.type) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 await this.writeSfdxJsconfig();
                 break;
-            case WorkspaceType.CORE_ALL:
-            case WorkspaceType.CORE_PARTIAL:
+            case 'CORE_ALL':
+            case 'CORE_PARTIAL':
                 await this.writeCoreJsconfig();
                 break;
             default:
@@ -355,7 +355,7 @@ export abstract class BaseWorkspaceContext {
                 const jsconfigTemplate = await fs.promises.readFile(utils.getCoreResource('jsconfig-core.json'), 'utf8');
                 // For core workspaces, the typings are in the core directory, not the project directory
                 // Calculate relative path from modules directory to the core directory
-                const coreDir = this.type === WorkspaceType.CORE_ALL ? this.workspaceRoots[0] : path.dirname(this.workspaceRoots[0]);
+                const coreDir = this.type === 'CORE_ALL' ? this.workspaceRoots[0] : path.dirname(this.workspaceRoots[0]);
                 const relativeCoreRoot = utils.relativePath(modulesDir, coreDir);
                 const jsconfigContent = processTemplate(jsconfigTemplate, { project_root: relativeCoreRoot });
                 updateConfigFile(jsconfigPath, jsconfigContent);
@@ -368,11 +368,11 @@ export abstract class BaseWorkspaceContext {
 
     private async writeTypings(): Promise<void> {
         switch (this.type) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 await this.writeSfdxTypings();
                 break;
-            case WorkspaceType.CORE_ALL:
-            case WorkspaceType.CORE_PARTIAL:
+            case 'CORE_ALL':
+            case 'CORE_PARTIAL':
                 await this.writeCoreTypings();
                 break;
             default:
@@ -387,7 +387,7 @@ export abstract class BaseWorkspaceContext {
     }
 
     private async writeCoreTypings(): Promise<void> {
-        const coreDir = this.type === WorkspaceType.CORE_ALL ? this.workspaceRoots[0] : path.dirname(this.workspaceRoots[0]);
+        const coreDir = this.type === 'CORE_ALL' ? this.workspaceRoots[0] : path.dirname(this.workspaceRoots[0]);
         const typingsPath = path.join(coreDir, '.vscode', 'typings', 'lwc');
         await this.createTypingsFiles(typingsPath);
     }

@@ -44,22 +44,22 @@ const RESOURCES_DIR = 'resources';
  */
 const AURA_EXPRESSION_REGEX = /['"]?\s*{[!#]\s*[!]?[vmc]\.(\w*)(\.?\w*)*\s*}\s*['"]?/;
 
-export function getAuraStandardResourcePath(): string {
+export const getAuraStandardResourcePath = (): string => {
     return join(__dirname, RESOURCES_DIR, AURA_STANDARD);
-}
+};
 
-export function getAuraSystemResourcePath(): string {
+export const getAuraSystemResourcePath = (): string => {
     return join(__dirname, RESOURCES_DIR, AURA_SYSTEM);
-}
+};
 
 // Create a parse function that works with the new API
-export function parse(input: string): HTMLDocument {
+export const parse = (input: string): HTMLDocument => {
     const languageService = getLanguageService();
     const mockDocument = TextDocument.create('file:///mock.html', 'html', 0, input);
     return languageService.parseHTMLDocument(mockDocument);
-}
+};
 
-function stripQuotes(str: string | null) {
+const stripQuotes = (str: string | null): string | null => {
     if (!str) {
         return str;
     }
@@ -70,13 +70,13 @@ function stripQuotes(str: string | null) {
         return str.substring(1, str.length - 1);
     }
     return str;
-}
+};
 
-function hasQuotes(str: string) {
+const hasQuotes = (str: string): boolean => {
     return (str.at(0) === '"' && str.at(-1) === '"') || (str.at(0) === "'" && str.at(-1) === "'");
-}
+};
 
-function getTagNameRange(document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null {
+const getTagNameRange = (document: TextDocument, offset: number, tokenType: TokenType, startOffset: number): Range | null => {
     const scanner = createScanner(document.getText(), startOffset);
     let token = scanner.scan();
     while (token !== TokenType.EOS && (scanner.getTokenEnd() < offset || (scanner.getTokenEnd() === offset && token !== tokenType))) {
@@ -86,9 +86,9 @@ function getTagNameRange(document: TextDocument, offset: number, tokenType: Toke
         return { start: document.positionAt(scanner.getTokenOffset()), end: document.positionAt(scanner.getTokenEnd()) };
     }
     return null;
-}
+};
 
-function getAttributeRange(document: TextDocument, attributeName: string, startOffset: number, endOffset: number): Range | null {
+const getAttributeRange = (document: TextDocument, attributeName: string, startOffset: number, endOffset: number): Range | null => {
     const scanner = createScanner(document.getText(), startOffset);
     let token = scanner.scan();
     while (token !== TokenType.EOS && scanner.getTokenEnd() < endOffset) {
@@ -119,9 +119,9 @@ function getAttributeRange(document: TextDocument, attributeName: string, startO
         }
     }
     return null;
-}
+};
 
-function findAuraDeclaration(document: TextDocument, attributeValue: string, htmlDocument: HTMLDocument): Location | null {
+const findAuraDeclaration = (document: TextDocument, attributeValue: string, htmlDocument: HTMLDocument): Location | null => {
     for (const root of htmlDocument.roots) {
         const attributes = root.children.filter((n) => n.tag === 'aura:attribute');
         for (const attribute of attributes) {
@@ -138,13 +138,13 @@ function findAuraDeclaration(document: TextDocument, attributeValue: string, htm
         }
     }
     return null;
-}
+};
 
 /**
  * Looks for property bindings {PROPERTY.something} within attribute values, or body content, and returns a location
  * within the same template that corresponds to iterator:PROPERTY or for:item="PROPERTY".
  */
-export function getAuraBindingTemplateDeclaration(document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null {
+export const getAuraBindingTemplateDeclaration = (document: TextDocument, position: Position, htmlDocument: HTMLDocument): Location | null => {
     const offset = document.offsetAt(position);
     const node = htmlDocument.findNodeAt(offset);
     if (!node || !node.tag) {
@@ -155,7 +155,7 @@ export function getAuraBindingTemplateDeclaration(document: TextDocument, positi
         return findAuraDeclaration(document, propertyValue, htmlDocument);
     }
     return null;
-}
+};
 
 /**
  * Extracts the Aura binding value at the given position in an HTML document.
@@ -181,7 +181,7 @@ export function getAuraBindingTemplateDeclaration(document: TextDocument, positi
  * @param htmlDocument - The parsed HTML document
  * @returns The property/method name from the Aura expression, or null if not found
  */
-export function getAuraBindingValue(document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null {
+export const getAuraBindingValue = (document: TextDocument, position: Position, htmlDocument: HTMLDocument): string | null => {
     const offset = document.offsetAt(position);
     const node = htmlDocument.findNodeAt(offset);
 
@@ -198,7 +198,7 @@ export function getAuraBindingValue(document: TextDocument, position: Position, 
 
     // If not in an attribute, check if we're in the body text content
     return extractAuraExpressionFromContent(document, offset, node);
-}
+};
 
 /**
  * Extracts Aura expression from HTML attribute values.
@@ -219,7 +219,7 @@ export function getAuraBindingValue(document: TextDocument, position: Position, 
  * @param node - The HTML node to check
  * @returns The property name from the Aura expression, or null if not found
  */
-function extractAuraExpressionFromAttribute(document: TextDocument, offset: number, node: any): string | null {
+const extractAuraExpressionFromAttribute = (document: TextDocument, offset: number, node: any): string | null => {
     const attributeRange = getTagNameRange(document, offset, TokenType.AttributeValue, node.start);
     if (!attributeRange) {
         return null;
@@ -238,7 +238,7 @@ function extractAuraExpressionFromAttribute(document: TextDocument, offset: numb
     // Extract the property name from the Aura expression
     const expressionMatch = AURA_EXPRESSION_REGEX.exec(attributeValue.trim());
     return expressionMatch?.[1] ?? null;
-}
+};
 
 /**
  * Extracts Aura expression from HTML body text content.
@@ -259,7 +259,7 @@ function extractAuraExpressionFromAttribute(document: TextDocument, offset: numb
  * @param node - The HTML node to check
  * @returns The property name from the Aura expression, or null if not found
  */
-function extractAuraExpressionFromContent(document: TextDocument, offset: number, node: any): string | null {
+const extractAuraExpressionFromContent = (document: TextDocument, offset: number, node: any): string | null => {
     const scanner = createScanner(document.getText(), node.start);
     let token = scanner.scan();
 
@@ -296,7 +296,7 @@ function extractAuraExpressionFromContent(document: TextDocument, offset: number
     }
 
     return null;
-}
+};
 
 /**
  * Extracts the property name from an Aura expression based on cursor position.
@@ -319,7 +319,7 @@ function extractAuraExpressionFromContent(document: TextDocument, offset: number
  * @param expressionEnd - The end index of the Aura expression
  * @returns The property name, or null if cursor is not in a valid position
  */
-function extractPropertyNameFromExpression(content: string, relativeOffset: number, expressionStart: number, expressionEnd: number): string | null {
+const extractPropertyNameFromExpression = (content: string, relativeOffset: number, expressionStart: number, expressionEnd: number): string | null => {
     const firstDotIndex = content.indexOf('.', expressionStart);
 
     // If no dot found, return null
@@ -349,4 +349,4 @@ function extractPropertyNameFromExpression(content: string, relativeOffset: numb
     }
 
     return null;
-}
+};

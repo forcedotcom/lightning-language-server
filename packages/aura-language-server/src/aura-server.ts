@@ -29,7 +29,6 @@ import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onT
 import AuraIndexer from './aura-indexer/indexer';
 import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
-import { WorkspaceType } from '@salesforce/lightning-lsp-common/lib/shared';
 import { getAuraBindingTemplateDeclaration, getAuraBindingValue } from './aura-utils';
 
 interface TagParams {
@@ -90,7 +89,7 @@ export default class Server {
 
             this.context = new AuraWorkspaceContext(this.workspaceRoots);
 
-            if (this.context.type === WorkspaceType.CORE_PARTIAL) {
+            if (this.context.type === 'CORE_PARTIAL') {
                 await startServer(path.join(this.workspaceRoots[0], '..'), path.join(this.workspaceRoots[0], '..'));
             } else {
                 await startServer(this.workspaceRoots[0], this.workspaceRoots[0]);
@@ -164,7 +163,7 @@ export default class Server {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
 
             const list = this.htmlLS.doComplete(document, completionParams.position, htmlDocument, {
-                isSfdxProject: this.context.type === WorkspaceType.SFDX,
+                isSfdxProject: this.context.type === 'SFDX',
                 useAttributeValueQuotes: true,
             });
             return list;
@@ -267,7 +266,7 @@ export default class Server {
 
         try {
             if (utils.isAuraRootDirectoryCreated(this.context, changes)) {
-                await this.context.getIndexingProvider('aura').resetIndex();
+                this.context.getIndexingProvider('aura').resetIndex();
                 await this.context.getIndexingProvider('aura').configureAndIndex();
                 // re-index everything on directory deletions as no events are reported for contents of deleted directories
                 const startTime = process.hrtime();
@@ -277,11 +276,11 @@ export default class Server {
                 for (const event of changes) {
                     if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(this.context, event.uri)) {
                         const dir = toResolvedPath(event.uri);
-                        this.auraIndexer.clearTagsforDirectory(dir, this.context.type === WorkspaceType.SFDX);
+                        this.auraIndexer.clearTagsforDirectory(dir, this.context.type === 'SFDX');
                     } else {
                         const file = toResolvedPath(event.uri);
                         if (file.endsWith('.app') || file.endsWith('.cmp') || file.endsWith('.intf') || file.endsWith('.evt') || file.endsWith('.lib')) {
-                            await this.auraIndexer.indexFile(file, this.context.type === WorkspaceType.SFDX);
+                            await this.auraIndexer.indexFile(file, this.context.type === 'SFDX');
                         }
                     }
                 }
