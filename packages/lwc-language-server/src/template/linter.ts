@@ -14,9 +14,8 @@ const LEVEL_MAPPING: Map<DiagnosticLevel, DiagnosticSeverity> = new Map([
 
 const TYPOS = ['<lighting-', '<lightening-', '<lihgtning-'];
 
-const toRange = (textDocument: TextDocument, start: number, length: number): Range => {
-    return Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
-};
+const toRange = (textDocument: TextDocument, start: number, length: number): Range =>
+    Range.create(textDocument.positionAt(start), textDocument.positionAt(start + length));
 
 const lintTypos = (document: TextDocument): Diagnostic[] => {
     const source = document.getText();

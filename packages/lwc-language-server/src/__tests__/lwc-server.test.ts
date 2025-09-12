@@ -43,40 +43,34 @@ jest.mock('vscode-languageserver', () => {
     const actual = jest.requireActual('vscode-languageserver');
     return {
         ...actual,
-        createConnection: jest.fn().mockImplementation(() => {
-            return {
-                onInitialize: (): boolean => true,
-                onInitialized: (): boolean => true,
-                onCompletion: (): boolean => true,
-                onCompletionResolve: (): boolean => true,
-                onDidChangeWatchedFiles: (): boolean => true,
-                onHover: (): boolean => true,
-                onShutdown: (): boolean => true,
-                onDefinition: (): boolean => true,
-                workspace: {
-                    getConfiguration: (): boolean => {
-                        return mockTypeScriptSupportConfig;
-                    },
-                },
-            };
-        }),
-        TextDocuments: jest.fn().mockImplementation(() => {
-            return {
-                listen: (): boolean => true,
-                onDidChangeContent: (): boolean => true,
-                get: (name: string): TextDocument => {
-                    const docs = new Map([
-                        [uri, document],
-                        [jsUri, jsDocument],
-                        [auraUri, auraDocument],
-                        [hoverUri, hoverDocument],
-                    ]);
-                    return docs.get(name);
-                },
-                onDidSave: (): boolean => true,
-                syncKind: 'html',
-            };
-        }),
+        createConnection: jest.fn().mockImplementation(() => ({
+            onInitialize: (): boolean => true,
+            onInitialized: (): boolean => true,
+            onCompletion: (): boolean => true,
+            onCompletionResolve: (): boolean => true,
+            onDidChangeWatchedFiles: (): boolean => true,
+            onHover: (): boolean => true,
+            onShutdown: (): boolean => true,
+            onDefinition: (): boolean => true,
+            workspace: {
+                getConfiguration: (): boolean => mockTypeScriptSupportConfig,
+            },
+        })),
+        TextDocuments: jest.fn().mockImplementation(() => ({
+            listen: (): boolean => true,
+            onDidChangeContent: (): boolean => true,
+            get: (name: string): TextDocument => {
+                const docs = new Map([
+                    [uri, document],
+                    [jsUri, jsDocument],
+                    [auraUri, auraDocument],
+                    [hoverUri, hoverDocument],
+                ]);
+                return docs.get(name);
+            },
+            onDidSave: (): boolean => true,
+            syncKind: 'html',
+        })),
     };
 });
 

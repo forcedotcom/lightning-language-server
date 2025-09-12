@@ -2,27 +2,23 @@ import { TextDocument, Position } from 'vscode-languageserver';
 import { getAuraBindingValue, parse } from '../aura-utils';
 
 describe('getAuraBindingValue', () => {
-    function createDocument(content: string): TextDocument {
-        return TextDocument.create('file:///test.cmp', 'html', 0, content);
-    }
+    const createDocument = (content: string): TextDocument => TextDocument.create('file:///test.cmp', 'html', 0, content);
 
-    function createPosition(line: number, character: number): Position {
-        return Position.create(line, character);
-    }
+    const createPosition = (line: number, character: number): Position => Position.create(line, character);
 
-    function getBindingValue(content: string, line: number, character: number): string | null {
+    const getBindingValue = (content: string, line: number, character: number): string | null => {
         const document = createDocument(content);
         const htmlDocument = parse(content);
         const position = createPosition(line, character);
         console.log('position', position);
         return getAuraBindingValue(document, position, htmlDocument);
-    }
+    };
 
     // simple function to find the cursor position in a string, helpful for readability
-    function findCursorPosition(content: string): number {
+    const findCursorPosition = (content: string): number => {
         const cursorPosition = content.indexOf('|');
         return cursorPosition;
-    }
+    };
 
     describe('basic functionality', () => {
         it('should extract property from v binding in attribute', () => {

@@ -45,14 +45,8 @@ export const moduleName = (namespace: string, tag: string): string => {
     // + decamelize(tag, '-');
 };
 
-const componentName = (namespace: string, tag: string): string => {
-    return namespace + ':' + tag;
-};
+const componentName = (namespace: string, tag: string): string => namespace + ':' + tag;
 
-export const componentFromFile = (file: string, sfdxProject: boolean): string => {
-    return nameFromFile(file, sfdxProject, componentName);
-};
+export const componentFromFile = (file: string, sfdxProject: boolean): string => nameFromFile(file, sfdxProject, componentName);
 
-export const componentFromDirectory = (file: string, sfdxProject: boolean): string => {
-    return nameFromDirectory(file, sfdxProject, componentName);
-};
+export const componentFromDirectory = (file: string, sfdxProject: boolean): string => nameFromDirectory(file, sfdxProject, componentName);

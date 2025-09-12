@@ -29,13 +29,9 @@ export const getClassMembers = (metadata: Metadata, memberType: string, memberDe
     return members;
 };
 
-export const getProperties = (metadata: Metadata): ClassMember[] => {
-    return getClassMembers(metadata, 'property');
-};
+export const getProperties = (metadata: Metadata): ClassMember[] => getClassMembers(metadata, 'property');
 
-export const getMethods = (metadata: Metadata): ClassMember[] => {
-    return getClassMembers(metadata, 'method');
-};
+export const getMethods = (metadata: Metadata): ClassMember[] => getClassMembers(metadata, 'method');
 
 const sanitizeComment = (comment: string): string => {
     const parsed = commentParser('/*' + comment + '*/');
@@ -142,10 +138,9 @@ export const compileDocument = (document: TextDocument): Promise<CompilerResult>
     return compileSource(document.getText(), fileName);
 };
 
-export const toVSCodeRange = (babelRange: SourceLocation): Range => {
+export const toVSCodeRange = (babelRange: SourceLocation): Range =>
     // babel (column:0-based line:1-based) => vscode (character:0-based line:0-based)
-    return Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
-};
+    Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
 
 export const extractAttributes = (metadata: Metadata, uri: string): { privateAttributes: AttributeInfo[]; publicAttributes: AttributeInfo[] } => {
     const publicAttributes: AttributeInfo[] = [];

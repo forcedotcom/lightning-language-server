@@ -36,20 +36,20 @@ const ForAllProps_Purgeable = infer.constraint({
     },
 });
 
-function getFilename(filename): string {
+const getFilename = (filename): string => {
     if (server.options.projectDir.endsWith('/')) {
         return server.options.projectDir + filename;
     }
     return server.options.projectDir + '/' + filename;
-}
+};
 
-function isBlocklisted(filename): any {
+const isBlocklisted = (filename): any => {
     let ret = filename.endsWith('/scrollerLib/bootstrap.js');
     ret = ret || filename.endsWith('ExportSymbolsHelper.js');
     return ret;
-}
+};
 
-async function readFile(filename): Promise<string> {
+const readFile = async (filename): Promise<string> => {
     let normalized = filename;
     if (!normalized.startsWith('/')) {
         normalized = getFilename(normalized);
@@ -67,27 +67,27 @@ async function readFile(filename): Promise<string> {
         }
         throw e;
     }
-}
+};
 
-function baseName(path): any {
+const baseName = (path): any => {
     const lastSlash = path.lastIndexOf('/');
     if (lastSlash === -1) {
         return path;
     } else {
         return path.slice(lastSlash + 1);
     }
-}
+};
 
-function trimExt(path): any {
+const trimExt = (path): any => {
     const lastDot = path.lastIndexOf('.');
     if (lastDot === -1) {
         return path;
     } else {
         return path.slice(0, lastDot);
     }
-}
+};
 
-function initScope(scope): void {
+const initScope = (scope): void => {
     const module = new infer.Obj();
     module.propagate(scope.defProp('module'));
     const exports = new infer.Obj(true);
@@ -96,46 +96,32 @@ function initScope(scope): void {
     exports.propagate(scope.defProp('exports'));
     const moduleExports = (scope.exports = module.defProp('exports'));
     exports.propagate(moduleExports, WG_DEFAULT_EXPORT);
-}
+};
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _debug(log): void {
-    //console.log(log);
-}
-
-function getName(name, type): string {
+const getName = (name, type): string => {
     const newname = name.replace(/Controller.js$|Helper.js$|Renderer.js$|Test.js$/, '') + type;
     return newname;
-}
+};
 
-function getController(name): string {
-    return getName(name, 'Controller.js');
-}
+const getController = (name): string => getName(name, 'Controller.js');
 
-function getHelper(name): string {
-    return getName(name, 'Helper.js');
-}
+const getHelper = (name): string => getName(name, 'Helper.js');
 
-function getRenderer(name): string {
-    return getName(name, 'Renderer.js');
-}
+const getRenderer = (name): string => getName(name, 'Renderer.js');
 
-function resolver(file, parent): any {
-    return file;
-}
+const resolver = (file, parent): any => file;
 
-function unloadDefs(): void {
+const unloadDefs = (): void => {
     server.deleteDefs('Aura');
-}
+};
 
-function readFileAsync(filename, c): void {
+const readFileAsync = (filename, c): void => {
     readFile(filename).then(function (contents) {
         c(null, contents);
     });
-}
+};
 
-function findAndBindComponent(type, server, cx, infer): void {
+const findAndBindComponent = (type, server, cx, infer): void => {
     const evs = cx.props['Component'];
     if (!evs) {
         return;
@@ -148,9 +134,9 @@ function findAndBindComponent(type, server, cx, infer): void {
             int.propagate(type);
         }
     }
-}
+};
 
-function findAndBindHelper(type, server, modules, file): void {
+const findAndBindHelper = (type, server, modules, file): void => {
     const helperFile = getHelper(file.name);
 
     const bn = trimExt(baseName(helperFile));
@@ -184,9 +170,9 @@ function findAndBindHelper(type, server, modules, file): void {
         p.addSource(type);
         helper.propagate(p);
     }
-}
+};
 
-function findAndBindEvent(type, server, cx, infer): void {
+const findAndBindEvent = (type, server, cx, infer): void => {
     // this is slightly hacky, but have no idea how to get the event Otherwise
     const evs = cx.props['Event'];
     if (!evs) {
@@ -200,15 +186,15 @@ function findAndBindEvent(type, server, cx, infer): void {
             int.propagate(type);
         }
     }
-}
+};
 
-function ternError(msg): Error {
+const ternError = (msg): Error => {
     const err = new Error(msg);
     err.name = 'TernError';
     return err;
-}
+};
 
-async function connectModule(file, out): Promise<void> {
+const connectModule = async (file, out): Promise<void> => {
     if (isBlocklisted(file.name)) {
         return;
     }
@@ -216,11 +202,11 @@ async function connectModule(file, out): Promise<void> {
     server.startAsyncAction();
     const modules = infer.cx().parent.mod.modules;
     const cx = infer.cx();
-    _debug('Starting... ' + file.name);
+    console.log('Starting... ' + file.name);
     if (/Helper.js$/.test(file.name)) {
         // need to reestablish server context after awaits
         infer.withContext(server.cx, function () {
-            _debug('Process helper exports ' + file.name);
+            console.log('Process helper exports ' + file.name);
             let outObj;
             if (!out.getType()) {
                 const type = baseName(file.name).replace(/.js$/, '');
@@ -300,7 +286,7 @@ async function connectModule(file, out): Promise<void> {
     }
     // reestablish scope after awaits
     infer.withContext(server.cx, function () {
-        _debug('Fixing scopes...' + file.name);
+        console.log('Fixing scopes...' + file.name);
         walk.simple(file.ast, {
             ObjectExpression: function (node, state) {
                 const parent = infer.parentNode(node, file.ast);
@@ -350,11 +336,11 @@ async function connectModule(file, out): Promise<void> {
                 }
             },
         });
-        _debug('All done ' + file.name);
+        console.log('All done ' + file.name);
     });
 
     server.finishAsyncAction();
-}
+};
 
 tern.registerPlugin('aura', function (s, options) {
     server = s;
@@ -383,7 +369,7 @@ tern.registerPlugin('aura', function (s, options) {
             },
             function (err, result) {
                 if (err) {
-                    _debug(err);
+                    console.log(err);
                 }
                 if (shouldFilter) {
                     result.completions = result.completions.filter(function (completion, index, array) {
@@ -404,17 +390,17 @@ tern.registerPlugin('aura', function (s, options) {
         return filteredResult;
     });
 
-    _debug('IDE mode');
+    console.log('IDE mode');
     server.addDefs(defs);
 
-    _debug(new Date().toISOString() + ' Done loading!');
+    console.log(new Date().toISOString() + ' Done loading!');
 });
 
 tern.defineQueryType('ideInit', {
     run: function (server, query) {
         if (query.unloadDefs) {
             unloadDefs();
-            _debug('Unloaded default Aura defs');
+            console.log('Unloaded default Aura defs');
         }
 
         if (query.shouldFilter === true || query.shouldFilter === false) {
@@ -465,7 +451,7 @@ tern.defineQueryType('guess-types', {
         const start = tern.resolvePos(file, query.end);
         const types = [];
 
-        function gather(prop, obj, depth): void {
+        const gather = (prop, obj, depth): void => {
             const val = obj.props[prop];
             const type = infer.toString(val.getType());
             types.push({
@@ -475,7 +461,7 @@ tern.defineQueryType('guess-types', {
                 //parent: obj.getType(),
                 depth: depth,
             });
-        }
+        };
 
         infer.forAllLocalsAt(file.ast, start, file.scope, gather);
         return {
