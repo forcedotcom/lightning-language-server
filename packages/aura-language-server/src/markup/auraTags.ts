@@ -22,8 +22,8 @@ export const setIndexer = (idx: AuraIndexer): void => {
     indexer = idx;
 };
 
-const getTagsData = (): { name: string; description?: string; attributes: IAttributeData[] }[] => {
-    return Array.from(getAuraTags()).map(([tag, tagInfo]) => ({
+const getTagsData = (): { name: string; description?: string; attributes: IAttributeData[] }[] =>
+    Array.from(getAuraTags()).map(([tag, tagInfo]) => ({
         name: tag,
         description: getHover(tagInfo),
         attributes: tagInfo.attributes.map((attr) => ({
@@ -32,7 +32,6 @@ const getTagsData = (): { name: string; description?: string; attributes: IAttri
             valueSet: attr.type,
         })),
     }));
-};
 
 const getAttributesData = (tag: string): IAttributeData[] => {
     const cTag = getAuraByTag(tag);
@@ -47,17 +46,13 @@ const getAttributesData = (tag: string): IAttributeData[] => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getValuesData = (tag: string, attribute: string): IValueData[] => {
+const getValuesData = (tag: string, attribute: string): IValueData[] =>
     // TODO provide suggestions by consulting shapeService
-    return [];
-};
-
-export const getAuraTagProvider = (): IHTMLDataProvider => {
-    return {
-        getId: (): string => 'aura',
-        isApplicable: (languageId): boolean => languageId === 'html',
-        provideTags: getTagsData,
-        provideAttributes: getAttributesData,
-        provideValues: getValuesData,
-    };
-};
+    [];
+export const getAuraTagProvider = (): IHTMLDataProvider => ({
+    getId: (): string => 'aura',
+    isApplicable: (languageId): boolean => languageId === 'html',
+    provideTags: getTagsData,
+    provideAttributes: getAttributesData,
+    provideValues: getValuesData,
+});

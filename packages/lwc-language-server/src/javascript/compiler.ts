@@ -6,7 +6,7 @@ import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { AttributeInfo, createAttributeInfo, ClassMember, Decorator as DecoratorType, MemberType } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, createAttributeInfo, ClassMember } from '@salesforce/lightning-lsp-common';
 import { Metadata } from '../decorators';
 import commentParser from 'comment-parser';
 
@@ -29,13 +29,9 @@ export const getClassMembers = (metadata: Metadata, memberType: string, memberDe
     return members;
 };
 
-export const getProperties = (metadata: Metadata): ClassMember[] => {
-    return getClassMembers(metadata, 'property');
-};
+export const getProperties = (metadata: Metadata): ClassMember[] => getClassMembers(metadata, 'property');
 
-export const getMethods = (metadata: Metadata): ClassMember[] => {
-    return getClassMembers(metadata, 'method');
-};
+export const getMethods = (metadata: Metadata): ClassMember[] => getClassMembers(metadata, 'method');
 
 const sanitizeComment = (comment: string): string => {
     const parsed = commentParser('/*' + comment + '*/');
@@ -142,10 +138,9 @@ export const compileDocument = (document: TextDocument): CompilerResult => {
     return compileSource(document.getText(), fileName);
 };
 
-export const toVSCodeRange = (babelRange: SourceLocation): Range => {
+export const toVSCodeRange = (babelRange: SourceLocation): Range =>
     // babel (column:0-based line:1-based) => vscode (character:0-based line:0-based)
-    return Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
-};
+    Range.create(Position.create(babelRange.start.line - 1, babelRange.start.column), Position.create(babelRange.end.line - 1, babelRange.end.column));
 
 export const extractAttributes = (metadata: Metadata, uri: string): { privateAttributes: AttributeInfo[]; publicAttributes: AttributeInfo[] } => {
     const publicAttributes: AttributeInfo[] = [];
@@ -155,14 +150,14 @@ export const extractAttributes = (metadata: Metadata, uri: string): { privateAtt
             const location = Location.create(uri, toVSCodeRange(x.loc));
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-            const memberType = x.type === 'property' ? MemberType.PROPERTY : MemberType.METHOD;
-            publicAttributes.push(createAttributeInfo(name, x.doc, memberType, DecoratorType.API, undefined, location, 'LWC custom attribute'));
+            const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
+            publicAttributes.push(createAttributeInfo(name, x.doc, memberType, 'API', undefined, location, 'LWC custom attribute'));
         } else {
             const location = Location.create(uri, toVSCodeRange(x.loc));
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
-            const memberType = x.type === 'property' ? MemberType.PROPERTY : MemberType.METHOD;
-            const decorator = x.decorator === 'track' ? DecoratorType.TRACK : undefined;
+            const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
+            const decorator = x.decorator === 'track' ? 'TRACK' : undefined;
             privateAttributes.push(createAttributeInfo(name, x.doc, memberType, decorator, undefined, location, 'LWC custom attribute'));
         }
     }

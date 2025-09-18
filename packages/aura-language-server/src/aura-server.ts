@@ -25,7 +25,6 @@ import { getLanguageService, LanguageService, CompletionList } from 'vscode-html
 import URI from 'vscode-uri';
 import {
     toResolvedPath,
-    WorkspaceType,
     interceptConsoleLogger,
     TagInfo,
     elapsedMillis,
@@ -96,7 +95,7 @@ export default class Server {
 
             this.context = new AuraWorkspaceContext(this.workspaceRoots);
 
-            if (this.context.type === WorkspaceType.CORE_PARTIAL) {
+            if (this.context.type === 'CORE_PARTIAL') {
                 await startServer(path.join(this.workspaceRoots[0], '..'), path.join(this.workspaceRoots[0], '..'));
             } else {
                 await startServer(this.workspaceRoots[0], this.workspaceRoots[0]);
@@ -170,7 +169,7 @@ export default class Server {
             const htmlDocument = this.htmlLS.parseHTMLDocument(document);
 
             const list = this.htmlLS.doComplete(document, completionParams.position, htmlDocument, {
-                isSfdxProject: this.context.type === WorkspaceType.SFDX,
+                isSfdxProject: this.context.type === 'SFDX',
                 useAttributeValueQuotes: true,
             });
             return list;
@@ -273,8 +272,8 @@ export default class Server {
 
         try {
             if (isAuraRootDirectoryCreated(this.context, changes)) {
-                await this.context.getIndexingProvider('aura').resetIndex();
-                await this.context.getIndexingProvider('aura').configureAndIndex();
+                this.context.getIndexingProvider('aura').resetIndex();
+                this.context.getIndexingProvider('aura').configureAndIndex();
                 // re-index everything on directory deletions as no events are reported for contents of deleted directories
                 const startTime = process.hrtime();
                 console.info('reindexed workspace in ' + elapsedMillis(startTime) + ', directory was deleted:', changes);
@@ -283,11 +282,11 @@ export default class Server {
                 for (const event of changes) {
                     if (event.type === FileChangeType.Deleted && isAuraWatchedDirectory(this.context, event.uri)) {
                         const dir = toResolvedPath(event.uri);
-                        this.auraIndexer.clearTagsforDirectory(dir, this.context.type === WorkspaceType.SFDX);
+                        this.auraIndexer.clearTagsforDirectory(dir, this.context.type === 'SFDX');
                     } else {
                         const file = toResolvedPath(event.uri);
                         if (file.endsWith('.app') || file.endsWith('.cmp') || file.endsWith('.intf') || file.endsWith('.evt') || file.endsWith('.lib')) {
-                            await this.auraIndexer.indexFile(file, this.context.type === WorkspaceType.SFDX);
+                            await this.auraIndexer.indexFile(file, this.context.type === 'SFDX');
                         }
                     }
                 }

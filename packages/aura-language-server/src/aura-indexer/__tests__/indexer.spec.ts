@@ -20,9 +20,7 @@ const normalize = (start: string, p: string): string => {
     return p;
 };
 
-const uriToFile = (uri: string): string => {
-    return URI.parse(uri).fsPath;
-};
+const uriToFile = (uri: string): string => URI.parse(uri).fsPath;
 
 describe('indexer parsing content', () => {
     afterEach(() => {
@@ -79,7 +77,7 @@ describe('indexer parsing content', () => {
         expect(tagInfo).toBeObject();
         expect(tagInfo.name).toEqual('c:wireLdsCmp');
         expect(tagInfo.file).toEndWith('wireLdsCmp.cmp');
-        expect(tagInfo.type).toEqual(2);
+        expect(tagInfo.type).toEqual('CUSTOM');
         expect(tagInfo.lwc).toEqual(false);
         expect(tagInfo.location).toBeObject();
         expect(tagInfo.location.uri).toEndWith('wireLdsCmp.cmp');

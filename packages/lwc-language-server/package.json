@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "4.12.8",
+  "version": "4.12.11",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "module": "lib/indexer.js",
@@ -87,11 +87,12 @@
   "dependencies": {
     "@lwc/compiler": "8.16.0",
     "@lwc/engine-dom": "8.16.0",
+    "@lwc/errors": "8.16.0",
     "@lwc/metadata": "12.2.0",
     "@lwc/template-compiler": "8.16.0",
     "@salesforce/apex": "0.0.21",
     "@salesforce/label": "0.0.21",
-    "@salesforce/lightning-lsp-common": "4.12.8",
+    "@salesforce/lightning-lsp-common": "4.12.11",
     "@salesforce/resourceurl": "0.0.21",
     "@salesforce/schema": "0.0.21",
     "camelcase": "^6.0.0",
@@ -102,7 +103,7 @@
     "vscode-html-languageservice": "^5.5.1",
     "vscode-languageserver": "^5.2.1",
     "vscode-uri": "^2.1.2",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@lwc/old-compiler": "npm:@lwc/compiler@0.34.8",
@@ -111,7 +112,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^20.0.0",
     "@types/normalize-path": "^3.0.2",
-    "@types/xml2js": "^0.4.5",
+    "@types/xml2js": "^0.4.14",
     "babel-types": "^6.26.0",
     "glob": "^7.2.3",
     "jest": "^29.7.0",

@@ -4,7 +4,6 @@ import { TextDocument, FileEvent, FileChangeType } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import equal from 'deep-equal';
 import { BaseWorkspaceContext } from './base-context';
-import { WorkspaceType } from './shared';
 import * as jsonc from 'jsonc-parser';
 
 const RESOURCES_DIR = 'resources';
@@ -19,12 +18,10 @@ const fileContainsLine = async (file: string, expectLine: string): Promise<boole
     return false;
 };
 
-export const toResolvedPath = (uri: string): string => {
-    return resolve(URI.parse(uri).fsPath);
-};
+export const toResolvedPath = (uri: string): string => resolve(URI.parse(uri).fsPath);
 
 const isLWCRootDirectory = (context: BaseWorkspaceContext, uri: string): boolean => {
-    if (context.type === WorkspaceType.SFDX) {
+    if (context.type === 'SFDX') {
         const file = toResolvedPath(uri);
         return file.endsWith('lwc');
     }
@@ -32,7 +29,7 @@ const isLWCRootDirectory = (context: BaseWorkspaceContext, uri: string): boolean
 };
 
 const isAuraDirectory = (context: BaseWorkspaceContext, uri: string): boolean => {
-    if (context.type === WorkspaceType.SFDX) {
+    if (context.type === 'SFDX') {
         const file = toResolvedPath(uri);
         return file.endsWith('aura');
     }
@@ -105,13 +102,9 @@ export const isAuraRootDirectoryCreated = (context: BaseWorkspaceContext, change
     return false;
 };
 
-export const unixify = (filePath: string): string => {
-    return filePath.replace(/\\/g, '/');
-};
+export const unixify = (filePath: string): string => filePath.replace(/\\/g, '/');
 
-export const relativePath = (from: string, to: string): string => {
-    return unixify(relative(from, to));
-};
+export const relativePath = (from: string, to: string): string => unixify(relative(from, to));
 
 export const pathStartsWith = (path: string, root: string): boolean => {
     if (process.platform === 'win32') {
@@ -131,13 +124,9 @@ export const getBasename = (textDocument: TextDocument): string => {
     return filePath ? basename(filePath, ext) : '';
 };
 
-export const getSfdxResource = (resourceName: string): string => {
-    return join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
-};
+export const getSfdxResource = (resourceName: string): string => join(__dirname, RESOURCES_DIR, 'sfdx', resourceName);
 
-export const getCoreResource = (resourceName: string): string => {
-    return join(__dirname, RESOURCES_DIR, 'core', resourceName);
-};
+export const getCoreResource = (resourceName: string): string => join(__dirname, RESOURCES_DIR, 'core', resourceName);
 
 export const appendLineIfMissing = async (file: string, line: string): Promise<void> => {
     if (!fs.existsSync(file)) {

@@ -2,11 +2,8 @@ import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '../decorators';
 
-export enum TagType {
-    STANDARD,
-    SYSTEM,
-    CUSTOM,
-}
+export type TagType = 'STANDARD' | 'SYSTEM' | 'CUSTOM';
+
 // Type definition for TagInfo data structure
 export type TagInfo = {
     file: string;
@@ -60,7 +57,7 @@ export const getAttributeInfo = (tagInfo: TagInfo, attribute: string): Attribute
 // Utility function to get hover information
 export const getHover = (tagInfo: TagInfo, hideComponentLibraryLink?: boolean): string | null => {
     let retVal = tagInfo.documentation + '\n' + getComponentLibraryLink(tagInfo) + '\n### Attributes\n';
-    if (hideComponentLibraryLink || tagInfo.type === TagType.CUSTOM) {
+    if (hideComponentLibraryLink || tagInfo.type === 'CUSTOM') {
         retVal = tagInfo.documentation + '\n### Attributes\n';
     }
 
@@ -82,9 +79,8 @@ export const getHover = (tagInfo: TagInfo, hideComponentLibraryLink?: boolean): 
 };
 
 // Utility function to get component library link
-export const getComponentLibraryLink = (tagInfo: TagInfo): string | null => {
-    return '[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/' + tagInfo.name + ')';
-};
+export const getComponentLibraryLink = (tagInfo: TagInfo): string | null =>
+    '[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/' + tagInfo.name + ')';
 
 // Utility function to get attribute markdown
 export const getAttributeMarkdown = (attribute: AttributeInfo): string => {

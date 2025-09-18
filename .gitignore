@@ -22,4 +22,5 @@ npm-debug.log
 
 # Ignore artifacts
 *.tgz
-.npmrcpackage-lock.json
+.npmrc
+package-lock.json

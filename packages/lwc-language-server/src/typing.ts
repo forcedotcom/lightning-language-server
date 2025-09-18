@@ -65,14 +65,10 @@ export const declarationsFromCustomLabels = async (xmlDocument: string | Buffer)
     if (doc.CustomLabels === undefined || doc.CustomLabels.labels === undefined) {
         return '';
     }
-    const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => {
-        return declaration('customLabel', label.fullName[0]);
-    });
+    const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => declaration('customLabel', label.fullName[0]));
 
     return declarations.join('\n');
 };
 
 // Utility function to get declaration for a Typing object
-export const getDeclaration = (typing: Typing): string => {
-    return declaration(typing.type, typing.name);
-};
+export const getDeclaration = (typing: Typing): string => declaration(typing.type, typing.name);

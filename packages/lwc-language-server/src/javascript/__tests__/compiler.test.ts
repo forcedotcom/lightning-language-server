@@ -26,17 +26,11 @@ const getDecoratorsTargets = (metadata: Metadata, elementType: string, targetTyp
     return props;
 };
 
-const getPublicReactiveProperties = (metadata: Metadata): ClassMember[] => {
-    return getClassMembers(metadata, 'property', 'api');
-};
+const getPublicReactiveProperties = (metadata: Metadata): ClassMember[] => getClassMembers(metadata, 'property', 'api');
 
-const getPrivateReactiveProperties = (metadata: Metadata): ClassMember[] => {
-    return getDecoratorsTargets(metadata, 'track', 'property');
-};
+const getPrivateReactiveProperties = (metadata: Metadata): ClassMember[] => getDecoratorsTargets(metadata, 'track', 'property');
 
-const getApiMethods = (metadata: Metadata): ClassMember[] => {
-    return getDecoratorsTargets(metadata, 'api', 'method');
-};
+const getApiMethods = (metadata: Metadata): ClassMember[] => getDecoratorsTargets(metadata, 'api', 'method');
 
 const codeOk = `
 import { LightningElement } from 'lwc';

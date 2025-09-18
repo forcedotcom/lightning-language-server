@@ -66,6 +66,12 @@
   "lint-staged": {
     "./{src,test}/**/*.{ts,js}": [
       "eslint -c .eslintrc.json --fix"
+    ],
+    "packages/*/src/**/*.{ts,js}": [
+      "eslint -c .eslintrc.json --fix"
+    ],
+    "packages/*/test/**/*.{ts,js}": [
+      "eslint -c .eslintrc.json --fix"
     ]
   },
   "private": true,

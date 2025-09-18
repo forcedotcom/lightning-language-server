@@ -3,12 +3,12 @@ import * as path from 'path';
 
 describe('createTyping', () => {
     it('cannot create a Typing with an invalid type', () => {
-        expect(() => {
-            return createTyping({
+        expect(() =>
+            createTyping({
                 name: 'logo',
                 type: 'invalidType',
-            });
-        }).toThrow();
+            }),
+        ).toThrow();
     });
 
     it('cannot create a Typing with an invalid meta file', () => {

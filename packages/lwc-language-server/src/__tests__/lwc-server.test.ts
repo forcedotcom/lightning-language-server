@@ -1,4 +1,4 @@
-import Server, { Token, findDynamicContent } from '../lwc-server';
+import Server, { findDynamicContent } from '../lwc-server';
 import { getLanguageService } from 'vscode-html-languageservice';
 import {
     TextDocument,
@@ -43,40 +43,34 @@ jest.mock('vscode-languageserver', () => {
     const actual = jest.requireActual('vscode-languageserver');
     return {
         ...actual,
-        createConnection: jest.fn().mockImplementation(() => {
-            return {
-                onInitialize: (): boolean => true,
-                onInitialized: (): boolean => true,
-                onCompletion: (): boolean => true,
-                onCompletionResolve: (): boolean => true,
-                onDidChangeWatchedFiles: (): boolean => true,
-                onHover: (): boolean => true,
-                onShutdown: (): boolean => true,
-                onDefinition: (): boolean => true,
-                workspace: {
-                    getConfiguration: (): boolean => {
-                        return mockTypeScriptSupportConfig;
-                    },
-                },
-            };
-        }),
-        TextDocuments: jest.fn().mockImplementation(() => {
-            return {
-                listen: (): boolean => true,
-                onDidChangeContent: (): boolean => true,
-                get: (name: string): TextDocument => {
-                    const docs = new Map([
-                        [uri, document],
-                        [jsUri, jsDocument],
-                        [auraUri, auraDocument],
-                        [hoverUri, hoverDocument],
-                    ]);
-                    return docs.get(name);
-                },
-                onDidSave: (): boolean => true,
-                syncKind: 'html',
-            };
-        }),
+        createConnection: jest.fn().mockImplementation(() => ({
+            onInitialize: (): boolean => true,
+            onInitialized: (): boolean => true,
+            onCompletion: (): boolean => true,
+            onCompletionResolve: (): boolean => true,
+            onDidChangeWatchedFiles: (): boolean => true,
+            onHover: (): boolean => true,
+            onShutdown: (): boolean => true,
+            onDefinition: (): boolean => true,
+            workspace: {
+                getConfiguration: (): boolean => mockTypeScriptSupportConfig,
+            },
+        })),
+        TextDocuments: jest.fn().mockImplementation(() => ({
+            listen: (): boolean => true,
+            onDidChangeContent: (): boolean => true,
+            get: (name: string): TextDocument => {
+                const docs = new Map([
+                    [uri, document],
+                    [jsUri, jsDocument],
+                    [auraUri, auraDocument],
+                    [hoverUri, hoverDocument],
+                ]);
+                return docs.get(name);
+            },
+            onDidSave: (): boolean => true,
+            syncKind: 'html',
+        })),
     };
 });
 
@@ -593,17 +587,17 @@ describe('#cursorInfo', () => {
 
     it('knows when Im in a start tag', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 16, character: 23 } }, document);
-        expect(cursorInfo).toEqual({ type: Token.Tag, name: 'c-todo_item', tag: 'c-todo_item' });
+        expect(cursorInfo).toEqual({ type: 'tag', name: 'c-todo_item', tag: 'c-todo_item' });
     });
 
     it('knows when Im on an attribute name', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 17, character: 26 } }, document);
-        expect(cursorInfo).toEqual({ type: Token.AttributeKey, name: 'key', tag: 'c-todo_item' });
+        expect(cursorInfo).toEqual({ type: 'attributeKey', name: 'key', tag: 'c-todo_item' });
     });
 
     it('knows when Im on a dynamic attribute value (inside "{}")', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 18, character: 33 } }, document);
-        expect(cursorInfo.type).toEqual(Token.DynamicAttributeValue);
+        expect(cursorInfo.type).toEqual('dynamicAttributeValue');
         expect(cursorInfo.name).toEqual('todo');
         expect(cursorInfo.tag).toEqual('c-todo_item');
         expect(cursorInfo.range).toEqual({
@@ -620,24 +614,24 @@ describe('#cursorInfo', () => {
 
     it('knows when Im on an attribute value', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 7, character: 35 } }, document);
-        expect(cursorInfo).toEqual({ type: Token.AttributeValue, name: '"off"', tag: 'input' });
+        expect(cursorInfo).toEqual({ type: 'attributeValue', name: '"off"', tag: 'input' });
     });
 
     it('knows when Im in content', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 37, character: 24 } }, document);
-        expect(cursorInfo.type).toEqual(Token.Content);
+        expect(cursorInfo.type).toEqual('content');
         expect(cursorInfo.tag).toEqual('button');
     });
 
     it('knows when Im in dynamic content', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 68 } }, document);
-        expect(cursorInfo.type).toEqual(Token.DynamicContent);
+        expect(cursorInfo.type).toEqual('dynamicContent');
         expect(cursorInfo.tag).toEqual('strong');
     });
 
     it('knows when Im not dynamic content', () => {
         const cursorInfo = server.cursorInfo({ textDocument: { uri }, position: { line: 27, character: 76 } }, document);
-        expect(cursorInfo.type).toEqual(Token.Content);
+        expect(cursorInfo.type).toEqual('content');
         expect(cursorInfo.tag).toEqual('strong');
     });
 });

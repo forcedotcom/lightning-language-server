@@ -33,9 +33,7 @@ type DecoratorValType = (typeof decoratorTypeMap)[DecoratorKeyType];
  * the stripKeysWithUndefinedVals helper function removes any key/val pair where the
  * value is `undefined`.
  */
-const stripKeysWithUndefinedVals = <T>(obj: T): T => {
-    return Object.fromEntries(Object.entries(obj).filter(([, val]) => val !== undefined)) as T;
-};
+const stripKeysWithUndefinedVals = <T>(obj: T): T => Object.fromEntries(Object.entries(obj).filter(([, val]) => val !== undefined)) as T;
 
 const externalToInternalLoc = (ext?: SourceLocation): InternalLocation | undefined => {
     if (!ext) {
@@ -110,11 +108,7 @@ const externalToInternalPropValue = (decoratorType: DecoratorValType, initialVal
             // There's similar weirdness here for object Values.
             return {
                 type: 'object',
-                value: Object.fromEntries(
-                    Object.entries(initialValue.value).map(([key, val]) => {
-                        return [key, externalToInternalPropValue(decoratorType, val)];
-                    }),
-                ),
+                value: Object.fromEntries(Object.entries(initialValue.value).map(([key, val]) => [key, externalToInternalPropValue(decoratorType, val)])),
             };
 
         case 'Boolean':
@@ -259,12 +253,10 @@ const getMembers = (classObj: Class): InternalClassMember[] => {
     return members;
 };
 
-const getDecoratedApiMethod = (method: ClassMethod): ApiDecoratorTarget => {
-    return {
-        type: 'method',
-        name: method.name,
-    };
-};
+const getDecoratedApiMethod = (method: ClassMethod): ApiDecoratorTarget => ({
+    type: 'method',
+    name: method.name,
+});
 
 /**
  * Wire adapters can have params passed to them. These params take the form:
@@ -283,15 +275,9 @@ const getWireParams = (decorator: WireDecorator) => {
     let params: Record<string, string> = {};
     if (decorator.adapterConfig) {
         staticObj = Object.fromEntries(
-            Object.entries(decorator.adapterConfig.static).map(([key, staticParam]) => {
-                return [key, externalToInternalPropValue('wire', staticParam.value, true)];
-            }),
+            Object.entries(decorator.adapterConfig.static).map(([key, staticParam]) => [key, externalToInternalPropValue('wire', staticParam.value, true)]),
         );
-        params = Object.fromEntries(
-            Object.entries(decorator.adapterConfig.reactive).map(([key, { classProperty }]) => {
-                return [key, classProperty];
-            }),
-        );
+        params = Object.fromEntries(Object.entries(decorator.adapterConfig.reactive).map(([key, { classProperty }]) => [key, classProperty]));
     }
     return {
         staticObj,
@@ -356,13 +342,12 @@ const getDecoratedMethods = (
     };
 };
 
-const getDecoratedApiProperty = (prop: ClassProperty): ApiDecoratorTarget => {
-    return stripKeysWithUndefinedVals({
+const getDecoratedApiProperty = (prop: ClassProperty): ApiDecoratorTarget =>
+    stripKeysWithUndefinedVals({
         name: prop.name,
         type: 'property',
         value: dataPropertyToPropValue('api', prop.dataProperty),
     });
-};
 
 const getDecoratedWiredProperty = (prop: ClassProperty, decorator: WireDecorator): WireDecoratorTarget => {
     const { staticObj, params } = getWireParams(decorator);
@@ -385,12 +370,10 @@ const getDecoratedWiredProperty = (prop: ClassProperty, decorator: WireDecorator
     };
 };
 
-const getDecoratedTrackedProperty = (prop: ClassProperty): TrackDecoratorTarget => {
-    return {
-        name: prop.name,
-        type: 'property',
-    };
-};
+const getDecoratedTrackedProperty = (prop: ClassProperty): TrackDecoratorTarget => ({
+    name: prop.name,
+    type: 'property',
+});
 
 /**
  * In the old metadata, a single location was provided for a property. However,
@@ -456,11 +439,8 @@ const getDecoratedProperties = (
  * data-structure. So we collect the locations separately and then correlate
  * property/method names to their locations using this Map.
  */
-const sortDecorators = <T extends { name: string }>(decorators: T[], locations: Map<string, number>): T[] => {
-    return decorators.concat().sort((a: T, b: T) => {
-        return locations.get(a.name) - locations.get(b.name);
-    });
-};
+const sortDecorators = <T extends { name: string }>(decorators: T[], locations: Map<string, number>): T[] =>
+    decorators.concat().sort((a: T, b: T) => locations.get(a.name) - locations.get(b.name));
 
 const getDecorators = (classObj: Class): InternalDecorator[] => {
     const {
@@ -497,8 +477,8 @@ const getDecorators = (classObj: Class): InternalDecorator[] => {
     return [api, wire, track].filter(Boolean);
 };
 
-const getExports = (lwcExports: LwcExport[]): InternalModuleExports[] => {
-    return lwcExports.flatMap((lwcExport) => {
+const getExports = (lwcExports: LwcExport[]): InternalModuleExports[] =>
+    lwcExports.flatMap((lwcExport) => {
         if (lwcExport.namedExports) {
             return lwcExport.namedExports.map((namedExport) =>
                 namedExport.exportedName === '*'
@@ -518,7 +498,6 @@ const getExports = (lwcExports: LwcExport[]): InternalModuleExports[] => {
             throw new Error('Unimplemented: no support for ExportAllDeclaration');
         }
     });
-};
 
 /**
  * This function accepts metadata produced by @lwc/metadata's `collectBundleMetadata`
@@ -529,9 +508,7 @@ const getExports = (lwcExports: LwcExport[]): InternalModuleExports[] => {
 export const mapLwcMetadataToInternal = (lwcMeta: ScriptFile): InternalMetadata => {
     let mainClassObj;
     if (lwcMeta.mainClass) {
-        mainClassObj = lwcMeta.classes.find((classObj) => {
-            return classObj.id === lwcMeta.mainClass.refId;
-        });
+        mainClassObj = lwcMeta.classes.find((classObj) => classObj.id === lwcMeta.mainClass.refId);
     } else if (lwcMeta.classes.length === 1) {
         mainClassObj = lwcMeta.classes[0];
     }

@@ -9,12 +9,10 @@ const typingIndexer: TypingIndexer = new TypingIndexer({
 // This is required in order to spyOn fs functions in newer versions of
 // jest and ts-jest. Solution adapted from Jest docs here:
 // https://jestjs.io/docs/jest-object
-jest.mock('fs', () => {
-    return {
-        __esModule: true,
-        ...jest.requireActual('fs'),
-    };
-});
+jest.mock('fs', () => ({
+    __esModule: true,
+    ...jest.requireActual('fs'),
+}));
 
 describe('TypingIndexer', () => {
     afterEach(() => {
@@ -81,7 +79,7 @@ describe('TypingIndexer', () => {
 
             const fileWriter = jest.spyOn(fs, 'writeFileSync');
             await typingIndexer.saveCustomLabelTypings();
-            expect(fileWriter).toBeCalledTimes(0);
+            expect(fileWriter).not.toHaveBeenCalled();
         });
     });
 

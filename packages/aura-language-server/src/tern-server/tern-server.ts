@@ -146,13 +146,9 @@ export const startServer = async (rootPath: string, wsroot: string): Promise<ter
     return ternServer;
 };
 
-const lsp2ternPos = ({ line, character }: { line: number; character: number }): tern.Position => {
-    return { line, ch: character };
-};
+const lsp2ternPos = ({ line, character }: { line: number; character: number }): tern.Position => ({ line, ch: character });
 
-const tern2lspPos = ({ line, ch }: { line: number; ch: number }): Position => {
-    return { line, character: ch };
-};
+const tern2lspPos = ({ line, ch }: { line: number; ch: number }): Position => ({ line, character: ch });
 
 const fileToUri = (file: string): string => {
     if (path.isAbsolute(file)) {
@@ -168,22 +164,18 @@ const uriToFile = (uri: string): string => {
     return parsedUri.scheme ? parsedUri.fsPath : uri;
 };
 
-const tern2lspRange = ({ start, end }: { start: tern.Position; end: tern.Position }): Range => {
-    return {
-        start: tern2lspPos(start),
-        end: tern2lspPos(end),
-    };
-};
+const tern2lspRange = ({ start, end }: { start: tern.Position; end: tern.Position }): Range => ({
+    start: tern2lspPos(start),
+    end: tern2lspPos(end),
+});
 
-const tern2lspLocation = ({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location => {
-    return {
-        uri: fileToUri(file),
-        range: tern2lspRange({ start, end }),
-    };
-};
+const tern2lspLocation = ({ file, start, end }: { file: string; start: tern.Position; end: tern.Position }): Location => ({
+    uri: fileToUri(file),
+    range: tern2lspRange({ start, end }),
+});
 
-const ternRequest = async (event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> => {
-    return await asyncTernRequest({
+const ternRequest = async (event: TextDocumentPositionParams, type: string, options: any = {}): Promise<any> =>
+    await asyncTernRequest({
         query: {
             type,
             file: uriToFile(event.textDocument.uri),
@@ -192,7 +184,6 @@ const ternRequest = async (event: TextDocumentPositionParams, type: string, opti
             ...options,
         },
     });
-};
 
 export const addFile = (event: TextDocumentChangeEvent): void => {
     const { document } = event;

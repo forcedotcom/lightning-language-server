@@ -23,17 +23,13 @@ type TsConfigPaths = {
 const AURA_DELIMITER = ':';
 const LWC_DELIMITER = '-';
 
-const tagEqualsFile = (tag: Tag, entry: Entry): boolean => {
-    return tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
-};
+const tagEqualsFile = (tag: Tag, entry: Entry): boolean => tag.file === entry.path && tag.updatedAt?.getTime() === entry.stats?.mtime.getTime();
 
-export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => {
-    return entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
-};
+export const unIndexedFiles = (entries: Entry[], tags: Tag[]): Entry[] => entries.filter((entry) => !tags.some((tag) => tagEqualsFile(tag, entry)));
 
 export default class ComponentIndexer {
     readonly workspaceRoot: string;
-    readonly workspaceType: number;
+    readonly workspaceType: WorkspaceType;
     readonly tags: Map<string, Tag> = new Map();
 
     constructor(attributes: ComponentIndexerAttributes) {
@@ -52,7 +48,7 @@ export default class ComponentIndexer {
     get componentEntries(): Entry[] {
         let files: Entry[] = [];
         switch (this.workspaceType) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/**/*.js`);
                 files = sync(sfdxSource, {
                     stats: true,
@@ -166,7 +162,7 @@ export default class ComponentIndexer {
 
     get tsConfigPathMapping(): TsConfigPaths {
         const files: TsConfigPaths = {};
-        if (this.workspaceType === WorkspaceType.SFDX) {
+        if (this.workspaceType === 'SFDX') {
             const sfdxSource = normalize(`${this.workspaceRoot}/${this.sfdxPackageDirsPattern}/**/*/lwc/*/*.{js,ts}`);
             const filePaths = sync(sfdxSource, { stats: true });
             for (const filePath of filePaths) {
@@ -193,9 +189,7 @@ export default class ComponentIndexer {
     get staleTags(): Tag[] {
         const { componentEntries } = this;
 
-        return this.customData.filter((tag) => {
-            return !componentEntries.some((entry) => entry.path === tag.file);
-        });
+        return this.customData.filter((tag) => !componentEntries.some((entry) => entry.path === tag.file));
     }
 
     async init(): Promise<void> {

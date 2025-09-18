@@ -40,7 +40,7 @@ export {
     getMethodMarkdown,
     TagType,
 } from './indexer/tagInfo';
-export { AttributeInfo, createAttributeInfo, Decorator, MemberType } from './indexer/attributeInfo';
+export { AttributeInfo, createAttributeInfo, DecoratorType, MemberType } from './indexer/attributeInfo';
 
 // Re-export from other modules
 export { interceptConsoleLogger } from './logger';

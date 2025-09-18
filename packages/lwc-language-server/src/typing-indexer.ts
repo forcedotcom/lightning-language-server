@@ -31,13 +31,13 @@ export const createTypingIndexer = (attributes: BaseIndexerAttributes): TypingIn
 
     let typingsBaseDir: string;
     switch (projectType) {
-        case WorkspaceType.SFDX:
+        case 'SFDX':
             typingsBaseDir = path.join(workspaceRoot, '.sfdx', 'typings', 'lwc');
             break;
-        case WorkspaceType.CORE_PARTIAL:
+        case 'CORE_PARTIAL':
             typingsBaseDir = path.join(workspaceRoot, '..', '.vscode', 'typings', 'lwc');
             break;
-        case WorkspaceType.CORE_ALL:
+        case 'CORE_ALL':
             typingsBaseDir = path.join(workspaceRoot, '.vscode', 'typings', 'lwc');
             break;
     }
@@ -56,15 +56,6 @@ export const diffItems = (items: string[], compareItems: string[]): string[] => 
         const filename = pathBasename(item);
         return !compareItems.includes(filename);
     });
-};
-
-// Utility function to initialize typing indexer
-export const initTypingIndexer = (indexer: TypingIndexerData): void => {
-    if (indexer.projectType === WorkspaceType.SFDX) {
-        createNewMetaTypings(indexer);
-        deleteStaleMetaTypings(indexer);
-        saveCustomLabelTypings(indexer);
-    }
 };
 
 // Utility function to create new meta typings
@@ -128,9 +119,7 @@ export const getCustomLabelFiles = (indexer: TypingIndexerData): string[] => {
 };
 
 // Utility function to get custom label typings path
-export const getCustomLabelTypings = (indexer: TypingIndexerData): string => {
-    return path.join(indexer.typingsBaseDir, 'customlabels.d.ts');
-};
+export const getCustomLabelTypings = (indexer: TypingIndexerData): string => path.join(indexer.typingsBaseDir, 'customlabels.d.ts');
 
 // Legacy class for backward compatibility (deprecated)
 export default class TypingIndexer {
@@ -147,20 +136,24 @@ export default class TypingIndexer {
         this.projectType = detectWorkspaceHelper(attributes.workspaceRoot);
 
         switch (this.projectType) {
-            case WorkspaceType.SFDX:
+            case 'SFDX':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.sfdx', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_PARTIAL:
+            case 'CORE_PARTIAL':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '..', '.vscode', 'typings', 'lwc');
                 break;
-            case WorkspaceType.CORE_ALL:
+            case 'CORE_ALL':
                 this.typingsBaseDir = path.join(this.workspaceRoot, '.vscode', 'typings', 'lwc');
                 break;
         }
     }
 
     init(): void {
-        initTypingIndexer(this);
+        if (this.projectType === 'SFDX') {
+            this.createNewMetaTypings();
+            this.deleteStaleMetaTypings();
+            this.saveCustomLabelTypings();
+        }
     }
 
     createNewMetaTypings(): void {
