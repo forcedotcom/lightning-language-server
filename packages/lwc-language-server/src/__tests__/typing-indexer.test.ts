@@ -73,18 +73,13 @@ describe('TypingIndexer', () => {
         });
 
         it('should not create a customlabels typing file when a project has no custom labels', async () => {
-            const xmlDocument = `
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
-`;
-            jest.spyOn(fs, 'readFileSync').mockReturnValue(Buffer.from(xmlDocument));
-            jest.spyOn(typingIndexer, 'customLabelFiles', 'get').mockReturnValue([
-                '/foo/bar/test-workspaces/sfdx-workspace/utils/meta/labels/CustomLabels.labels-meta.xml',
-            ]);
+            // Mock the getCustomLabelFiles function to return empty array (no custom labels)
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            jest.spyOn(require('../typing-indexer'), 'getCustomLabelFiles').mockReturnValue([]);
 
             const fileWriter = jest.spyOn(fs, 'writeFileSync');
             await typingIndexer.saveCustomLabelTypings();
-            expect(fileWriter).toBeCalledTimes(0);
+            expect(fileWriter).not.toHaveBeenCalled();
         });
     });
 

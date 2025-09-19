@@ -3,7 +3,46 @@
   "version": "4.12.11",
   "description": "Language server for Aura components.",
   "main": "lib/index.js",
+  "module": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./server": {
+      "import": "./lib/aura-server.js",
+      "require": "./lib/aura-server.js",
+      "types": "./lib/aura-server.d.ts"
+    },
+    "./context": {
+      "import": "./lib/context/aura-context.js",
+      "require": "./lib/context/aura-context.js",
+      "types": "./lib/context/aura-context.d.ts"
+    },
+    "./indexer": {
+      "import": "./lib/aura-indexer/indexer.js",
+      "require": "./lib/aura-indexer/indexer.js",
+      "types": "./lib/aura-indexer/indexer.d.ts"
+    },
+    "./utils": {
+      "import": "./lib/aura-utils.js",
+      "require": "./lib/aura-utils.js",
+      "types": "./lib/aura-utils.d.ts"
+    },
+    "./component-util": {
+      "import": "./lib/util/component-util.js",
+      "require": "./lib/util/component-util.js",
+      "types": "./lib/util/component-util.d.ts"
+    },
+    "./tern-server": {
+      "import": "./lib/tern-server/tern-server.js",
+      "require": "./lib/tern-server/tern-server.js",
+      "types": "./lib/tern-server/tern-server.d.ts"
+    }
+  },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",

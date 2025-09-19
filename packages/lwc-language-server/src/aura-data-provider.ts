@@ -1,4 +1,5 @@
 import { IAttributeData, ITagData, IValueData, IHTMLDataProvider } from 'vscode-html-languageservice';
+import { getAuraName, getTagDescription, getPublicAttributes } from './tag';
 import ComponentIndexer from './component-indexer';
 
 type DataProviderAttributes = {
@@ -22,9 +23,9 @@ export class AuraDataProvider implements IHTMLDataProvider {
     }
     provideTags(): ITagData[] {
         return this.indexer.customData.map((tag) => ({
-            name: tag.auraName,
-            description: tag.description,
-            attributes: tag.attributes,
+            name: getAuraName(tag),
+            description: getTagDescription(tag),
+            attributes: getPublicAttributes(tag),
         }));
     }
     provideAttributes(tagName: string): IAttributeData[] {

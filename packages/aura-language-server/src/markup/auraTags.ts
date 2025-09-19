@@ -1,5 +1,5 @@
 import AuraIndexer from '../aura-indexer/indexer';
-import { TagInfo } from '@salesforce/lightning-lsp-common';
+import { TagInfo, getHover } from '@salesforce/lightning-lsp-common';
 import { IAttributeData, IHTMLDataProvider, IValueData } from 'vscode-html-languageservice';
 
 let indexer: AuraIndexer;
@@ -25,7 +25,7 @@ export const setIndexer = (idx: AuraIndexer): void => {
 const getTagsData = (): { name: string; description?: string; attributes: IAttributeData[] }[] =>
     Array.from(getAuraTags()).map(([tag, tagInfo]) => ({
         name: tag,
-        description: tagInfo.getHover(),
+        description: getHover(tagInfo),
         attributes: tagInfo.attributes.map((attr) => ({
             name: attr.name,
             description: attr.name,

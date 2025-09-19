@@ -54,17 +54,10 @@ const externalToInternalLoc = (ext?: SourceLocation): InternalLocation | undefin
     };
 };
 
-const assertSingleDecorator: (decorators: LwcDecorator[], member: ClassProperty | ClassMethod) => asserts decorators is [LwcDecorator] = (
-    decorators,
-    member,
-) => {
+const getDecorator = (decorators: LwcDecorator[], member: ClassProperty | ClassMethod): LwcDecorator | null => {
     if (decorators.length && decorators.length > 1) {
         throw new Error(`Unexpected number of decorators in ${member.name}: ${member.decorators.length}`);
     }
-};
-
-const getDecorator = (decorators: LwcDecorator[], member: ClassProperty | ClassMethod): LwcDecorator | null => {
-    assertSingleDecorator(decorators, member);
     return decorators[0] ?? null;
 };
 

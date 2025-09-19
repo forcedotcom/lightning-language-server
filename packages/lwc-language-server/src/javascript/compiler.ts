@@ -6,7 +6,7 @@ import { DIAGNOSTIC_SOURCE, MAX_32BIT_INTEGER } from '../constants';
 import { BundleConfig, ScriptFile, collectBundleMetadata } from '@lwc/metadata';
 import { transformSync } from '@lwc/compiler';
 import { mapLwcMetadataToInternal } from './type-mapping';
-import { AttributeInfo, ClassMember } from '@salesforce/lightning-lsp-common';
+import { AttributeInfo, createAttributeInfo, ClassMember } from '@salesforce/lightning-lsp-common';
 import { Metadata } from '../decorators';
 import commentParser from 'comment-parser';
 
@@ -87,7 +87,7 @@ const toDiagnostic = (err: any): Diagnostic => {
     };
 };
 
-export const compileSource = async (source: string, fileName = 'foo.js'): Promise<CompilerResult> => {
+export const compileSource = (source: string, fileName = 'foo.js'): CompilerResult => {
     const name = fileName.substring(0, fileName.lastIndexOf('.'));
 
     const transformOptions = {
@@ -131,7 +131,7 @@ export const compileSource = async (source: string, fileName = 'foo.js'): Promis
 /**
  * Use to compile a live document (contents may be different from current file in disk)
  */
-export const compileDocument = (document: TextDocument): Promise<CompilerResult> => {
+export const compileDocument = (document: TextDocument): CompilerResult => {
     const file = URI.file(document.uri).fsPath;
     const filePath = path.parse(file);
     const fileName = filePath.base;
@@ -151,14 +151,14 @@ export const extractAttributes = (metadata: Metadata, uri: string): { privateAtt
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
             const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
-            publicAttributes.push(new AttributeInfo(name, x.doc, memberType, 'API', undefined, location, 'LWC custom attribute'));
+            publicAttributes.push(createAttributeInfo(name, x.doc, memberType, 'API', undefined, location, 'LWC custom attribute'));
         } else {
             const location = Location.create(uri, toVSCodeRange(x.loc));
 
             const name = x.name.replace(/([A-Z])/g, (match: string) => `-${match.toLowerCase()}`);
             const memberType = x.type === 'property' ? 'PROPERTY' : 'METHOD';
             const decorator = x.decorator === 'track' ? 'TRACK' : undefined;
-            privateAttributes.push(new AttributeInfo(name, x.doc, memberType, decorator, undefined, location, 'LWC custom attribute'));
+            privateAttributes.push(createAttributeInfo(name, x.doc, memberType, decorator, undefined, location, 'LWC custom attribute'));
         }
     }
     return {

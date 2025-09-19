@@ -1,5 +1,5 @@
 import ComponentIndexer, { unIndexedFiles } from '../component-indexer';
-import Tag from '../tag';
+import { Tag, createTag, getTagName } from '../tag';
 import { Entry } from 'fast-glob';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
@@ -61,12 +61,12 @@ describe('ComponentIndexer', () => {
 
         describe('findTagByName', () => {
             it('finds tag with an exact match', async () => {
-                expect(componentIndexer.findTagByName('hello_world').name).toEqual('hello_world');
+                expect(getTagName(componentIndexer.findTagByName('hello_world'))).toEqual('hello_world');
                 expect(componentIndexer.findTagByName('foo')).toBeNull();
             });
 
             it('finds tag with lwc prefix', async () => {
-                expect(componentIndexer.findTagByName('c-hello_world').name).toEqual('hello_world');
+                expect(getTagName(componentIndexer.findTagByName('c-hello_world'))).toEqual('hello_world');
                 expect(componentIndexer.findTagByName('c-hello-world')).toBeNull();
                 expect(componentIndexer.findTagByName('c-helloWorld')).toBeNull();
                 expect(componentIndexer.findTagByName('c-todo-foo')).toBeNull();
@@ -75,9 +75,9 @@ describe('ComponentIndexer', () => {
             it('finds tag with aura prefix', async () => {
                 expect(componentIndexer.findTagByName('c:hello_world')).toBeNull();
                 expect(componentIndexer.findTagByName('c:hello-world')).toBeNull();
-                expect(componentIndexer.findTagByName('c:helloWorld').name).toEqual('hello_world');
-                expect(componentIndexer.findTagByName('c:todo').name).toEqual('todo');
-                expect(componentIndexer.findTagByName('c:todoItem').name).toEqual('todo_item');
+                expect(getTagName(componentIndexer.findTagByName('c:helloWorld'))).toEqual('hello_world');
+                expect(getTagName(componentIndexer.findTagByName('c:todo'))).toEqual('todo');
+                expect(getTagName(componentIndexer.findTagByName('c:todoItem'))).toEqual('todo_item');
                 expect(componentIndexer.findTagByName('c:todo-foo')).toBeNull();
             });
 
@@ -184,7 +184,7 @@ describe('ComponentIndexer', () => {
                 const stats = new Stats();
                 stats.mtime = new Date('2020-01-01');
                 const dirent = new Dirent();
-                const tags: Tag[] = [new Tag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
+                const tags: Tag[] = [createTag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
                 const entries: Entry[] = [{ path: '/foo', stats, dirent, name: 'foo' }];
 
                 expect(unIndexedFiles(entries, tags).length).toEqual(0);
@@ -194,7 +194,7 @@ describe('ComponentIndexer', () => {
                 const stats = new Stats();
                 stats.mtime = new Date('2020-02-01');
                 const dirent = new Dirent();
-                const tags: Tag[] = [new Tag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
+                const tags: Tag[] = [createTag({ file: '/foo', updatedAt: new Date('2020-01-01') })];
                 const entries: Entry[] = [{ path: '/foo', stats, dirent, name: 'foo' }];
 
                 expect(unIndexedFiles(entries, tags).length).toEqual(1);

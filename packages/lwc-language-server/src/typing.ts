@@ -28,42 +28,47 @@ const declaration = (type: string, name: string): string => {
 }`;
 };
 
-export default class Typing {
-    private static allowedTypes: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
+// Type definition for Typing data structure
+export type Typing = {
+    type: string;
+    name: string;
+    fileName: string;
+};
 
-    readonly type: string;
-    readonly name: string;
-    readonly fileName: string;
+// Allowed types constant
+const ALLOWED_TYPES: string[] = ['asset', 'resource', 'messageChannel', 'customLabel'];
 
-    constructor(attributes: any) {
-        if (!Typing.allowedTypes.includes(attributes.type)) {
-            const errorMessage: string = 'Cannot create a Typing with "' + attributes.type + '" type. Must be one of [' + Typing.allowedTypes.toString() + ']';
-
-            throw new Error(errorMessage);
-        }
-
-        this.type = attributes.type;
-        this.name = attributes.name;
-        this.fileName = `${attributes.name}.${attributes.type}.d.ts`;
+// Factory function to create Typing objects
+export const createTyping = (attributes: { type: string; name: string }): Typing => {
+    if (!ALLOWED_TYPES.includes(attributes.type)) {
+        const errorMessage: string = 'Cannot create a Typing with "' + attributes.type + '" type. Must be one of [' + ALLOWED_TYPES.toString() + ']';
+        throw new Error(errorMessage);
     }
 
-    static fromMeta(metaFilename: string): Typing {
-        const parsedPath = path.parse(metaFilename);
-        const { name, type } = metaRegex.exec(parsedPath.name).groups;
-        return new Typing({ name, type });
-    }
+    return {
+        type: attributes.type,
+        name: attributes.name,
+        fileName: `${attributes.name}.${attributes.type}.d.ts`,
+    };
+};
 
-    static async declarationsFromCustomLabels(xmlDocument: string | Buffer): Promise<string> {
-        const doc = await new xml2js.Parser().parseStringPromise(xmlDocument);
-        if (doc.CustomLabels === undefined || doc.CustomLabels.labels === undefined) {
-            return '';
-        }
-        const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => declaration('customLabel', label.fullName[0]));
+// Utility function to create Typing from meta filename
+export const fromMeta = (metaFilename: string): Typing => {
+    const parsedPath = path.parse(metaFilename);
+    const { name, type } = metaRegex.exec(parsedPath.name).groups;
+    return createTyping({ name, type });
+};
 
-        return declarations.join('\n');
+// Utility function to generate declarations from custom labels
+export const declarationsFromCustomLabels = async (xmlDocument: string | Buffer): Promise<string> => {
+    const doc = await new xml2js.Parser().parseStringPromise(xmlDocument);
+    if (doc.CustomLabels === undefined || doc.CustomLabels.labels === undefined) {
+        return '';
     }
+    const declarations = doc.CustomLabels.labels.map((label: { [key: string]: string[] }) => declaration('customLabel', label.fullName[0]));
 
-    get declaration(): string {
-        return declaration(this.type, this.name);
-    }
-}
+    return declarations.join('\n');
+};
+
+// Utility function to get declaration for a Typing object
+export const getDeclaration = (typing: Typing): string => declaration(typing.type, typing.name);

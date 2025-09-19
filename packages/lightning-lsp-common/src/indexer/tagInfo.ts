@@ -2,94 +2,112 @@ import { Location } from 'vscode-languageserver';
 import { AttributeInfo } from './attributeInfo';
 import { ClassMember } from '../decorators';
 
-type TagType = 'STANDARD' | 'SYSTEM' | 'CUSTOM';
+export type TagType = 'STANDARD' | 'SYSTEM' | 'CUSTOM';
 
-export class TagInfo {
-    constructor(
-        public file: string,
-        public type: TagType,
-        public lwc: boolean,
-        public attributes: AttributeInfo[],
-        public location?: Location,
-        public documentation?: string,
-        public name?: string,
-        public namespace?: string,
-        public properties?: ClassMember[],
-        public methods?: ClassMember[],
-    ) {
-        this.attributes = attributes;
-        this.location = location;
-        this.documentation = documentation;
-        this.name = name;
-        this.namespace = namespace;
-        if (!this.documentation) {
-            this.documentation = '';
+// Type definition for TagInfo data structure
+export type TagInfo = {
+    file: string;
+    type: TagType;
+    lwc: boolean;
+    attributes: AttributeInfo[];
+    location?: Location;
+    documentation?: string;
+    name?: string;
+    namespace?: string;
+    properties?: ClassMember[];
+    methods?: ClassMember[];
+};
+
+// Factory function to create TagInfo objects
+export const createTagInfo = (
+    file: string,
+    type: TagType,
+    lwc: boolean,
+    attributes: AttributeInfo[],
+    location?: Location,
+    documentation?: string,
+    name?: string,
+    namespace?: string,
+    properties?: ClassMember[],
+    methods?: ClassMember[],
+): TagInfo => ({
+    file,
+    type,
+    lwc,
+    attributes,
+    location,
+    documentation: documentation || '',
+    name,
+    namespace,
+    properties,
+    methods,
+});
+
+// Utility function to get attribute info by name
+export const getAttributeInfo = (tagInfo: TagInfo, attribute: string): AttributeInfo | null => {
+    attribute = attribute.toLowerCase();
+    for (const info of tagInfo.attributes) {
+        if (attribute === info.name.toLowerCase()) {
+            return info;
         }
-        this.properties = properties;
-        this.methods = methods;
+    }
+    return null;
+};
+
+// Utility function to get hover information
+export const getHover = (tagInfo: TagInfo, hideComponentLibraryLink?: boolean): string | null => {
+    let retVal = tagInfo.documentation + '\n' + getComponentLibraryLink(tagInfo) + '\n### Attributes\n';
+    if (hideComponentLibraryLink || tagInfo.type === 'CUSTOM') {
+        retVal = tagInfo.documentation + '\n### Attributes\n';
     }
 
-    public getAttributeInfo(attribute: string): AttributeInfo | null {
-        attribute = attribute.toLowerCase();
-        for (const info of this.attributes) {
-            if (attribute === info.name.toLowerCase()) {
-                return info;
-            }
-        }
-        return null;
+    for (const info of tagInfo.attributes) {
+        retVal += getAttributeMarkdown(info);
+        retVal += '\n';
     }
 
-    public getHover(hideComponentLibraryLink?: boolean): string | null {
-        let retVal = this.documentation + '\n' + this.getComponentLibraryLink() + '\n### Attributes\n';
-        if (hideComponentLibraryLink || this.type === 'CUSTOM') {
-            retVal = this.documentation + '\n### Attributes\n';
-        }
-
-        for (const info of this.attributes) {
-            retVal += this.getAttributeMarkdown(info);
+    const methods = (tagInfo.methods && tagInfo.methods.filter((m) => m.decorator === 'api')) || [];
+    if (methods.length > 0) {
+        retVal += tagInfo.documentation + '\n### Methods\n';
+        for (const info of methods) {
+            retVal += getMethodMarkdown(info);
             retVal += '\n';
         }
-
-        const methods = (this.methods && this.methods.filter((m) => m.decorator === 'api')) || [];
-        if (methods.length > 0) {
-            retVal += this.documentation + '\n### Methods\n';
-            for (const info of methods) {
-                retVal += this.getMethodMarkdown(info);
-                retVal += '\n';
-            }
-        }
-
-        return retVal;
     }
 
-    public getComponentLibraryLink(): string | null {
-        return '[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/' + this.name + ')';
+    return retVal;
+};
+
+// Utility function to get component library link
+export const getComponentLibraryLink = (tagInfo: TagInfo): string | null =>
+    '[View in Component Library](https://developer.salesforce.com/docs/component-library/bundle/' + tagInfo.name + ')';
+
+// Utility function to get attribute markdown
+export const getAttributeMarkdown = (attribute: AttributeInfo): string => {
+    if (attribute.name && attribute.type && attribute.documentation) {
+        return '* **' + attribute.name + '**: *' + attribute.type + '* ' + attribute.documentation;
     }
 
-    public getAttributeMarkdown(attribute: AttributeInfo): string {
-        if (attribute.name && attribute.type && attribute.documentation) {
-            return '* **' + attribute.name + '**: *' + attribute.type + '* ' + attribute.documentation;
-        }
-
-        if (attribute.name && attribute.type) {
-            return '* **' + attribute.name + '**: *' + attribute.type + '*';
-        }
-
-        if (attribute.name) {
-            return '* **' + attribute.name + '**';
-        }
-
-        return '';
+    if (attribute.name && attribute.type) {
+        return '* **' + attribute.name + '**: *' + attribute.type + '*';
     }
-    public getMethodMarkdown(method: ClassMember): string {
-        if (method.name && method.doc) {
-            return '* **' + method.name + '()**: ' + method.doc;
-        }
 
-        if (method.name) {
-            return '* **' + method.name + '()**';
-        }
-
-        return '';
+    if (attribute.name) {
+        return '* **' + attribute.name + '**';
     }
-}
+
+    return '';
+};
+
+// Utility function to get method markdown
+export const getMethodMarkdown = (method: ClassMember): string => {
+    if (method.name && method.doc) {
+        return '* **' + method.name + '()**: ' + method.doc;
+    }
+
+    if (method.name) {
+        return '* **' + method.name + '()**';
+    }
+
+    return '';
+};

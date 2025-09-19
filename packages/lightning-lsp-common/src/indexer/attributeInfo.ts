@@ -1,17 +1,34 @@
 import { Location } from 'vscode-languageserver';
 
+export type AttributeInfo = {
+    name: string;
+    documentation: string;
+    memberType: MemberType;
+    decorator: DecoratorType;
+    type: string;
+    location?: Location;
+    detail?: string;
+};
+
 export type MemberType = 'PROPERTY' | 'METHOD';
 
 export type DecoratorType = 'API' | 'TRACK';
 
-export class AttributeInfo {
-    constructor(
-        public name: string,
-        public documentation: string,
-        public memberType: MemberType,
-        public decorator: DecoratorType,
-        public type: string,
-        public location?: Location,
-        public detail?: string,
-    ) {}
-}
+// Factory function to replace constructor usage
+export const createAttributeInfo = (
+    name: string,
+    documentation: string,
+    memberType: MemberType,
+    decorator: DecoratorType,
+    type: string,
+    location?: Location,
+    detail?: string,
+): AttributeInfo => ({
+    name,
+    documentation,
+    memberType,
+    decorator,
+    type,
+    location,
+    detail,
+});

@@ -3,6 +3,65 @@
   "version": "4.12.11",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
+  "module": "lib/indexer.js",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./lib/indexer.js",
+      "require": "./lib/indexer.js",
+      "types": "./lib/indexer.d.ts"
+    },
+    "./server": {
+      "import": "./lib/lwc-server.js",
+      "require": "./lib/lwc-server.js",
+      "types": "./lib/lwc-server.d.ts"
+    },
+    "./context": {
+      "import": "./lib/context/lwc-context.js",
+      "require": "./lib/context/lwc-context.js",
+      "types": "./lib/context/lwc-context.d.ts"
+    },
+    "./component-indexer": {
+      "import": "./lib/component-indexer.js",
+      "require": "./lib/component-indexer.js",
+      "types": "./lib/component-indexer.d.ts"
+    },
+    "./javascript": {
+      "import": "./lib/javascript/compiler.js",
+      "require": "./lib/javascript/compiler.js",
+      "types": "./lib/javascript/compiler.d.ts"
+    },
+    "./decorators": {
+      "import": "./lib/decorators/lwc-decorators.js",
+      "require": "./lib/decorators/lwc-decorators.js",
+      "types": "./lib/decorators/lwc-decorators.d.ts"
+    },
+    "./template": {
+      "import": "./lib/template/linter.js",
+      "require": "./lib/template/linter.js",
+      "types": "./lib/template/linter.d.ts"
+    },
+    "./typing": {
+      "import": "./lib/typing.js",
+      "require": "./lib/typing.js",
+      "types": "./lib/typing.d.ts"
+    },
+    "./tag": {
+      "import": "./lib/tag.js",
+      "require": "./lib/tag.js",
+      "types": "./lib/tag.d.ts"
+    },
+    "./typing-indexer": {
+      "import": "./lib/typing-indexer.js",
+      "require": "./lib/typing-indexer.js",
+      "types": "./lib/typing-indexer.d.ts"
+    },
+    "./base-indexer": {
+      "import": "./lib/base-indexer.js",
+      "require": "./lib/base-indexer.js",
+      "types": "./lib/base-indexer.d.ts"
+    }
+  },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",

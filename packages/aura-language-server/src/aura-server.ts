@@ -23,11 +23,17 @@ import {
 import { getLanguageService, LanguageService, CompletionList } from 'vscode-html-languageservice';
 
 import URI from 'vscode-uri';
-import { utils, interceptConsoleLogger, TagInfo } from '@salesforce/lightning-lsp-common';
+import {
+    toResolvedPath,
+    interceptConsoleLogger,
+    TagInfo,
+    elapsedMillis,
+    isAuraRootDirectoryCreated,
+    isAuraWatchedDirectory,
+} from '@salesforce/lightning-lsp-common';
 import { AuraWorkspaceContext } from './context/aura-context';
 import { startServer, addFile, delFile, onCompletion, onHover, onDefinition, onTypeDefinition, onReferences, onSignatureHelp } from './tern-server/tern-server';
 import AuraIndexer from './aura-indexer/indexer';
-import { toResolvedPath } from '@salesforce/lightning-lsp-common/lib/utils';
 import { setIndexer, getAuraTagProvider } from './markup/auraTags';
 import { getAuraBindingTemplateDeclaration, getAuraBindingValue } from './aura-utils';
 
@@ -106,7 +112,7 @@ export default class Server {
             this.htmlLS = getLanguageService();
             this.htmlLS.setDataProviders(true, [getAuraTagProvider()]);
 
-            console.info('... language server started in ' + utils.elapsedMillis(startTime));
+            console.info('... language server started in ' + elapsedMillis(startTime));
 
             return {
                 capabilities: {
@@ -265,16 +271,16 @@ export default class Server {
         const changes = change.changes;
 
         try {
-            if (utils.isAuraRootDirectoryCreated(this.context, changes)) {
+            if (isAuraRootDirectoryCreated(this.context, changes)) {
                 this.context.getIndexingProvider('aura').resetIndex();
-                await this.context.getIndexingProvider('aura').configureAndIndex();
+                this.context.getIndexingProvider('aura').configureAndIndex();
                 // re-index everything on directory deletions as no events are reported for contents of deleted directories
                 const startTime = process.hrtime();
-                console.info('reindexed workspace in ' + utils.elapsedMillis(startTime) + ', directory was deleted:', changes);
+                console.info('reindexed workspace in ' + elapsedMillis(startTime) + ', directory was deleted:', changes);
                 return;
             } else {
                 for (const event of changes) {
-                    if (event.type === FileChangeType.Deleted && utils.isAuraWatchedDirectory(this.context, event.uri)) {
+                    if (event.type === FileChangeType.Deleted && isAuraWatchedDirectory(this.context, event.uri)) {
                         const dir = toResolvedPath(event.uri);
                         this.auraIndexer.clearTagsforDirectory(dir, this.context.type === 'SFDX');
                     } else {

@@ -1,67 +1,66 @@
-import Typing from '../typing';
+import { Typing, createTyping, fromMeta, declarationsFromCustomLabels, getDeclaration } from '../typing';
 import * as path from 'path';
 
-describe('new Typing', () => {
+describe('createTyping', () => {
     it('cannot create a Typing with an invalid type', () => {
-        expect(
-            () =>
-                new Typing({
-                    name: 'logo',
-                    type: 'invalidType',
-                }),
+        expect(() =>
+            createTyping({
+                name: 'logo',
+                type: 'invalidType',
+            }),
         ).toThrow();
     });
 
     it('cannot create a Typing with an invalid meta file', () => {
         const filename = 'asset.foobar-meta.xml';
         expect(() => {
-            Typing.fromMeta(filename);
+            fromMeta(filename);
         }).toThrow();
     });
 });
 
-describe('Typing.declaration', () => {
+describe('getDeclaration', () => {
     it('generates the typing declaration for a content asset file.', () => {
-        const typing: Typing = Typing.fromMeta('logo.asset-meta.xml');
+        const typing: Typing = fromMeta('logo.asset-meta.xml');
         const expectedDeclaration = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;
 }`;
 
-        expect(typing.declaration).toEqual(expectedDeclaration);
+        expect(getDeclaration(typing)).toEqual(expectedDeclaration);
     });
 
     it('generate the typing declaration for a static resource file', () => {
-        const typing: Typing = Typing.fromMeta('d3.resource-meta.xml');
+        const typing: Typing = fromMeta('d3.resource-meta.xml');
         const expectedDeclaration = `declare module "@salesforce/resourceUrl/d3" {
     var d3: string;
     export default d3;
 }`;
 
-        expect(typing.declaration).toEqual(expectedDeclaration);
+        expect(getDeclaration(typing)).toEqual(expectedDeclaration);
     });
 
     it('generate the typing declaration for a message channels file', () => {
-        const typing: Typing = Typing.fromMeta('Channel1.messageChannel-meta.xml');
+        const typing: Typing = fromMeta('Channel1.messageChannel-meta.xml');
         const expectedDeclaration = `declare module "@salesforce/messageChannel/Channel1__c" {
     var Channel1: string;
     export default Channel1;
 }`;
 
-        expect(typing.declaration).toEqual(expectedDeclaration);
+        expect(getDeclaration(typing)).toEqual(expectedDeclaration);
     });
 
     it('handles a full path', async () => {
-        const typing: Typing = Typing.fromMeta(path.join('.', 'foo', 'bar', 'buz', 'logo.asset-meta.xml'));
+        const typing: Typing = fromMeta(path.join('.', 'foo', 'bar', 'buz', 'logo.asset-meta.xml'));
         const expectedDeclaration = `declare module "@salesforce/contentAssetUrl/logo" {
     var logo: string;
     export default logo;
 }`;
-        expect(typing.declaration).toEqual(expectedDeclaration);
+        expect(getDeclaration(typing)).toEqual(expectedDeclaration);
     });
 });
 
-describe('Typing.fromCustomLabels', () => {
+describe('declarationsFromCustomLabels', () => {
     it('Generates declarations from parsed xml document', async () => {
         const xmlDocument = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -93,7 +92,7 @@ describe('Typing.fromCustomLabels', () => {
     export default other_greeting;
 }`;
 
-        const typings: string = await Typing.declarationsFromCustomLabels(xmlDocument);
+        const typings: string = await declarationsFromCustomLabels(xmlDocument);
         const expectedDeclarations: string = [expectedDeclaration1, expectedDeclaration2].join('\n');
 
         expect(typings).toEqual(expectedDeclarations);
@@ -105,7 +104,7 @@ describe('Typing.fromCustomLabels', () => {
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata"/>
 `;
 
-        const typings: string = await Typing.declarationsFromCustomLabels(xmlDocument);
+        const typings: string = await declarationsFromCustomLabels(xmlDocument);
         expect(typings).toEqual('');
     });
 });

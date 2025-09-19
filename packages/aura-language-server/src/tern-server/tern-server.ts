@@ -9,7 +9,7 @@ import URI from 'vscode-uri';
 import browser from '../tern/defs/browser.json';
 import ecmascript from '../tern/defs/ecmascript.json';
 
-import { memoize } from '@salesforce/lightning-lsp-common/lib/utils';
+import { memoize } from '@salesforce/lightning-lsp-common';
 import {
     TextDocumentPositionParams,
     CompletionList,
