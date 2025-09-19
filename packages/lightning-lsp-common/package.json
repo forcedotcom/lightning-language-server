@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lightning-lsp-common",
-  "version": "4.12.11",
+  "version": "4.12.12",
   "description": "Common components for lwc-language-server and aura-language-server.",
   "main": "lib/index.js",
   "module": "lib/index.js",

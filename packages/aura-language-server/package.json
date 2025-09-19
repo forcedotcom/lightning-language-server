@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/aura-language-server",
-  "version": "4.12.11",
+  "version": "4.12.12",
   "description": "Language server for Aura components.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -66,7 +66,7 @@
     "package": "yarn pack"
   },
   "dependencies": {
-    "@salesforce/lightning-lsp-common": "4.12.11",
+    "@salesforce/lightning-lsp-common": "4.12.12",
     "acorn-loose": "^6.0.0",
     "acorn-walk": "^6.0.0",
     "line-column": "^1.0.2",
