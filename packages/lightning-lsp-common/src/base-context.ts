@@ -365,59 +365,44 @@ export abstract class BaseWorkspaceContext {
     }
 
     private async writeTypings(): Promise<void> {
+        let typingsDir: string;
+
         switch (this.type) {
             case 'SFDX':
-                await this.writeSfdxTypings();
+                typingsDir = path.join(this.workspaceRoots[0], '.sfdx', 'typings', 'lwc');
+                break;
+            case 'CORE_PARTIAL':
+                typingsDir = path.join(this.workspaceRoots[0], '..', '.vscode', 'typings', 'lwc');
                 break;
             case 'CORE_ALL':
-            case 'CORE_PARTIAL':
-                await this.writeCoreTypings();
-                break;
-            default:
-                // No typings needed for other workspace types
+                typingsDir = path.join(this.workspaceRoots[0], '.vscode', 'typings', 'lwc');
                 break;
         }
-    }
 
-    private async writeSfdxTypings(): Promise<void> {
-        const typingsPath = path.join(this.workspaceRoots[0], '.sfdx', 'typings', 'lwc');
-        await this.createTypingsFiles(typingsPath);
-    }
-
-    private async writeCoreTypings(): Promise<void> {
-        const coreDir = this.type === 'CORE_ALL' ? this.workspaceRoots[0] : path.dirname(this.workspaceRoots[0]);
-        const typingsPath = path.join(coreDir, '.vscode', 'typings', 'lwc');
-        await this.createTypingsFiles(typingsPath);
-    }
-
-    private async createTypingsFiles(typingsPath: string): Promise<void> {
-        // Create the typings directory
-        fs.mkdirSync(typingsPath, { recursive: true });
-
-        // Create basic typings files
-        const engineTypings = `declare module '@salesforce/resourceUrl/*' {
-    var url: string;
-    export = url;
-}`;
-
-        const ldsTypings = `declare module '@salesforce/label/*' {
-    var label: string;
-    export = label;
-}`;
-
-        const apexTypings = `declare module '@salesforce/apex/*' {
-    var apex: any;
-    export = apex;
-}`;
-
-        const schemaTypings = `declare module '@salesforce/schema' {
-    export * from './schema';
-}`;
-
-        await fs.promises.writeFile(path.join(typingsPath, 'engine.d.ts'), engineTypings);
-        await fs.promises.writeFile(path.join(typingsPath, 'lds.d.ts'), ldsTypings);
-        await fs.promises.writeFile(path.join(typingsPath, 'apex.d.ts'), apexTypings);
-        await fs.promises.writeFile(path.join(typingsPath, 'schema.d.ts'), schemaTypings);
+        // TODO should we just be copying every file in this directory rather than hardcoding?
+        if (typingsDir) {
+            // copy typings to typingsDir
+            const resourceTypingsDir = utils.getSfdxResource('typings');
+            await fs.promises.mkdir(typingsDir, { recursive: true });
+            try {
+                await fs.promises.copyFile(path.join(resourceTypingsDir, 'lds.d.ts'), path.join(typingsDir, 'lds.d.ts'));
+            } catch (ignore) {
+                // ignore
+            }
+            try {
+                await fs.promises.copyFile(path.join(resourceTypingsDir, 'messageservice.d.ts'), path.join(typingsDir, 'messageservice.d.ts'));
+            } catch (ignore) {
+                // ignore
+            }
+            const dirs = await fs.promises.readdir(path.join(resourceTypingsDir, 'copied'));
+            for (const file of dirs) {
+                try {
+                    await fs.promises.copyFile(path.join(resourceTypingsDir, 'copied', file), path.join(typingsDir, file));
+                } catch (ignore) {
+                    // ignore
+                }
+            }
+        }
     }
 
     private async getSettings(): Promise<any> {
