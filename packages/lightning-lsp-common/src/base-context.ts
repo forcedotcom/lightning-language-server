@@ -6,7 +6,6 @@
  */
 
 import * as fs from 'fs';
-import { homedir } from 'os';
 import * as path from 'path';
 import { TextDocument } from 'vscode-languageserver';
 import ejs from 'ejs';
@@ -74,27 +73,6 @@ export const updateForceIgnoreFile = async (forceignorePath: string, addTsConfig
 
     // Always write the forceignore file, even if it's empty
     await fs.promises.writeFile(forceignorePath, forceignoreContent.trim());
-};
-
-const getESLintToolVersion = async (): Promise<string> => {
-    const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
-    const packageJsonPath = path.join(eslintToolDir, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-        const packageJson = JSON.parse(await fs.promises.readFile(packageJsonPath, 'utf8'));
-        return packageJson.version;
-    }
-    return '1.0.3';
-};
-
-const findCoreESLint = async (): Promise<string> => {
-    const eslintToolDir = path.join(homedir(), 'tools', 'eslint-tool');
-    if (!fs.existsSync(eslintToolDir)) {
-        console.warn('core eslint-tool not installed: ' + eslintToolDir);
-        // default
-        return '~/tools/eslint-tool/1.0.3/node_modules';
-    }
-    const eslintToolVersion = await getESLintToolVersion();
-    return path.join(eslintToolDir, eslintToolVersion, 'node_modules');
 };
 
 // exported for testing
@@ -416,15 +394,11 @@ export abstract class BaseWorkspaceContext {
             folders: this.workspaceRoots.map((root) => ({ path: root })),
             settings: {},
         };
-        const eslintPath = await findCoreESLint();
-        await this.updateCoreCodeWorkspace(workspace.settings, eslintPath);
+        await this.updateCoreCodeWorkspace(workspace.settings);
         return workspace;
     }
 
     private async updateCoreSettings(settings: any): Promise<void> {
-        // Get eslint path once to avoid multiple warnings
-        const eslintPath = await findCoreESLint();
-
         try {
             // Load core settings template
             const coreSettingsTemplate = await fs.promises.readFile(utils.getCoreResource('settings-core.json'), 'utf8');
@@ -435,7 +409,6 @@ export abstract class BaseWorkspaceContext {
 
             // Update eslint settings
             settings['eslint.workingDirectories'] = this.workspaceRoots;
-            settings['eslint.nodePath'] = eslintPath;
             settings['eslint.validate'] = ['javascript', 'typescript'];
             settings['eslint.options'] = {
                 overrideConfigFile: path.join(this.workspaceRoots[0], '.eslintrc.json'),
@@ -449,7 +422,6 @@ export abstract class BaseWorkspaceContext {
             console.error('updateCoreSettings: Error loading core settings template:', error);
             // Fallback to basic settings
             settings['eslint.workingDirectories'] = this.workspaceRoots;
-            settings['eslint.nodePath'] = eslintPath;
             settings['eslint.validate'] = ['javascript', 'typescript'];
             settings['eslint.options'] = {
                 overrideConfigFile: path.join(this.workspaceRoots[0], '.eslintrc.json'),
@@ -457,9 +429,8 @@ export abstract class BaseWorkspaceContext {
         }
     }
 
-    private async updateCoreCodeWorkspace(settings: any, eslintPath: string): Promise<void> {
+    private async updateCoreCodeWorkspace(settings: any): Promise<void> {
         settings['eslint.workingDirectories'] = this.workspaceRoots;
-        settings['eslint.nodePath'] = eslintPath;
         settings['eslint.validate'] = ['javascript', 'typescript'];
         settings['eslint.options'] = {
             overrideConfigFile: path.join(this.workspaceRoots[0], '.eslintrc.json'),

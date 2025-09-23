@@ -12,7 +12,6 @@
       "test-workspaces/core-like-workspace/app/main/core/ui-force-components",
       "test-workspaces/core-like-workspace/app/main/core/ui-global-components"
     ],
-    "eslint.nodePath": "~/tools/eslint-tool/1.0.3/node_modules",
     "eslint.validate": [
       "javascript",
       "typescript"
