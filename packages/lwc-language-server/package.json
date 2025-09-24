@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/lwc-language-server",
-  "version": "4.12.12",
+  "version": "4.12.13",
   "description": "Language server for Lightning Web Components.",
   "main": "lib/indexer.js",
   "module": "lib/indexer.js",
@@ -92,7 +92,7 @@
     "@lwc/template-compiler": "8.16.0",
     "@salesforce/apex": "0.0.21",
     "@salesforce/label": "0.0.21",
-    "@salesforce/lightning-lsp-common": "4.12.12",
+    "@salesforce/lightning-lsp-common": "4.12.13",
     "@salesforce/resourceurl": "0.0.21",
     "@salesforce/schema": "0.0.21",
     "camelcase": "^6.0.0",
