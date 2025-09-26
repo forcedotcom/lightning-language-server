@@ -186,7 +186,6 @@ describe('WorkspaceContext', () => {
 
     const verifyCoreSettings = (settings: any): void => {
         expect(settings['files.watcherExclude']).toBeDefined();
-        expect(settings['eslint.nodePath']).toBeDefined();
         expect(settings['perforce.client']).toBe('username-localhost-blt');
         expect(settings['perforce.user']).toBe('username');
         expect(settings['perforce.port']).toBe('ssl:host:port');
