@@ -38,6 +38,6 @@
         "extensions.ignoreRecommendations": true,
         "salesforcedx-vscode-lightning.activationMode": "always",
         "salesforcedx-vscode-lightning.showLightningExplorer": true,
-        "salesforcedx-vscode-core.internal-development": true
+        "salesforcedx-vscode-core.internal-development": false
     }
 }

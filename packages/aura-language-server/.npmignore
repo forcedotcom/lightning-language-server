@@ -1,12 +1,12 @@
 # Dev config folders
-/.circleci
-/.vscode
-/coverage
-/patches
-/src
-/test-workspaces
-/typings
-**/__tests__/**
+.circleci/
+.vscode/
+coverage/
+patches/
+src/
+test-workspaces/
+typings/
+**/__tests__/
 
 # Configuration files
 .eslintignore
@@ -18,8 +18,12 @@
 CONTRIBUTING.md
 copy-static-assets.ts
 jest.config.js
+jest.setup.js
 tsconfig.json
 tslint.json
+
+# Development files
+core.code-workspace
 
 # Ignore artifacts
 *.tgz
